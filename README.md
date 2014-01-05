@@ -6,7 +6,7 @@ Audio library for Teensy 3.0 &amp; 3.1
 This is *BETA* status code.  It works pretty well, but it's still under very active
 development.
 
-*APIs are likely to incompatibly change*.
+**APIs are likely to incompatibly change**.
 
 Please discuss any issues here.
 code
