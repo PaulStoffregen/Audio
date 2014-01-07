@@ -1287,6 +1287,12 @@ start:
 			// below will depend upon this and fail if not even.
 			leftover_bytes = 0;
 			state = state_play;
+			if (state & 1) {
+				// if we're going to start stereo
+				// better allocate another output block
+				block_right = allocate();
+				if (!block_right) return false;
+			}
 		} else {
 			state = STATE_PARSE4;
 		}
@@ -1314,11 +1320,8 @@ start:
 
 	  // playing mono at native sample rate
 	  case STATE_DIRECT_16BIT_MONO:
-		if (size > data_length) {
-			size = data_length;
-		}
+		if (size > data_length) size = data_length;
 		data_length -= size;
-
 		while (1) {
 			lsb = *p++;
 			msb = *p++;
@@ -1348,9 +1351,52 @@ start:
 		state = STATE_STOP;
 		return false;
 
-
 	  // playing stereo at native sample rate
 	  case STATE_DIRECT_16BIT_STEREO:
+		if (size > data_length) size = data_length;
+		data_length -= size;
+		if (leftover_bytes) {
+			block_left->data[block_offset] = header[0];
+			goto right16;
+		}
+		while (1) {
+			lsb = *p++;
+			msb = *p++;
+			size -= 2;
+			if (size == 0) {
+				if (data_length == 0) break;
+				header[0] = (msb << 8) | lsb;
+				leftover_bytes = 2;
+				return false;
+			}
+			block_left->data[block_offset] = (msb << 8) | lsb;
+			right16:
+			lsb = *p++;
+			msb = *p++;
+			size -= 2;
+			block_right->data[block_offset++] = (msb << 8) | lsb;
+			if (block_offset >= AUDIO_BLOCK_SAMPLES) {
+				transmit(block_left, 0);
+				release(block_left);
+				block_left = NULL;
+				transmit(block_right, 1);
+				release(block_right);
+				block_right = NULL;
+				data_length += size;
+				buffer_remaining = size;
+				return true;
+			}
+			if (size == 0) {
+				if (data_length == 0) break;
+				leftover_bytes = 0;
+				return false;
+			}
+		}
+		// end of file reached
+		if (block_offset > 0) {
+			// TODO: fill remainder of last block with zero and transmit
+		}
+		state = STATE_STOP;
 		return false;
 
 	  // playing mono, converting sample rate
