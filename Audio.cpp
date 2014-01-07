@@ -1159,13 +1159,17 @@ void AudioPlaySDcardWAV::update(void)
 	// allocate the audio blocks to transmit
 	block_left = allocate();
 	if (block_left == NULL) return;
-	if (state >= 8 || (state & 1) == 1) {
+	if (state < 8 && (state & 1) == 1) {
+		// if we're playing stereo, allocate another
+		// block for the right channel output
 		block_right = allocate();
 		if (block_right == NULL) {
 			release(block_left);
 			return;
 		}
 	} else {
+		// if we're playing mono or just parsing
+		// the WAV file header, no right-side block
 		block_right = NULL;
 	}
 	block_offset = 0;
@@ -1178,6 +1182,7 @@ void AudioPlaySDcardWAV::update(void)
 		if (consume()) return; // it was enough to transmit audio
 	}
 
+	// we only get to this point when buffer[512] is empty
 	if (state != STATE_STOP && wavfile.available()) {
 		// we can read more data from the file...
 		buffer_remaining = wavfile.read(buffer, 512);
@@ -1214,7 +1219,6 @@ bool AudioPlaySDcardWAV::consume(void)
 
 	size = buffer_remaining;
 	p = buffer + 512 - size;
-	
 start:
 	if (size == 0) return false;
 	//Serial.print("AudioPlaySDcardWAV write, size = ");
@@ -1278,6 +1282,9 @@ start:
 		data_length = header[1];
 		if (header[0] == 0x61746164) {
 			//Serial.println("found data chunk");
+			// TODO: verify offset in file is an even number
+			// as required by WAV format.  abort if odd.  Code
+			// below will depend upon this and fail if not even.
 			leftover_bytes = 0;
 			state = state_play;
 		} else {
@@ -1311,24 +1318,11 @@ start:
 			size = data_length;
 		}
 		data_length -= size;
-		if (leftover_bytes > 0) {
-			lsb = header[0];
-			leftover_bytes = 0;
-			goto do_msb;
-		}
 
 		while (1) {
 			lsb = *p++;
-			size--;
-			if (size == 0) {
-				if (data_length == 0) break;
-				header[0] = lsb;
-				leftover_bytes = 1;
-				return false;
-			}
-			do_msb:
 			msb = *p++;
-			size--;
+			size -= 2;
 			block_left->data[block_offset++] = (msb << 8) | lsb;
 			if (block_offset >= AUDIO_BLOCK_SAMPLES) {
 				transmit(block_left, 0);
@@ -1344,7 +1338,6 @@ start:
 			}
 			if (size == 0) {
 				if (data_length == 0) break;
-				leftover_bytes = 0;
 				return false;
 			}
 		}

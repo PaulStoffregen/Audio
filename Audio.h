@@ -241,7 +241,7 @@ private:
 	bool consume(void);
 	bool parse_format(void);
 	uint32_t header[5];
-	uint32_t data_length;
+	uint32_t data_length;		// number of bytes remaining in data section
 	audio_block_t *block_left;
 	audio_block_t *block_right;
 	uint16_t block_offset;
