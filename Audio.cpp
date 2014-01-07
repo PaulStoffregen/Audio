@@ -1120,6 +1120,7 @@ bool AudioPlaySDcardWAV::play(const char *filename)
 	if (!wavfile) return false;
 	buffer_remaining = 0;
 	state_play = STATE_STOP;
+	data_length = 0;
 	state = STATE_PARSE1;
 	return true;
 }
