@@ -2,10 +2,10 @@
 
 // waveforms.c
 extern "C" {
-const int16_t AudioWaveformSine[257];
-const int16_t AudioWaveformTriangle[257];
-const int16_t AudioWaveformSquare[257];
-const int16_t AudioWaveformSawtooth[257];
+extern const int16_t AudioWaveformSine[257];
+extern const int16_t AudioWaveformTriangle[257];
+extern const int16_t AudioWaveformSquare[257];
+extern const int16_t AudioWaveformSawtooth[257];
 }
 
 // windows.c
