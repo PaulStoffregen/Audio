@@ -53,36 +53,23 @@ private:
 
 
 
-class AudioSineWave : public AudioStream
+class AudioSynthWaveform : public AudioStream
 {
 public:
-	AudioSineWave() : AudioStream(0, NULL) { magnitude = 0; }
-	void frequency(float freq);
-	//void amplitude(double n) { amplitude((float)n); }
+	AudioSynthWaveform(const int16_t *waveform)
+	  : AudioStream(0, NULL), wavetable(waveform), magnitude(0), phase(0) { }
+	void frequency(float freq) {
+		if (freq > AUDIO_SAMPLE_RATE_EXACT / 2 || freq < 0.0) return;
+		phase_increment = (freq / AUDIO_SAMPLE_RATE_EXACT) * 4294967296.0f;
+	}
 	void amplitude(float n) {        // 0 to 1.0
 		if (n < 0) n = 0;
 		else if (n > 1.0) n = 1.0;
 		magnitude = n * 32767.0;
-		Serial.print("magnitude(f) = ");
-		Serial.println(magnitude);
 	}
-/*
-	void amplitude(int n) { // 0 to 32767
-		if (n < 0) n = 0;
-		else if (n > 32767) n = 32767;
-		magnitude = n;
-		Serial.print("magnitude(i) = ");
-		Serial.println(magnitude);
-	}
-	void amplitude(unsigned int n) { // 0 to 32767
-		if (n > 32767) n = 32767;
-		magnitude = n;
-		Serial.print("magnitude(u) = ");
-		Serial.println(magnitude);
-	}
-*/
 	virtual void update(void);
 private:
+	const int16_t *wavetable;
 	uint16_t magnitude;
 	uint32_t phase;
 	uint32_t phase_increment;
@@ -91,6 +78,7 @@ private:
 
 
 
+#if 0
 class AudioSineWaveMod : public AudioStream
 {
 public:
@@ -104,7 +92,7 @@ private:
 	uint32_t modulation_factor;
 	audio_block_t *inputQueueArray[1];
 };
-
+#endif
 
 
 

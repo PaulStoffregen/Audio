@@ -10,13 +10,13 @@ const int myInput = AUDIO_INPUT_LINEIN;
 // order data flows, inputs/sources -> processing -> outputs
 //
 //AudioInputAnalog analogPinInput(16); // analog A2 (pin 16)
-AudioInputI2S    audioInput;         // audio shield: mic or line-in
-AudioSineWave    toneLow;
-AudioSineWave    toneHigh;
-AudioMixer4      mixerLeft;          
-AudioMixer4      mixerRight;          
-AudioOutputI2S   audioOutput;        // audio shield: headphones & line-out
-AudioOutputPWM   pwmOutput;          // audio output with PWM on pins 3 & 4
+AudioInputI2S       audioInput;         // audio shield: mic or line-in
+AudioSynthWaveform  toneLow(AudioWaveformSine);
+AudioSynthWaveform  toneHigh(AudioWaveformTriangle);
+AudioMixer4         mixerLeft;
+AudioMixer4         mixerRight;
+AudioOutputI2S      audioOutput;        // audio shield: headphones & line-out
+AudioOutputPWM      pwmOutput;          // audio output with PWM on pins 3 & 4
 
 // Create Audio connections between the components
 //

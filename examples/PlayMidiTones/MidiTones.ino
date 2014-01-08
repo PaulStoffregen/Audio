@@ -7,8 +7,8 @@
 
 //AudioInputI2S adc;
 //AudioInputAnalog ana(16);
-AudioSineWave mysine;
-AudioSineWave sine2;
+AudioSynthWaveform mysine(AudioWaveformSine);
+AudioSynthWaveform sine2(AudioWaveformSine);
 //AudioOutputPWM myout;
 //AudioPlaySDcardWAV wav;
 //AudioPlaySDcardRAW wav;
