@@ -1,6 +1,14 @@
 #include "AudioStream.h"
 
+// waveforms.c
+extern "C" {
+const int16_t AudioWaveformSine[257];
+const int16_t AudioWaveformTriangle[257];
+const int16_t AudioWaveformSquare[257];
+const int16_t AudioWaveformSawtooth[257];
+}
 
+// windows.c
 extern "C" {
 extern const int16_t AudioWindowHanning256[];
 extern const int16_t AudioWindowBartlett256[];
