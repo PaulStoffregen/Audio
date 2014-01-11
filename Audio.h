@@ -277,7 +277,6 @@ private:
 	const unsigned int *next;
 	uint32_t length;
 	int16_t prior;
-	uint8_t fraction;
 	uint8_t playing;
 };
 

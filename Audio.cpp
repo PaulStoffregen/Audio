@@ -1540,7 +1540,6 @@ void AudioPlayMemory::play(const unsigned int *data)
 	format = *data++;
 	next = data;
 	prior = 0;
-	fraction = 0;
 	if (format == (44100 | (8 << 24))) {
 		playing = 1;
 	} else if (format == (44100 | (16 << 24))) {
@@ -1684,113 +1683,6 @@ void AudioPlayMemory::update(void)
 		consumed = 32;
 		break;
 
-	  case 7: // 8 bits, 8000 Hz - has audible problem, pull requests welcome!
-		if (fraction > 0) {
-			tmp32 = *in++;
-			s1 = (int8_t)((tmp32 >> 0) & 255) << 8;
-			s2 = (int8_t)((tmp32 >> 8) & 255) << 8;
-			s3 = (int8_t)((tmp32 >> 16) & 255) << 8;
-			s4 = (int8_t)((tmp32 >> 24) & 255) << 8;
-			switch (fraction) {
-			  case 20: *out++ = (s0 *  7447 + s1 *  8937) >> 14;
-			           *out++ = (s0 *  4468 + s1 * 11916) >> 14;
-			  case 18: *out++ = (s0 *  1489 + s1 * 14894) >> 14;
-			           *out++ = (s1 * 14894 + s2 *  1489) >> 14;
-			  case 16: *out++ = (s1 * 11916 + s2 *  4468) >> 14;
-			           *out++ = (s1 *  8937 + s2 *  7447) >> 14;
-			  case 14: *out++ = (s1 *  5958 + s2 * 10426) >> 14;
-			           *out++ = (s1 *  2978 + s2 * 13405) >> 14;
-			  case 12: *out++ = s2;
-			           *out++ = (s2 * 13405 + s3 *  2978) >> 14;
-			  case 10: *out++ = (s2 * 10426 + s3 *  5958) >> 14;
-			           *out++ = (s2 *  7447 + s3 *  8937) >> 14;
-			  case  8: *out++ = (s2 *  4468 + s3 * 11916) >> 14;
-			           *out++ = (s2 *  1489 + s3 * 14894) >> 14;
-			  case  6: *out++ = (s3 * 14894 + s4 *  1489) >> 14;
-			           *out++ = (s3 * 11916 + s4 *  4468) >> 14;
-			  case  4: *out++ = (s3 *  8937 + s4 *  7447) >> 14;
-			           *out++ = (s3 *  5958 + s4 * 10426) >> 14;
-			  case  2: *out++ = (s3 *  2978 + s4 * 13405) >> 14;
-			           *out++ = s4;
-			}
-			s0 = s4;
-			consumed = 4;
-		} else {
-			consumed = 0;
-		}
-		for (i = fraction; i < AUDIO_BLOCK_SAMPLES-22 /* 106 */ ; i += 22) {
-			tmp32 = *in++;
-			s1 = (int8_t)((tmp32 >> 0) & 255) << 8;
-			s2 = (int8_t)((tmp32 >> 8) & 255) << 8;
-			s3 = (int8_t)((tmp32 >> 16) & 255) << 8;
-			s4 = (int8_t)((tmp32 >> 24) & 255) << 8;
-			*out++ = (s0 * 13405 + s1 *  2978) >> 14;
-			*out++ = (s0 * 10426 + s1 *  5958) >> 14;
-			*out++ = (s0 *  7447 + s1 *  8937) >> 14;
-			*out++ = (s0 *  4468 + s1 * 11916) >> 14;
-			*out++ = (s0 *  1489 + s1 * 14894) >> 14;
-			*out++ = (s1 * 14894 + s2 *  1489) >> 14;
-			*out++ = (s1 * 11916 + s2 *  4468) >> 14;
-			*out++ = (s1 *  8937 + s2 *  7447) >> 14;
-			*out++ = (s1 *  5958 + s2 * 10426) >> 14;
-			*out++ = (s1 *  2978 + s2 * 13405) >> 14;
-			*out++ = s2;
-			*out++ = (s2 * 13405 + s3 *  2978) >> 14;
-			*out++ = (s2 * 10426 + s3 *  5958) >> 14;
-			*out++ = (s2 *  7447 + s3 *  8937) >> 14;
-			*out++ = (s2 *  4468 + s3 * 11916) >> 14;
-			*out++ = (s2 *  1489 + s3 * 14894) >> 14;
-			*out++ = (s3 * 14894 + s4 *  1489) >> 14;
-			*out++ = (s3 * 11916 + s4 *  4468) >> 14;
-			*out++ = (s3 *  8937 + s4 *  7447) >> 14;
-			*out++ = (s3 *  5958 + s4 * 10426) >> 14;
-			*out++ = (s3 *  2978 + s4 * 13405) >> 14;
-			*out++ = s4;
-			s0 = s4;
-			consumed += 4;
-		}
-		if (i < AUDIO_BLOCK_SAMPLES) {
-			fraction = 22 - (AUDIO_BLOCK_SAMPLES - i);
-			tmp32 = *in;
-			s1 = (int8_t)((tmp32 >> 0) & 255) << 8;
-			s2 = (int8_t)((tmp32 >> 8) & 255) << 8;
-			s3 = (int8_t)((tmp32 >> 16) & 255) << 8;
-			s4 = (int8_t)((tmp32 >> 24) & 255) << 8;
-			do {
-				*out++ = (s0 * 13405 + s1 *  2978) >> 14;
-				*out++ = (s0 * 10426 + s1 *  5958) >> 14;
-				if ((i += 2) == AUDIO_BLOCK_SAMPLES) break;
-				*out++ = (s0 *  7447 + s1 *  8937) >> 14;
-				*out++ = (s0 *  4468 + s1 * 11916) >> 14;
-				if ((i += 2) == AUDIO_BLOCK_SAMPLES) break;
-				*out++ = (s0 *  1489 + s1 * 14894) >> 14;
-				*out++ = (s1 * 14894 + s2 *  1489) >> 14;
-				if ((i += 2) == AUDIO_BLOCK_SAMPLES) break;
-				*out++ = (s1 * 11916 + s2 *  4468) >> 14;
-				*out++ = (s1 *  8937 + s2 *  7447) >> 14;
-				if ((i += 2) == AUDIO_BLOCK_SAMPLES) break;
-				*out++ = (s1 *  5958 + s2 * 10426) >> 14;
-				*out++ = (s1 *  2978 + s2 * 13405) >> 14;
-				if ((i += 2) == AUDIO_BLOCK_SAMPLES) break;
-				*out++ = s2;
-				*out++ = (s2 * 13405 + s3 *  2978) >> 14;
-				if ((i += 2) == AUDIO_BLOCK_SAMPLES) break;
-				*out++ = (s2 * 10426 + s3 *  5958) >> 14;
-				*out++ = (s2 *  7447 + s3 *  8937) >> 14;
-				if ((i += 2) == AUDIO_BLOCK_SAMPLES) break;
-				*out++ = (s2 *  4468 + s3 * 11916) >> 14;
-				*out++ = (s2 *  1489 + s3 * 14894) >> 14;
-				if ((i += 2) == AUDIO_BLOCK_SAMPLES) break;
-				*out++ = (s3 * 14894 + s4 *  1489) >> 14;
-				*out++ = (s3 * 11916 + s4 *  4468) >> 14;
-				if ((i += 2) == AUDIO_BLOCK_SAMPLES) break;
-				*out++ = (s3 *  8937 + s4 *  7447) >> 14;
-				*out++ = (s3 *  5958 + s4 * 10426) >> 14;
-			} while (0);
-		} else {
-			fraction = 0;
-		}
-		break;
 	  default:
 		release(block);
 		playing = 0;
