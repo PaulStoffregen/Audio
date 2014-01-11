@@ -1682,7 +1682,6 @@ void AudioPlayMemory::update(void)
 	if (length > consumed) {
 		length -= consumed;
 	} else {
-		Serial.println("end");
 		playing = 0;
 	}
 	transmit(block);
