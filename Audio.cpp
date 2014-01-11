@@ -1536,25 +1536,11 @@ void AudioPlayMemory::play(const unsigned int *data)
 	uint32_t format;
 
 	playing = 0;
-	length = *data++;
+	prior = 0;
 	format = *data++;
 	next = data;
-	prior = 0;
-	if (format == (44100 | (8 << 24))) {
-		playing = 1;
-	} else if (format == (44100 | (16 << 24))) {
-		playing = 2;
-	} else if (format == (22050 | (8 << 24))) {
-		playing = 3;
-	} else if (format == (22050 | (16 << 24))) {
-		playing = 4;
-	} else if (format == (11025 | (8 << 24))) {
-		playing = 5;
-	} else if (format == (11025 | (16 << 24))) {
-		playing = 6;
-	} else if (format == (8000 | (8 << 24))) {
-		playing = 7;
-	}
+	length = format & 0xFFFFFF;
+	playing = format >> 24;
 }
 
 void AudioPlayMemory::stop(void)
@@ -1562,6 +1548,9 @@ void AudioPlayMemory::stop(void)
 	playing = 0;
 }
 
+extern "C" {
+extern const int16_t ulaw_decode_table[256];
+};
 
 void AudioPlayMemory::update(void)
 {
@@ -1583,18 +1572,18 @@ void AudioPlayMemory::update(void)
 	s0 = prior;
 
 	switch (playing) {
-	  case 1: // 8 bits, 44100 Hz - works
+	  case 0x01: // u-law encoded, 44100 Hz
 		for (i=0; i < AUDIO_BLOCK_SAMPLES; i += 4) {
 			tmp32 = *in++;
-			*out++ = (int8_t)(tmp32 & 255) << 8;
-			*out++ = (int8_t)((tmp32 >> 8) & 255) << 8;
-			*out++ = (int8_t)((tmp32 >> 16) & 255) << 8;
-			*out++ = (int8_t)((tmp32 >> 24) & 255) << 8;
+			*out++ = ulaw_decode_table[(tmp32 >> 0) & 255];
+			*out++ = ulaw_decode_table[(tmp32 >> 8) & 255];
+			*out++ = ulaw_decode_table[(tmp32 >> 16) & 255];
+			*out++ = ulaw_decode_table[(tmp32 >> 24) & 255];
 		}
 		consumed = 128;
 		break;
 
-	  case 2: // 16 bits, 44100 Hz - ???
+	  case 0x81: // 16 bit PCM, 44100 Hz
 		for (i=0; i < AUDIO_BLOCK_SAMPLES; i += 2) {
 			tmp32 = *in++;
 			*out++ = (int16_t)(tmp32 & 65535);
@@ -1603,13 +1592,13 @@ void AudioPlayMemory::update(void)
 		consumed = 128;
 		break;
 
-	  case 3: // 8 bits, 22050 Hz - works
+	  case 0x02: // u-law encoded, 22050 Hz 
 		for (i=0; i < AUDIO_BLOCK_SAMPLES; i += 8) {
 			tmp32 = *in++;
-			s1 = (int8_t)((tmp32 >> 0) & 255) << 8;
-			s2 = (int8_t)((tmp32 >> 8) & 255) << 8;
-			s3 = (int8_t)((tmp32 >> 16) & 255) << 8;
-			s4 = (int8_t)((tmp32 >> 24) & 255) << 8;
+			s1 = ulaw_decode_table[(tmp32 >> 0) & 255];
+			s2 = ulaw_decode_table[(tmp32 >> 8) & 255];
+			s3 = ulaw_decode_table[(tmp32 >> 16) & 255];
+			s4 = ulaw_decode_table[(tmp32 >> 24) & 255];
 			*out++ = (s0 + s1) >> 1;
 			*out++ = s1;
 			*out++ = (s1 + s2) >> 1;
@@ -1623,7 +1612,7 @@ void AudioPlayMemory::update(void)
 		consumed = 64;
 		break;
 
-	  case 4: // 16 bits, 22050 Hz - ??
+	  case 0x82: // 16 bits PCM, 22050 Hz
 		for (i=0; i < AUDIO_BLOCK_SAMPLES; i += 4) {
 			tmp32 = *in++;
 			s1 = (int16_t)(tmp32 & 65535);
@@ -1637,13 +1626,13 @@ void AudioPlayMemory::update(void)
 		consumed = 64;
 		break;
 
-	  case 5: // 8 bits, 11025 Hz - ??
+	  case 0x03: // u-law encoded, 11025 Hz
 		for (i=0; i < AUDIO_BLOCK_SAMPLES; i += 16) {
 			tmp32 = *in++;
-			s1 = (int8_t)((tmp32 >> 0) & 255) << 8;
-			s2 = (int8_t)((tmp32 >> 8) & 255) << 8;
-			s3 = (int8_t)((tmp32 >> 16) & 255) << 8;
-			s4 = (int8_t)((tmp32 >> 24) & 255) << 8;
+			s1 = ulaw_decode_table[(tmp32 >> 0) & 255];
+			s2 = ulaw_decode_table[(tmp32 >> 8) & 255];
+			s3 = ulaw_decode_table[(tmp32 >> 16) & 255];
+			s4 = ulaw_decode_table[(tmp32 >> 24) & 255];
 			*out++ = (s0 * 3 + s1) >> 2;
 			*out++ = (s0 + s1)     >> 1;
 			*out++ = (s0 + s1 * 3) >> 2;
@@ -1665,7 +1654,7 @@ void AudioPlayMemory::update(void)
 		consumed = 32;
 		break;
 
-	  case 6: // 16 bits, 11025 Hz - ??
+	  case 0x83: // 16 bit PCM, 11025 Hz
 		for (i=0; i < AUDIO_BLOCK_SAMPLES; i += 8) {
 			tmp32 = *in++;
 			s1 = (int16_t)(tmp32 & 65535);
