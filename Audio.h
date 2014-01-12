@@ -116,6 +116,26 @@ private:
 
 
 
+
+
+class AudioOutputAnalog : public AudioStream
+{
+public:
+	AudioOutputAnalog(void) : AudioStream(1, inputQueueArray) { begin(); }
+	virtual void update(void);
+	void begin(void);
+	friend void dma_ch4_isr(void);
+private:
+	static audio_block_t *block_left_1st;
+	static audio_block_t *block_left_2nd;
+	static bool update_responsibility;
+	audio_block_t *inputQueueArray[1];
+};
+
+
+
+
+
 class AudioPrint : public AudioStream
 {
 public:

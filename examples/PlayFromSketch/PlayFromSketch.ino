@@ -22,7 +22,8 @@ AudioPlayMemory    sound4;
 AudioPlayMemory    sound5;
 AudioMixer4        mix1;    // two 4-channel mixers are needed in
 AudioMixer4        mix2;    // tandem to combine 6 audio sources
-AudioOutputI2S     dac;
+AudioOutputI2S     headphones;
+AudioOutputAnalog  dac;     // play to both I2S audio board and on-chip DAC
 
 // Create Audio connections between the components
 //
@@ -33,8 +34,9 @@ AudioConnection c4(sound3, 0, mix1, 3);
 AudioConnection c5(mix1, 0, mix2, 0);   // output of mix1 into 1st input on mix2
 AudioConnection c6(sound4, 0, mix2, 1);
 AudioConnection c7(sound5, 0, mix2, 2);
-AudioConnection c8(mix2, 0, dac, 0);
-AudioConnection c9(mix2, 0, dac, 1);
+AudioConnection c8(mix2, 0, headphones, 0);
+AudioConnection c9(mix2, 0, headphones, 1);
+AudioConnection c10(mix2, 0, dac, 0);
 
 // Create an object to control the audio shield.
 // 
