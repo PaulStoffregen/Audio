@@ -1035,20 +1035,17 @@ void AudioOutputAnalog::begin(void)
 	SIM_SCGC2 |= SIM_SCGC2_DAC0;
 	DAC0_C0 = DAC_C0_DACEN | DAC_C0_DACRFS; // 3.3V VDDA is DACREF_2
 	// slowly ramp up to DC voltage, approx 1/4 second
-	for (int16_t i=0; i<2047; i++) {
-		*(int16_t *)&(DAC0_DAT0L) = i;
-		delayMicroseconds(262);
+	for (int16_t i=0; i<128; i++) {
+		analogWrite(A14, i);
+		delay(2);
 	}
 
 	// set the programmable delay block to trigger DMA requests
 	SIM_SCGC6 |= SIM_SCGC6_PDB;
-	PDB0_IDLY = 50; // TODO: is this ok?
+	PDB0_IDLY = 1;
 	PDB0_MOD = PDB_PERIOD;
 	PDB0_SC = PDB_CONFIG | PDB_SC_LDOK;
 	PDB0_SC = PDB_CONFIG | PDB_SC_SWTRIG | PDB_SC_PDBIE | PDB_SC_DMAEN;
-	//PDB0_SC = PDB_CONFIG | PDB_SC_SWTRIG | PDB_SC_PDBIE;
-	//NVIC_ENABLE_IRQ(IRQ_PDB);
-#if 1
 	SIM_SCGC7 |= SIM_SCGC7_DMA;
 	SIM_SCGC6 |= SIM_SCGC6_DMAMUX;
 	DMA_CR = 0;
@@ -1063,26 +1060,12 @@ void AudioOutputAnalog::begin(void)
 	DMA_TCD4_DLASTSGA = 0;
 	DMA_TCD4_BITER_ELINKNO = sizeof(dac_buffer) / 2;
 	DMA_TCD4_CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
-
 	DMAMUX0_CHCFG4 = DMAMUX_DISABLE;
 	DMAMUX0_CHCFG4 = DMAMUX_SOURCE_PDB | DMAMUX_ENABLE;
 	update_responsibility = update_setup();
 	DMA_SERQ = 4;
-
 	NVIC_ENABLE_IRQ(IRQ_DMA_CH4);
-#endif
 }
-
-//void pdb_isr(void)
-//{
-//	static uint16_t val=0;
-//
-//	PDB0_SC = PDB_CONFIG | PDB_SC_PDBIE;
-//	if (val == 0) val = 4095;  // testing only, full scale 22.05 kHz output
-//	else val = 0;
-//	DAC0_DAT0L = val & 255;
-//	DAC0_DATH = val >> 8;
-//}
 
 void AudioOutputAnalog::update(void)
 {
@@ -1123,7 +1106,6 @@ void dma_ch4_isr(void)
 		// so we must fill the second half
 		dest = (int16_t *)&dac_buffer[AUDIO_BLOCK_SAMPLES];
 		end = (int16_t *)&dac_buffer[AUDIO_BLOCK_SAMPLES*2];
-		if (AudioOutputAnalog::update_responsibility) AudioStream::update_all();
 	} else {
 		// DMA is transmitting the second half of the buffer
 		// so we must fill the first half
@@ -1135,7 +1117,7 @@ void dma_ch4_isr(void)
 		src = &block->data[offset];
 		do {
 			// TODO: this should probably dither
-			*dest++ = ((*src++) + 32767) >> 4; // TODO: optimize
+			*dest++ = ((*src++) + 32767) >> 4;
 		} while (dest < end);
 		AudioStream::release(block);
 		AudioOutputAnalog::block_left_1st = AudioOutputAnalog::block_left_2nd;
@@ -1145,7 +1127,7 @@ void dma_ch4_isr(void)
 			*dest++ = 2047;
 		} while (dest < end);
 	}
-	Serial.print(".");
+	if (AudioOutputAnalog::update_responsibility) AudioStream::update_all();
 }
 
 #else
