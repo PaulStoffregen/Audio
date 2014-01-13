@@ -1067,6 +1067,17 @@ void AudioOutputAnalog::begin(void)
 	NVIC_ENABLE_IRQ(IRQ_DMA_CH4);
 }
 
+void AudioOutputAnalog::analogReference(int ref)
+{
+	// TODO: this should ramp gradually to the new DC level
+	if (ref == INTERNAL) {
+		DAC0_C0 &= ~DAC_C0_DACRFS; // 1.2V
+	} else {
+		DAC0_C0 |= DAC_C0_DACRFS;  // 3.3V
+	}
+}
+
+
 void AudioOutputAnalog::update(void)
 {
 	audio_block_t *block;

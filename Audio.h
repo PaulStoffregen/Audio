@@ -124,6 +124,7 @@ public:
 	AudioOutputAnalog(void) : AudioStream(1, inputQueueArray) { begin(); }
 	virtual void update(void);
 	void begin(void);
+	void analogReference(int ref);
 	friend void dma_ch4_isr(void);
 private:
 	static audio_block_t *block_left_1st;
