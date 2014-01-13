@@ -69,6 +69,15 @@ void setup() {
   // turn on the output
   audioShield.enable();
   audioShield.volume(50);
+
+  // reduce the gain on mixer channels, so more than 1
+  // sound can play simultaneously without clipping
+  mix1.gain(0, 0.4);
+  mix1.gain(1, 0.4);
+  mix1.gain(2, 0.4);
+  mix1.gain(3, 0.4);
+  mix2.gain(1, 0.4);
+  mix2.gain(2, 0.4);
 }
 
 void loop() {
