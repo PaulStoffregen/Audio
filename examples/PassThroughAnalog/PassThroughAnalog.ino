@@ -14,7 +14,7 @@ AudioOutputPWM   pwmOutput;          // audio output with PWM on pins 3 & 4
 //
 AudioConnection c1(analogPinInput, 0, audioOutput, 0);
 AudioConnection c2(analogPinInput, 0, audioOutput, 1);
-AudioConnection c3(audioInput, 0, pwmOutput, 0);
+AudioConnection c3(analogPinInput, 0, pwmOutput, 0);
 
 // Create an object to control the audio shield.
 // 
