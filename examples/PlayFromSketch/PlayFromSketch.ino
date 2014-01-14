@@ -70,6 +70,11 @@ void setup() {
   audioShield.enable();
   audioShield.volume(50);
 
+  // by default the Teensy 3.1 DAC uses 3.3Vp-p output
+  // if your 3.3V power has noise, switching to the
+  // internal 1.2V reference can give you a clean signal
+  //dac.analogReference(INTERNAL);
+
   // reduce the gain on mixer channels, so more than 1
   // sound can play simultaneously without clipping
   mix1.gain(0, 0.4);
