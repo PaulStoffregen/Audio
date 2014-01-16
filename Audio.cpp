@@ -1856,7 +1856,7 @@ static inline int32_t signed_multiply_32x16t(int32_t a, uint32_t b)
 }
 
 
-// computes ((a[15:0) << 16) | b[15:0])
+// computes ((a[15:0] << 16) | b[15:0])
 static inline uint32_t pack_16x16(int32_t a, int32_t b) __attribute__((always_inline));
 static inline uint32_t pack_16x16(int32_t a, int32_t b)
 {
@@ -1873,6 +1873,31 @@ static inline uint32_t signed_add_16_and_16(uint32_t a, uint32_t b)
 	asm volatile("qadd16 %0, %1, %2" : "=r" (out) : "r" (a), "r" (b));
 	return out;
 }
+
+// computes (sum + ((a[31:0] * b[15:0]) >> 16))
+static inline int32_t signed_multiply_accumulate_32x16b(int32_t sum, int32_t a, uint32_t b)
+{
+	int32_t out;
+	asm volatile("smlawb %0, %2, %3, %1" : "=r" (out) : "r" (sum), "r" (a), "r" (b));
+	return out;
+}
+
+// computes (sum + ((a[31:0] * b[31:16]) >> 16))
+static inline int32_t signed_multiply_accumulate_32x16t(int32_t sum, int32_t a, uint32_t b)
+{
+	int32_t out;
+	asm volatile("smlawt %0, %2, %3, %1" : "=r" (out) : "r" (sum), "r" (a), "r" (b));
+	return out;
+}
+
+// computes logical and, forces compiler to allocate register and use single cycle instruction
+static inline uint32_t logical_and(uint32_t a, uint32_t b)
+{
+	asm volatile("and %0, %1" : "+r" (a) : "r" (b));
+	return a;
+}
+
+
 
 
 void applyGain(int16_t *data, int32_t mult)
@@ -1945,6 +1970,65 @@ void AudioMixer4::update(void)
 		release(out);
 	}
 }
+
+
+/******************************************************************/
+
+
+
+
+
+void AudioFilterBiquad::update(void)
+{
+	audio_block_t *block;
+	int32_t a0, a1, a2, b1, b2, sum;
+	uint32_t in2, out2, aprev, bprev, flag;
+	uint32_t *data, *end;
+	int32_t *state;
+
+	block = receiveWritable();
+	if (!block) return;
+	data = (uint32_t *)(block->data);
+	end = data + AUDIO_BLOCK_SAMPLES/2;
+	state = (int32_t *)definition;
+	do {
+		a0 = *state++;
+		a1 = *state++;
+		a2 = *state++;
+		b1 = *state++;
+		b2 = *state++;
+		aprev = *state++;
+		bprev = *state++;
+		sum = *state & 0x3FFF;
+		do {
+			in2 = *data;
+			sum = signed_multiply_accumulate_32x16b(sum, a0, in2);
+			sum = signed_multiply_accumulate_32x16t(sum, a1, aprev);
+			sum = signed_multiply_accumulate_32x16b(sum, a2, aprev);
+			sum = signed_multiply_accumulate_32x16t(sum, b1, bprev);
+			sum = signed_multiply_accumulate_32x16b(sum, b2, bprev);
+			out2 = (uint32_t)sum >> 14;
+			sum &= 0x3FFF;
+			sum = signed_multiply_accumulate_32x16t(sum, a0, in2);
+			sum = signed_multiply_accumulate_32x16b(sum, a1, in2);
+			sum = signed_multiply_accumulate_32x16t(sum, a2, aprev);
+			sum = signed_multiply_accumulate_32x16b(sum, b1, out2);
+			sum = signed_multiply_accumulate_32x16t(sum, b2, bprev);
+			aprev = in2;
+			bprev = pack_16x16(sum >> 14, out2);
+			sum &= 0x3FFF;
+			aprev = in2;
+			*data++ = bprev;
+		} while (data < end);
+		flag = *state & 0x80000000;
+		*state++ = sum | flag;
+		*(state-2) = bprev;
+		*(state-3) = aprev;
+	} while (flag);
+	transmit(block);
+	release(block);
+}
+
 
 
 

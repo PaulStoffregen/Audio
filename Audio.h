@@ -346,6 +346,24 @@ private:
 
 
 
+
+
+class AudioFilterBiquad : public AudioStream
+{
+public:
+	AudioFilterBiquad(int *parameters)
+	   : AudioStream(1, inputQueueArray), definition(parameters) { }
+	virtual void update(void);
+private:
+	int *definition;
+	audio_block_t *inputQueueArray[1];
+};
+
+
+
+
+
+
 // TODO: more audio processing objects....
 //  N-channel mixer, adjustable gain on each channel
 //  sine wave with frequency modulation (phase)
