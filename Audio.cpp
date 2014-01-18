@@ -674,6 +674,82 @@ void AudioOutputI2S::config_i2s(void)
 
 /******************************************************************/
 
+void AudioOutputI2Sslave::begin(void)
+{
+	//pinMode(2, OUTPUT);
+	block_left_1st = NULL;
+	block_right_1st = NULL;
+
+	AudioOutputI2Sslave::config_i2s();
+	CORE_PIN22_CONFIG = PORT_PCR_MUX(6); // pin 22, PTC1, I2S0_TXD0
+
+	DMA_CR = 0;
+	DMA_TCD0_SADDR = i2s_tx_buffer;
+	DMA_TCD0_SOFF = 2;
+	DMA_TCD0_ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
+	DMA_TCD0_NBYTES_MLNO = 2;
+	DMA_TCD0_SLAST = -sizeof(i2s_tx_buffer);
+	DMA_TCD0_DADDR = &I2S0_TDR0;
+	DMA_TCD0_DOFF = 0;
+	DMA_TCD0_CITER_ELINKNO = sizeof(i2s_tx_buffer) / 2;
+	DMA_TCD0_DLASTSGA = 0;
+	DMA_TCD0_BITER_ELINKNO = sizeof(i2s_tx_buffer) / 2;
+	DMA_TCD0_CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
+
+	DMAMUX0_CHCFG0 = DMAMUX_DISABLE;
+	DMAMUX0_CHCFG0 = DMAMUX_SOURCE_I2S0_TX | DMAMUX_ENABLE;
+	update_responsibility = update_setup();
+	DMA_SERQ = 0;
+
+	I2S0_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE | I2S_TCSR_FR;
+	NVIC_ENABLE_IRQ(IRQ_DMA_CH0);
+}
+
+void AudioOutputI2Sslave::config_i2s(void)
+{
+	SIM_SCGC6 |= SIM_SCGC6_I2S;
+	SIM_SCGC7 |= SIM_SCGC7_DMA;
+	SIM_SCGC6 |= SIM_SCGC6_DMAMUX;
+
+	// if either transmitter or receiver is enabled, do nothing
+	if (I2S0_TCSR & I2S_TCSR_TE) return;
+	if (I2S0_RCSR & I2S_RCSR_RE) return;
+
+	// Select input clock 0
+	// Configure to input the bit-clock from pin, bypasses the MCLK divider
+	I2S0_MCR = I2S_MCR_MICS(0);
+	I2S0_MDR = 0;
+
+	// configure transmitter
+	I2S0_TMR = 0;
+	I2S0_TCR1 = I2S_TCR1_TFW(1);  // watermark at half fifo size
+	I2S0_TCR2 = I2S_TCR2_SYNC(0) | I2S_TCR2_BCP;
+
+	I2S0_TCR3 = I2S_TCR3_TCE;
+	I2S0_TCR4 = I2S_TCR4_FRSZ(1) | I2S_TCR4_SYWD(15) | I2S_TCR4_MF
+		| I2S_TCR4_FSE | I2S_TCR4_FSP;
+
+	I2S0_TCR5 = I2S_TCR5_WNW(15) | I2S_TCR5_W0W(15) | I2S_TCR5_FBT(15);
+
+	// configure receiver (sync'd to transmitter clocks)
+	I2S0_RMR = 0;
+	I2S0_RCR1 = I2S_RCR1_RFW(1);
+	I2S0_RCR2 = I2S_RCR2_SYNC(1) | I2S_TCR2_BCP;
+
+	I2S0_RCR3 = I2S_RCR3_RCE;
+	I2S0_RCR4 = I2S_RCR4_FRSZ(1) | I2S_RCR4_SYWD(15) | I2S_RCR4_MF
+		| I2S_RCR4_FSE | I2S_RCR4_FSP | I2S_RCR4_FSD;
+
+	I2S0_RCR5 = I2S_RCR5_WNW(15) | I2S_RCR5_W0W(15) | I2S_RCR5_FBT(15);
+
+	// configure pin mux for 3 clock signals
+	CORE_PIN23_CONFIG = PORT_PCR_MUX(6); // pin 23, PTC2, I2S0_TX_FS (LRCLK)
+	CORE_PIN9_CONFIG  = PORT_PCR_MUX(6); // pin  9, PTC3, I2S0_TX_BCLK
+	CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK
+}
+
+/******************************************************************/
+
 
 DMAMEM static uint32_t i2s_rx_buffer[AUDIO_BLOCK_SAMPLES];
 audio_block_t * AudioInputI2S::block_left = NULL;
@@ -816,6 +892,49 @@ void AudioInputI2S::update(void)
 		__enable_irq();
 	}
 }
+
+
+/******************************************************************/
+
+
+void AudioInputI2Sslave::begin(void)
+{
+	//block_left_1st = NULL;
+	//block_right_1st = NULL;
+
+	//pinMode(3, OUTPUT);
+	//digitalWriteFast(3, HIGH);
+	//delayMicroseconds(500);
+	//digitalWriteFast(3, LOW);
+
+	AudioOutputI2Sslave::config_i2s();
+
+	CORE_PIN13_CONFIG = PORT_PCR_MUX(4); // pin 13, PTC5, I2S0_RXD0
+
+	DMA_CR = 0;
+	DMA_TCD1_SADDR = &I2S0_RDR0;
+	DMA_TCD1_SOFF = 0;
+	DMA_TCD1_ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
+	DMA_TCD1_NBYTES_MLNO = 2;
+	DMA_TCD1_SLAST = 0;
+	DMA_TCD1_DADDR = i2s_rx_buffer;
+	DMA_TCD1_DOFF = 2;
+	DMA_TCD1_CITER_ELINKNO = sizeof(i2s_rx_buffer) / 2;
+	DMA_TCD1_DLASTSGA = -sizeof(i2s_rx_buffer);
+	DMA_TCD1_BITER_ELINKNO = sizeof(i2s_rx_buffer) / 2;
+	DMA_TCD1_CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
+
+	DMAMUX0_CHCFG1 = DMAMUX_DISABLE;
+	DMAMUX0_CHCFG1 = DMAMUX_SOURCE_I2S0_RX | DMAMUX_ENABLE;
+	update_responsibility = update_setup();
+	DMA_SERQ = 1;
+
+	// TODO: is I2S_RCSR_BCE appropriate if sync'd to transmitter clock?
+	//I2S0_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE | I2S_RCSR_FR;
+	I2S0_RCSR |= I2S_RCSR_RE | I2S_RCSR_FRDE | I2S_RCSR_FR;
+	NVIC_ENABLE_IRQ(IRQ_DMA_CH1);
+}
+
 
 
 /******************************************************************/
@@ -2068,7 +2187,7 @@ bool AudioControlWM8731::enable(void)
 	write(WM8731_REG_DIGITAL, 0x08);   // DAC soft mute
 	write(WM8731_REG_ANALOG, 0x00);    // disable all
 
-	write(WM8731_REG_POWERDOWN, 0x60); // linein, mic, adc, dac, lineout
+	write(WM8731_REG_POWERDOWN, 0x00); // codec powerdown
 
 	write(WM8731_REG_LHEADOUT, 0x80);      // volume off
 	write(WM8731_REG_RHEADOUT, 0x80);
@@ -2104,6 +2223,40 @@ bool AudioControlWM8731::volumeInteger(unsigned int n)
 }
 
 
+
+/******************************************************************/
+
+
+bool AudioControlWM8731master::enable(void)
+{
+	Wire.begin();
+	delay(5);
+	//write(WM8731_REG_RESET, 0);
+
+	write(WM8731_REG_INTERFACE, 0x42); // I2S, 16 bit, MCLK master
+	write(WM8731_REG_SAMPLING, 0x20);  // 256*Fs, 44.1 kHz, MCLK/1
+
+	// In order to prevent pops, the DAC should first be soft-muted (DACMU),
+	// the output should then be de-selected from the line and headphone output
+	// (DACSEL), then the DAC powered down (DACPD).
+
+	write(WM8731_REG_DIGITAL, 0x08);   // DAC soft mute
+	write(WM8731_REG_ANALOG, 0x00);    // disable all
+	
+	write(WM8731_REG_POWERDOWN, 0x00); // codec powerdown
+
+	write(WM8731_REG_LHEADOUT, 0x80);      // volume off
+	write(WM8731_REG_RHEADOUT, 0x80);
+
+	delay(100); // how long to power up?
+
+	write(WM8731_REG_ACTIVE, 1);
+	delay(5);
+	write(WM8731_REG_DIGITAL, 0x00);   // DAC unmuted
+	write(WM8731_REG_ANALOG, 0x10);    // DAC selected
+
+	return true;
+}
 
 /******************************************************************/
 

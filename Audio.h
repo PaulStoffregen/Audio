@@ -189,11 +189,13 @@ public:
 	virtual void update(void);
 	void begin(void);
 	friend void dma_ch1_isr(void);
+protected:	
+	AudioInputI2S(int dummy): AudioStream(0, NULL) {} // to be used only inside AudioInputI2Sslave !!
+	static bool update_responsibility;  // TODO: implement and test this.
 private:
 	static audio_block_t *block_left;
 	static audio_block_t *block_right;
 	static uint16_t block_offset;
-	static bool update_responsibility;  // TODO: implement and test this.
 };
 
 
@@ -205,19 +207,40 @@ public:
 	void begin(void);
 	friend void dma_ch0_isr(void);
 	friend class AudioInputI2S;
-private:
+protected:
+	AudioOutputI2S(int dummy): AudioStream(2, inputQueueArray) {} // to be used only inside AudioOutputI2Sslave !!
 	static void config_i2s(void);
 	static audio_block_t *block_left_1st;
 	static audio_block_t *block_right_1st;
+	static bool update_responsibility;
+private:
 	static audio_block_t *block_left_2nd;
 	static audio_block_t *block_right_2nd;
 	static uint16_t block_left_offset;
 	static uint16_t block_right_offset;
-	static bool update_responsibility;
 	audio_block_t *inputQueueArray[2];
 };
 
 
+class AudioInputI2Sslave : public AudioInputI2S
+{
+public:
+	AudioInputI2Sslave(void) : AudioInputI2S(0) { begin(); }
+	void begin(void);
+	friend void dma_ch1_isr(void);
+};
+
+
+class AudioOutputI2Sslave : public AudioOutputI2S
+{
+public:
+	AudioOutputI2Sslave(void) : AudioOutputI2S(0) { begin(); } ;
+	void begin(void);
+	friend class AudioInputI2Sslave;
+	friend void dma_ch0_isr(void);
+protected:
+	static void config_i2s(void);
+};
 
 
 
@@ -399,6 +422,7 @@ class AudioControlWM8731 : public AudioControl
 {
 public:
 	bool enable(void);
+	bool disable(void) { return false; }
 	bool volume(float n) { return volumeInteger(n * 0.8 + 47.499); }
 	bool inputLevel(float n) { return false; }
 	bool inputSelect(int n) { return false; }
@@ -407,6 +431,11 @@ protected:
 	bool volumeInteger(unsigned int n); // range: 0x2F to 0x7F
 };
 
+class AudioControlWM8731master : public AudioControlWM8731
+{
+public:
+	bool enable(void);
+};
 
 
 class AudioControlSGTL5000 : public AudioControl
