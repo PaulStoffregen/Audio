@@ -2252,7 +2252,7 @@ void AudioAnalyzeToneDetect::set_params(int32_t coef, uint16_t cycles, uint16_t 
 	s2 = 0;
 	enabled = true;
 	__enable_irq();
-	Serial.printf("Tone: coef=%d, ncycles=%d, length=%d\n", coefficient, ncycles, length);
+	//Serial.printf("Tone: coef=%d, ncycles=%d, length=%d\n", coefficient, ncycles, length);
 }
 
 float AudioAnalyzeToneDetect::read(void)

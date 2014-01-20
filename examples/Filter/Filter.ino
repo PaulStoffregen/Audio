@@ -6,6 +6,8 @@ const int myInput = AUDIO_INPUT_LINEIN;
 //const int myInput = AUDIO_INPUT_MIC;
 
 // each filter requires a set up parameters
+//  http://forum.pjrc.com/threads/24793-Audio-Library?p=40179&viewfull=1#post40179
+//
 int myFilterParameters[] = {  // lowpass, Fc=800 Hz, Q=0.707
   3224322, 6448644, 3224322, 1974735214, -913890679, 0, 0, 0};
 
