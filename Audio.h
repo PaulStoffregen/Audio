@@ -257,7 +257,7 @@ private:
         static audio_block_t *block_left;
         static uint16_t block_offset;
 	uint16_t dc_average;
-        //static bool update_responsibility;  // TODO: implement and test this.
+        static bool update_responsibility;  // TODO: implement and test this.
 };
 
 

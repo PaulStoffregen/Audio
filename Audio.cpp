@@ -952,6 +952,7 @@ void AudioInputI2Sslave::begin(void)
 DMAMEM static uint16_t analog_rx_buffer[AUDIO_BLOCK_SAMPLES];
 audio_block_t * AudioInputAnalog::block_left = NULL;
 uint16_t AudioInputAnalog::block_offset = 0;
+bool AudioInputAnalog::update_responsibility = false;
 
 #define PDB_CONFIG (PDB_SC_TRGSEL(15) | PDB_SC_PDBEN | PDB_SC_CONT)
 #define PDB_PERIOD 1087 // 48e6 / 44100
@@ -1016,7 +1017,7 @@ void AudioInputAnalog::begin(unsigned int pin)
 	DMA_TCD2_CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
 	DMAMUX0_CHCFG2 = DMAMUX_DISABLE;
 	DMAMUX0_CHCFG2 = DMAMUX_SOURCE_ADC0 | DMAMUX_ENABLE;
-	//update_responsibility = update_setup();
+	update_responsibility = update_setup();
 	DMA_SERQ = 2;
 	NVIC_ENABLE_IRQ(IRQ_DMA_CH2);
 }
@@ -1037,7 +1038,7 @@ void dma_ch2_isr(void)
 		// need to remove data from the second half
 		src = (uint16_t *)&analog_rx_buffer[AUDIO_BLOCK_SAMPLES/2];
 		end = (uint16_t *)&analog_rx_buffer[AUDIO_BLOCK_SAMPLES];
-		//if (AudioInputI2S::update_responsibility) AudioStream::update_all();
+		if (AudioInputAnalog::update_responsibility) AudioStream::update_all();
 	} else {
 		// DMA is receiving to the second half of the buffer
 		// need to remove data from the first half
