@@ -191,7 +191,7 @@ public:
 	friend void dma_ch1_isr(void);
 protected:	
 	AudioInputI2S(int dummy): AudioStream(0, NULL) {} // to be used only inside AudioInputI2Sslave !!
-	static bool update_responsibility;  // TODO: implement and test this.
+	static bool update_responsibility;
 private:
 	static audio_block_t *block_left;
 	static audio_block_t *block_right;
@@ -257,7 +257,7 @@ private:
         static audio_block_t *block_left;
         static uint16_t block_offset;
 	uint16_t dc_average;
-        static bool update_responsibility;  // TODO: implement and test this.
+        static bool update_responsibility;
 };
 
 
