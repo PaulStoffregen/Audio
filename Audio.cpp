@@ -1338,8 +1338,14 @@ void AudioPlaySDcardWAV::stop(void)
 {
 	__disable_irq();
 	if (state != STATE_STOP) {
+		audio_block_t *b1 = block_left;
+		block_left = NULL;
+		audio_block_t *b2 = block_right;
+		block_right = NULL;
 		state = STATE_STOP;
 		__enable_irq();
+		if (b1) release(b1);
+		if (b2) release(b2);
 		wavfile.close();
 	} else {
 		__enable_irq();
@@ -1402,8 +1408,14 @@ void AudioPlaySDcardWAV::update(void)
 		} else {
 			// not good, no audio was transmitted
 			buffer_remaining = 0;
-			if (block_left) release(block_left);
-			if (block_right) release(block_right);
+			if (block_left) {
+				release(block_left);
+				block_left = NULL;
+			}
+			if (block_right) {
+				release(block_right);
+				block_right = NULL;
+			}
 			// if we're still playing, well, there's going to
 			// be a gap in output, but we can't keep burning
 			// time trying to read more data.  Hopefully things
@@ -1413,6 +1425,14 @@ void AudioPlaySDcardWAV::update(void)
 	}
 	// end of file reached or other reason to stop
 	wavfile.close();
+	if (block_left) {
+		release(block_left);
+		block_left = NULL;
+	}
+	if (block_right) {
+		release(block_right);
+		block_right = NULL;
+	}
 	state_play = STATE_STOP;
 	state = STATE_STOP;
 }
