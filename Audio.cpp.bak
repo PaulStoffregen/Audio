@@ -3071,8 +3071,9 @@ bool AudioControlSGTL5000::volumeInteger(unsigned int n)
 
 
 
-
 /******************************************************************/
+/******************************************************************/
+
 
 // arm state arrays and FIR instances for left and right channels
 // the state arrays are defined to handle a maximum of MAX_COEFFS
@@ -3148,3 +3149,5 @@ void AudioFilterFIR::update(void)
   if(b_new)release(b_new);
 }
 
+/******************************************************************/
+/******************************************************************/
