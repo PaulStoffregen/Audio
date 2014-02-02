@@ -1,4 +1,5 @@
 #include "AudioStream.h"
+#include "arm_math.h"
 
 
 // When changing multiple audio object settings that must update at
@@ -540,14 +541,43 @@ protected:
 
 
 
+/******************************************************************/
+/******************************************************************/
+
+// Maximum number of coefficients in a FIR filter
+// The audio breaks up with 128 coefficients so a
+// maximum of 150 is more than sufficient
+#define MAX_COEFFS 150
+
+// Indicates that the code should just pass through the audio
+// without any filtering (as opposed to doing nothing at all)
+#define FIR_PASSTHRU ((short *) 1)
+
+class AudioFilterFIR : 
+public AudioStream
+{
+public:
+  AudioFilterFIR(void): 
+  AudioStream(2,inputQueueArray) { 
+  }
+
+  void begin(short *coeff_p,int f_pin);
+  virtual void update(void);
+  void stop(void);
+  
+private:
+  audio_block_t *inputQueueArray[2];
+  static q15_t l_StateQ15[];
+  static q15_t r_StateQ15[];
+  static arm_fir_instance_q15 l_fir_inst;
+  static arm_fir_instance_q15 r_fir_inst;
+  static short *coeff_p;
+};
 
 
 
-
-
-
-
-
+/******************************************************************/
+/******************************************************************/
 
 
 
