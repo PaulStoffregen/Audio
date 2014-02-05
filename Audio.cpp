@@ -3148,3 +3148,415 @@ void AudioFilterFIR::update(void)
   if(b_new)release(b_new);
 }
 
+
+/******************************************************************/
+//                A u d i o E f f e c t F l a n g e
+// Written by Pete (El Supremo) Jan 2014
+
+// circular addressing indices for left and right channels
+short AudioEffectFlange::l_circ_idx;
+short AudioEffectFlange::r_circ_idx;
+
+short * AudioEffectFlange::l_delayline = NULL;
+short * AudioEffectFlange::r_delayline = NULL;
+
+// User-supplied offset for the delayed sample
+// but start with passthru
+int AudioEffectFlange::delay_offset_idx = DELAY_PASSTHRU;
+int AudioEffectFlange::delay_length;
+
+int AudioEffectFlange::delay_depth;
+int AudioEffectFlange::delay_rate_incr;
+unsigned int AudioEffectFlange::l_delay_rate_index;
+unsigned int AudioEffectFlange::r_delay_rate_index;
+// fails if the user provides unreasonable values but will
+// coerce them and go ahead anyway. e.g. if the delay offset
+// is >= CHORUS_DELAY_LENGTH, the code will force it to
+// CHORUS_DELAY_LENGTH-1 and return false.
+// delay_rate is the rate (in Hz) of the sine wave modulation
+// delay_depth is the maximum variation around delay_offset
+// i.e. the total offset is delay_offset + delay_depth * sin(delay_rate)
+boolean AudioEffectFlange::begin(short *delayline,int d_length,int delay_offset,int d_depth,float delay_rate)
+{
+  boolean all_ok = true;
+
+Serial.print("AudioEffectFlange.begin(ofsset = ");
+Serial.print(delay_offset);
+Serial.print(", depth = ");
+Serial.print(d_depth);
+Serial.print(", rate = ");
+Serial.print(delay_rate,3);
+Serial.println(")");
+Serial.print("    CHORUS_DELAY_LENGTH = ");
+Serial.println(d_length);
+
+  delay_length = d_length/2;
+  l_delayline = delayline;
+  r_delayline = delayline + delay_length;
+  
+  delay_depth = d_depth;
+  // initial index
+  l_delay_rate_index = 0;
+  r_delay_rate_index = 0;
+  l_circ_idx = 0;
+  r_circ_idx = 0;
+  delay_rate_incr = 2*PI*delay_rate/44100.*2147483648.; 
+//Serial.println(delay_rate_incr,HEX);
+
+  delay_offset_idx = delay_offset;
+  // Allow the passthru code to go through
+  if(delay_offset_idx < -1) {
+    delay_offset_idx = 0;
+    all_ok = false;
+  }
+  if(delay_offset_idx >= delay_length) {
+    delay_offset_idx = delay_length - 1;
+    all_ok = false;
+  }  
+  return(all_ok);
+}
+
+
+boolean AudioEffectFlange::modify(int delay_offset,int d_depth,float delay_rate)
+{
+  boolean all_ok = true;
+  
+  delay_depth = d_depth;
+
+  delay_rate_incr = 2*PI*delay_rate/44100.*2147483648.;
+  
+  delay_offset_idx = delay_offset;
+  // Allow the passthru code to go through
+  if(delay_offset_idx < -1) {
+    delay_offset_idx = 0;
+    all_ok = false;
+  }
+  if(delay_offset_idx >= delay_length) {
+    delay_offset_idx = delay_length - 1;
+    all_ok = false;
+  }
+  l_delay_rate_index = 0;
+  r_delay_rate_index = 0;
+  l_circ_idx = 0;
+  r_circ_idx = 0;
+  return(all_ok);
+}
+
+void AudioEffectFlange::update(void)
+{
+  audio_block_t *block;
+  int idx;
+  short *bp;
+  short frac;
+  int idx1;
+
+  if(l_delayline == NULL)return;
+  if(r_delayline == NULL)return; 
+
+  // do passthru
+  if(delay_offset_idx == DELAY_PASSTHRU) {
+    // Just passthrough
+    block = receiveWritable(0);
+    if(block) {
+      bp = block->data;
+      for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
+        l_circ_idx++;
+        if(l_circ_idx >= delay_length) {
+          l_circ_idx = 0;
+        }
+        l_delayline[l_circ_idx] = *bp++;
+      }
+      transmit(block,0);
+      release(block);
+    }
+    block = receiveWritable(1);
+    if(block) {
+      bp = block->data;
+      for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
+        r_circ_idx++;
+        if(r_circ_idx >= delay_length) {
+          r_circ_idx = 0;
+        }
+        r_delayline[r_circ_idx] = *bp++;
+      }
+      transmit(block,1);
+      release(block);
+    }
+    return;
+  }
+
+  //          L E F T  C H A N N E L
+
+  block = receiveWritable(0);
+  if(block) {
+    bp = block->data;
+    for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
+      l_circ_idx++;
+      if(l_circ_idx >= delay_length) {
+        l_circ_idx = 0;
+      }
+      l_delayline[l_circ_idx] = *bp;
+      idx = arm_sin_q15( (q15_t)((l_delay_rate_index >> 16) & 0x7fff));
+      idx = (idx * delay_depth) >> 15;
+//Serial.println(idx);
+      idx = l_circ_idx - (delay_offset_idx + idx);
+      if(idx < 0) {
+        idx += delay_length;
+      }
+      if(idx >= delay_length) {
+        idx -= delay_length;
+      }
+
+      if(frac < 0)
+        idx1 = idx - 1;
+      else
+        idx1 = idx + 1;
+      if(idx1 < 0) {
+        idx1 += delay_length;
+      }
+      if(idx1 >= delay_length) {
+        idx1 -= delay_length;
+      }
+      frac = (l_delay_rate_index >> 1) &0x7fff;
+      frac = (( (int)(l_delayline[idx1] - l_delayline[idx])*frac) >> 15);
+
+//frac = 0;
+      *bp++ = (l_delayline[l_circ_idx]
+                + l_delayline[idx] + frac
+//                + l_delayline[(l_circ_idx + delay_length/2) % delay_length]                
+              )/2;
+
+      l_delay_rate_index += delay_rate_incr;
+      if(l_delay_rate_index & 0x80000000) {
+        l_delay_rate_index &= 0x7fffffff;
+      }
+    }
+    // send the effect output to the left channel
+    transmit(block,0);
+    release(block);
+  }
+
+  //          R I G H T  C H A N N E L
+
+  block = receiveWritable(1);
+  if(block) {
+    bp = block->data;
+    for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
+      r_circ_idx++;
+      if(r_circ_idx >= delay_length) {
+        r_circ_idx = 0;
+      }
+      r_delayline[r_circ_idx] = *bp;
+      idx = arm_sin_q15( (q15_t)((r_delay_rate_index >> 16)&0x7fff));
+       idx = (idx * delay_depth) >> 15;
+
+      idx = r_circ_idx - (delay_offset_idx + idx);
+      if(idx < 0) {
+        idx += delay_length;
+      }
+      if(idx >= delay_length) {
+        idx -= delay_length;
+      }
+
+      if(frac < 0)
+        idx1 = idx - 1;
+      else
+        idx1 = idx + 1;
+      if(idx1 < 0) {
+        idx1 += delay_length;
+      }
+      if(idx1 >= delay_length) {
+        idx1 -= delay_length;
+      }
+      frac = (r_delay_rate_index >> 1) &0x7fff;
+      frac = (( (int)(r_delayline[idx1] - r_delayline[idx])*frac) >> 15);
+
+//frac = 0;
+
+      *bp++ = (r_delayline[r_circ_idx]
+                + r_delayline[idx] + frac
+               )/2;
+
+      r_delay_rate_index += delay_rate_incr;
+      if(r_delay_rate_index & 0x80000000) {
+        r_delay_rate_index &= 0x7fffffff;
+      }
+
+    }
+    // send the effect output to the right channel
+    transmit(block,1);
+    release(block);
+  }
+}
+
+
+
+/******************************************************************/
+
+//                A u d i o E f f e c t C h o r u s
+// Written by Pete (El Supremo) Jan 2014
+
+// circular addressing indices for left and right channels
+short AudioEffectChorus::l_circ_idx;
+short AudioEffectChorus::r_circ_idx;
+
+short * AudioEffectChorus::l_delayline = NULL;
+short * AudioEffectChorus::r_delayline = NULL;
+int AudioEffectChorus::delay_length;
+// An initial value of zero indicates passthru
+int AudioEffectChorus::num_chorus = 0;
+
+
+// All three must be valid.
+boolean AudioEffectChorus::begin(short *delayline,int d_length,int n_chorus)
+{
+Serial.print("AudioEffectChorus.begin(Chorus delay line length = ");
+Serial.print(d_length);
+Serial.print(", n_chorus = ");
+Serial.print(n_chorus);
+Serial.println(")");
+
+l_delayline = NULL;
+r_delayline = NULL;
+delay_length = 0;
+l_circ_idx = 0;
+r_circ_idx = 0;
+
+  if(delayline == NULL) {
+    return(false);
+  }
+  if(d_length < 10) {
+    return(false);
+  }
+  if(n_chorus < 1) {
+    return(false);
+  }
+  
+  l_delayline = delayline;
+  r_delayline = delayline + d_length/2;
+  delay_length = d_length/2;
+  num_chorus = n_chorus;
+ 
+  return(true);
+}
+
+// This has the same effect as begin(NULL,0);
+void AudioEffectChorus::stop(void)
+{
+
+}
+
+void AudioEffectChorus::modify(int n_chorus)
+{
+  num_chorus = n_chorus;
+}
+
+int iabs(int x)
+{
+  if(x < 0)return(-x);
+  return(x);
+}
+//static int d_count = 0;
+
+int last_idx = 0;
+void AudioEffectChorus::update(void)
+{
+  audio_block_t *block;
+  short *bp;
+  int sum;
+  int c_idx;
+
+  if(l_delayline == NULL)return;
+  if(r_delayline == NULL)return;  
+  
+  // do passthru
+  // It stores the unmodified data in the delay line so that
+  // it isn't as likely to click
+  if(num_chorus < 1) {
+    // Just passthrough
+    block = receiveWritable(0);
+    if(block) {
+      bp = block->data;
+      for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
+        l_circ_idx++;
+        if(l_circ_idx >= delay_length) {
+          l_circ_idx = 0;
+        }
+        l_delayline[l_circ_idx] = *bp++;
+      }
+      transmit(block,0);
+      release(block);
+    }
+    block = receiveWritable(1);
+    if(block) {
+      bp = block->data;
+      for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
+        r_circ_idx++;
+        if(r_circ_idx >= delay_length) {
+          r_circ_idx = 0;
+        }
+        r_delayline[r_circ_idx] = *bp++;
+      }
+      transmit(block,1);
+      release(block);
+    }
+    return;
+  }
+
+  //          L E F T  C H A N N E L
+
+  block = receiveWritable(0);
+  if(block) {
+    bp = block->data;
+    for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
+      l_circ_idx++;
+      if(l_circ_idx >= delay_length) {
+        l_circ_idx = 0;
+      }
+      l_delayline[l_circ_idx] = *bp;
+      sum = 0;
+      c_idx = l_circ_idx;
+      for(int k = 0; k < num_chorus; k++) {
+        sum += l_delayline[c_idx];
+        if(num_chorus > 1)c_idx -= delay_length/(num_chorus - 1) - 1;
+        if(c_idx < 0) {
+          c_idx += delay_length;
+        }
+      }
+      *bp++ = sum/num_chorus;
+    }
+
+    // send the effect output to the left channel
+    transmit(block,0);
+    release(block);
+  }
+
+  //          R I G H T  C H A N N E L
+
+  block = receiveWritable(1);
+  if(block) {
+    bp = block->data;
+    for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
+      r_circ_idx++;
+      if(r_circ_idx >= delay_length) {
+        r_circ_idx = 0;
+      }
+      r_delayline[r_circ_idx] = *bp;
+      sum = 0;
+      c_idx = r_circ_idx;
+      for(int k = 0; k < num_chorus; k++) {
+        sum += r_delayline[c_idx];
+        if(num_chorus > 1)c_idx -= delay_length/(num_chorus - 1) - 1;
+        if(c_idx < 0) {
+          c_idx += delay_length;
+        }
+      }
+      *bp++ = sum/num_chorus;
+    }
+
+    // send the effect output to the left channel
+    transmit(block,1);
+    release(block);
+  }
+}
+
