@@ -139,7 +139,21 @@ void AudioAnalyzeFFT256::update(void)
 
 
 /******************************************************************/
-
+// PAH - add ramp-up and ramp-down at the beginning and end of the wave
+// 
+void AudioSynthWaveform::set_ramp_length(uint16_t r_length)
+{
+	if(r_length < 0) {
+		ramp_length = 0;
+		return;
+	}
+	// Don't set the ramp length longer than about 4 milliseconds
+	if(r_length > 44*4) {
+		ramp_length = 44*4;
+		return;
+	}
+	ramp_length = r_length;
+}
 
 void AudioSynthWaveform::update(void)
 {
@@ -148,7 +162,7 @@ void AudioSynthWaveform::update(void)
 	int32_t val1, val2, val3;
 
 	//Serial.println("AudioSynthWaveform::update");
-	if (magnitude > 0 && (block = allocate()) != NULL) {
+	if (((magnitude > 0) || ramp_down) && (block = allocate()) != NULL) {
 		ph = phase;
 		inc = phase_increment;
 		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
@@ -159,7 +173,35 @@ void AudioSynthWaveform::update(void)
 			val2 *= scale;
 			val1 *= 0xFFFF - scale;
 			val3 = (val1 + val2) >> 16;
-			block->data[i] = (val3 * magnitude) >> 15;
+
+
+// The value of ramp_up is always initialized to RAMP_LENGTH and then is
+// decremented each time through here until it reaches zero.
+// The value of ramp_up is used to generate a Q15 fraction which varies
+// from [0 - 1), and multiplies this by the current sample
+			if(ramp_up) {
+				// ramp up to the new magnitude
+				// ramp_mag is the Q15 representation of the fraction
+				// Since ramp_up can't be zero, this cannot generate +1
+				ramp_mag = ((ramp_length-ramp_up)<<15)/ramp_length;
+				ramp_up--;
+				block->data[i] = (val3 * ((ramp_mag * magnitude)>>15)) >> 15;
+
+			} else if(ramp_down) {
+				// ramp down to zero from the last magnitude
+// The value of ramp_down is always initialized to RAMP_LENGTH and then is
+// decremented each time through here until it reaches zero.
+// The value of ramp_down is used to generate a Q15 fraction which varies
+// from (1 - 0], and multiplies this by the current sample
+				// avoid RAMP_LENGTH/RAMP_LENGTH because Q15 format
+				// cannot represent +1
+				ramp_mag = ((ramp_down - 1)<<15)/ramp_length;
+				ramp_down--;
+				block->data[i] = (val3 * ((ramp_mag * last_magnitude)>>15)) >> 15;
+			} else {			
+				block->data[i] = (val3 * magnitude) >> 15;
+			}
+
 			 //Serial.print(block->data[i]);
 			 //Serial.print(", ");
 			 //if ((i % 12) == 11) Serial.println();
