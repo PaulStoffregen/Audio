@@ -2204,7 +2204,28 @@ void AudioFilterBiquad::update(void)
 	release(block);
 }
 
+void AudioFilterBiquad::updateCoefs(int *source, bool noReset)
+{
+	int32_t *dest=(int32_t *)definition;
+	int32_t *src=(int32_t *)source;
+	__disable_irq();
+	for(uint8_t index=0;index<5;index++)
+	{
+		*dest++=*src++;
+	}
+	if(!noReset)
+	{
+		*dest++=0;
+		*dest++=0;
+		*dest++=0;
+	}
+	__enable_irq();
+}
 
+void AudioFilterBiquad::updateCoefs(int *source)
+{
+	updateCoefs(source,false);
+}
 
 /******************************************************************/
 
@@ -3005,13 +3026,14 @@ bool AudioControlSGTL5000::enable(void)
 	write(CHIP_ANA_POWER, 0x4060);  // VDDD is externally driven with 1.8V
 	write(CHIP_LINREG_CTRL, 0x006C);  // VDDA & VDDIO both over 3.1V
 	write(CHIP_REF_CTRL, 0x01F1); // VAG=1.575 slow ramp, normal bias current
-	write(CHIP_LINE_OUT_CTRL, 0x0322);
+	write(CHIP_LINE_OUT_CTRL, 0x0322); // LO_VAGCNTRL=1.65V, OUT_CURRENT=0.36mA
 	write(CHIP_SHORT_CTRL, 0x4446);  // allow up to 125mA
 	write(CHIP_ANA_CTRL, 0x0137);  // enable zero cross detectors
 	write(CHIP_ANA_POWER, 0x40FF); // power up: lineout, hp, adc, dac
 	write(CHIP_DIG_POWER, 0x0073); // power up all digital stuff
 	delay(400);
-	write(CHIP_LINE_OUT_VOL, 0x0505); // TODO: correct value for 3.3V
+	// 40*log((1.575)/(1.65)) + 15 = 13.1391993746043 
+	write(CHIP_LINE_OUT_VOL, 0x0D0D); // [S]TODO: correct value for 3.3V[/S] 
 	write(CHIP_CLK_CTRL, 0x0004);  // 44.1 kHz, 256*Fs
 	write(CHIP_I2S_CTRL, 0x0130); // SCLK=32*Fs, 16bit, I2S format
 	// default signal routing is ok?
@@ -3050,6 +3072,13 @@ bool AudioControlSGTL5000::write(unsigned int reg, unsigned int val)
 	return false;
 }
 
+unsigned int AudioControlSGTL5000::modify(unsigned int reg, unsigned int val, unsigned int iMask)
+{
+	unsigned int val1 = (read(reg)&(~iMask))|val;
+	if(!write(reg,val1)) return 0;
+	return val1;
+}
+
 bool AudioControlSGTL5000::volumeInteger(unsigned int n)
 {
 	if (n == 0) {
@@ -3069,6 +3098,134 @@ bool AudioControlSGTL5000::volumeInteger(unsigned int n)
 	return write(CHIP_ANA_HP_CTRL, n);  // set volume
 }
 
+// CHIP_LINE_OUT_VOL
+unsigned short AudioControlSGTL5000::lo_lvl_right(uint8_t n)
+{
+	n&=31;
+	return modify(CHIP_LINE_OUT_VOL,n<<8,31<<8);
+}
+unsigned short AudioControlSGTL5000::lo_lvl_left(uint8_t n)
+{
+	n&=31;
+	return modify(CHIP_LINE_OUT_VOL,n,31);
+}
+unsigned short AudioControlSGTL5000::lo_lvl(uint8_t n)
+{
+	n&=31;
+	return modify(CHIP_LINE_OUT_VOL,(n<<8)|n,(31<<8)|31);
+}
 
+// CHIP_DAC_VOL
+unsigned short AudioControlSGTL5000::dac_vol_right(float n) //  by percentage 0-100
+{
+	unsigned char m=calcVol(n,0xC0);
+	return modify(CHIP_DAC_VOL,(0xFC-m)<<8,255<<8);
+}
+unsigned short AudioControlSGTL5000::dac_vol_left(float n)
+{
+	unsigned char m=calcVol(n,0xC0);
+	return modify(CHIP_DAC_VOL,(0xFC-m),255);
+}
+unsigned short AudioControlSGTL5000::dac_vol(float n) // set both directly
+{
+	unsigned char m=calcVol(n,0xC0);
+	return modify(CHIP_DAC_VOL,((0xFC-m)<<8)|(0xFC-m),65535);
+}
 
+// DAP_CONTROL
+unsigned short AudioControlSGTL5000::dap_mix_enable(uint8_t n)
+{
+	return modify(DAP_CONTROL,(n&1)<<4,1<<4);
+}
+unsigned short AudioControlSGTL5000::dap_enable(uint8_t n)
+{
+	return modify(DAP_CONTROL,(n&1),1);
+}
+
+// DAP_PEQ
+unsigned short AudioControlSGTL5000::dap_peqs(uint8_t n) // valid to n&7, 0 thru 7 filters enabled.
+{
+	return modify(DAP_PEQ,(n&7),7);
+}
+
+// DAP_AUDIO_EQ
+unsigned short AudioControlSGTL5000::dap_audio_eq(uint8_t n) // 0=NONE, 1=PEQ (7 IIR Biquad filters), 2=TONE (tone), 3=GEQ (5 band EQ)
+{
+	return modify(DAP_AUDIO_EQ,n&3,3);
+}
+
+// DAP_AUDIO_EQ_BASS_BAND0 & DAP_AUDIO_EQ_BAND1 & DAP_AUDIO_EQ_BAND2 etc etc
+unsigned short AudioControlSGTL5000::dap_audio_eq_band(uint8_t bandNum, float n) // by signed percentage -100/+100; dap_audio_eq(3);
+{ // 0x00==-12dB, 0x2F==0dB, 0x5F==12dB
+	n=((n/100)*48)+0.499;
+	if(n<-48) n=-48;
+	if(n>48) n=48;
+	unsigned char m=0x2F+(unsigned char)n;
+	return modify(DAP_AUDIO_EQ_BASS_BAND0+bandNum,m&127,127);
+}
+void AudioControlSGTL5000::dap_audio_eq_geq(float bass, float mid_bass, float midrange, float mid_treble, float treble)
+{
+	dap_audio_eq_band(0,bass);
+	dap_audio_eq_band(1,mid_bass);
+	dap_audio_eq_band(2,midrange);
+	dap_audio_eq_band(3,mid_treble);
+	dap_audio_eq_band(4,treble);
+}
+void AudioControlSGTL5000::dap_audio_eq_tone(float bass, float treble) // dap_audio_eq(2);
+{
+	dap_audio_eq_band(0,bass);
+	dap_audio_eq_band(4,treble);
+}
+
+// SGTL5000 PEQ Coefficient loader
+void AudioControlSGTL5000::load_peq(uint8_t filterNum, int *filterParameters)
+{
+	// 1111 11111111 11111111
+
+	write(DAP_COEF_WR_B0_MSB,(*filterParameters>>4)&65535);
+	write(DAP_COEF_WR_B0_LSB,(*filterParameters++)&15);
+	write(DAP_COEF_WR_B1_MSB,(*filterParameters>>4)&65535);
+	write(DAP_COEF_WR_B1_LSB,(*filterParameters++)&15);
+	write(DAP_COEF_WR_B2_MSB,(*filterParameters>>4)&65535);
+	write(DAP_COEF_WR_B2_LSB,(*filterParameters++)&15);
+	write(DAP_COEF_WR_A1_MSB,(*filterParameters>>4)&65535);
+	write(DAP_COEF_WR_A1_LSB,(*filterParameters++)&15);
+	write(DAP_COEF_WR_A2_MSB,(*filterParameters>>4)&65535);
+	write(DAP_COEF_WR_A2_LSB,(*filterParameters++)&15);
+}
+
+// a route selection routine to simplify a little
+void AudioControlSGTL5000::route(uint8_t via_i2s, uint8_t via_dap)
+{
+	if(via_i2s)
+	{
+		modify(CHIP_SSS_CTRL,0,3); // I2S_OUT select ADC
+		if(via_dap)
+		{
+			modify(CHIP_SSS_CTRL,1<<6,3<<6); // DAP select I2S_IN
+			modify(CHIP_SSS_CTRL,3<<4,3<<4); // DAC select DAP
+			modify(DAP_CONTROL,1,1); // enable DAP
+		} else {
+			modify(CHIP_SSS_CTRL,1<<4,3<<4); // DAC select I2S_IN
+			modify(DAP_CONTROL,0,1); // disable DAP
+		}
+	} else {
+		if(via_dap)
+		{
+			modify(CHIP_SSS_CTRL,0,3<<6); // DAP select ADC
+			modify(CHIP_SSS_CTRL,3<<4,3<<4); // DAC select DAP
+			modify(DAP_CONTROL,1,1); // enable DAP
+		} else {
+			modify(CHIP_SSS_CTRL,0,3<<4); // DAC select ADC
+			modify(DAP_CONTROL,0,1); // disable DAP
+		}
+	}
+}
+
+unsigned char AudioControlSGTL5000::calcVol(float n, unsigned char range)
+{
+	n=(n*(((float)range)/100))+0.499;
+	if ((unsigned char)n>range) n=range;
+	return (unsigned char)n;
+}
 

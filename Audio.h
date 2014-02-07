@@ -377,6 +377,9 @@ public:
 	AudioFilterBiquad(int *parameters)
 	   : AudioStream(1, inputQueueArray), definition(parameters) { }
 	virtual void update(void);
+	
+	void updateCoefs(int *source, bool noReset);
+	void updateCoefs(int *source);
 private:
 	int *definition;
 	audio_block_t *inputQueueArray[1];
@@ -527,29 +530,34 @@ public:
 	}
 	//bool inputLinein(void) { return write(0x0024, ana_ctrl | (1<<2)); }
 	//bool inputMic(void) { return write(0x002A, 0x0172) && write(0x0024, ana_ctrl & ~(1<<2)); }
+
+	unsigned int micGain(unsigned int n) { return modify(0x002A, n&3, 3); }
+	unsigned short lo_lvl_right(uint8_t n);
+	unsigned short lo_lvl_left(uint8_t n);
+	unsigned short lo_lvl(uint8_t n);
+	unsigned short dac_vol_right(float n);
+	unsigned short dac_vol_left(float n);
+	unsigned short dac_vol(float n);
+	unsigned short dap_mix_enable(uint8_t n);
+	unsigned short dap_enable(uint8_t n);
+	unsigned short dap_peqs(uint8_t n);
+	unsigned short dap_audio_eq(uint8_t n);
+	unsigned short dap_audio_eq_band(uint8_t bandNum, float n);
+	void dap_audio_eq_geq(float bass, float mid_bass, float midrange, float mid_treble, float treble);
+	void dap_audio_eq_tone(float bass, float treble);
+	void load_peq(uint8_t filterNum, int *filterParameters);
+	void route(uint8_t via_i2s, uint8_t via_dap);
+	
+	
 protected:
 	bool muted;
 	bool volumeInteger(unsigned int n); // range: 0x00 to 0x80
 	uint16_t ana_ctrl;
 
-
+	unsigned char calcVol(float n, unsigned char range);
 
 	unsigned int read(unsigned int reg);
 	bool write(unsigned int reg, unsigned int val);
+	unsigned int modify(unsigned int reg, unsigned int val, unsigned int iMask);
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
