@@ -3222,15 +3222,17 @@ boolean AudioEffectFlange::begin(short *delayline,int d_length,int delay_offset,
 {
   boolean all_ok = true;
 
-Serial.print("AudioEffectFlange.begin(ofsset = ");
+if(0) {
+Serial.print("AudioEffectFlange.begin(offset = ");
 Serial.print(delay_offset);
 Serial.print(", depth = ");
 Serial.print(d_depth);
 Serial.print(", rate = ");
 Serial.print(delay_rate,3);
 Serial.println(")");
-Serial.print("    CHORUS_DELAY_LENGTH = ");
+Serial.print("    FLANGE_DELAY_LENGTH = ");
 Serial.println(d_length);
+}
 
   delay_length = d_length/2;
   l_delayline = delayline;
