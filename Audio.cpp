@@ -3194,6 +3194,9 @@ void AudioFilterFIR::update(void)
 /******************************************************************/
 //                A u d i o E f f e c t F l a n g e
 // Written by Pete (El Supremo) Jan 2014
+// 140207 - fix calculation of delay_rate_incr which is expressed as
+//			a fraction of 2*PI
+// 140207 - cosmetic fix to begin()
 
 // circular addressing indices for left and right channels
 short AudioEffectFlange::l_circ_idx;
@@ -3223,17 +3226,16 @@ boolean AudioEffectFlange::begin(short *delayline,int d_length,int delay_offset,
   boolean all_ok = true;
 
 if(0) {
-Serial.print("AudioEffectFlange.begin(offset = ");
-Serial.print(delay_offset);
-Serial.print(", depth = ");
-Serial.print(d_depth);
-Serial.print(", rate = ");
-Serial.print(delay_rate,3);
-Serial.println(")");
-Serial.print("    FLANGE_DELAY_LENGTH = ");
-Serial.println(d_length);
+  Serial.print("AudioEffectFlange.begin(offset = ");
+  Serial.print(delay_offset);
+  Serial.print(", depth = ");
+  Serial.print(d_depth);
+  Serial.print(", rate = ");
+  Serial.print(delay_rate,3);
+  Serial.println(")");
+  Serial.print("    FLANGE_DELAY_LENGTH = ");
+  Serial.println(d_length);
 }
-
   delay_length = d_length/2;
   l_delayline = delayline;
   r_delayline = delayline + delay_length;
@@ -3244,7 +3246,7 @@ Serial.println(d_length);
   r_delay_rate_index = 0;
   l_circ_idx = 0;
   r_circ_idx = 0;
-  delay_rate_incr = 2*PI*delay_rate/44100.*2147483648.; 
+  delay_rate_incr = delay_rate/44100.*2147483648.; 
 //Serial.println(delay_rate_incr,HEX);
 
   delay_offset_idx = delay_offset;
@@ -3267,7 +3269,7 @@ boolean AudioEffectFlange::modify(int delay_offset,int d_depth,float delay_rate)
   
   delay_depth = d_depth;
 
-  delay_rate_incr = 2*PI*delay_rate/44100.*2147483648.;
+  delay_rate_incr = delay_rate/44100.*2147483648.;
   
   delay_offset_idx = delay_offset;
   // Allow the passthru code to go through
@@ -3364,10 +3366,8 @@ void AudioEffectFlange::update(void)
       frac = (l_delay_rate_index >> 1) &0x7fff;
       frac = (( (int)(l_delayline[idx1] - l_delayline[idx])*frac) >> 15);
 
-//frac = 0;
       *bp++ = (l_delayline[l_circ_idx]
-                + l_delayline[idx] + frac
-//                + l_delayline[(l_circ_idx + delay_length/2) % delay_length]                
+                + l_delayline[idx] + frac               
               )/2;
 
       l_delay_rate_index += delay_rate_incr;
@@ -3414,8 +3414,6 @@ void AudioEffectFlange::update(void)
       }
       frac = (r_delay_rate_index >> 1) &0x7fff;
       frac = (( (int)(r_delayline[idx1] - r_delayline[idx])*frac) >> 15);
-
-//frac = 0;
 
       *bp++ = (r_delayline[r_circ_idx]
                 + r_delayline[idx] + frac
