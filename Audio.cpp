@@ -2983,7 +2983,7 @@ bool AudioControlWM8731master::enable(void)
 #define DAP_BASS_ENHANCE_CTRL		0x0106
 #define DAP_AUDIO_EQ			0x0108
 #define DAP_SGTL_SURROUND		0x010A
-#define DAP_FILTER_COEF_ACCES		0x010C
+#define DAP_FILTER_COEF_ACCESS		0x010C
 #define DAP_COEF_WR_B0_MSB		0x010E
 #define DAP_COEF_WR_B0_LSB		0x0110
 #define DAP_AUDIO_EQ_BASS_BAND0		0x0116 // 115 Hz
@@ -3192,6 +3192,9 @@ void AudioControlSGTL5000::load_peq(uint8_t filterNum, int *filterParameters)
 	write(DAP_COEF_WR_A1_LSB,(*filterParameters++)&15);
 	write(DAP_COEF_WR_A2_MSB,(*filterParameters>>4)&65535);
 	write(DAP_COEF_WR_A2_LSB,(*filterParameters++)&15);
+	write(DAP_FILTER_COEF_ACCESS,(uint16_t)0x100|filterNum);
+	// This next step should be unnecessary but I'd prefer to do it for now
+	modify(DAP_FILTER_COEF_ACCESS,(uint16_t)filterNum,15); 
 }
 
 // a route selection routine to simplify a little
