@@ -3193,7 +3193,7 @@ void AudioControlSGTL5000::load_peq(uint8_t filterNum, int *filterParameters)
 	write(DAP_COEF_WR_A2_MSB,(*filterParameters>>4)&65535);
 	write(DAP_COEF_WR_A2_LSB,(*filterParameters++)&15);
 	write(DAP_FILTER_COEF_ACCESS,(uint16_t)0x100|filterNum);
-	// This next step should be unnecessary but I'd prefer to do it for now
+	delay(10); // seems necessary, didn't work for 1ms.
 	modify(DAP_FILTER_COEF_ACCESS,(uint16_t)filterNum,15); 
 }
 
