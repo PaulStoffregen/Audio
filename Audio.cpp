@@ -3032,8 +3032,8 @@ bool AudioControlSGTL5000::enable(void)
 	write(CHIP_ANA_POWER, 0x40FF); // power up: lineout, hp, adc, dac
 	write(CHIP_DIG_POWER, 0x0073); // power up all digital stuff
 	delay(400);
-	// 40*log((1.575)/(1.65)) + 15 = 13.1391993746043 
-	write(CHIP_LINE_OUT_VOL, 0x0D0D); // [S]TODO: correct value for 3.3V[/S] 
+	// 40*log((1.575)/(1.65)) + 15 = 13.1391993746043 but it seems wrong, 5 is better...
+	write(CHIP_LINE_OUT_VOL, 0x0505); // TODO: correct value for 3.3V
 	write(CHIP_CLK_CTRL, 0x0004);  // 44.1 kHz, 256*Fs
 	write(CHIP_I2S_CTRL, 0x0130); // SCLK=32*Fs, 16bit, I2S format
 	// default signal routing is ok?
