@@ -530,15 +530,12 @@ public:
 	//bool inputLinein(void) { return write(0x0024, ana_ctrl | (1<<2)); }
 	//bool inputMic(void) { return write(0x002A, 0x0172) && write(0x0024, ana_ctrl & ~(1<<2)); }
 
+	bool volume(float left, float right);
 	unsigned short micGain(unsigned int n) { return modify(0x002A, n&3, 3); }
-	unsigned short hp_vol_right(float n);
-	unsigned short hp_vol_left(float n);
-	unsigned short lo_lvl_right(uint8_t n);
-	unsigned short lo_lvl_left(uint8_t n);
 	unsigned short lo_lvl(uint8_t n);
-	unsigned short dac_vol_right(float n);
-	unsigned short dac_vol_left(float n);
+	unsigned short lo_lvl(uint8_t left, uint8_t right);
 	unsigned short dac_vol(float n);
+	unsigned short dac_vol(float left, float right);
 	unsigned short dap_mix_enable(uint8_t n);
 	unsigned short dap_enable(uint8_t n);
 	unsigned short dap_enable(void);

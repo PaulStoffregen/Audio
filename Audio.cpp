@@ -3098,56 +3098,40 @@ bool AudioControlSGTL5000::volumeInteger(unsigned int n)
 	return write(CHIP_ANA_HP_CTRL, n);  // set volume
 }
 
-unsigned short AudioControlSGTL5000::hp_vol_right(float n)
+bool AudioControlSGTL5000::volume(float left, float right)
 {
-	unsigned char m=calcVol(n,0x7F);
-	return modify(CHIP_ANA_HP_CTRL,(0x7F-m)<<8,0x7F<<8);
+	unsigned short m=(0x7F-calcVol(right,0x7F))<<8|0x7F-calcVol(left,0x7F);
+	return write(CHIP_ANA_HP_CTRL, m);
 }
 
-unsigned short AudioControlSGTL5000::hp_vol_left(float n)
-{
-	unsigned char m=calcVol(n,0x7F);
-	return modify(CHIP_ANA_HP_CTRL,(0x7F-m),0x7F);
-
-}
 
 // CHIP_LINE_OUT_VOL
-unsigned short AudioControlSGTL5000::lo_lvl_right(uint8_t n)
-{
-	n&=31;
-	return modify(CHIP_LINE_OUT_VOL,n<<8,31<<8);
-}
-unsigned short AudioControlSGTL5000::lo_lvl_left(uint8_t n)
-{
-	n&=31;
-	return modify(CHIP_LINE_OUT_VOL,n,31);
-}
 unsigned short AudioControlSGTL5000::lo_lvl(uint8_t n)
 {
 	n&=31;
 	return modify(CHIP_LINE_OUT_VOL,(n<<8)|n,(31<<8)|31);
 }
 
-// CHIP_DAC_VOL
-unsigned short AudioControlSGTL5000::dac_vol_right(float n) //  by percentage 0-100
+unsigned short AudioControlSGTL5000::lo_lvl(uint8_t left, uint8_t right)
 {
-	if(read(CHIP_ADCDAC_CTRL)&(1<<3)!=((n>0 ? 0:1)<<3)) modify(CHIP_ADCDAC_CTRL,(n>0 ? 0:1)<<3,1<<3);
-	unsigned char m=calcVol(n,0xC0);
-	return modify(CHIP_DAC_VOL,(0xFC-m)<<8,255<<8);
+	left&=31;
+	right&=31;
+	return modify(CHIP_LINE_OUT_VOL,(right<<8)|left,(31<<8)|31);
 }
-unsigned short AudioControlSGTL5000::dac_vol_left(float n)
-{
-	if(read(CHIP_ADCDAC_CTRL)&(1<<2)!=((n>0 ? 0:1)<<2)) modify(CHIP_ADCDAC_CTRL,(n>0 ? 0:1)<<2,1<<2);
-	unsigned char m=calcVol(n,0xC0);
-	return modify(CHIP_DAC_VOL,(0xFC-m),255);
-}
+
 unsigned short AudioControlSGTL5000::dac_vol(float n) // set both directly
 {
 	if(read(CHIP_ADCDAC_CTRL)&(3<<2)!=((n>0 ? 0:3)<<2)) modify(CHIP_ADCDAC_CTRL,(n>0 ? 0:3)<<2,3<<2);
 	unsigned char m=calcVol(n,0xC0);
 	return modify(CHIP_DAC_VOL,((0xFC-m)<<8)|(0xFC-m),65535);
 }
-
+unsigned short AudioControlSGTL5000::dac_vol(float left, float right)
+{
+	unsigned short adcdac=((right>0 ? 0:2)|(left>0 ? 0:1))<<2;
+	if(read(CHIP_ADCDAC_CTRL)&(3<<2)!=adcdac)  modify(CHIP_ADCDAC_CTRL,adcdac,1<<2);
+	unsigned short m=(0xFC-calcVol(right,0xC0))<<8|(0xFC-calcVol(left,0xC0));
+	return modify(CHIP_DAC_VOL,m,65535);
+}
 // DAP_CONTROL
 unsigned short AudioControlSGTL5000::dap_mix_enable(uint8_t n)
 {
