@@ -14,7 +14,6 @@
 #define AudioNoInterrupts() (NVIC_DISABLE_IRQ(IRQ_SOFTWARE))
 #define AudioInterrupts()   (NVIC_ENABLE_IRQ(IRQ_SOFTWARE))
 
-
 // waveforms.c
 extern "C" {
 extern const int16_t AudioWaveformSine[257];
@@ -378,7 +377,7 @@ public:
 	   : AudioStream(1, inputQueueArray), definition(parameters) { }
 	virtual void update(void);
 	
-	void updateCoefs(int *source, bool noReset);
+	void updateCoefs(int *source, bool doReset);
 	void updateCoefs(int *source);
 private:
 	int *definition;
@@ -531,7 +530,9 @@ public:
 	//bool inputLinein(void) { return write(0x0024, ana_ctrl | (1<<2)); }
 	//bool inputMic(void) { return write(0x002A, 0x0172) && write(0x0024, ana_ctrl & ~(1<<2)); }
 
-	unsigned int micGain(unsigned int n) { return modify(0x002A, n&3, 3); }
+	unsigned short micGain(unsigned int n) { return modify(0x002A, n&3, 3); }
+	unsigned short hp_vol_right(float n);
+	unsigned short hp_vol_left(float n);
 	unsigned short lo_lvl_right(uint8_t n);
 	unsigned short lo_lvl_left(uint8_t n);
 	unsigned short lo_lvl(uint8_t n);
@@ -540,13 +541,13 @@ public:
 	unsigned short dac_vol(float n);
 	unsigned short dap_mix_enable(uint8_t n);
 	unsigned short dap_enable(uint8_t n);
+	unsigned short dap_enable(void);
 	unsigned short dap_peqs(uint8_t n);
 	unsigned short dap_audio_eq(uint8_t n);
 	unsigned short dap_audio_eq_band(uint8_t bandNum, float n);
 	void dap_audio_eq_geq(float bass, float mid_bass, float midrange, float mid_treble, float treble);
 	void dap_audio_eq_tone(float bass, float treble);
 	void load_peq(uint8_t filterNum, int *filterParameters);
-	void route(uint8_t via_i2s, uint8_t via_dap);
 	
 	
 protected:
@@ -561,3 +562,13 @@ protected:
 	unsigned int modify(unsigned int reg, unsigned int val, unsigned int iMask);
 };
 
+//For Filter Type: 0 = LPF, 1 = HPF, 2 = BPF, 3 = NOTCH, 4 = PeakingEQ, 5 = LowShelf, 6 = HighShelf
+  #define FILTER_LOPASS 0
+  #define FILTER_HIPASS 1
+  #define FILTER_BANDPASS 2
+  #define FILTER_NOTCH 3
+  #define FILTER_PARAEQ 4
+  #define FILTER_LOSHELF 5
+  #define FILTER_HISHELF 6
+
+void calcBiquad(uint8_t filtertype, float fC, float dB_Gain, float Q, uint32_t quantization_unit, uint32_t fS, int *coef);

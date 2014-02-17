@@ -2204,7 +2204,7 @@ void AudioFilterBiquad::update(void)
 	release(block);
 }
 
-void AudioFilterBiquad::updateCoefs(int *source, bool noReset)
+void AudioFilterBiquad::updateCoefs(int *source, bool doReset)
 {
 	int32_t *dest=(int32_t *)definition;
 	int32_t *src=(int32_t *)source;
@@ -2213,7 +2213,7 @@ void AudioFilterBiquad::updateCoefs(int *source, bool noReset)
 	{
 		*dest++=*src++;
 	}
-	if(!noReset)
+	if(doReset)
 	{
 		*dest++=0;
 		*dest++=0;
@@ -3098,6 +3098,19 @@ bool AudioControlSGTL5000::volumeInteger(unsigned int n)
 	return write(CHIP_ANA_HP_CTRL, n);  // set volume
 }
 
+unsigned short AudioControlSGTL5000::hp_vol_right(float n)
+{
+	unsigned char m=calcVol(n,0x7F);
+	return modify(CHIP_ANA_HP_CTRL,(0x7F-m)<<8,0x7F<<8);
+}
+
+unsigned short AudioControlSGTL5000::hp_vol_left(float n)
+{
+	unsigned char m=calcVol(n,0x7F);
+	return modify(CHIP_ANA_HP_CTRL,(0x7F-m),0x7F);
+
+}
+
 // CHIP_LINE_OUT_VOL
 unsigned short AudioControlSGTL5000::lo_lvl_right(uint8_t n)
 {
@@ -3118,16 +3131,19 @@ unsigned short AudioControlSGTL5000::lo_lvl(uint8_t n)
 // CHIP_DAC_VOL
 unsigned short AudioControlSGTL5000::dac_vol_right(float n) //  by percentage 0-100
 {
+	if(read(CHIP_ADCDAC_CTRL)&(1<<3)!=((n>0 ? 0:1)<<3)) modify(CHIP_ADCDAC_CTRL,(n>0 ? 0:1)<<3,1<<3);
 	unsigned char m=calcVol(n,0xC0);
 	return modify(CHIP_DAC_VOL,(0xFC-m)<<8,255<<8);
 }
 unsigned short AudioControlSGTL5000::dac_vol_left(float n)
 {
+	if(read(CHIP_ADCDAC_CTRL)&(1<<2)!=((n>0 ? 0:1)<<2)) modify(CHIP_ADCDAC_CTRL,(n>0 ? 0:1)<<2,1<<2);
 	unsigned char m=calcVol(n,0xC0);
 	return modify(CHIP_DAC_VOL,(0xFC-m),255);
 }
 unsigned short AudioControlSGTL5000::dac_vol(float n) // set both directly
 {
+	if(read(CHIP_ADCDAC_CTRL)&(3<<2)!=((n>0 ? 0:3)<<2)) modify(CHIP_ADCDAC_CTRL,(n>0 ? 0:3)<<2,3<<2);
 	unsigned char m=calcVol(n,0xC0);
 	return modify(CHIP_DAC_VOL,((0xFC-m)<<8)|(0xFC-m),65535);
 }
@@ -3139,7 +3155,15 @@ unsigned short AudioControlSGTL5000::dap_mix_enable(uint8_t n)
 }
 unsigned short AudioControlSGTL5000::dap_enable(uint8_t n)
 {
-	return modify(DAP_CONTROL,(n&1),1);
+	if(n) n=1;
+	unsigned char DAC=1+(2*n); // I2S_IN if n==0 else DAP
+	modify(DAP_CONTROL,n,1);
+	return modify(CHIP_SSS_CTRL,(0<<6)|(DAC<<4),(3<<6)|(3<<4));
+}
+
+unsigned short AudioControlSGTL5000::dap_enable(void)
+{
+	return dap_enable(1);
 }
 
 // DAP_PEQ
@@ -3158,10 +3182,10 @@ unsigned short AudioControlSGTL5000::dap_audio_eq(uint8_t n) // 0=NONE, 1=PEQ (7
 unsigned short AudioControlSGTL5000::dap_audio_eq_band(uint8_t bandNum, float n) // by signed percentage -100/+100; dap_audio_eq(3);
 { // 0x00==-12dB, 0x2F==0dB, 0x5F==12dB
 	n=((n/100)*48)+0.499;
-	if(n<-48) n=-48;
+	if(n<-47) n=-47;
 	if(n>48) n=48;
-	unsigned char m=0x2F+(unsigned char)n;
-	return modify(DAP_AUDIO_EQ_BASS_BAND0+bandNum,m&127,127);
+	n+=47;
+	return modify(DAP_AUDIO_EQ_BASS_BAND0+(bandNum*2),(unsigned int)n,127);
 }
 void AudioControlSGTL5000::dap_audio_eq_geq(float bass, float mid_bass, float midrange, float mid_treble, float treble)
 {
@@ -3197,34 +3221,6 @@ void AudioControlSGTL5000::load_peq(uint8_t filterNum, int *filterParameters)
 	modify(DAP_FILTER_COEF_ACCESS,(uint16_t)filterNum,15); 
 }
 
-// a route selection routine to simplify a little
-void AudioControlSGTL5000::route(uint8_t via_i2s, uint8_t via_dap)
-{
-	if(via_i2s)
-	{
-		modify(CHIP_SSS_CTRL,0,3); // I2S_OUT select ADC
-		if(via_dap)
-		{
-			modify(CHIP_SSS_CTRL,1<<6,3<<6); // DAP select I2S_IN
-			modify(CHIP_SSS_CTRL,3<<4,3<<4); // DAC select DAP
-			modify(DAP_CONTROL,1,1); // enable DAP
-		} else {
-			modify(CHIP_SSS_CTRL,1<<4,3<<4); // DAC select I2S_IN
-			modify(DAP_CONTROL,0,1); // disable DAP
-		}
-	} else {
-		if(via_dap)
-		{
-			modify(CHIP_SSS_CTRL,0,3<<6); // DAP select ADC
-			modify(CHIP_SSS_CTRL,3<<4,3<<4); // DAC select DAP
-			modify(DAP_CONTROL,1,1); // enable DAP
-		} else {
-			modify(CHIP_SSS_CTRL,0,3<<4); // DAC select ADC
-			modify(DAP_CONTROL,0,1); // disable DAP
-		}
-	}
-}
-
 unsigned char AudioControlSGTL5000::calcVol(float n, unsigned char range)
 {
 	n=(n*(((float)range)/100))+0.499;
@@ -3232,3 +3228,93 @@ unsigned char AudioControlSGTL5000::calcVol(float n, unsigned char range)
 	return (unsigned char)n;
 }
 
+// if(SGTL5000_PEQ) quantization_unit=524288; if(AudioFilterBiquad) quantization_unit=2147483648;
+void calcBiquad(uint8_t filtertype, float fC, float dB_Gain, float Q, uint32_t quantization_unit, uint32_t fS, int *coef)
+{
+
+// I used resources like http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt
+// to make this routine, I tested most of the filter types and they worked. Such filters have limits and
+// before calling this routine with varying values the end user should check that those values are limited
+// to valid results.
+
+  float A;
+  if(filtertype<FILTER_PARAEQ) A=pow(10,dB_Gain/20); else A=pow(10,dB_Gain/40);
+  float W0 = 2*3.14159265358979323846*fC/fS; 
+  float cosw=cos(W0);
+  float sinw=sin(W0);
+  //float alpha = sinw*sinh((log(2)/2)*BW*W0/sinw);
+  //float beta = sqrt(2*A);
+  float alpha = sinw / (2 * Q); 
+  float beta = sqrt(A)/Q;
+  float b0,b1,b2,a0,a1,a2;
+
+  switch(filtertype) {
+  case FILTER_LOPASS:
+    b0 = (1.0F - cosw) * 0.5F; // =(1-COS($H$2))/2
+    b1 = 1.0F - cosw;
+    b2 = (1.0F - cosw) * 0.5F;
+    a0 = 1.0F + alpha;
+    a1 = 2.0F * cosw;
+    a2 = alpha - 1.0F;
+  break;
+  case FILTER_HIPASS:
+    b0 = (1.0F + cosw) * 0.5F;
+    b1 = -(cosw + 1.0F);
+    b2 = (1.0F + cosw) * 0.5F;
+    a0 = 1.0F + alpha;
+    a1 = 2.0F * cosw;
+    a2 = alpha - 1.0F;
+  break;
+  case FILTER_BANDPASS:
+    b0 = alpha;
+    b1 = 0.0F;
+    b2 = -alpha;
+    a0 = 1.0F + alpha;
+    a1 = 2.0F * cosw;
+    a2 = alpha - 1.0F;
+   break;
+  case FILTER_NOTCH:
+    b0=1;
+    b1=-2*cosw;
+    b2=1;
+    a0=1+alpha;
+    a1=2*cosw;
+    a2=-(1-alpha);
+  break;
+  case FILTER_PARAEQ:
+    b0 = 1 + (alpha*A);
+    b1 =-2 * cosw;
+    b2 = 1 - (alpha*A);
+    a0 = 1 + (alpha/A);
+    a1 = 2 * cosw;
+    a2 =-(1-(alpha/A));
+  break;
+  case FILTER_LOSHELF:
+    b0 = A * ((A+1.0F) - ((A-1.0F)*cosw) + (beta*sinw));
+    b1 = 2.0F * A * ((A-1.0F) - ((A+1.0F)*cosw));
+    b2 = A * ((A+1.0F) - ((A-1.0F)*cosw) - (beta*sinw));
+    a0 = (A+1.0F) + ((A-1.0F)*cosw) + (beta*sinw);
+    a1 = 2.0F * ((A-1.0F) + ((A+1.0F)*cosw));
+    a2 = -((A+1.0F) + ((A-1.0F)*cosw) - (beta*sinw));
+  break;
+  case FILTER_HISHELF:
+    b0 = A * ((A+1.0F) + ((A-1.0F)*cosw) + (beta*sinw));
+    b1 = -2.0F * A * ((A-1.0F) + ((A+1.0F)*cosw));
+    b2 = A * ((A+1.0F) + ((A-1.0F)*cosw) - (beta*sinw));
+    a0 = (A+1.0F) - ((A-1.0F)*cosw) + (beta*sinw);
+    a1 = -2.0F * ((A-1.0F) - ((A+1.0F)*cosw));
+    a2 = -((A+1.0F) - ((A-1.0F)*cosw) - (beta*sinw));
+  }
+
+  a0=(a0*2)/(float)quantization_unit; // once here instead of five times there...
+  b0/=a0;
+  *coef++=(int)(b0+0.499);
+  b1/=a0;
+  *coef++=(int)(b1+0.499);
+  b2/=a0;
+  *coef++=(int)(b2+0.499);
+  a1/=a0;
+  *coef++=(int)(a1+0.499);
+  a2/=a0;
+  *coef++=(int)(a2+0.499);
+}
