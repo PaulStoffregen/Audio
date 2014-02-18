@@ -1,4 +1,5 @@
 #include "AudioStream.h"
+#include "arm_math.h"
 
 
 // When changing multiple audio object settings that must update at
@@ -72,7 +73,9 @@ class AudioSynthWaveform : public AudioStream
 {
 public:
 	AudioSynthWaveform(const int16_t *waveform)
-	  : AudioStream(0, NULL), wavetable(waveform), magnitude(0), phase(0) { }
+	  : AudioStream(0, NULL), wavetable(waveform), magnitude(0), phase(0)
+					, ramp_up(0), ramp_down(0), ramp_mag(0), ramp_length(0)
+	  				 { }
 	void frequency(float freq) {
 		if (freq > AUDIO_SAMPLE_RATE_EXACT / 2 || freq < 0.0) return;
 		phase_increment = (freq / AUDIO_SAMPLE_RATE_EXACT) * 4294967296.0f;
@@ -80,14 +83,32 @@ public:
 	void amplitude(float n) {        // 0 to 1.0
 		if (n < 0) n = 0;
 		else if (n > 1.0) n = 1.0;
+// Ramp code
+		if(magnitude && (n == 0)) {
+			ramp_down = ramp_length;
+			ramp_up = 0;
+			last_magnitude = magnitude;
+		}
+		else if((magnitude == 0) && n) {
+			ramp_up = ramp_length;
+			ramp_down = 0;
+		}
+// set new magnitude
 		magnitude = n * 32767.0;
 	}
 	virtual void update(void);
+	void set_ramp_length(uint16_t r_length);
+	
 private:
 	const int16_t *wavetable;
 	uint16_t magnitude;
+	uint16_t last_magnitude;
 	uint32_t phase;
 	uint32_t phase_increment;
+	uint32_t ramp_down;
+	uint32_t ramp_up;
+	uint32_t ramp_mag;
+	uint16_t ramp_length;
 };
 
 
@@ -541,13 +562,108 @@ protected:
 
 
 
+/******************************************************************/
+
+// Maximum number of coefficients in a FIR filter
+// The audio breaks up with 128 coefficients so a
+// maximum of 150 is more than sufficient
+#define MAX_COEFFS 150
+
+// Indicates that the code should just pass through the audio
+// without any filtering (as opposed to doing nothing at all)
+#define FIR_PASSTHRU ((short *) 1)
+
+class AudioFilterFIR : 
+public AudioStream
+{
+public:
+  AudioFilterFIR(void): 
+  AudioStream(2,inputQueueArray), coeff_p(NULL)
+  { 
+  }
+
+  void begin(short *coeff_p,int f_pin);
+  virtual void update(void);
+  void stop(void);
+  
+private:
+  audio_block_t *inputQueueArray[2];
+  // arm state arrays and FIR instances for left and right channels
+  // the state arrays are defined to handle a maximum of MAX_COEFFS
+  // coefficients in a filter
+  q15_t l_StateQ15[AUDIO_BLOCK_SAMPLES + MAX_COEFFS];
+  q15_t r_StateQ15[AUDIO_BLOCK_SAMPLES + MAX_COEFFS];
+  arm_fir_instance_q15 l_fir_inst;
+  arm_fir_instance_q15 r_fir_inst;
+  // pointer to current coefficients or NULL or FIR_PASSTHRU
+  short *coeff_p;
+};
 
 
 
+/******************************************************************/
+//                A u d i o E f f e c t F l a n g e
+// Written by Pete (El Supremo) Jan 2014
+
+#define DELAY_PASSTHRU 0
+
+class AudioEffectFlange : 
+public AudioStream
+{
+public:
+  AudioEffectFlange(void): 
+  AudioStream(2,inputQueueArray) { 
+  }
+
+  boolean begin(short *delayline,int d_length,int delay_offset,int d_depth,float delay_rate);
+  boolean modify(int delay_offset,int d_depth,float delay_rate);
+  virtual void update(void);
+  void stop(void);
+  
+private:
+  audio_block_t *inputQueueArray[2];
+  static short *l_delayline;
+  static short *r_delayline;
+  static int delay_length;
+  static short l_circ_idx;
+  static short r_circ_idx;
+  static int delay_depth;
+  static int delay_offset_idx;
+  static int   delay_rate_incr;
+  static unsigned int l_delay_rate_index;
+  static unsigned int r_delay_rate_index;
+};
 
 
+/******************************************************************/
 
+//                A u d i o E f f e c t C h o r u s
+// Written by Pete (El Supremo) Jan 2014
 
+#define DELAY_PASSTHRU -1
+
+class AudioEffectChorus : 
+public AudioStream
+{
+public:
+  AudioEffectChorus(void): 
+  AudioStream(2,inputQueueArray) { 
+  }
+
+  boolean begin(short *delayline,int delay_length,int n_chorus);
+  virtual void update(void);
+  void stop(void);
+  void modify(int n_chorus);
+  
+private:
+  audio_block_t *inputQueueArray[2];
+  static short *l_delayline;
+  static short *r_delayline;
+  static short l_circ_idx;
+  static short r_circ_idx;
+  static int num_chorus;
+  static int delay_length;
+};
 
 
 
