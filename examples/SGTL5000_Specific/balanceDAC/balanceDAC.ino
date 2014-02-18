@@ -4,8 +4,6 @@
 #include <Wire.h>
 #include <SD.h>
 
-#define PIN_VOLUME 0
-#define PIN_BALANCE 15
 
 const int myInput = AUDIO_INPUT_LINEIN;
 // const int myInput = AUDIO_INPUT_MIC;
@@ -16,8 +14,6 @@ const int myInput = AUDIO_INPUT_LINEIN;
 
 AudioInputI2S       audioInput;         // audio shield: mic or line-in
 AudioOutputI2S      audioOutput;        // audio shield: headphones & line-out
-
-
 
 // Create Audio connections between the components
 //
@@ -31,26 +27,21 @@ AudioControlSGTL5000 audioShield;
 void setup() {
   // Audio connections require memory to work.  For more
   // detailed information, see the MemoryAndCpuUsage example
-  AudioMemory(6);
+  AudioMemory(4);
   // Enable the audio shield and set the output volume.
   audioShield.enable();
   audioShield.inputSelect(myInput);
-  audioShield.volume(90);
+  audioShield.volume(75);
   audioShield.unmuteLineout();
 }
 
 elapsedMillis chgMsec=0;
-float lastVol=1024;
 float lastBal=1024;
 
 void loop() {
   // every 10 ms, check for adjustment the balance & vol
   if (chgMsec > 10) { // more regular updates for actual changes seems better.
-#if PIN_BALANCE
-    float bal1=analogRead(PIN_BALANCE);
-#else
-    float bal1=0; // middle will be default if analog pin is not supplied
-#endif
+    float bal1=analogRead(15);
     bal1=((bal1-512)/512)*100;
     bal1=(int)bal1;
     if(lastBal!=bal1)
@@ -64,18 +55,6 @@ void loop() {
         audioShield.dac_vol(100);
       }
       lastBal=bal1;
-    }
-
-#if PIN_VOLUME
-    float vol1=analogRead(PIN_VOLUME)/10.23; // 0 - 100
-#else
-    float vol1=70; // 70% output will be default if analog pin is not supplied.
-#endif
-    vol1=(int)vol1;
-    if(lastVol!=vol1)
-    {
-      audioShield.volume(vol1);
-      lastVol=vol1;
     }
     chgMsec = 0;
   }
