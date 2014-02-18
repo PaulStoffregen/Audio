@@ -3113,19 +3113,7 @@ bool AudioControlSGTL5000::volumeInteger(unsigned int n)
 
 
 
-
 /******************************************************************/
-
-// arm state arrays and FIR instances for left and right channels
-// the state arrays are defined to handle a maximum of MAX_COEFFS
-// coefficients in a filter
-q15_t AudioFilterFIR::l_StateQ15[AUDIO_BLOCK_SAMPLES + MAX_COEFFS];
-q15_t AudioFilterFIR::r_StateQ15[AUDIO_BLOCK_SAMPLES + MAX_COEFFS];
-arm_fir_instance_q15 AudioFilterFIR::l_fir_inst;
-arm_fir_instance_q15 AudioFilterFIR::r_fir_inst;
-
-// pointer to current coefficients or NULL or FIR_PASSTHRU
-short * AudioFilterFIR::coeff_p = NULL;
 
 void AudioFilterFIR::begin(short *cp,int n_coeffs)
 {
