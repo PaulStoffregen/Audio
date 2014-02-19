@@ -3692,6 +3692,5 @@ void AudioToneSweep::update(void)
     // send the samples to the left channel
     transmit(block,0);
     release(block);
-    if(!sweep_busy)Serial.println(b_count);
   }
 }

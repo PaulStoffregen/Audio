@@ -1,0 +1,88 @@
+/*
+  Demo of the audio sweep function.
+  The user specifies the amplitude,
+  start and end frequencies (which can sweep up or down)
+  and the length of time of the sweep.
+   
+FMI:
+The audio board uses the following pins.
+ 6 - MEMCS
+ 7 - MOSI
+ 9 - BCLK
+10 - SDCS
+11 - MCLK
+12 - MISO
+13 - RX
+14 - SCLK
+15 - VOL
+18 - SDA
+19 - SCL
+22 - TX
+23 - LRCLK
+
+*/
+
+#include <arm_math.h>
+#include <Audio.h>
+#include <Wire.h>
+//#include <WM8731.h>
+#include <SD.h>
+#include <SPI.h>
+#include <Bounce.h>
+
+AudioToneSweep      myEffect;
+AudioOutputI2S      audioOutput;        // audio shield: headphones & line-out
+
+// The tone sweep goes to left and right channels
+AudioConnection c1(myEffect, 0, audioOutput, 0);
+AudioConnection c2(myEffect, 0, audioOutput, 1);
+
+AudioControlSGTL5000 audioShield;
+
+
+int t_ampx = 20000;
+int t_lox = 10;
+int t_hix = 22000;
+// Length of time for the sweep in seconds
+float t_timex = 10;
+// <<<<<<<<<<<<<<>>>>>>>>>>>>>>>>
+void setup(void)
+{
+  
+  Serial.begin(9600);
+  while (!Serial) ;
+  delay(3000);
+
+  AudioMemory(2);
+
+  audioShield.enable();
+  audioShield.volume(50);
+    // I want output on the line out too
+  audioShield.unmuteLineout();
+//  audioShield.muteHeadphone();
+
+  Serial.println("setup done");
+
+  if(!myEffect.begin(t_ampx,t_lox,t_hix,t_timex)) {
+    Serial.println("AudioToneSweep - begin failed");
+    while(1);
+  }
+  // wait for the sweep to end
+  while(myEffect.busy());
+
+  // and now reverse the sweep
+  if(!myEffect.begin(t_ampx,t_hix,t_lox,t_timex)) {
+    Serial.println("AudioToneSweep - begin failed");
+    while(1);
+  }
+  // wait for the sweep to end
+  while(myEffect.busy());
+  Serial.println("Done");
+}
+
+void loop(void)
+{
+}
+
+
+
