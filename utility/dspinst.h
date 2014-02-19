@@ -1,3 +1,6 @@
+#ifndef dspinst_h_
+#define dspinst_h_
+
 #include <stdint.h>
 
 // computes limit((val >> rshift), 2**bits)
@@ -107,5 +110,4 @@ static inline uint32_t logical_and(uint32_t a, uint32_t b)
 	return a;
 }
 
-
-
+#endif
