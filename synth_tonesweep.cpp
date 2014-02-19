@@ -3,29 +3,7 @@
 #include "utility/dspinst.h"
 
 
-
-/******************************************************************/
-
-
-void AudioPrint::update(void)
-{
-	audio_block_t *block;
-	uint32_t i;
-
-	Serial.println("AudioPrint::update");
-	Serial.println(name);
-	block = receiveReadOnly();
-	if (block) {
-		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
-			Serial.print(block->data[i]);
-			Serial.print(", ");
-			if ((i % 12) == 11) Serial.println();
-		}
-		Serial.println();
-		release(block);
-	}
-}
-
+// TODO: this object should be renamed to AudioSynthToneSweep
 
 /******************************************************************/
 
