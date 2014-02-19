@@ -42,8 +42,8 @@ class AudioAnalyzeFFT256 : public AudioStream
 {
 public:
 	AudioAnalyzeFFT256(uint8_t navg = 8, const int16_t *win = AudioWindowHanning256)
-	  : AudioStream(1, inputQueueArray), outputflag(false),
-	    prevblock(NULL), count(0), naverage(navg), window(win)  { init(); }
+	  : AudioStream(1, inputQueueArray), window(win), 
+	    prevblock(NULL), count(0), naverage(navg), outputflag(false) { init(); }
 
 	bool available() {
 		if (outputflag == true) {
@@ -73,7 +73,7 @@ class AudioSynthWaveform : public AudioStream
 public:
 	AudioSynthWaveform(const int16_t *waveform)
 	  : AudioStream(0, NULL), wavetable(waveform), magnitude(0), phase(0)
-					, ramp_up(0), ramp_down(0), ramp_mag(0), ramp_length(0)
+					, ramp_down(0), ramp_up(0), ramp_mag(0), ramp_length(0)
 	  				 { }
 	void frequency(float freq) {
 		if (freq > AUDIO_SAMPLE_RATE_EXACT / 2 || freq < 0.0) return;

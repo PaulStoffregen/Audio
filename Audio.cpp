@@ -3142,7 +3142,7 @@ bool AudioControlSGTL5000::volumeInteger(unsigned int n)
 
 bool AudioControlSGTL5000::volume(float left, float right)
 {
-	unsigned short m=(0x7F-calcVol(right,0x7F))<<8|0x7F-calcVol(left,0x7F);
+	unsigned short m=((0x7F-calcVol(right,0x7F))<<8)|(0x7F-calcVol(left,0x7F));
 	return write(CHIP_ANA_HP_CTRL, m);
 }
 
