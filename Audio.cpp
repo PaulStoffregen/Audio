@@ -1420,7 +1420,7 @@ void dma_ch4_isr(void)
 	const int16_t *src, *end;
 	int16_t *dest;
 	audio_block_t *block;
-	uint32_t saddr, offset;
+	uint32_t saddr;
 
 	saddr = (uint32_t)DMA_TCD4_SADDR;
         DMA_CINT = 4;
@@ -1437,7 +1437,7 @@ void dma_ch4_isr(void)
 	}
 	block = AudioOutputAnalog::block_left_1st;
 	if (block) {
-		src = &block->data[offset];
+		src = block->data;
 		do {
 			// TODO: this should probably dither
 			*dest++ = ((*src++) + 32767) >> 4;

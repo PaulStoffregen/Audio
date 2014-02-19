@@ -127,9 +127,9 @@ public AudioStream
 {
 public:
   AudioSynthWaveform(void) : 
-  AudioStream(0,NULL), tone_amp(0), ramp_up(0), ramp_down(0), 
-  ramp_length(0), tone_phase(0), tone_incr(0),
-  tone_type(0), tone_freq(0)
+  AudioStream(0,NULL), 
+  tone_freq(0), tone_phase(0), tone_incr(0), tone_type(0),
+  ramp_down(0), ramp_up(0), ramp_length(0)
   { 
   }
   // Change the frequency on-the-fly to permit a phase-continuous
