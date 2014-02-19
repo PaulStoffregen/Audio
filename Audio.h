@@ -679,7 +679,7 @@ private:
 //                A u d i o E f f e c t F l a n g e
 // Written by Pete (El Supremo) Jan 2014
 
-#define DELAY_PASSTHRU 0
+#define FLANGE_DELAY_PASSTHRU 0
 
 class AudioEffectFlange : 
 public AudioStream
@@ -696,16 +696,16 @@ public:
   
 private:
   audio_block_t *inputQueueArray[2];
-  static short *l_delayline;
-  static short *r_delayline;
-  static int delay_length;
-  static short l_circ_idx;
-  static short r_circ_idx;
-  static int delay_depth;
-  static int delay_offset_idx;
-  static int   delay_rate_incr;
-  static unsigned int l_delay_rate_index;
-  static unsigned int r_delay_rate_index;
+  short *l_delayline;
+  short *r_delayline;
+  int   delay_length;
+  short l_circ_idx;
+  short r_circ_idx;
+  int   delay_depth;
+  int   delay_offset_idx;
+  int   delay_rate_incr;
+  unsigned int l_delay_rate_index;
+  unsigned int r_delay_rate_index;
 };
 
 
@@ -713,16 +713,17 @@ private:
 
 //                A u d i o E f f e c t C h o r u s
 // Written by Pete (El Supremo) Jan 2014
+// 140219 - correct storage class (not static)
 
-#define DELAY_PASSTHRU -1
+#define CHORUS_DELAY_PASSTHRU -1
 
 class AudioEffectChorus : 
 public AudioStream
 {
 public:
   AudioEffectChorus(void): 
-  AudioStream(2,inputQueueArray) { 
-  }
+  AudioStream(2,inputQueueArray), num_chorus(2) 
+  { }
 
   boolean begin(short *delayline,int delay_length,int n_chorus);
   virtual void update(void);
@@ -731,12 +732,12 @@ public:
   
 private:
   audio_block_t *inputQueueArray[2];
-  static short *l_delayline;
-  static short *r_delayline;
-  static short l_circ_idx;
-  static short r_circ_idx;
-  static int num_chorus;
-  static int delay_length;
+  short *l_delayline;
+  short *r_delayline;
+  short l_circ_idx;
+  short r_circ_idx;
+  int num_chorus;
+  int delay_length;
 };
 
 

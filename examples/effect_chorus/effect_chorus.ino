@@ -174,7 +174,7 @@ AudioControlSGTL5000 audioShield;
 
 
 // number of "voices" in the chorus which INCLUDES the original voice
-int n_chorus = 3;
+int n_chorus = 2;
 
 // <<<<<<<<<<<<<<>>>>>>>>>>>>>>>>
 void setup() {
