@@ -1,8 +1,4 @@
-#include "Audio.h"
-#include "arm_math.h"
-#include "utility/dspinst.h"
-
-
+#include "play_sd_wav.h"
 
 #define STATE_DIRECT_8BIT_MONO		0  // playing mono at native sample rate
 #define STATE_DIRECT_8BIT_STEREO	1  // playing stereo at native sample rate

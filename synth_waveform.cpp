@@ -1,8 +1,6 @@
-#include "Audio.h"
+#include "synth_waveform.h"
 #include "arm_math.h"
 #include "utility/dspinst.h"
-
-
 
 
 #ifdef ORIGINAL_AUDIOSYNTHWAVEFORM

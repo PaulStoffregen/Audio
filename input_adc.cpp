@@ -1,6 +1,5 @@
-#include "Audio.h"
+#include "input_adc.h"
 #include "utility/pdb.h"
-
 
 DMAMEM static uint16_t analog_rx_buffer[AUDIO_BLOCK_SAMPLES];
 audio_block_t * AudioInputAnalog::block_left = NULL;

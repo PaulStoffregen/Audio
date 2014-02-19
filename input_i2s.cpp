@@ -1,6 +1,5 @@
-#include "Audio.h"
-#include "arm_math.h"
-
+#include "input_i2s.h"
+#include "output_i2s.h"
 
 DMAMEM static uint32_t i2s_rx_buffer[AUDIO_BLOCK_SAMPLES];
 audio_block_t * AudioInputI2S::block_left = NULL;

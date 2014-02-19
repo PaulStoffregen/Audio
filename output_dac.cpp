@@ -1,8 +1,5 @@
-#include "Audio.h"
+#include "output_dac.h"
 #include "utility/pdb.h"
-
-// #define PDB_CONFIG (PDB_SC_TRGSEL(15) | PDB_SC_PDBEN | PDB_SC_CONT)
-// #define PDB_PERIOD 1087 // 48e6 / 44100
 
 #if defined(__MK20DX256__)
 

@@ -1,7 +1,4 @@
-#include "Audio.h"
-#include "arm_math.h"
-
-
+#include "output_pwm.h"
 
 audio_block_t * AudioOutputPWM::block_1st = NULL;
 audio_block_t * AudioOutputPWM::block_2nd = NULL;

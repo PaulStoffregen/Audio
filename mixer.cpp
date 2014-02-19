@@ -1,8 +1,5 @@
-#include "Audio.h"
-#include "arm_math.h"
+#include "mixer.h"
 #include "utility/dspinst.h"
-
-
 
 void applyGain(int16_t *data, int32_t mult)
 {

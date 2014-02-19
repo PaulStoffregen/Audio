@@ -1,6 +1,5 @@
-#include "Audio.h"
+#include "synth_tonesweep.h"
 #include "arm_math.h"
-#include "utility/dspinst.h"
 
 
 // TODO: this object should be renamed to AudioSynthToneSweep

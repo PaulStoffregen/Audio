@@ -1,7 +1,4 @@
-#include "Audio.h"
-#include "arm_math.h"
-#include "utility/dspinst.h"
-
+#include "effect_chorus.h"
 
 /******************************************************************/
 

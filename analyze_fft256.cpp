@@ -1,9 +1,7 @@
-#include "Audio.h"
+#include "analyze_fft256.h"
 #include "arm_math.h"
-#include "utility/dspinst.h"
 
-
-
+// TODO: this should be a class member, so more than one FFT can be used
 static arm_cfft_radix4_instance_q15 fft_inst;
 
 void AudioAnalyzeFFT256::init(void)

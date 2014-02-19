@@ -2,7 +2,6 @@
 #define analyze_fft256_h_
 
 #include "AudioStream.h"
-#include "arm_math.h"
 
 // windows.c
 extern "C" {

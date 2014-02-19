@@ -1,7 +1,4 @@
-#include "Audio.h"
-#include "arm_math.h"
-
-
+#include "control_wm8731.h"
 #include "Wire.h"
 
 #define WM8731_I2C_ADDR 0x1A

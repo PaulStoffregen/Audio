@@ -1,10 +1,8 @@
-#include "Audio.h"
-
+#include "analyze_print.h"
 
 // TODO: this needs some sort of trigger or delay or other options to make
 // actually useful for watching interesting parts of data, without spewing
 // tremendous and endless data to the Arduino Serial Monitor
-
 
 void AudioPrint::update(void)
 {

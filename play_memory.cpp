@@ -1,7 +1,5 @@
-#include "Audio.h"
-#include "arm_math.h"
+#include "play_memory.h"
 #include "utility/dspinst.h"
-
 
 
 void AudioPlayMemory::play(const unsigned int *data)

@@ -2,6 +2,7 @@
 #define filter_fir_h_
 
 #include "AudioStream.h"
+#include "arm_math.h"
 
 // Maximum number of coefficients in a FIR filter
 // The audio breaks up with 128 coefficients so a

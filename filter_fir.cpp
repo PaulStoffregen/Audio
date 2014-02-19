@@ -1,8 +1,4 @@
-#include "Audio.h"
-#include "arm_math.h"
-#include "utility/dspinst.h"
-
-
+#include "filter_fir.h"
 
 void AudioFilterFIR::begin(short *cp,int n_coeffs)
 {

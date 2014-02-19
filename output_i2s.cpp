@@ -1,6 +1,4 @@
-#include "Audio.h"
-#include "arm_math.h"
-
+#include "output_i2s.h"
 
 // MCLK needs to be 48e6 / 1088 * 256 = 11.29411765 MHz -> 44.117647 kHz sample rate
 // Possible to create using fractional divider for all USB-compatible Kinetis:
@@ -13,7 +11,6 @@
 
 // TODO: instigate using I2S0_MCR to select the crystal directly instead of the system
 // clock, which has audio band jitter from the PLL
-
 
 
 audio_block_t * AudioOutputI2S::block_left_1st = NULL;
@@ -55,8 +52,6 @@ void AudioOutputI2S::begin(void)
 	I2S0_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE | I2S_TCSR_FR;
 	NVIC_ENABLE_IRQ(IRQ_DMA_CH0);
 }
-
-
 
 
 void dma_ch0_isr(void)

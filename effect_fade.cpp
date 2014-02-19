@@ -1,13 +1,9 @@
-#include "Audio.h"
-#include "arm_math.h"
+#include "effect_fade.h"
 #include "utility/dspinst.h"
-
-
 
 extern "C" {
 extern const int16_t fader_table[256];
 };
-
 
 void AudioEffectFade::update(void)
 {

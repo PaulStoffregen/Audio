@@ -1,7 +1,4 @@
-#include "Audio.h"
-#include "arm_math.h"
-
-
+#include "control_sgtl5000.h"
 #include "Wire.h"
 
 #define CHIP_ID				0x0000
