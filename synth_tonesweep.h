@@ -28,10 +28,10 @@
 //                A u d i o T o n e S w e e p
 // Written by Pete (El Supremo) Feb 2014
 
-class AudioToneSweep : public AudioStream
+class AudioSynthToneSweep : public AudioStream
 {
 public:
-  AudioToneSweep(void) : 
+  AudioSynthToneSweep(void) :
   AudioStream(0,NULL), sweep_busy(0)
   { }
 

@@ -30,7 +30,7 @@ The audio board uses the following pins.
 #include <SPI.h>
 #include <Bounce.h>
 
-AudioToneSweep      myEffect;
+AudioSynthToneSweep myEffect;
 AudioOutputI2S      audioOutput;        // audio shield: headphones & line-out
 
 // The tone sweep goes to left and right channels
@@ -64,7 +64,7 @@ void setup(void)
   Serial.println("setup done");
 
   if(!myEffect.begin(t_ampx,t_lox,t_hix,t_timex)) {
-    Serial.println("AudioToneSweep - begin failed");
+    Serial.println("AudioSynthToneSweep - begin failed");
     while(1);
   }
   // wait for the sweep to end
@@ -72,7 +72,7 @@ void setup(void)
 
   // and now reverse the sweep
   if(!myEffect.begin(t_ampx,t_hix,t_lox,t_timex)) {
-    Serial.println("AudioToneSweep - begin failed");
+    Serial.println("AudioSynthToneSweep - begin failed");
     while(1);
   }
   // wait for the sweep to end

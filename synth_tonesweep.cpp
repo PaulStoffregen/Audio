@@ -32,12 +32,12 @@
 // Written by Pete (El Supremo) Feb 2014
 
 
-boolean AudioToneSweep::begin(short t_amp,int t_lo,int t_hi,float t_time)
+boolean AudioSynthToneSweep::begin(short t_amp,int t_lo,int t_hi,float t_time)
 {
   double tone_tmp;
   
 if(0) {
-  Serial.print("AudioToneSweep.begin(tone_amp = ");
+  Serial.print("AudioSynthToneSweep.begin(tone_amp = ");
   Serial.print(t_amp);
   Serial.print(", tone_lo = ");
   Serial.print(t_lo);
@@ -78,13 +78,14 @@ if(0) {
 
 
 
-unsigned char AudioToneSweep::busy(void)
+unsigned char AudioSynthToneSweep::busy(void)
 {
   return(sweep_busy);
 }
 
-int b_count = 0;
-void AudioToneSweep::update(void)
+static int b_count = 0; // TODO: what's this for?
+
+void AudioSynthToneSweep::update(void)
 {
   audio_block_t *block;
   short *bp;
