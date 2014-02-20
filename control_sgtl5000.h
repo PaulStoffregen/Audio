@@ -68,9 +68,11 @@ public:
 	void dap_audio_eq_geq(float bass, float mid_bass, float midrange, float mid_treble, float treble);
 	void dap_audio_eq_tone(float bass, float treble);
 	void load_peq(uint8_t filterNum, int *filterParameters);
-	
-	
-protected:
+	unsigned short dap_avc(uint8_t maxGain, uint8_t lbiResponse, uint8_t hardLimit, float threshold, float attack, float decay);
+	unsigned short dap_avc_enable(uint8_t n);
+	unsigned short dap_avc_enable(void);
+
+	protected:
 	bool muted;
 	bool volumeInteger(unsigned int n); // range: 0x00 to 0x80
 	uint16_t ana_ctrl;

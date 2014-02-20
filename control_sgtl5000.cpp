@@ -621,6 +621,7 @@ unsigned short AudioControlSGTL5000::dac_vol(float left, float right)
 	unsigned short m=(0xFC-calcVol(right,0xC0))<<8|(0xFC-calcVol(left,0xC0));
 	return modify(CHIP_DAC_VOL,m,65535);
 }
+
 // DAP_CONTROL
 unsigned short AudioControlSGTL5000::dap_mix_enable(uint8_t n)
 {
@@ -695,12 +696,62 @@ void AudioControlSGTL5000::load_peq(uint8_t filterNum, int *filterParameters)
 	modify(DAP_FILTER_COEF_ACCESS,(uint16_t)filterNum,15); 
 }
 
+/* Valid values for dap_avc parameters
+
+	maxGain; Maximum gain that can be applied
+	0 - 0 dB
+	1 - 6.0 dB
+	2 - 12 dB
+	
+	lbiResponse; Integrator Response
+	0 - 0 mS
+	1 - 25 mS
+	2 - 50 mS
+	3 - 100 mS
+	
+	hardLimit
+	0 - Hard limit disabled. AVC Compressor/Expander enabled.
+	1 - Hard limit enabled. The signal is limited to the programmed threshold (signal saturates at the threshold)
+	
+	threshold
+	floating point in range 0 to -96 dB
+	
+	attack
+	floating point figure is dB/s rate at which gain is increased
+	
+	decay
+	floating point figure is dB/s rate at which gain is reduced
+*/
+unsigned short AudioControlSGTL5000::dap_avc(uint8_t maxGain, uint8_t lbiResponse, uint8_t hardLimit, float threshold, float attack, float decay)
+{
+	if(maxGain>2) maxGain=2;
+	lbiResponse&=3;
+	hardLimit&=1;
+	uint8_t thresh=(pow(10,threshold/20)*0.636)*pow(2,15);
+	uint8_t att=(1-pow(10,-(attack/(20*44100))))*pow(2,19);
+	uint8_t dec=(1-pow(10,-(decay/(20*44100))))*pow(2,23);
+	write(DAP_AVC_THRESHOLD,thresh);
+	write(DAP_AVC_ATTACK,att);
+	write(DAP_AVC_DECAY,dec);
+	return 	modify(DAP_AVC_CTRL,maxGain<<12|lbiResponse<<8|hardLimit<<5,3<<12|3<<8|1<<5);
+}
+unsigned short AudioControlSGTL5000::dap_avc_enable(uint8_t n)
+{
+	n&=1;
+	return modify(DAP_AVC_CTRL,n,1);
+}
+unsigned short AudioControlSGTL5000::dap_avc_enable(void)
+{
+	return modify(DAP_AVC_CTRL,1,1);
+}
+
 unsigned char AudioControlSGTL5000::calcVol(float n, unsigned char range)
 {
 	n=(n*(((float)range)/100))+0.499;
 	if ((unsigned char)n>range) n=range;
 	return (unsigned char)n;
 }
+
 
 // if(SGTL5000_PEQ) quantization_unit=524288; if(AudioFilterBiquad) quantization_unit=2147483648;
 void calcBiquad(uint8_t filtertype, float fC, float dB_Gain, float Q, uint32_t quantization_unit, uint32_t fS, int *coef)

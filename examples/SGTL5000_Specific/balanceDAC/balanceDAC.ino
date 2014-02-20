@@ -1,4 +1,7 @@
-// DAC balance example: Will influence both HP & LO outputs.
+/* DAC balance example: Will influence both HP & LO outputs.
+
+This example code is in the public domain
+*/
 
 #include <Audio.h>
 #include <Wire.h>

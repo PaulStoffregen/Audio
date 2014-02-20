@@ -1,5 +1,7 @@
-// Tone example using SGTL5000 DAP PEQ filters and calcBiquad filter calculator routine.
+/* Tone example using SGTL5000 DAP PEQ filters and calcBiquad filter calculator routine.
 
+This example code is in the public domain
+*/
 #include <Audio.h>
 #include <Wire.h>
 #include <SD.h>
