@@ -6,7 +6,7 @@
 // Create the Audio components.  These should be created in the
 // order data flows, inputs/sources -> processing -> outputs
 //
-AudioPlaySDcardWAV wav;
+AudioPlaySdWav     wav;
 AudioOutputI2S     dac;
 
 // Create Audio connections between the components

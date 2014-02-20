@@ -40,7 +40,7 @@
 #define STATE_PARSE4			11 // ignoring unknown chunk
 #define STATE_STOP			12
 
-void AudioPlaySDcardWAV::begin(void)
+void AudioPlaySdWav::begin(void)
 {
 	state = STATE_STOP;
 	state_play = STATE_STOP;
@@ -56,7 +56,7 @@ void AudioPlaySDcardWAV::begin(void)
 }
 
 
-bool AudioPlaySDcardWAV::play(const char *filename)
+bool AudioPlaySdWav::play(const char *filename)
 {
 	stop();
 	wavfile = SD.open(filename);
@@ -68,7 +68,7 @@ bool AudioPlaySDcardWAV::play(const char *filename)
 	return true;
 }
 
-void AudioPlaySDcardWAV::stop(void)
+void AudioPlaySdWav::stop(void)
 {
 	__disable_irq();
 	if (state != STATE_STOP) {
@@ -86,7 +86,7 @@ void AudioPlaySDcardWAV::stop(void)
 	}
 }
 
-bool AudioPlaySDcardWAV::start(void)
+bool AudioPlaySdWav::start(void)
 {
 	__disable_irq();
 	if (state == STATE_STOP) {
@@ -101,7 +101,7 @@ bool AudioPlaySDcardWAV::start(void)
 }
 
 
-void AudioPlaySDcardWAV::update(void)
+void AudioPlaySdWav::update(void)
 {
 	// only update if we're playing
 	if (state == STATE_STOP) return;
@@ -175,7 +175,7 @@ void AudioPlaySDcardWAV::update(void)
 // https://ccrma.stanford.edu/courses/422/projects/WaveFormat/
 
 // Consume already buffered data.  Returns true if audio transmitted.
-bool AudioPlaySDcardWAV::consume(void)
+bool AudioPlaySdWav::consume(void)
 {
 	uint32_t len, size;
 	uint8_t lsb, msb;
@@ -185,7 +185,7 @@ bool AudioPlaySDcardWAV::consume(void)
 	p = buffer + 512 - size;
 start:
 	if (size == 0) return false;
-	//Serial.print("AudioPlaySDcardWAV write, size = ");
+	//Serial.print("AudioPlaySdWav write, size = ");
 	//Serial.print(size);
 	//Serial.print(", data_length = ");
 	//Serial.print(data_length);
@@ -386,7 +386,7 @@ start:
 
 	  // this is not supposed to happen!
 	  //default:
-		//Serial.println("AudioPlaySDcardWAV, unknown state");
+		//Serial.println("AudioPlaySdWav, unknown state");
 	}
 	state_play = STATE_STOP;
 	state = STATE_STOP;
@@ -419,7 +419,7 @@ start:
 
 
 
-bool AudioPlaySDcardWAV::parse_format(void)
+bool AudioPlaySdWav::parse_format(void)
 {
 	uint8_t num = 0;
 	uint16_t format;
