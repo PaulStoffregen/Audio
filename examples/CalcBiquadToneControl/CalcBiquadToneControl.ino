@@ -1,4 +1,7 @@
-// Tone example using AudioFilterBiquad object and calcBiquad filter calculator routine.
+/* Tone example using AudioFilterBiquad object and calcBiquad filter calculator routine.
+
+This example code is in the public domain
+*/
 
 #include <Audio.h>
 #include <Wire.h>
