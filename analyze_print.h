@@ -29,10 +29,10 @@
 
 #include "AudioStream.h"
 
-class AudioPrint : public AudioStream
+class AudioAnalyzePrint : public AudioStream
 {
 public:
-	AudioPrint(const char *str) : AudioStream(1, inputQueueArray), name(str) {}
+	AudioAnalyzePrint(const char *str) : AudioStream(1, inputQueueArray), name(str) {}
 	virtual void update(void);
 private:
 	const char *name;

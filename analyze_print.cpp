@@ -30,12 +30,12 @@
 // actually useful for watching interesting parts of data, without spewing
 // tremendous and endless data to the Arduino Serial Monitor
 
-void AudioPrint::update(void)
+void AudioAnalyzePrint::update(void)
 {
 	audio_block_t *block;
 	uint32_t i;
 
-	Serial.println("AudioPrint::update");
+	Serial.println("AudioAnalyzePrint::update");
 	Serial.println(name);
 	block = receiveReadOnly();
 	if (block) {
