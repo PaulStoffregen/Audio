@@ -150,7 +150,7 @@ many blocks you provided with AudioMemory().
 #include <Bounce.h>
 
 // Number of samples in ONE channel
-#define FLANGE_DELAY_LENGTH (16*AUDIO_BLOCK_SAMPLES)
+#define FLANGE_DELAY_LENGTH (6*AUDIO_BLOCK_SAMPLES)
 // Allocate the delay line for left and right channels
 // The delayline will hold left and right samples so it
 // should be declared to be twice as long as the desired
@@ -221,9 +221,14 @@ double s_freq = .0625;
 */
 
 //12 - good with Eric Clapton Unplugged
+/*
 int s_idx = 3*FLANGE_DELAY_LENGTH/4;
 int s_depth = FLANGE_DELAY_LENGTH/8;
 double s_freq = .0625;
+*/
+int s_idx = FLANGE_DELAY_LENGTH/4;
+int s_depth = FLANGE_DELAY_LENGTH/4;
+double s_freq = .5;
 
 void setup() {
   

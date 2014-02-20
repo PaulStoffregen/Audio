@@ -29,23 +29,24 @@
 // 140207 - fix calculation of delay_rate_incr which is expressed as
 //			a fraction of 2*PI
 // 140207 - cosmetic fix to begin()
+// 140219 - correct the calculation of "frac"
 
 // circular addressing indices for left and right channels
-short AudioEffectFlange::l_circ_idx;
-short AudioEffectFlange::r_circ_idx;
+//short AudioEffectFlange::l_circ_idx;
+//short AudioEffectFlange::r_circ_idx;
 
-short * AudioEffectFlange::l_delayline = NULL;
-short * AudioEffectFlange::r_delayline = NULL;
+//short * AudioEffectFlange::l_delayline = NULL;
+//short * AudioEffectFlange::r_delayline = NULL;
 
 // User-supplied offset for the delayed sample
 // but start with passthru
-int AudioEffectFlange::delay_offset_idx = DELAY_PASSTHRU;
-int AudioEffectFlange::delay_length;
+//int AudioEffectFlange::delay_offset_idx = FLANGE_DELAY_PASSTHRU;
+//int AudioEffectFlange::delay_length;
 
-int AudioEffectFlange::delay_depth;
-int AudioEffectFlange::delay_rate_incr;
-unsigned int AudioEffectFlange::l_delay_rate_index;
-unsigned int AudioEffectFlange::r_delay_rate_index;
+//int AudioEffectFlange::delay_depth;
+//int AudioEffectFlange::delay_rate_incr;
+//unsigned int AudioEffectFlange::l_delay_rate_index;
+//unsigned int AudioEffectFlange::r_delay_rate_index;
 // fails if the user provides unreasonable values but will
 // coerce them and go ahead anyway. e.g. if the delay offset
 // is >= CHORUS_DELAY_LENGTH, the code will force it to
@@ -132,7 +133,7 @@ void AudioEffectFlange::update(void)
   if(r_delayline == NULL)return; 
 
   // do passthru
-  if(delay_offset_idx == DELAY_PASSTHRU) {
+  if(delay_offset_idx == FLANGE_DELAY_PASSTHRU) {
     // Just passthrough
     block = receiveWritable(0);
     if(block) {
@@ -169,15 +170,30 @@ void AudioEffectFlange::update(void)
   if(block) {
     bp = block->data;
     for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
+      // increment the index into the circular delay line buffer
       l_circ_idx++;
+      // wrap the index around if necessary
       if(l_circ_idx >= delay_length) {
         l_circ_idx = 0;
       }
+      // store the current sample in the delay line
       l_delayline[l_circ_idx] = *bp;
-      idx = arm_sin_q15( (q15_t)((l_delay_rate_index >> 16) & 0x7fff));
-      idx = (idx * delay_depth) >> 15;
+      // The argument to the arm_sin_q15 function is NOT in radians. It is
+      // actually, in effect, the fraction remaining after the division
+      // of radians/(2*PI) which is then expressed as a positive Q15
+      // fraction in the interval [0 , +1) - this is l_delay_rate_index. 
+      // l_delay_rate_index should probably be called l_delay_rate_phase
+      // (sorry about that!)
+      // It is a Q31 positive number of which the high order 16 bits are
+      // used when calculating the sine. idx will have a value in the
+      // interval [-1 , +1)
+      frac = arm_sin_q15( (q15_t)((l_delay_rate_index >> 16) & 0x7fff));
+      // multiply the sin by the delay depth
+      idx = (frac * delay_depth) >> 15;
 //Serial.println(idx);
+      // Calculate the offset into the buffer
       idx = l_circ_idx - (delay_offset_idx + idx);
+      // and adjust idx to point into the circular buffer
       if(idx < 0) {
         idx += delay_length;
       }
@@ -185,21 +201,28 @@ void AudioEffectFlange::update(void)
         idx -= delay_length;
       }
 
+      // Here we interpolate between two indices but if the sine was negative
+      // then we interpolate between idx and idx-1, otherwise the
+      // interpolation is between idx and idx+1
       if(frac < 0)
         idx1 = idx - 1;
       else
         idx1 = idx + 1;
+      // adjust idx1 in the circular buffer
       if(idx1 < 0) {
         idx1 += delay_length;
       }
       if(idx1 >= delay_length) {
         idx1 -= delay_length;
       }
+      // Do the interpolation
       frac = (l_delay_rate_index >> 1) &0x7fff;
       frac = (( (int)(l_delayline[idx1] - l_delayline[idx])*frac) >> 15);
 
+//frac = 0;
       *bp++ = (l_delayline[l_circ_idx]
-                + l_delayline[idx] + frac               
+                + l_delayline[idx] + frac
+//                + l_delayline[(l_circ_idx + delay_length/2) % delay_length]
               )/2;
 
       l_delay_rate_index += delay_rate_incr;
@@ -223,8 +246,8 @@ void AudioEffectFlange::update(void)
         r_circ_idx = 0;
       }
       r_delayline[r_circ_idx] = *bp;
-      idx = arm_sin_q15( (q15_t)((r_delay_rate_index >> 16)&0x7fff));
-       idx = (idx * delay_depth) >> 15;
+      frac = arm_sin_q15( (q15_t)((r_delay_rate_index >> 16)&0x7fff));
+      idx = (frac * delay_depth) >> 15;
 
       idx = r_circ_idx - (delay_offset_idx + idx);
       if(idx < 0) {
@@ -247,6 +270,7 @@ void AudioEffectFlange::update(void)
       frac = (r_delay_rate_index >> 1) &0x7fff;
       frac = (( (int)(r_delayline[idx1] - r_delayline[idx])*frac) >> 15);
 
+//frac = 0;
       *bp++ = (r_delayline[r_circ_idx]
                 + r_delayline[idx] + frac
                )/2;

@@ -26,19 +26,8 @@
 
 //                A u d i o E f f e c t C h o r u s
 // Written by Pete (El Supremo) Jan 2014
+// 140219 - correct storage class (not static)
 
-// circular addressing indices for left and right channels
-short AudioEffectChorus::l_circ_idx;
-short AudioEffectChorus::r_circ_idx;
-
-short * AudioEffectChorus::l_delayline = NULL;
-short * AudioEffectChorus::r_delayline = NULL;
-int AudioEffectChorus::delay_length;
-// An initial value of zero indicates passthru
-int AudioEffectChorus::num_chorus = 0;
-
-
-// All three must be valid.
 boolean AudioEffectChorus::begin(short *delayline,int d_length,int n_chorus)
 {
 Serial.print("AudioEffectChorus.begin(Chorus delay line length = ");
@@ -47,11 +36,11 @@ Serial.print(", n_chorus = ");
 Serial.print(n_chorus);
 Serial.println(")");
 
-l_delayline = NULL;
-r_delayline = NULL;
-delay_length = 0;
-l_circ_idx = 0;
-r_circ_idx = 0;
+  l_delayline = NULL;
+  r_delayline = NULL;
+  delay_length = 0;
+  l_circ_idx = 0;
+  r_circ_idx = 0;
 
   if(delayline == NULL) {
     return(false);
@@ -71,25 +60,12 @@ r_circ_idx = 0;
   return(true);
 }
 
-// This has the same effect as begin(NULL,0);
-void AudioEffectChorus::stop(void)
-{
-
-}
-
 void AudioEffectChorus::modify(int n_chorus)
 {
   num_chorus = n_chorus;
 }
 
-int iabs(int x)
-{
-  if(x < 0)return(-x);
-  return(x);
-}
-//static int d_count = 0;
-
-int last_idx = 0;
+//int last_idx = 0;
 void AudioEffectChorus::update(void)
 {
   audio_block_t *block;
