@@ -30,10 +30,10 @@
 #include "AudioStream.h"
 #include "SD.h"
 
-class AudioPlaySDcardRAW : public AudioStream
+class AudioPlaySdRaw : public AudioStream
 {
 public:
-	AudioPlaySDcardRAW(void) : AudioStream(0, NULL) { begin(); }
+	AudioPlaySdRaw(void) : AudioStream(0, NULL) { begin(); }
 	void begin(void);
 	bool play(const char *filename);
 	void stop(void);

@@ -27,7 +27,7 @@
 #include "play_sd_raw.h"
 
 
-void AudioPlaySDcardRAW::begin(void)
+void AudioPlaySdRaw::begin(void)
 {
 	playing = false;
 	if (block) {
@@ -37,7 +37,7 @@ void AudioPlaySDcardRAW::begin(void)
 }
 
 
-bool AudioPlaySDcardRAW::play(const char *filename)
+bool AudioPlaySdRaw::play(const char *filename)
 {
 	stop();
 	rawfile = SD.open(filename);
@@ -50,7 +50,7 @@ bool AudioPlaySDcardRAW::play(const char *filename)
 	return true;
 }
 
-void AudioPlaySDcardRAW::stop(void)
+void AudioPlaySdRaw::stop(void)
 {
 	__disable_irq();
 	if (playing) {
@@ -63,7 +63,7 @@ void AudioPlaySDcardRAW::stop(void)
 }
 
 
-void AudioPlaySDcardRAW::update(void)
+void AudioPlaySdRaw::update(void)
 {
 	unsigned int i, n;
 
