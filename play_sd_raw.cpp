@@ -34,6 +34,8 @@ void AudioPlaySdRaw::begin(void)
 		release(block);
 		block = NULL;
 	}
+	file_offset = 0;
+	file_size = 0;
 }
 
 
@@ -42,10 +44,12 @@ bool AudioPlaySdRaw::play(const char *filename)
 	stop();
 	rawfile = SD.open(filename);
 	if (!rawfile) {
-		Serial.println("unable to open file");
+		//Serial.println("unable to open file");
 		return false;
 	}
-	Serial.println("able to open file");
+	file_size = rawfile.size();
+	file_offset = 0;
+	//Serial.println("able to open file");
 	playing = true;
 	return true;
 }
@@ -77,6 +81,7 @@ void AudioPlaySdRaw::update(void)
 	if (rawfile.available()) {
 		// we can read more data from the file...
 		n = rawfile.read(block->data, AUDIO_BLOCK_SAMPLES*2);
+		file_offset += n;
 		for (i=n/2; i < AUDIO_BLOCK_SAMPLES; i++) {
 			block->data[i] = 0;
 		}
@@ -86,6 +91,18 @@ void AudioPlaySdRaw::update(void)
 		rawfile.close();
 		playing = false;
 	}
+}
+
+#define B2M (uint32_t)((double)4294967296000.0 / AUDIO_SAMPLE_RATE_EXACT / 2.0) // 97352592
+
+uint32_t AudioPlaySdRaw::positionMillis(void)
+{
+	return ((uint64_t)file_offset * B2M) >> 32;
+}
+
+uint32_t AudioPlaySdRaw::lengthMillis(void)
+{
+	return ((uint64_t)file_size * B2M) >> 32;
 }
 
 

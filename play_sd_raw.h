@@ -37,12 +37,16 @@ public:
 	void begin(void);
 	bool play(const char *filename);
 	void stop(void);
+	bool isPlaying(void) { return playing; }
+	uint32_t positionMillis(void);
+	uint32_t lengthMillis(void);
 	virtual void update(void);
 private:
 	File rawfile;
 	audio_block_t *block;
+	uint32_t file_size;
+	uint32_t file_offset;
 	bool playing;
-	bool paused;
 };
 
 #endif
