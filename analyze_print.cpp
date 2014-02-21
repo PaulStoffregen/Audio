@@ -26,26 +26,76 @@
 
 #include "analyze_print.h"
 
-// TODO: this needs some sort of trigger or delay or other options to make
-// actually useful for watching interesting parts of data, without spewing
-// tremendous and endless data to the Arduino Serial Monitor
+#define STATE_IDLE          0  // doing nothing
+#define STATE_WAIT_TRIGGER  1  // looking for trigger condition
+#define STATE_DELAY         2  // waiting from trigger to print
+#define STATE_PRINTING      3  // printing data
 
 void AudioAnalyzePrint::update(void)
 {
 	audio_block_t *block;
-	uint32_t i;
+	uint32_t offset = 0;
+	uint32_t remain, n;
 
-	Serial.println("AudioAnalyzePrint::update");
-	Serial.println(name);
+	//Serial.println(name);
 	block = receiveReadOnly();
-	if (block) {
-		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
-			Serial.print(block->data[i]);
-			Serial.print(", ");
-			if ((i % 12) == 11) Serial.println();
+	if (!block) return;
+
+	while (offset < AUDIO_BLOCK_SAMPLES) {
+		remain = AUDIO_BLOCK_SAMPLES - offset;
+		switch (state) {
+		  case STATE_WAIT_TRIGGER:
+			// TODO: implement this....
+			offset = AUDIO_BLOCK_SAMPLES;
+			break;
+
+		  case STATE_DELAY:
+			//Serial.printf("STATE_DELAY, count = %u\n", count);
+			if (remain < count) {
+				count -= remain;
+				offset = AUDIO_BLOCK_SAMPLES;
+			} else {
+				offset += count;
+				count = print_length;
+				state = STATE_PRINTING;
+			}
+			break;
+
+		  case STATE_PRINTING:
+			n = count;
+			if (n > remain) n = remain;
+			count -= n;
+			while (n > 0) {
+				Serial.println(block->data[offset++]);
+				n--;
+			}
+			if (count == 0) state = STATE_IDLE;
+			break;
+
+		  default: // STATE_IDLE
+			offset = AUDIO_BLOCK_SAMPLES;
+			break;
 		}
-		Serial.println();
-		release(block);
+	}
+	release(block);
+}
+
+void AudioAnalyzePrint::trigger(void)
+{
+	uint32_t n = delay_length;
+
+	if (n > 0) {
+		Serial.print("trigger ");
+		Serial.print(name);
+		Serial.print(", delay=");
+		Serial.println(n);
+		count = n;
+		state = 2;
+	} else {
+		Serial.print("trigger ");
+		Serial.println(name);
+		count = print_length;
+		state = 3;
 	}
 }
 
