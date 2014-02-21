@@ -87,20 +87,6 @@ void AudioPlaySdWav::stop(void)
 	}
 }
 
-bool AudioPlaySdWav::start(void)
-{
-	__disable_irq();
-	if (state == STATE_STOP) {
-		if (state_play == STATE_STOP) {
-			__enable_irq();
-			return false;
-		}
-		state = state_play;
-	}
-	__enable_irq();
-	return true;
-}
-
 
 void AudioPlaySdWav::update(void)
 {
@@ -268,6 +254,7 @@ start:
 				block_right = allocate();
 				if (!block_right) return false;
 			}
+			total_length = data_length;
 		} else {
 			state = STATE_PARSE4;
 		}
@@ -427,16 +414,16 @@ start:
 //  256 byte chunks, speed is 443272 bytes/sec
 //  512 byte chunks, speed is 468023 bytes/sec
 
-
-
-
+#define B2M_44100 (uint32_t)((double)4294967296000.0 / AUDIO_SAMPLE_RATE_EXACT) // 97352592
+#define B2M_22050 (uint32_t)((double)4294967296000.0 / AUDIO_SAMPLE_RATE_EXACT * 2.0)
+#define B2M_11025 (uint32_t)((double)4294967296000.0 / AUDIO_SAMPLE_RATE_EXACT * 4.0)
 
 bool AudioPlaySdWav::parse_format(void)
 {
 	uint8_t num = 0;
 	uint16_t format;
 	uint16_t channels;
-	uint32_t rate;
+	uint32_t rate, b2m;
 	uint16_t bits;
 
 	format = header[0];
@@ -444,12 +431,28 @@ bool AudioPlaySdWav::parse_format(void)
 	//Serial.println(format);
 	if (format != 1) return false;
 
+	rate = header[1];
+	//Serial.print("  rate = ");
+	//Serial.println(rate);
+	if (rate == AUDIO_SAMPLE_RATE) {
+		b2m = B2M_44100;
+	} else if (rate == 22050) {
+		b2m = B2M_22050;
+		num |= 4;
+	} else if (rate == 11025) {
+		b2m = B2M_11025;
+		num |= 4;
+	} else {
+		return false;
+	}
+
 	channels = header[0] >> 16;
 	//Serial.print("  channels = ");
 	//Serial.println(channels);
 	if (channels == 1) {
 	} else if (channels == 2) {
-		num = 1;
+		b2m >>= 1;
+		num |= 1;
 	} else {
 		return false;
 	}
@@ -459,20 +462,16 @@ bool AudioPlaySdWav::parse_format(void)
 	//Serial.println(bits);
 	if (bits == 8) {
 	} else if (bits == 16) {
+		b2m >>= 1;
 		num |= 2;
 	} else {
 		return false;
 	}
 
-	rate = header[1];
-	//Serial.print("  rate = ");
-	//Serial.println(rate);
-	if (rate == AUDIO_SAMPLE_RATE) {
-	} else if (rate >= 8000 && rate <= 48000) {
-		num |= 4;
-	} else {
-		return false;
-	}
+	bytes2millis = b2m;
+	//Serial.print("  bytes2millis = ");
+	//Serial.println(b2m);
+
 	// we're not checking the byte rate and block align fields
 	// if they're not the expected values, all we could do is
 	// return false.  Do any real wav files have unexpected
@@ -480,5 +479,29 @@ bool AudioPlaySdWav::parse_format(void)
 	state_play = num;
 	return true;
 }
+
+
+bool AudioPlaySdWav::isPlaying(void)
+{
+	return (state < 8);
+}
+
+uint32_t AudioPlaySdWav::positionMillis(void)
+{
+	if (state >= 8) return 0;
+	uint32_t offset = total_length - data_length;
+	return ((uint64_t)offset * bytes2millis) >> 32;
+}
+
+
+uint32_t AudioPlaySdWav::lengthMillis(void)
+{
+	if (state >= 8) return 0;
+	return ((uint64_t)total_length * bytes2millis) >> 32;
+}
+
+
+
+
 
 
