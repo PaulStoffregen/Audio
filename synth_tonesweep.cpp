@@ -24,11 +24,10 @@
 #include "arm_math.h"
 
 
-// TODO: this object should be renamed to AudioSynthToneSweep
 
 /******************************************************************/
 
-//                A u d i o T o n e S w e e p
+//                A u d i o S y n t h T o n e S w e e p
 // Written by Pete (El Supremo) Feb 2014
 
 
@@ -83,7 +82,6 @@ unsigned char AudioSynthToneSweep::busy(void)
   return(sweep_busy);
 }
 
-static int b_count = 0; // TODO: what's this for?
 
 void AudioSynthToneSweep::update(void)
 {
