@@ -123,7 +123,7 @@ void AudioSynthToneSweep::update(void)
       *bp++ = 0;
       i++;
     }
-    b_count++;
+    //b_count++;
     // send the samples to the left channel
     transmit(block,0);
     release(block);
