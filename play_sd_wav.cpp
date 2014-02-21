@@ -61,7 +61,8 @@ bool AudioPlaySdWav::play(const char *filename)
 	stop();
 	wavfile = SD.open(filename);
 	if (!wavfile) return false;
-	buffer_remaining = 0;
+	buffer_length = 0;
+	buffer_offset = 0;
 	state_play = STATE_STOP;
 	data_length = 0;
 	state = STATE_PARSE1;
@@ -103,6 +104,8 @@ bool AudioPlaySdWav::start(void)
 
 void AudioPlaySdWav::update(void)
 {
+	int32_t n;
+
 	// only update if we're playing
 	if (state == STATE_STOP) return;
 
@@ -127,68 +130,75 @@ void AudioPlaySdWav::update(void)
 	//Serial.println("update");
 
 	// is there buffered data?
-	if (buffer_remaining > 0) {
+	n = buffer_length - buffer_offset;
+	if (n > 0) {
 		// we have buffered data
-		if (consume()) return; // it was enough to transmit audio
+		if (consume(n)) return; // it was enough to transmit audio
 	}
 
 	// we only get to this point when buffer[512] is empty
 	if (state != STATE_STOP && wavfile.available()) {
 		// we can read more data from the file...
-		buffer_remaining = wavfile.read(buffer, 512);
-		if (consume()) {
-			// good, it resulted in audio transmit
-			return;
-		} else {
-			// not good, no audio was transmitted
-			buffer_remaining = 0;
-			if (block_left) {
-				release(block_left);
-				block_left = NULL;
-			}
-			if (block_right) {
-				release(block_right);
-				block_right = NULL;
-			}
-			// if we're still playing, well, there's going to
-			// be a gap in output, but we can't keep burning
-			// time trying to read more data.  Hopefully things
-			// will go better next time?
-			if (state != STATE_STOP) return;
+		buffer_length = wavfile.read(buffer, 512);
+		if (buffer_length == 0) goto end;
+		buffer_offset = 0;
+		if (!consume(buffer_length)) {
+			// no audio was transmitted
+			//Serial.println("consume returned false");
+			if (state != STATE_STOP) goto cleanup;
 		}
+		return;
 	}
-	// end of file reached or other reason to stop
+end:	// end of file reached or other reason to stop
 	wavfile.close();
+	state_play = STATE_STOP;
+	state = STATE_STOP;
+cleanup:
 	if (block_left) {
+		if (block_offset > 0) {
+			while (block_offset < AUDIO_BLOCK_SAMPLES) {
+				block_left->data[block_offset++] = 0;
+			}
+			transmit(block_left, 0);
+			if (state < 8 && (state & 1) == 0) {
+				transmit(block_left, 1);
+			}
+		}
 		release(block_left);
 		block_left = NULL;
 	}
 	if (block_right) {
+		if (block_offset > 0) {
+			while (block_offset < AUDIO_BLOCK_SAMPLES) {
+				block_right->data[block_offset++] = 0;
+			}
+			transmit(block_right, 1);
+		}
 		release(block_right);
 		block_right = NULL;
 	}
-	state_play = STATE_STOP;
-	state = STATE_STOP;
 }
 
 
 // https://ccrma.stanford.edu/courses/422/projects/WaveFormat/
 
 // Consume already buffered data.  Returns true if audio transmitted.
-bool AudioPlaySdWav::consume(void)
+bool AudioPlaySdWav::consume(uint32_t size)
 {
-	uint32_t len, size;
+	uint32_t len;
 	uint8_t lsb, msb;
 	const uint8_t *p;
 
-	size = buffer_remaining;
-	p = buffer + 512 - size;
+	p = buffer + buffer_offset;
 start:
 	if (size == 0) return false;
-	//Serial.print("AudioPlaySdWav write, size = ");
+	//Serial.print("AudioPlaySdWav write, ");
+	//Serial.print("size = ");
 	//Serial.print(size);
 	//Serial.print(", data_length = ");
 	//Serial.print(data_length);
+	//Serial.print(", space = ");
+	//Serial.println((AUDIO_BLOCK_SAMPLES - block_offset) * 2);
 	//Serial.print(", state = ");
 	//Serial.println(state);
 	switch (state) {
@@ -245,7 +255,8 @@ start:
 		size -= len;
 		data_length = header[1];
 		if (header[0] == 0x61746164) {
-			//Serial.println("found data chunk");
+			//Serial.print("wav: found data chunk, len=");
+			//Serial.println(data_length);
 			// TODO: verify offset in file is an even number
 			// as required by WAV format.  abort if odd.  Code
 			// below will depend upon this and fail if not even.
@@ -294,13 +305,12 @@ start:
 			if (block_offset >= AUDIO_BLOCK_SAMPLES) {
 				transmit(block_left, 0);
 				transmit(block_left, 1);
-				 //Serial1.print('%');
-				 //delayMicroseconds(90);
 				release(block_left);
 				block_left = NULL;
 				data_length += size;
-				buffer_remaining = size;
+				buffer_offset = p - buffer;
 				if (block_right) release(block_right);
+				if (data_length == 0) state = STATE_STOP;
 				return true;
 			}
 			if (size == 0) {
@@ -308,6 +318,7 @@ start:
 				return false;
 			}
 		}
+		//Serial.println("end of file reached");
 		// end of file reached
 		if (block_offset > 0) {
 			// TODO: fill remainder of last block with zero and transmit
@@ -347,7 +358,8 @@ start:
 				release(block_right);
 				block_right = NULL;
 				data_length += size;
-				buffer_remaining = size;
+				buffer_offset = p - buffer;
+				if (data_length == 0) state = STATE_STOP;
 				return true;
 			}
 			if (size == 0) {

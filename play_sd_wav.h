@@ -42,7 +42,7 @@ public:
 	virtual void update(void);
 private:
 	File wavfile;
-	bool consume(void);
+	bool consume(uint32_t size);
 	bool parse_format(void);
 	uint32_t header[5];
 	uint32_t data_length;		// number of bytes remaining in data section
@@ -50,7 +50,8 @@ private:
 	audio_block_t *block_right;
 	uint16_t block_offset;
 	uint8_t buffer[512];
-	uint16_t buffer_remaining;
+	uint16_t buffer_offset;
+	uint16_t buffer_length;
 	uint8_t state;
 	uint8_t state_play;
 	uint8_t leftover_bytes;
