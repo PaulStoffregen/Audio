@@ -54,6 +54,7 @@ void AudioOutputI2S::begin(void)
 	block_left_1st = NULL;
 	block_right_1st = NULL;
 
+	// TODO: should we set & clear the I2S_TCSR_SR bit here?
 	config_i2s();
 	CORE_PIN22_CONFIG = PORT_PCR_MUX(6); // pin 22, PTC1, I2S0_TXD0
 
