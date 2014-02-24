@@ -745,6 +745,42 @@ unsigned short AudioControlSGTL5000::dap_avc_enable(void)
 	return modify(DAP_AVC_CTRL,1,1);
 }
 
+unsigned short AudioControlSGTL5000::dap_bass_enhance(float lr_lev, float bass_lev)
+{
+	return modify(DAP_BASS_ENHANCE_CTRL,(0x3F-calcVol(lr_lev,0x3F))<<8|0x7F-calcVol(bass_lev,0x7F),0x3F<<8|0x7F);
+}
+unsigned short AudioControlSGTL5000::dap_bass_enhance(float lr_lev, float bass_lev, uint8_t hpf_bypass, uint8_t cutoff)
+{
+	modify(DAP_BASS_ENHANCE,(hpf_bypass&1)<<8|(cutoff&7)<<4,1<<8|7<<4);
+	return dap_bass_enhance(lr_lev,bass_lev);
+}
+unsigned short AudioControlSGTL5000::dap_bass_enhance_enable(uint8_t n)
+{
+	return modify(DAP_BASS_ENHANCE,n&1,1);
+}
+unsigned short AudioControlSGTL5000::dap_bass_enhance_enable(void)
+{
+	return dap_bass_enhance_enable(1);
+}
+unsigned short AudioControlSGTL5000::dap_surround(uint8_t width)
+{
+	return modify(DAP_SGTL_SURROUND,(width&7)<<4,7<<4);
+}
+unsigned short AudioControlSGTL5000::dap_surround(uint8_t width, uint8_t select)
+{
+	return modify(DAP_SGTL_SURROUND,(width&7)<<4|select&3,7<<4|3);
+}
+unsigned short AudioControlSGTL5000::dap_surround_enable(uint8_t n)
+{
+	if(n) n=3;
+	return modify(DAP_SGTL_SURROUND,n,3);
+}
+unsigned short AudioControlSGTL5000::dap_surround_enable(void)
+{
+	dap_surround_enable(1);
+}
+
+
 unsigned char AudioControlSGTL5000::calcVol(float n, unsigned char range)
 {
 	n=(n*(((float)range)/100))+0.499;
