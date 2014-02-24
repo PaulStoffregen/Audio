@@ -48,8 +48,8 @@ elapsedMillis chgMsec=0;
 float lastVol=1024;
 
 void loop() {
-  // every 10 ms, check for adjustment the balance & vol
-  if (chgMsec > 10) { // more regular updates for actual changes seems better.
+  // every 10 ms, check for adjustment
+  if (chgMsec > 10) {
     float vol1=analogRead(15)/10.23;
     vol1=(int)vol1;
     if(lastVol!=vol1)

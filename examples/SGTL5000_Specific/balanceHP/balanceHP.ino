@@ -44,8 +44,8 @@ float lastBal=1024;
 float vol1=75;
 
 void loop() {
-  // every 10 ms, check for adjustment the balance & vol
-  if (chgMsec > 10) { // more regular updates for actual changes seems better.
+  // every 10 ms, check for adjustment
+  if (chgMsec > 10) {
     float bal1=analogRead(15);
     bal1=((bal1-512)/512)*100;
     bal1=(int)bal1;

@@ -1,4 +1,4 @@
-/* DAC balance example: Will influence both HP & LO outputs.
+/* DAP Bass enhance example SGTL5000 only
 
 This example code is in the public domain
 */
@@ -36,28 +36,26 @@ void setup() {
   audioShield.inputSelect(myInput);
   audioShield.volume(75);
   audioShield.unmuteLineout();
+  // have to enable DAP to use bass enhance
+  audioShield.dap_enable();
+  audioShield.dap_bass_enhance_enable(); // all we need to do for default bass enhancement settings.
+  // audioShield.dap_bass_enhance((float)lr_level,(float)bass_level);
+  // audioShield.dap_bass_enhance((float)lr_level,(float)bass_level,(uint8_t)hpf_bypass,(uint8_t)cutoff);
+  // please see http://www.pjrc.com/teensy/SGTL5000.pdf page 50 for valid values for BYPASS_HPF and CUTOFF
 }
 
 elapsedMillis chgMsec=0;
-float lastBal=1024;
+float lastVol=1024;
 
 void loop() {
   // every 10 ms, check for adjustment
-  if (chgMsec > 10) {
-    float bal1=analogRead(15);
-    bal1=((bal1-512)/512)*100;
-    bal1=(int)bal1;
-    if(lastBal!=bal1)
+  if (chgMsec > 10) { // more regular updates for actual changes seems better.
+    float vol1=analogRead(15)/10.23;
+    vol1=(int)vol1;
+    if(lastVol!=vol1)
     {
-      if(bal1<0)
-      { // leaning toward left...
-        audioShield.dac_vol(100,100+bal1);
-      } else if(bal1>0) { // to the right
-        audioShield.dac_vol(100-bal1,100);
-      } else { // middle
-        audioShield.dac_vol(100);
-      }
-      lastBal=bal1;
+      audioShield.volume(vol1);
+      lastVol=vol1;
     }
     chgMsec = 0;
   }

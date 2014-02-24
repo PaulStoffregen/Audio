@@ -71,6 +71,14 @@ public:
 	unsigned short dap_avc(uint8_t maxGain, uint8_t lbiResponse, uint8_t hardLimit, float threshold, float attack, float decay);
 	unsigned short dap_avc_enable(uint8_t n);
 	unsigned short dap_avc_enable(void);
+	unsigned short dap_bass_enhance(float lr_lev, float bass_lev);
+	unsigned short dap_bass_enhance(float lr_lev, float bass_lev, uint8_t hpf_bypass, uint8_t cutoff);
+	unsigned short dap_bass_enhance_enable(uint8_t n);
+	unsigned short dap_bass_enhance_enable(void);
+	unsigned short dap_surround(uint8_t width);
+	unsigned short dap_surround(uint8_t width, uint8_t select);
+	unsigned short dap_surround_enable(uint8_t n);
+	unsigned short dap_surround_enable(void);
 
 	protected:
 	bool muted;

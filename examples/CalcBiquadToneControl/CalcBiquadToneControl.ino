@@ -59,8 +59,8 @@ elapsedMillis chgMsec=0;
 float tone1=0;
 
 void loop() {
-  // every 10 ms, check for adjustment the tone & vol
-  if (chgMsec > 10) { // more regular updates for actual changes seems better.
+  // every 10 ms, check for adjustment
+  if (chgMsec > 10) {
     
     float tone2=analogRead(15);
     tone2=floor(((tone2-512)/512)*70)/10;
