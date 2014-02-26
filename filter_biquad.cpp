@@ -35,8 +35,8 @@ void AudioFilterBiquad::update(void)
 	uint32_t *data, *end;
 	int32_t *state;
 	block = receiveWritable();
-	data = (uint32_t *)(block->data);
 	if (!block) return;
+	data = (uint32_t *)(block->data);
 	end = data + AUDIO_BLOCK_SAMPLES/2;
 	state = (int32_t *)definition;
 	do {
