@@ -34,7 +34,6 @@ void AudioFilterBiquad::update(void)
 	uint32_t in2, out2, aprev, bprev, flag;
 	uint32_t *data, *end;
 	int32_t *state;
-
 	block = receiveWritable();
 	if (!block) return;
 	data = (uint32_t *)(block->data);
@@ -73,19 +72,26 @@ void AudioFilterBiquad::update(void)
 		*state++ = sum | flag;
 		*(state-2) = bprev;
 		*(state-3) = aprev;
+		data = (uint32_t *)(block->data); // needs to be reset, may as well be done here
 	} while (flag);
 	transmit(block);
 	release(block);
 }
 
-void AudioFilterBiquad::updateCoefs(int *source, bool doReset)
+void AudioFilterBiquad::updateCoefs(uint8_t set,int *source, bool doReset)
 {
 	int32_t *dest=(int32_t *)definition;
-	int32_t *src=(int32_t *)source;
+	while(set)
+	{
+		*dest+=7;
+		if(!(*dest&0x80000000)) return;
+		*dest++;
+		set--;
+	}
 	__disable_irq();
 	for(uint8_t index=0;index<5;index++)
 	{
-		*dest++=*src++;
+		*dest++=*source++;
 	}
 	if(doReset)
 	{
@@ -94,10 +100,5 @@ void AudioFilterBiquad::updateCoefs(int *source, bool doReset)
 		*dest++=0;
 	}
 	__enable_irq();
-}
-
-void AudioFilterBiquad::updateCoefs(int *source)
-{
-	updateCoefs(source,false);
 }
 
