@@ -34,13 +34,12 @@ void AudioFilterBiquad::update(void)
 	uint32_t in2, out2, aprev, bprev, flag;
 	uint32_t *data, *end;
 	int32_t *state;
-
 	block = receiveWritable();
+	data = (uint32_t *)(block->data);
 	if (!block) return;
 	end = data + AUDIO_BLOCK_SAMPLES/2;
 	state = (int32_t *)definition;
 	do {
-		data = (uint32_t *)(block->data); // needs to be done inside the loop, end need not be reset.
 		a0 = *state++;
 		a1 = *state++;
 		a2 = *state++;
@@ -73,6 +72,7 @@ void AudioFilterBiquad::update(void)
 		*state++ = sum | flag;
 		*(state-2) = bprev;
 		*(state-3) = aprev;
+		data = (uint32_t *)(block->data); // needs to be reset, may as well be done here
 	} while (flag);
 	transmit(block);
 	release(block);
