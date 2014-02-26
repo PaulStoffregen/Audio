@@ -36,8 +36,11 @@ public:
 	   : AudioStream(1, inputQueueArray), definition(parameters) { }
 	virtual void update(void);
 	
-	void updateCoefs(int *source, bool doReset);
-	void updateCoefs(int *source);
+	void updateCoefs(uint8_t set,int *source, bool doReset);
+
+	void updateCoefs(uint8_t set,int *source) { updateCoefs(set,source,false); }
+	void updateCoefs(int *source, bool doReset) { updateCoefs(0,source,doReset); }
+	void updateCoefs(int *source) { updateCoefs(0,source,false); }
 private:
 	int *definition;
 	audio_block_t *inputQueueArray[1];
