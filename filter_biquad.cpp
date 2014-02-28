@@ -36,8 +36,7 @@ void AudioFilterBiquad::update(void)
 	int32_t *state;
 	block = receiveWritable();
 	if (!block) return;
-	data = (uint32_t *)(block->data);
-	end = data + AUDIO_BLOCK_SAMPLES/2;
+	end = (uint32_t *)(block->data) + AUDIO_BLOCK_SAMPLES/2;
 	state = (int32_t *)definition;
 	do {
 		a0 = *state++;
@@ -48,6 +47,7 @@ void AudioFilterBiquad::update(void)
 		aprev = *state++;
 		bprev = *state++;
 		sum = *state & 0x3FFF;
+		data = end - AUDIO_BLOCK_SAMPLES/2;
 		do {
 			in2 = *data;
 			sum = signed_multiply_accumulate_32x16b(sum, a0, in2);
@@ -72,7 +72,6 @@ void AudioFilterBiquad::update(void)
 		*state++ = sum | flag;
 		*(state-2) = bprev;
 		*(state-3) = aprev;
-		data = (uint32_t *)(block->data); // needs to be reset, may as well be done here
 	} while (flag);
 	transmit(block);
 	release(block);
@@ -84,7 +83,7 @@ void AudioFilterBiquad::updateCoefs(uint8_t set,int *source, bool doReset)
 	while(set)
 	{
 		*dest+=7;
-		if(!(*dest&0x80000000)) return;
+		if(!(*dest)&0x80000000) return;
 		*dest++;
 		set--;
 	}
