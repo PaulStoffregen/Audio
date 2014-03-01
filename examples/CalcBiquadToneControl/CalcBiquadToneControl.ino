@@ -10,28 +10,22 @@ This example code is in the public domain
 const int myInput = AUDIO_INPUT_LINEIN;
 // const int myInput = AUDIO_INPUT_MIC;
 
-int BassFilter_L[]={0,0,0,0,0,0,0,0};
-int BassFilter_R[]={0,0,0,0,0,0,0,0};
-int TrebFilter_L[]={0,0,0,0,0,0,0,0};
-int TrebFilter_R[]={0,0,0,0,0,0,0,0};
+int ToneFilter_L[]={0,0,0,0,0,0,0,0x80000000,0,0,0,0,0,0,0,0}; // defines 2 sets of coefficients, not sure max possible in
+int ToneFilter_R[]={0,0,0,0,0,0,0,0x80000000,0,0,0,0,0,0,0,0}; // time frame but probably quite a few.
 
 int updateFilter[5];
  
 AudioInputI2S        audioInput;         // audio shield: mic or line-in
-AudioFilterBiquad    filterBass_L(BassFilter_L);
-AudioFilterBiquad    filterBass_R(BassFilter_R);
-AudioFilterBiquad    filterTreb_L(TrebFilter_L);
-AudioFilterBiquad    filterTreb_R(TrebFilter_R);
+AudioFilterBiquad    filterTone_L(ToneFilter_L);
+AudioFilterBiquad    filterTone_R(ToneFilter_R);
 AudioOutputI2S       audioOutput;        // audio shield: headphones & line-out
 
 // Create Audio connections between the components
-//
-AudioConnection c1(audioInput,0,filterBass_L,0);
-AudioConnection c2(audioInput,1,filterBass_R,0);
-AudioConnection c3(filterBass_L,0,filterTreb_L,0);
-AudioConnection c4(filterBass_R,0,filterTreb_R,0);
-AudioConnection c5(filterTreb_L,0,audioOutput,0);
-AudioConnection c6(filterTreb_R,0,audioOutput,1);
+//                                    
+AudioConnection c1(audioInput,0,filterTone_L,0);
+AudioConnection c2(audioInput,1,filterTone_R,0);
+AudioConnection c3(filterTone_L,0,audioOutput,0);
+AudioConnection c4(filterTone_R,0,audioOutput,1);
 
 // Create an object to control the audio shield.
 // 
@@ -40,7 +34,7 @@ AudioControlSGTL5000 audioShield;
 void setup() {
   // Audio connections require memory to work.  For more
   // detailed information, see the MemoryAndCpuUsage example
-  AudioMemory(12);
+  AudioMemory(6);
   // Enable the audio shield, select the input and set the output volume.
   audioShield.enable();
   audioShield.inputSelect(myInput);
@@ -48,19 +42,21 @@ void setup() {
   audioShield.unmuteLineout();
 
   calcBiquad(FILTER_PARAEQ,110,0,0.2,2147483648,44100,updateFilter);
-  filterBass_L.updateCoefs(updateFilter);
-  filterBass_R.updateCoefs(updateFilter);
+  filterTone_L.updateCoefs(updateFilter); // default set updateCoefs(0,updateFilter);
+  filterTone_R.updateCoefs(updateFilter);
   calcBiquad(FILTER_PARAEQ,4400,0,0.167,2147483648,44100,updateFilter);
-  filterTreb_L.updateCoefs(updateFilter);
-  filterTreb_R.updateCoefs(updateFilter);
+  filterTone_L.updateCoefs(1,updateFilter);
+  filterTone_R.updateCoefs(1,updateFilter);
+  
+  Serial.begin(9600);
 }
 
 elapsedMillis chgMsec=0;
 float tone1=0;
 
 void loop() {
-  // every 10 ms, check for adjustment
-  if (chgMsec > 10) {
+  // every 10 ms, check for adjustment the tone & vol
+  if (chgMsec > 10) { // more regular updates for actual changes seems better.
     
     float tone2=analogRead(15);
     tone2=floor(((tone2-512)/512)*70)/10;
@@ -68,11 +64,11 @@ void loop() {
     {
       // calcBiquad(FilterType,FrequencyC,dBgain,Q,QuantizationUnit,SampleRate,int*);
       calcBiquad(FILTER_PARAEQ,110,-tone2,0.2,2147483648,44100,updateFilter);
-      filterBass_L.updateCoefs(updateFilter);
-      filterBass_R.updateCoefs(updateFilter);
+      filterTone_L.updateCoefs(updateFilter);
+      filterTone_R.updateCoefs(updateFilter);
       calcBiquad(FILTER_PARAEQ,4400,tone2,0.167,2147483648,44100,updateFilter);
-      filterTreb_L.updateCoefs(updateFilter);
-      filterTreb_R.updateCoefs(updateFilter);
+      filterTone_L.updateCoefs(1,updateFilter);
+      filterTone_R.updateCoefs(1,updateFilter);
       tone1=tone2;
     }
     chgMsec = 0;

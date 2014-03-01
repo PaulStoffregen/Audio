@@ -82,9 +82,9 @@ void AudioFilterBiquad::updateCoefs(uint8_t set,int *source, bool doReset)
 	int32_t *dest=(int32_t *)definition;
 	while(set)
 	{
-		*dest+=7;
+		dest+=7;
 		if(!(*dest)&0x80000000) return;
-		*dest++;
+		dest++;
 		set--;
 	}
 	__disable_irq();
