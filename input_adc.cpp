@@ -39,9 +39,11 @@ void AudioInputAnalog::begin(unsigned int pin)
 {
 	uint32_t i, sum=0;
 
-	// pin must be 0 to 13 (for A0 to A13)
-	// or 14 to 23 for digital pin numbers A0-A9
-	// or 34 to 37 corresponding to A10-A13
+	// pin specified in user sketches should be A0 to A13
+	// numbers can be used, but the recommended usage is
+	// with the named constants A0 to A13
+	//   constants A0-A9 are actually 14 to 23
+	//   constants A10-A13 are actually 34 to 37
 	if (pin > 23 && !(pin >= 34 && pin <= 37)) return;
 
 	//pinMode(2, OUTPUT);
