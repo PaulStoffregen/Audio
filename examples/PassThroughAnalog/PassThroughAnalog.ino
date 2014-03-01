@@ -6,7 +6,7 @@
 // Create the Audio components.  These should be created in the
 // order data flows, inputs/sources -> processing -> outputs
 //
-AudioInputAnalog analogPinInput(16); // analog A2 (pin 16)
+AudioInputAnalog analogPinInput(A2); // analog A2 (pin 16)
 AudioOutputI2S   audioOutput;        // audio shield: headphones & line-out
 AudioOutputPWM   pwmOutput;          // audio output with PWM on pins 3 & 4
 
