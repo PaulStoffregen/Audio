@@ -22,7 +22,7 @@ AudioConnection c2(audioInput,audioOutput);
 
 void setup() {
   AudioMemory(4);
-  Serial.begin(1);
+  Serial.begin(Serial.baud());
 }
 
 elapsedMillis fps;

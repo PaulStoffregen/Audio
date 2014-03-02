@@ -29,7 +29,7 @@ void setup() {
   audioShield.inputSelect(myInput);
   audioShield.volume(75);
   audioShield.unmuteLineout();
-  Serial.begin(1);
+  Serial.begin(Serial.baud());
 }
 
 elapsedMillis fps;
