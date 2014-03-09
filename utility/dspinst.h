@@ -136,4 +136,22 @@ static inline uint32_t logical_and(uint32_t a, uint32_t b)
 	return a;
 }
 
+// computes ((a[15:0] * b[15:0]) + (a[31:16] * b[31:16]))
+static inline int32_t multiply_16tx16t_add_16bx16b(uint32_t a, uint32_t b) __attribute__((always_inline, unused));
+static inline int32_t multiply_16tx16t_add_16bx16b(uint32_t a, uint32_t b)
+{
+	int32_t out;
+	asm volatile("smuad %0, %1, %2" : "=r" (out) : "r" (a), "r" (b));
+	return out;
+}
+
+// computes ((a[15:0] * b[31:16]) + (a[31:16] * b[15:0]))
+static inline int32_t multiply_16tx16b_add_16bx16t(uint32_t a, uint32_t b) __attribute__((always_inline, unused));
+static inline int32_t multiply_16tx16b_add_16bx16t(uint32_t a, uint32_t b)
+{
+	int32_t out;
+	asm volatile("smuad %0, %1, %2" : "=r" (out) : "r" (a), "r" (b));
+	return out;
+}
+
 #endif
