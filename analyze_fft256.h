@@ -60,12 +60,13 @@ public:
 	}
 	virtual void update(void);
 	//uint32_t cycles;
-	int32_t output[128] __attribute__ ((aligned (4)));
+	uint16_t output[128] __attribute__ ((aligned (4)));
 private:
 	void init(void);
 	const int16_t *window;
 	audio_block_t *prevblock;
 	int16_t buffer[512] __attribute__ ((aligned (4)));
+	uint32_t sum[128];
 	uint8_t count;
 	uint8_t naverage;
 	bool outputflag;
