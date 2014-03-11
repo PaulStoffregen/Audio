@@ -64,7 +64,8 @@ bool AudioPlaySdWav::play(const char *filename)
 	buffer_length = 0;
 	buffer_offset = 0;
 	state_play = STATE_STOP;
-	data_length = 0;
+	data_length = 20;
+	header_offset = 0;
 	state = STATE_PARSE1;
 	return true;
 }
@@ -186,27 +187,35 @@ start:
 	//Serial.print(", data_length = ");
 	//Serial.print(data_length);
 	//Serial.print(", space = ");
-	//Serial.println((AUDIO_BLOCK_SAMPLES - block_offset) * 2);
+	//Serial.print((AUDIO_BLOCK_SAMPLES - block_offset) * 2);
 	//Serial.print(", state = ");
 	//Serial.println(state);
 	switch (state) {
 	  // parse wav file header, is this really a .wav file?
 	  case STATE_PARSE1:
-		len = 20 - data_length;
+		len = data_length;
 		if (size < len) len = size;
-		memcpy((uint8_t *)header + data_length, p, len);
-		data_length += len;
+		memcpy((uint8_t *)header + header_offset, p, len);
+		header_offset += len;
 		buffer_offset += len;
 		buffer_length -= len;
-		if (data_length < 20) return false;
+		data_length -= len;
+		if (data_length > 0) return false;
 		// parse the header...
 		if (header[0] == 0x46464952 && header[2] == 0x45564157
-		  && header[3] == 0x20746D66 && header[4] == 16) {
+		  && header[3] == 0x20746D66 && header[4] >= 16) {
+			if (header[4] > sizeof(header)) {
+				// if such .wav files exist, increasing the
+				// size of header[] should accomodate them...
+				//Serial.println("WAVEFORMATEXTENSIBLE too long");
+				break;
+			}
 			//Serial.println("header ok");
-			state = STATE_PARSE2;
 			p += len;
 			size -= len;
-			data_length = 0;
+			data_length = header[4];
+			header_offset = 0;
+			state = STATE_PARSE2;
 			goto start;
 		}
 		//Serial.println("unknown WAV header");
@@ -214,18 +223,20 @@ start:
 
 	  // check & extract key audio parameters
 	  case STATE_PARSE2:
-		len = 16 - data_length;
+		len = data_length;
 		if (size < len) len = size;
-		memcpy((uint8_t *)header + data_length, p, len);
-		data_length += len;
+		memcpy((uint8_t *)header + header_offset, p, len);
+		header_offset += len;
 		buffer_offset += len;
 		buffer_length -= len;
-		if (data_length < 16) return false;
+		data_length -= len;
+		if (data_length > 0) return false;
 		if (parse_format()) {
 			//Serial.println("audio format ok");
 			p += len;
 			size -= len;
-			data_length = 0;
+			data_length = 8;
+			header_offset = 0;
 			state = STATE_PARSE3;
 			goto start;
 		}
@@ -234,13 +245,14 @@ start:
 
 	  // find the data chunk
 	  case STATE_PARSE3: // 10
-		len = 8 - data_length;
+		len = data_length;
 		if (size < len) len = size;
-		memcpy((uint8_t *)header + data_length, p, len);
-		data_length += len;
+		memcpy((uint8_t *)header + header_offset, p, len);
+		header_offset += len;
 		buffer_offset += len;
 		buffer_length -= len;
-		if (data_length < 8) return false;
+		data_length -= len;
+		if (data_length > 0) return false;
 		//Serial.print("chunk id = ");
 		//Serial.print(header[0], HEX);
 		//Serial.print(", length = ");
@@ -280,7 +292,8 @@ start:
 		size -= data_length;
 		buffer_offset += data_length;
 		buffer_length -= data_length;
-		data_length = 0;
+		data_length = 8;
+		header_offset = 0;
 		state = STATE_PARSE3;
 		//Serial.println("consumed unknown chunk");
 		goto start;

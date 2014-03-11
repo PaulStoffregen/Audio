@@ -45,16 +45,17 @@ private:
 	File wavfile;
 	bool consume(uint32_t size);
 	bool parse_format(void);
-	uint32_t header[5];
-	uint32_t data_length;		// number of bytes remaining in data section
+	uint32_t header[6];		// temporary storage of wav header data
+	uint32_t data_length;		// number of bytes remaining in current section
 	uint32_t total_length;		// number of audio data bytes in file
 	uint32_t bytes2millis;
 	audio_block_t *block_left;
 	audio_block_t *block_right;
 	uint16_t block_offset;
-	uint8_t buffer[512];
+	uint8_t buffer[512];		// buffer one block of data
 	uint16_t buffer_offset;
 	uint16_t buffer_length;
+	uint8_t header_offset;		// number of bytes in header[]
 	uint8_t state;
 	uint8_t state_play;
 	uint8_t leftover_bytes;
