@@ -622,6 +622,17 @@ unsigned short AudioControlSGTL5000::dac_vol(float left, float right)
 	return modify(CHIP_DAC_VOL,m,65535);
 }
 
+unsigned short AudioControlSGTL5000::adc_hpf(uint8_t bypass, uint8_t freeze)
+{
+	return modify(CHIP_ADCDAC_CTRL, (freeze&1)<<1|bypass&1,3);
+}
+
+unsigned short AudioControlSGTL5000::adc_hpf(uint8_t bypass)
+{
+	return modify(CHIP_ADCDAC_CTRL, bypass&1,1);
+}
+
+
 // DAP_CONTROL
 unsigned short AudioControlSGTL5000::dap_mix_enable(uint8_t n)
 {

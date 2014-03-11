@@ -59,6 +59,8 @@ public:
 	unsigned short lo_lvl(uint8_t left, uint8_t right);
 	unsigned short dac_vol(float n);
 	unsigned short dac_vol(float left, float right);
+	unsigned short adc_hpf(uint8_t bypass, uint8_t freeze);
+	unsigned short adc_hpf(uint8_t bypass);
 	unsigned short dap_mix_enable(uint8_t n);
 	unsigned short dap_enable(uint8_t n);
 	unsigned short dap_enable(void);
