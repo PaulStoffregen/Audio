@@ -181,6 +181,8 @@ start:
 	//Serial.print("AudioPlaySdWav write, ");
 	//Serial.print("size = ");
 	//Serial.print(size);
+	//Serial.print(", buffer_offset = ");
+	//Serial.print(buffer_offset);
 	//Serial.print(", data_length = ");
 	//Serial.print(data_length);
 	//Serial.print(", space = ");
@@ -194,6 +196,8 @@ start:
 		if (size < len) len = size;
 		memcpy((uint8_t *)header + data_length, p, len);
 		data_length += len;
+		buffer_offset += len;
+		buffer_length -= len;
 		if (data_length < 20) return false;
 		// parse the header...
 		if (header[0] == 0x46464952 && header[2] == 0x45564157
@@ -214,6 +218,8 @@ start:
 		if (size < len) len = size;
 		memcpy((uint8_t *)header + data_length, p, len);
 		data_length += len;
+		buffer_offset += len;
+		buffer_length -= len;
 		if (data_length < 16) return false;
 		if (parse_format()) {
 			//Serial.println("audio format ok");
@@ -227,11 +233,13 @@ start:
 		break;
 
 	  // find the data chunk
-	  case STATE_PARSE3:
+	  case STATE_PARSE3: // 10
 		len = 8 - data_length;
 		if (size < len) len = size;
 		memcpy((uint8_t *)header + data_length, p, len);
 		data_length += len;
+		buffer_offset += len;
+		buffer_length -= len;
 		if (data_length < 8) return false;
 		//Serial.print("chunk id = ");
 		//Serial.print(header[0], HEX);
@@ -261,15 +269,20 @@ start:
 		goto start;
 
 	  // ignore any extra unknown chunks (title & artist info)
-	  case STATE_PARSE4:
+	  case STATE_PARSE4: // 11
 		if (size < data_length) {
 			data_length -= size;
+			buffer_offset += size;
+			buffer_length -= size;
 			return false;
 		}
 		p += data_length;
 		size -= data_length;
+		buffer_offset += data_length;
+		buffer_length -= data_length;
 		data_length = 0;
 		state = STATE_PARSE3;
+		//Serial.println("consumed unknown chunk");
 		goto start;
 
 	  // playing mono at native sample rate
