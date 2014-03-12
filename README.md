@@ -3,6 +3,8 @@ Audio
 
 Audio library for Teensy 3.0 &amp; 3.1
 
+http://www.pjrc.com/teensy/td_libs_Audio.html
+
 This is *BETA* status code.  It works pretty well, but it's still under very active
 development.
 
