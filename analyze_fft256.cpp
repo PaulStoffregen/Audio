@@ -40,15 +40,14 @@ void AudioAnalyzeFFT256::init(void)
 	//outputflag = false;
 }
 
+// 140312 - PAH - slightly faster copy
 static void copy_to_fft_buffer(void *destination, const void *source)
 {
-	const int16_t *src = (const int16_t *)source;
-	int16_t *dst = (int16_t *)destination;
+	const uint16_t *src = (const uint16_t *)source;
+	uint32_t *dst = (uint32_t *)destination;
 
-	// TODO: optimize this
 	for (int i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
-		*dst++ = *src++;  // real
-		*dst++ = 0;       // imaginary
+		*dst++ = *src++;  // real sample plus a zero for imaginary
 	}
 }
 
