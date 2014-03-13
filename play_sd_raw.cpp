@@ -30,10 +30,6 @@
 void AudioPlaySdRaw::begin(void)
 {
 	playing = false;
-	if (block) {
-		release(block);
-		block = NULL;
-	}
 	file_offset = 0;
 	file_size = 0;
 }
@@ -70,6 +66,7 @@ void AudioPlaySdRaw::stop(void)
 void AudioPlaySdRaw::update(void)
 {
 	unsigned int i, n;
+	audio_block_t *block;
 
 	// only update if we're playing
 	if (!playing) return;
@@ -86,11 +83,11 @@ void AudioPlaySdRaw::update(void)
 			block->data[i] = 0;
 		}
 		transmit(block);
-		release(block);
 	} else {
 		rawfile.close();
 		playing = false;
 	}
+	release(block);
 }
 
 #define B2M (uint32_t)((double)4294967296000.0 / AUDIO_SAMPLE_RATE_EXACT / 2.0) // 97352592

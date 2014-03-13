@@ -43,7 +43,6 @@ public:
 	virtual void update(void);
 private:
 	File rawfile;
-	audio_block_t *block;
 	uint32_t file_size;
 	uint32_t file_offset;
 	bool playing;
