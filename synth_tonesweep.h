@@ -35,9 +35,9 @@ public:
   AudioStream(0,NULL), sweep_busy(0)
   { }
 
-  boolean begin(short t_amp,int t_lo,int t_hi,float t_time);
+  boolean play(float t_amp,int t_lo,int t_hi,float t_time);
   virtual void update(void);
-  unsigned char busy(void);
+  unsigned char isPlaying(void);
 
 private:
   short tone_amp;
