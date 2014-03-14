@@ -46,6 +46,7 @@ void AudioSynthWaveform::set_ramp_length(int16_t r_length)
   ramp_length = r_length;
 }
 
+
 boolean AudioSynthWaveform::begin(float t_amp,int t_hi,short type)
 {
   tone_type = type;

@@ -50,13 +50,12 @@ public:
   ramp_down(0), ramp_up(0), ramp_length(0)
   { 
   }
-  // Change the frequency on-the-fly to permit a phase-continuous
-  // change between two frequencies.
+  
   void frequency(int t_hi)
   {
-//    tone_incr = (0x100000000LL*t_hi)/AUDIO_SAMPLE_RATE_EXACT;
     tone_incr = (0x80000000LL*t_hi)/AUDIO_SAMPLE_RATE_EXACT;
   }
+  
   // If ramp_length is non-zero this will set up
   // either a rmap up or a ramp down when a wave
   // first starts or when the amplitude is set
@@ -85,16 +84,18 @@ public:
     // set new magnitude
     tone_amp = n * 32767.0;
   }
+  
   boolean begin(float t_amp,int t_hi,short t_type);
   virtual void update(void);
   void set_ramp_length(int16_t r_length);
-
+  
 private:
   short    tone_amp;
   short    last_tone_amp;
   short    tone_freq;
   uint32_t tone_phase;
-  uint32_t tone_incr;
+  // volatile prevents the compiler optimizing out the frequency function
+  volatile uint32_t tone_incr;
   short    tone_type;
 
   uint32_t ramp_down;
