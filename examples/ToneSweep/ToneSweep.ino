@@ -40,7 +40,7 @@ AudioConnection c2(myEffect, 0, audioOutput, 1);
 AudioControlSGTL5000 audioShield;
 
 
-int t_ampx = 20000;
+float t_ampx = 0.8;
 int t_lox = 10;
 int t_hix = 22000;
 // Length of time for the sweep in seconds
@@ -63,20 +63,20 @@ void setup(void)
 
   Serial.println("setup done");
 
-  if(!myEffect.begin(t_ampx,t_lox,t_hix,t_timex)) {
+  if(!myEffect.play(t_ampx,t_lox,t_hix,t_timex)) {
     Serial.println("AudioSynthToneSweep - begin failed");
     while(1);
   }
   // wait for the sweep to end
-  while(myEffect.busy());
+  while(myEffect.isPlaying());
 
   // and now reverse the sweep
-  if(!myEffect.begin(t_ampx,t_hix,t_lox,t_timex)) {
+  if(!myEffect.play(t_ampx,t_hix,t_lox,t_timex)) {
     Serial.println("AudioSynthToneSweep - begin failed");
     while(1);
   }
   // wait for the sweep to end
-  while(myEffect.busy());
+  while(myEffect.isPlaying());
   Serial.println("Done");
 }
 

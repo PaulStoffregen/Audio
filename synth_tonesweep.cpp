@@ -32,7 +32,7 @@
 // Written by Pete (El Supremo) Feb 2014
 
 
-boolean AudioSynthToneSweep::begin(short t_amp,int t_lo,int t_hi,float t_time)
+boolean AudioSynthToneSweep::play(float t_amp,int t_lo,int t_hi,float t_time)
 {
   double tone_tmp;
   
@@ -49,6 +49,7 @@ if(0) {
 }
   tone_amp = 0;
   if(t_amp < 0)return false;
+  if(t_amp > 1)return false;
   if(t_lo < 1)return false;
   if(t_hi < 1)return false;
   if(t_hi >= 44100/2)return false;
@@ -58,11 +59,8 @@ if(0) {
   tone_hi = t_hi;
   tone_phase = 0;
 
-  tone_amp = t_amp;
-  // Limit the output amplitude to prevent aliasing
-  // until I can figure out why this "overtops"
-  // above 29000.
-  if(tone_amp > 29000)tone_amp = 29000;
+  tone_amp = t_amp * 32767.0;
+
   tone_tmp = tone_hi - tone_lo;
   tone_sign = 1;
   tone_freq = tone_lo*0x100000000LL;
@@ -78,7 +76,7 @@ if(0) {
 
 
 
-unsigned char AudioSynthToneSweep::busy(void)
+unsigned char AudioSynthToneSweep::isPlaying(void)
 {
   return(sweep_busy);
 }
