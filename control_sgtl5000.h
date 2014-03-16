@@ -29,6 +29,10 @@
 
 #include "AudioControl.h"
 
+#define SGTL_ADC 0
+#define SGTL_I2S_TEENSY 1
+#define SGTL_AUDIO_PROCESSOR 3
+
 class AudioControlSGTL5000 : public AudioControl
 {
 public:
@@ -53,6 +57,8 @@ public:
 	//bool inputLinein(void) { return write(0x0024, ana_ctrl | (1<<2)); }
 	//bool inputMic(void) { return write(0x002A, 0x0172) && write(0x0024, ana_ctrl & ~(1<<2)); }
 
+	unsigned short route(uint8_t i2s_out, uint8_t dac, uint8_t dap, uint8_t dap_mix);
+	unsigned short route(uint8_t i2s_out, uint8_t dac, uint8_t dap) { route(i2s_out,dac,dap,0); }
 	bool volume(float left, float right);
 	unsigned short micGain(unsigned int n) { return modify(0x002A, n&3, 3); }
 	unsigned short lo_lvl(uint8_t n);

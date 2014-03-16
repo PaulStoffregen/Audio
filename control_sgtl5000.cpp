@@ -568,6 +568,16 @@ unsigned int AudioControlSGTL5000::modify(unsigned int reg, unsigned int val, un
 	return val1;
 }
 
+unsigned short AudioControlSGTL5000::route(uint8_t i2s_out, uint8_t dac, uint8_t dap, uint8_t dap_mix)
+{
+	i2s_out&=3;
+	dac&=3;
+	dap&=3;
+	dap_mix&=3;
+	if((i2s_out==SGTL_AUDIO_PROCESSOR)||(dac==SGTL_AUDIO_PROCESSOR)) modify(DAP_CONTROL,1,1); // enable DAP
+	return modify(CHIP_SSS_CTRL,(dap_mix<<8)|(dap<<6)|(dac<<4)|i2s_out,(3<<8)|(3<<6)|(3<<4)|3);
+}
+
 bool AudioControlSGTL5000::volumeInteger(unsigned int n)
 {
 	if (n == 0) {
@@ -641,9 +651,9 @@ unsigned short AudioControlSGTL5000::dap_mix_enable(uint8_t n)
 unsigned short AudioControlSGTL5000::dap_enable(uint8_t n)
 {
 	if(n) n=1;
-	unsigned char DAC=1+(2*n); // I2S_IN if n==0 else DAP
+	unsigned char i2s_sel=3*n; // ADC if n==0 else DAP
 	modify(DAP_CONTROL,n,1);
-	return modify(CHIP_SSS_CTRL,(0<<6)|(DAC<<4),(3<<6)|(3<<4));
+	return route(i2s_sel,SGTL_I2S_TEENSY,SGTL_ADC);
 }
 
 unsigned short AudioControlSGTL5000::dap_enable(void)
