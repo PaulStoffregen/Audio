@@ -44,7 +44,7 @@ public:
   boolean begin(short *delayline,int delay_length,int n_chorus);
   virtual void update(void);
   void stop(void);
-  void modify(int n_chorus);
+  void voices(int n_chorus);
   
 private:
   audio_block_t *inputQueueArray[2];
