@@ -108,7 +108,7 @@ void AudioSynthWaveform::update(void)
           // adjust tone_phase to Q15 format and then adjust the result
           // of the multiplication
       	// calculate the sample
-          tmp_amp = (short)((arm_sin_q15(tone_phase>>16) * tone_amp) >> 16);
+          tmp_amp = (short)((arm_sin_q15(tone_phase>>16) * tone_amp) >> 15);
           *bp++ = (tmp_amp * ramp_mag)>>15;
         } 
         else if(ramp_down) {
@@ -123,12 +123,12 @@ void AudioSynthWaveform::update(void)
           ramp_down--;
           // adjust tone_phase to Q15 format and then adjust the result
           // of the multiplication
-          tmp_amp = (short)((arm_sin_q15(tone_phase>>16) * last_tone_amp) >> 16);
+          tmp_amp = (short)((arm_sin_q15(tone_phase>>16) * last_tone_amp) >> 15);
           *bp++ = (tmp_amp * ramp_mag)>>15;
         } else {
           // adjust tone_phase to Q15 format and then adjust the result
           // of the multiplication
-          tmp_amp = (short)((arm_sin_q15(tone_phase>>16) * tone_amp) >> 16);
+          tmp_amp = (short)((arm_sin_q15(tone_phase>>16) * tone_amp) >> 15);
           *bp++ = tmp_amp;
         } 
         
