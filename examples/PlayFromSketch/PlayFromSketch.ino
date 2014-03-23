@@ -68,7 +68,7 @@ void setup() {
 
   // turn on the output
   audioShield.enable();
-  audioShield.volume(50);
+  audioShield.volume(0.5);
 
   // by default the Teensy 3.1 DAC uses 3.3Vp-p output
   // if your 3.3V power has noise, switching to the

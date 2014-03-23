@@ -84,7 +84,7 @@ void setup()
   AudioMemory(10);
   
   codec.enable();
-  codec.volume(volume);
+  codec.volume(0.5);
   // I want output on the line out too
   // Comment this if you don't it
   codec.unmuteLineout();
@@ -135,7 +135,7 @@ if(0) {
   int n = analogRead(15);
   if (n != volume) {
     volume = n;
-    codec.volume((float)n / 10.23);
+    codec.volume((float)n / 1023);
   }
   
   c = *sp++;

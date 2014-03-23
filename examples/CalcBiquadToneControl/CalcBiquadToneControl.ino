@@ -38,7 +38,7 @@ void setup() {
   // Enable the audio shield, select the input and set the output volume.
   audioShield.enable();
   audioShield.inputSelect(myInput);
-  audioShield.volume(75);
+  audioShield.volume(0.75);
   audioShield.unmuteLineout();
 
   calcBiquad(FILTER_PARAEQ,110,0,0.2,2147483648,44100,updateFilter);
@@ -47,8 +47,6 @@ void setup() {
   calcBiquad(FILTER_PARAEQ,4400,0,0.167,2147483648,44100,updateFilter);
   filterTone_L.updateCoefs(1,updateFilter);
   filterTone_R.updateCoefs(1,updateFilter);
-  
-  Serial.begin(9600);
 }
 
 elapsedMillis chgMsec=0;

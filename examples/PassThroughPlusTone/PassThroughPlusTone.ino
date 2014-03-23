@@ -52,7 +52,7 @@ void setup() {
   // Enable the audio shield and set the output volume.
   audioShield.enable();
   audioShield.inputSelect(myInput);
-  audioShield.volume(60);
+  audioShield.volume(0.60);
 }
 
 elapsedMillis volmsec=0;

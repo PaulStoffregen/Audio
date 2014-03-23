@@ -25,7 +25,7 @@ void setup() {
   AudioMemory(5);
 
   audioShield.enable();
-  audioShield.volume(20);
+  audioShield.volume(0.5);
 
   SPI.setMOSI(7);
   SPI.setSCK(14);
@@ -36,7 +36,7 @@ void setup() {
 
 void loop() {
   float vol = analogRead(15);
-  vol = vol / 10.24;
+  vol = vol / 1024;
   audioShield.volume(vol);
   delay(20);
 }
