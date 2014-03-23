@@ -34,14 +34,12 @@ void setup() {
   // Enable the audio shield and set the output volume.
   audioShield.enable();
   audioShield.inputSelect(myInput);
-  audioShield.volume(75);
+  audioShield.volume(0.75);
   audioShield.unmuteLineout();
-  // have to enable DAP to use AVC
-  audioShield.dap_enable();
   // here are some settings for AVC that have a fairly obvious effect
-  audioShield.dap_avc(2,1,0,-5,0.5,0.5); // see comments starting line #699 of control_sgtl5000.cpp in ./libraries/audio/
+  audioShield.autoVolumeControl(2,1,0,-5,0.5,0.5); // see comments starting line #699 of control_sgtl5000.cpp in ./libraries/audio/
   // AVC has its own enable/disable bit
-  audioShield.dap_avc_enable(); // you can use audioShield.dap_avc_enable(0); to turn off AVC
+  // you can use audioShield.autoVolumeEnable(0); to turn off AVC
 }
 
 elapsedMillis chgMsec=0;

@@ -34,7 +34,7 @@ void setup() {
   // Enable the audio shield and set the output volume.
   audioShield.enable();
   audioShield.inputSelect(myInput);
-  audioShield.volume(75);
+  audioShield.volume(0.75);
   audioShield.unmuteLineout();
 }
 
@@ -45,17 +45,17 @@ void loop() {
   // every 10 ms, check for adjustment
   if (chgMsec > 10) {
     float bal1=analogRead(15);
-    bal1=((bal1-512)/512)*100;
+    bal1=((bal1-512)/512);
     bal1=(int)bal1;
     if(lastBal!=bal1)
     {
       if(bal1<0)
       { // leaning toward left...
-        audioShield.dac_vol(100,100+bal1);
+        audioShield.dacVolume(1,1+bal1);
       } else if(bal1>0) { // to the right
-        audioShield.dac_vol(100-bal1,100);
+        audioShield.dacVolume(1-bal1,1);
       } else { // middle
-        audioShield.dac_vol(100);
+        audioShield.dacVolume(1);
       }
       lastBal=bal1;
     }

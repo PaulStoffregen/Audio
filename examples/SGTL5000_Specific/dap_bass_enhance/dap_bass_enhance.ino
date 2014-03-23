@@ -34,13 +34,12 @@ void setup() {
   // Enable the audio shield and set the output volume.
   audioShield.enable();
   audioShield.inputSelect(myInput);
-  audioShield.volume(75);
+  audioShield.volume(0.75);
   audioShield.unmuteLineout();
-  // have to enable DAP to use bass enhance
-  audioShield.dap_enable();
-  audioShield.dap_bass_enhance_enable(); // all we need to do for default bass enhancement settings.
-  // audioShield.dap_bass_enhance((float)lr_level,(float)bass_level);
-  // audioShield.dap_bass_enhance((float)lr_level,(float)bass_level,(uint8_t)hpf_bypass,(uint8_t)cutoff);
+  // just enable it to use default settings.
+  audioShield.enhanceBassEnable(); // all we need to do for default bass enhancement settings.
+  // audioShield.enhanceBass((float)lr_level,(float)bass_level);
+  // audioShield.enhanceBass((float)lr_level,(float)bass_level,(uint8_t)hpf_bypass,(uint8_t)cutoff);
   // please see http://www.pjrc.com/teensy/SGTL5000.pdf page 50 for valid values for BYPASS_HPF and CUTOFF
 }
 

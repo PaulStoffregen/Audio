@@ -30,16 +30,15 @@ void setup() {
   // Enable the audio shield, select the input and set the output volume.
   audioShield.enable();
   audioShield.inputSelect(myInput);
-  audioShield.volume(75);
+  audioShield.volume(0.75);
   audioShield.unmuteLineout();
-  audioShield.dap_enable(); // enable the DAP block in SGTL5000
-  audioShield.dap_audio_eq(1); // using PEQ Biquad filters
-  audioShield.dap_peqs(2); // enable filter 0 & filter 1
-
-  calcBiquad(FILTER_PARAEQ,110,0,0.2,524288,44100,updateFilter);
-  audioShield.load_peq(0,updateFilter);
+  // audioShield.audioProcessorEnable(); // enable the DAP block in SGTL5000
+  // audioShield.eqSelect(1); // using PEQ Biquad filters
+  // audioShield.eqFilterCount(2); // enable filter 0 & filter 1
+  calcBiquad(FILTER_PARAEQ,110,0,0.2,524288,44100,updateFilter); // automation negates the need
+  audioShield.eqFilter(0,updateFilter); // for the three lines commented out above.
   calcBiquad(FILTER_PARAEQ,4400,0,0.167,524288,44100,updateFilter);
-  audioShield.load_peq(1,updateFilter);
+  audioShield.eqFilter(1,updateFilter);
 }
 
 elapsedMillis chgMsec=0;
@@ -55,9 +54,9 @@ void loop() {
     {
       // calcBiquad(FilterType,FrequencyC,dBgain,Q,QuantizationUnit,SampleRate,int*);
       calcBiquad(FILTER_PARAEQ,110,-tone2,0.2,524288,44100,updateFilter);
-      audioShield.load_peq(0,updateFilter);
+      audioShield.eqFilter(0,updateFilter);
       calcBiquad(FILTER_PARAEQ,4400,tone2,0.167,524288,44100,updateFilter);
-      audioShield.load_peq(1,updateFilter);
+      audioShield.eqFilter(1,updateFilter);
       tone1=tone2;
     }
     chgMsec = 0;

@@ -532,13 +532,13 @@ bool AudioControlSGTL5000::enable(void)
 	write(CHIP_ANA_HP_CTRL, 0x7F7F); // set volume (lowest level)
 	write(CHIP_ANA_CTRL, 0x0136);  // enable zero cross detectors
 	//mute = false;
+	semi_automated = true;
 	return true;
 }
 
 unsigned int AudioControlSGTL5000::read(unsigned int reg)
 {
 	unsigned int val;
-
 	Wire.beginTransmission(SGTL5000_I2C_ADDR);
 	Wire.write(reg >> 8);
 	Wire.write(reg);
@@ -605,26 +605,26 @@ bool AudioControlSGTL5000::volume(float left, float right)
 
 
 // CHIP_LINE_OUT_VOL
-unsigned short AudioControlSGTL5000::lo_lvl(uint8_t n)
+unsigned short AudioControlSGTL5000::lineOutLevel(uint8_t n)
 {
 	n&=31;
 	return modify(CHIP_LINE_OUT_VOL,(n<<8)|n,(31<<8)|31);
 }
 
-unsigned short AudioControlSGTL5000::lo_lvl(uint8_t left, uint8_t right)
+unsigned short AudioControlSGTL5000::lineOutLevel(uint8_t left, uint8_t right)
 {
 	left&=31;
 	right&=31;
 	return modify(CHIP_LINE_OUT_VOL,(right<<8)|left,(31<<8)|31);
 }
 
-unsigned short AudioControlSGTL5000::dac_vol(float n) // set both directly
+unsigned short AudioControlSGTL5000::dacVolume(float n) // set both directly
 {
 	if(read(CHIP_ADCDAC_CTRL)&(3<<2)!=((n>0 ? 0:3)<<2)) modify(CHIP_ADCDAC_CTRL,(n>0 ? 0:3)<<2,3<<2);
 	unsigned char m=calcVol(n,0xC0);
 	return modify(CHIP_DAC_VOL,((0xFC-m)<<8)|(0xFC-m),65535);
 }
-unsigned short AudioControlSGTL5000::dac_vol(float left, float right)
+unsigned short AudioControlSGTL5000::dacVolume(float left, float right)
 {
 	unsigned short adcdac=((right>0 ? 0:2)|(left>0 ? 0:1))<<2;
 	if(read(CHIP_ADCDAC_CTRL)&(3<<2)!=adcdac)  modify(CHIP_ADCDAC_CTRL,adcdac,1<<2);
@@ -632,23 +632,23 @@ unsigned short AudioControlSGTL5000::dac_vol(float left, float right)
 	return modify(CHIP_DAC_VOL,m,65535);
 }
 
-unsigned short AudioControlSGTL5000::adc_hpf(uint8_t bypass, uint8_t freeze)
+unsigned short AudioControlSGTL5000::adcHighPassFilterControl(uint8_t bypass, uint8_t freeze)
 {
 	return modify(CHIP_ADCDAC_CTRL, (freeze&1)<<1|bypass&1,3);
 }
 
-unsigned short AudioControlSGTL5000::adc_hpf(uint8_t bypass)
+unsigned short AudioControlSGTL5000::adcHighPassFilterControl(uint8_t bypass)
 {
 	return modify(CHIP_ADCDAC_CTRL, bypass&1,1);
 }
 
 
 // DAP_CONTROL
-unsigned short AudioControlSGTL5000::dap_mix_enable(uint8_t n)
+unsigned short AudioControlSGTL5000::audioMixerEnable(uint8_t n)
 {
 	return modify(DAP_CONTROL,(n&1)<<4,1<<4);
 }
-unsigned short AudioControlSGTL5000::dap_enable(uint8_t n)
+unsigned short AudioControlSGTL5000::audioProcessorEnable(uint8_t n)
 {
 	if(n) n=1;
 	unsigned char i2s_sel=3*n; // ADC if n==0 else DAP
@@ -656,52 +656,50 @@ unsigned short AudioControlSGTL5000::dap_enable(uint8_t n)
 	return route(i2s_sel,SGTL_I2S_TEENSY,SGTL_ADC);
 }
 
-unsigned short AudioControlSGTL5000::dap_enable(void)
+unsigned short AudioControlSGTL5000::audioProcessorEnable(void)
 {
-	return dap_enable(1);
+	return audioProcessorEnable(1);
 }
 
 // DAP_PEQ
-unsigned short AudioControlSGTL5000::dap_peqs(uint8_t n) // valid to n&7, 0 thru 7 filters enabled.
+unsigned short AudioControlSGTL5000::eqFilterCount(uint8_t n) // valid to n&7, 0 thru 7 filters enabled.
 {
 	return modify(DAP_PEQ,(n&7),7);
 }
 
 // DAP_AUDIO_EQ
-unsigned short AudioControlSGTL5000::dap_audio_eq(uint8_t n) // 0=NONE, 1=PEQ (7 IIR Biquad filters), 2=TONE (tone), 3=GEQ (5 band EQ)
+unsigned short AudioControlSGTL5000::eqSelect(uint8_t n) // 0=NONE, 1=PEQ (7 IIR Biquad filters), 2=TONE (tone), 3=GEQ (5 band EQ)
 {
 	return modify(DAP_AUDIO_EQ,n&3,3);
 }
 
-
-// DAP_AUDIO_EQ_BASS_BAND0 & DAP_AUDIO_EQ_BAND1 & DAP_AUDIO_EQ_BAND2 etc etc
-unsigned short AudioControlSGTL5000::dap_audio_eq_band(uint8_t bandNum, float n) // by signed percentage -100/+100; dap_audio_eq(3);
-{ // 0x00==-12dB, 0x2F==0dB, 0x5F==12dB
-	n=((n/100)*48)+0.499;
-	if(n<-47) n=-47;
-	if(n>48) n=48;
-	n+=47;
-	return modify(DAP_AUDIO_EQ_BASS_BAND0+(bandNum*2),(unsigned int)n,127);
-}
-void AudioControlSGTL5000::dap_audio_eq_geq(float bass, float mid_bass, float midrange, float mid_treble, float treble)
+unsigned short AudioControlSGTL5000::eqBand(uint8_t bandNum, float n)
 {
+	if(semi_automated) automate(1,3);
+	return dap_audio_eq_band(bandNum, n);
+}
+void AudioControlSGTL5000::eqBands(float bass, float mid_bass, float midrange, float mid_treble, float treble)
+{
+	if(semi_automated) automate(1,3);
 	dap_audio_eq_band(0,bass);
 	dap_audio_eq_band(1,mid_bass);
 	dap_audio_eq_band(2,midrange);
 	dap_audio_eq_band(3,mid_treble);
 	dap_audio_eq_band(4,treble);
 }
-void AudioControlSGTL5000::dap_audio_eq_tone(float bass, float treble) // dap_audio_eq(2);
+void AudioControlSGTL5000::eqBands(float bass, float treble) // dap_audio_eq(2);
 {
+	if(semi_automated) automate(1,2);
 	dap_audio_eq_band(0,bass);
 	dap_audio_eq_band(4,treble);
 }
 
 // SGTL5000 PEQ Coefficient loader
-void AudioControlSGTL5000::load_peq(uint8_t filterNum, int *filterParameters)
+void AudioControlSGTL5000::eqFilter(uint8_t filterNum, int *filterParameters)
 {
-	// 1111 11111111 11111111
-
+	// TODO: add the part that selects 7 PEQ filters.
+	if(semi_automated) automate(1,1,filterNum+1);
+	modify(DAP_FILTER_COEF_ACCESS,(uint16_t)filterNum,15); 
 	write(DAP_COEF_WR_B0_MSB,(*filterParameters>>4)&65535);
 	write(DAP_COEF_WR_B0_LSB,(*filterParameters++)&15);
 	write(DAP_COEF_WR_B1_MSB,(*filterParameters>>4)&65535);
@@ -713,8 +711,6 @@ void AudioControlSGTL5000::load_peq(uint8_t filterNum, int *filterParameters)
 	write(DAP_COEF_WR_A2_MSB,(*filterParameters>>4)&65535);
 	write(DAP_COEF_WR_A2_LSB,(*filterParameters++)&15);
 	write(DAP_FILTER_COEF_ACCESS,(uint16_t)0x100|filterNum);
-	delay(10); // seems necessary, didn't work for 1ms.
-	modify(DAP_FILTER_COEF_ACCESS,(uint16_t)filterNum,15); 
 }
 
 /* Valid values for dap_avc parameters
@@ -743,8 +739,9 @@ void AudioControlSGTL5000::load_peq(uint8_t filterNum, int *filterParameters)
 	decay
 	floating point figure is dB/s rate at which gain is reduced
 */
-unsigned short AudioControlSGTL5000::dap_avc(uint8_t maxGain, uint8_t lbiResponse, uint8_t hardLimit, float threshold, float attack, float decay)
+unsigned short AudioControlSGTL5000::autoVolumeControl(uint8_t maxGain, uint8_t lbiResponse, uint8_t hardLimit, float threshold, float attack, float decay)
 {
+	if(semi_automated&&(!read(DAP_CONTROL)&1)) audioProcessorEnable(1);
 	if(maxGain>2) maxGain=2;
 	lbiResponse&=3;
 	hardLimit&=1;
@@ -756,57 +753,80 @@ unsigned short AudioControlSGTL5000::dap_avc(uint8_t maxGain, uint8_t lbiRespons
 	write(DAP_AVC_DECAY,dec);
 	return 	modify(DAP_AVC_CTRL,maxGain<<12|lbiResponse<<8|hardLimit<<5,3<<12|3<<8|1<<5);
 }
-unsigned short AudioControlSGTL5000::dap_avc_enable(uint8_t n)
+unsigned short AudioControlSGTL5000::autoVolumeEnable(uint8_t n)
 {
 	n&=1;
 	return modify(DAP_AVC_CTRL,n,1);
 }
-unsigned short AudioControlSGTL5000::dap_avc_enable(void)
+unsigned short AudioControlSGTL5000::autoVolumeEnable(void)
 {
 	return modify(DAP_AVC_CTRL,1,1);
 }
 
-unsigned short AudioControlSGTL5000::dap_bass_enhance(float lr_lev, float bass_lev)
+unsigned short AudioControlSGTL5000::enhanceBass(float lr_lev, float bass_lev)
 {
 	return modify(DAP_BASS_ENHANCE_CTRL,(0x3F-calcVol(lr_lev,0x3F))<<8|0x7F-calcVol(bass_lev,0x7F),0x3F<<8|0x7F);
 }
-unsigned short AudioControlSGTL5000::dap_bass_enhance(float lr_lev, float bass_lev, uint8_t hpf_bypass, uint8_t cutoff)
+unsigned short AudioControlSGTL5000::enhanceBass(float lr_lev, float bass_lev, uint8_t hpf_bypass, uint8_t cutoff)
 {
 	modify(DAP_BASS_ENHANCE,(hpf_bypass&1)<<8|(cutoff&7)<<4,1<<8|7<<4);
-	return dap_bass_enhance(lr_lev,bass_lev);
+	return enhanceBass(lr_lev,bass_lev);
 }
-unsigned short AudioControlSGTL5000::dap_bass_enhance_enable(uint8_t n)
+unsigned short AudioControlSGTL5000::enhanceBassEnable(uint8_t n)
 {
 	return modify(DAP_BASS_ENHANCE,n&1,1);
 }
-unsigned short AudioControlSGTL5000::dap_bass_enhance_enable(void)
+unsigned short AudioControlSGTL5000::enhanceBassEnable(void)
 {
-	return dap_bass_enhance_enable(1);
+	return enhanceBassEnable(1);
 }
-unsigned short AudioControlSGTL5000::dap_surround(uint8_t width)
+unsigned short AudioControlSGTL5000::surroundSound(uint8_t width)
 {
 	return modify(DAP_SGTL_SURROUND,(width&7)<<4,7<<4);
 }
-unsigned short AudioControlSGTL5000::dap_surround(uint8_t width, uint8_t select)
+unsigned short AudioControlSGTL5000::surroundSound(uint8_t width, uint8_t select)
 {
 	return modify(DAP_SGTL_SURROUND,(width&7)<<4|select&3,7<<4|3);
 }
-unsigned short AudioControlSGTL5000::dap_surround_enable(uint8_t n)
+unsigned short AudioControlSGTL5000::surroundSoundEnable(uint8_t n)
 {
 	if(n) n=3;
 	return modify(DAP_SGTL_SURROUND,n,3);
 }
-unsigned short AudioControlSGTL5000::dap_surround_enable(void)
+unsigned short AudioControlSGTL5000::surroundSoundEnable(void)
 {
-	dap_surround_enable(1);
+	surroundSoundEnable(1);
 }
 
 
 unsigned char AudioControlSGTL5000::calcVol(float n, unsigned char range)
 {
-	n=(n*(((float)range)/100))+0.499;
+	// n=(n*(((float)range)/100))+0.499;
+	n=(n*((float)range))+0.499;
 	if ((unsigned char)n>range) n=range;
 	return (unsigned char)n;
+}
+
+// DAP_AUDIO_EQ_BASS_BAND0 & DAP_AUDIO_EQ_BAND1 & DAP_AUDIO_EQ_BAND2 etc etc
+unsigned short AudioControlSGTL5000::dap_audio_eq_band(uint8_t bandNum, float n) // by signed percentage -100/+100; dap_audio_eq(3);
+{
+	n=((n/1)*48)+0.499;
+	if(n<-47) n=-47;
+	if(n>48) n=48;
+	n+=47;
+	return modify(DAP_AUDIO_EQ_BASS_BAND0+(bandNum*2),(unsigned int)n,127);
+}
+
+void AudioControlSGTL5000::automate(uint8_t dap, uint8_t eq)
+{
+	if((dap!=0)&&(!read(DAP_CONTROL)&1)) audioProcessorEnable(1);
+	if(read(DAP_AUDIO_EQ)&3!=eq) eqSelect(eq);
+}
+
+void AudioControlSGTL5000::automate(uint8_t dap, uint8_t eq, uint8_t filterCount)
+{
+	automate(dap,eq);
+	if(filterCount>read(DAP_PEQ)&7) eqFilterCount(filterCount);
 }
 
 

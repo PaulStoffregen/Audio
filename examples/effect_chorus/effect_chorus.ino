@@ -96,7 +96,7 @@ void setup() {
 
   audioShield.enable();
   audioShield.inputSelect(myInput);
-  audioShield.volume(50);
+  audioShield.volume(0.5);
   
   // Warn that the passthru pin is grounded
   if(!digitalRead(PASSTHRU_PIN)) {
@@ -134,7 +134,7 @@ void loop()
   int n = analogRead(15);
   if (n != volume) {
     volume = n;
-    audioShield.volume((float)n / 10.23);
+    audioShield.volume((float)n / 1023);
   }
 if(0) {
   if(millis() - last_time >= 5000) {

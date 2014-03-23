@@ -44,7 +44,7 @@ void setup() {
 
   // Enable the audio shield and set the output volume.
   audioShield.enable();
-  audioShield.volume(82);
+  audioShield.volume(0.82);
   
   while (!Serial) ;
   delay(100);
