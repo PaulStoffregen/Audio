@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 
 // compile with:  gcc -O2 -Wall -o wav2sketch wav2sketch.c
+//                i686-w64-mingw32-gcc -s -O2 -Wall wav2sketch.c -o wav2sketch.exe
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,6 +29,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <dirent.h>
 
 uint8_t ulaw_encode(int16_t audio);
@@ -241,6 +243,7 @@ int main(int argc, char **argv)
 {
 	DIR *dir;
 	struct dirent *f;
+	struct stat s;
 	FILE *fp, *outc=NULL, *outh=NULL;
 	char buf[128];
 	int i, len;
@@ -256,8 +259,11 @@ int main(int argc, char **argv)
 	while (1) {
 		f = readdir(dir);
 		if (!f) break;
-		if ((f->d_type & DT_DIR)) continue; // skip directories
-		if (!(f->d_type & DT_REG)) continue; // skip special files
+		//if ((f->d_type & DT_DIR)) continue; // skip directories
+		//if (!(f->d_type & DT_REG)) continue; // skip special files
+		if (stat(f->d_name, &s) < 0) continue; // skip if unable to stat
+		if (S_ISDIR(s.st_mode)) continue;  // skip directories
+		if (!S_ISREG(s.st_mode)) continue; // skip special files
 		filename = f->d_name;
 		len = strlen(filename);
 		if (len < 5) continue;
