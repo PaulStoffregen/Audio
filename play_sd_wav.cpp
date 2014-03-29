@@ -59,6 +59,7 @@ void AudioPlaySdWav::begin(void)
 bool AudioPlaySdWav::play(const char *filename)
 {
 	stop();
+	// TODO: SD.open probably needs to be done with the audio interrupt disabled...
 	wavfile = SD.open(filename);
 	if (!wavfile) return false;
 	buffer_length = 0;
