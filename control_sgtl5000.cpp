@@ -798,11 +798,10 @@ unsigned short AudioControlSGTL5000::surroundSoundEnable(void)
 	surroundSoundEnable(1);
 }
 
-
 unsigned char AudioControlSGTL5000::calcVol(float n, unsigned char range)
 {
 	// n=(n*(((float)range)/100))+0.499;
-	n=(n*((float)range))+0.499;
+	n=(n*(float)range)+0.499;
 	if ((unsigned char)n>range) n=range;
 	return (unsigned char)n;
 }
@@ -810,7 +809,7 @@ unsigned char AudioControlSGTL5000::calcVol(float n, unsigned char range)
 // DAP_AUDIO_EQ_BASS_BAND0 & DAP_AUDIO_EQ_BAND1 & DAP_AUDIO_EQ_BAND2 etc etc
 unsigned short AudioControlSGTL5000::dap_audio_eq_band(uint8_t bandNum, float n) // by signed percentage -100/+100; dap_audio_eq(3);
 {
-	n=((n/1)*48)+0.499;
+	n=(n*48)+0.499;
 	if(n<-47) n=-47;
 	if(n>48) n=48;
 	n+=47;
