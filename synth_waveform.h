@@ -85,7 +85,7 @@ public:
     tone_amp = n * 32767.0;
   }
   
-  boolean begin(float t_amp,int t_hi,short t_type);
+  boolean begin(float t_amp,float t_hi,short t_type);
   virtual void update(void);
   void set_ramp_length(int16_t r_length);
   

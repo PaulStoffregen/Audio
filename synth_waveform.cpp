@@ -30,8 +30,11 @@
 
 
 /******************************************************************/
+// PAH 140316 - fix calculation of sample (amplitude error)
+// PAH 140314 - change t_hi from int to float
 // PAH - add ramp-up and ramp-down to the onset of the wave
 // the length is specified in samples
+
 void AudioSynthWaveform::set_ramp_length(int16_t r_length)
 {
   if(r_length < 0) {
@@ -47,16 +50,14 @@ void AudioSynthWaveform::set_ramp_length(int16_t r_length)
 }
 
 
-boolean AudioSynthWaveform::begin(float t_amp,int t_hi,short type)
+boolean AudioSynthWaveform::begin(float t_amp,float t_hi,short type)
 {
   tone_type = type;
-//  tone_amp = t_amp;
   amplitude(t_amp);
   tone_freq = t_hi;
   if(t_hi < 1)return false;
   if(t_hi >= AUDIO_SAMPLE_RATE_EXACT/2)return false;
   tone_phase = 0;
-//  tone_incr = (0x100000000LL*t_hi)/AUDIO_SAMPLE_RATE_EXACT;
   tone_incr = (0x80000000LL*t_hi)/AUDIO_SAMPLE_RATE_EXACT;
   if(0) {
     Serial.print("AudioSynthWaveform.begin(tone_amp = ");
@@ -107,7 +108,7 @@ void AudioSynthWaveform::update(void)
           // adjust tone_phase to Q15 format and then adjust the result
           // of the multiplication
       	// calculate the sample
-          tmp_amp = (short)((arm_sin_q15(tone_phase>>16) * tone_amp) >> 17);
+          tmp_amp = (short)((arm_sin_q15(tone_phase>>16) * tone_amp) >> 15);
           *bp++ = (tmp_amp * ramp_mag)>>15;
         } 
         else if(ramp_down) {
@@ -122,12 +123,12 @@ void AudioSynthWaveform::update(void)
           ramp_down--;
           // adjust tone_phase to Q15 format and then adjust the result
           // of the multiplication
-          tmp_amp = (short)((arm_sin_q15(tone_phase>>16) * last_tone_amp) >> 17);
+          tmp_amp = (short)((arm_sin_q15(tone_phase>>16) * last_tone_amp) >> 15);
           *bp++ = (tmp_amp * ramp_mag)>>15;
         } else {
           // adjust tone_phase to Q15 format and then adjust the result
           // of the multiplication
-          tmp_amp = (short)((arm_sin_q15(tone_phase>>16) * tone_amp) >> 17);
+          tmp_amp = (short)((arm_sin_q15(tone_phase>>16) * tone_amp) >> 15);
           *bp++ = tmp_amp;
         } 
         

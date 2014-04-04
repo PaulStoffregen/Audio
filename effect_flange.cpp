@@ -26,33 +26,16 @@
 /******************************************************************/
 //                A u d i o E f f e c t F l a n g e
 // Written by Pete (El Supremo) Jan 2014
+
+// 140314 - add missing stop() function
 // 140207 - fix calculation of delay_rate_incr which is expressed as
 //			a fraction of 2*PI
 // 140207 - cosmetic fix to begin()
 // 140219 - correct the calculation of "frac"
 
-// circular addressing indices for left and right channels
-//short AudioEffectFlange::l_circ_idx;
-//short AudioEffectFlange::r_circ_idx;
-
-//short * AudioEffectFlange::l_delayline = NULL;
-//short * AudioEffectFlange::r_delayline = NULL;
-
-// User-supplied offset for the delayed sample
-// but start with passthru
-//int AudioEffectFlange::delay_offset_idx = FLANGE_DELAY_PASSTHRU;
-//int AudioEffectFlange::delay_length;
-
-//int AudioEffectFlange::delay_depth;
-//int AudioEffectFlange::delay_rate_incr;
-//unsigned int AudioEffectFlange::l_delay_rate_index;
-//unsigned int AudioEffectFlange::r_delay_rate_index;
-// fails if the user provides unreasonable values but will
-// coerce them and go ahead anyway. e.g. if the delay offset
-// is >= CHORUS_DELAY_LENGTH, the code will force it to
-// CHORUS_DELAY_LENGTH-1 and return false.
+// fails if the user provides unreasonable values.
 // delay_rate is the rate (in Hz) of the sine wave modulation
-// delay_depth is the maximum variation around delay_offset
+// d_depth is the maximum variation around delay_offset
 // i.e. the total offset is delay_offset + delay_depth * sin(delay_rate)
 boolean AudioEffectFlange::begin(short *delayline,int d_length,int delay_offset,int d_depth,float delay_rate)
 {
@@ -79,7 +62,7 @@ if(0) {
   r_delay_rate_index = 0;
   l_circ_idx = 0;
   r_circ_idx = 0;
-  delay_rate_incr = delay_rate/44100.*2147483648.; 
+  delay_rate_incr = delay_rate/(float)AUDIO_SAMPLE_RATE_EXACT*2147483648.; 
 //Serial.println(delay_rate_incr,HEX);
 
   delay_offset_idx = delay_offset;
@@ -95,6 +78,11 @@ if(0) {
   return(all_ok);
 }
 
+void AudioEffectFlange::stop(void)
+{
+  l_delayline = NULL;
+  r_delayline = NULL;
+}
 
 boolean AudioEffectFlange::modify(int delay_offset,int d_depth,float delay_rate)
 {

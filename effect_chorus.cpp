@@ -26,6 +26,9 @@
 
 //                A u d i o E f f e c t C h o r u s
 // Written by Pete (El Supremo) Jan 2014
+
+// 140314 - change 'modify' to 'voices'
+// 140314 - add missing stop() function
 // 140219 - correct storage class (not static)
 
 boolean AudioEffectChorus::begin(short *delayline,int d_length,int n_chorus)
@@ -60,7 +63,13 @@ Serial.println(")");
   return(true);
 }
 
-void AudioEffectChorus::modify(int n_chorus)
+void AudioEffectChorus::stop(void)
+{
+  l_delayline = NULL;
+  r_delayline = NULL;
+}
+
+void AudioEffectChorus::voices(int n_chorus)
 {
   num_chorus = n_chorus;
 }
