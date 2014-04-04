@@ -59,7 +59,8 @@ void AudioPlayFlashWAV::update(void)
 		return;
 	}
 	// This reads two pages (512 bytes) starting at the specified page
-	flash_fast_read_pages((unsigned char *)f_buffer,c_page,2);
+	// flash_fast_read sometimes glitches - for now, don't use it
+	flash_read_pages((unsigned char *)f_buffer,c_page,2);
 	f_buf = f_buffer;
 	l_bl = (uint16_t *)&l_block->data[0];
 	r_bl = (uint16_t *)&r_block->data[0];
