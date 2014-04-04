@@ -68,6 +68,10 @@
 #include "synth_tonesweep.h"
 #include "synth_waveform.h"
 
+#include "record_sd_wav.h"
+#include "synth_samples.h"
+#include "play_flash_wav.h"
+#include "flash_spi.h"
 
 // TODO: more audio processing objects....
 //  sine wave with frequency modulation (phase)
