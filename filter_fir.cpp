@@ -29,7 +29,6 @@ void AudioFilterFIR::begin(short *cp,int n_coeffs)
   // Initialize FIR instances for the left and right channels
   if(coeff_p && (coeff_p != FIR_PASSTHRU)) {
     arm_fir_init_q15(&l_fir_inst, n_coeffs, coeff_p, &l_StateQ15[0], AUDIO_BLOCK_SAMPLES);
-    arm_fir_init_q15(&r_fir_inst, n_coeffs, coeff_p, &r_StateQ15[0], AUDIO_BLOCK_SAMPLES);
   }
 }
 
@@ -55,11 +54,6 @@ void AudioFilterFIR::update(void)
       transmit(block,0);
       release(block);
     }
-    block = receiveReadOnly(1);
-    if(block) {
-      transmit(block,1);
-      release(block);
-    }
     return;
   }
   // Left Channel
@@ -67,19 +61,12 @@ void AudioFilterFIR::update(void)
   // get a block for the FIR output
   b_new = allocate();
   if(block && b_new) {
-    arm_fir_q15(&l_fir_inst, (q15_t *)block->data, (q15_t *)b_new->data, AUDIO_BLOCK_SAMPLES);
+    if(arm_fast)
+    	arm_fir_fast_q15(&l_fir_inst, (q15_t *)block->data, (q15_t *)b_new->data, AUDIO_BLOCK_SAMPLES);
+    else
+    	arm_fir_q15(&l_fir_inst, (q15_t *)block->data, (q15_t *)b_new->data, AUDIO_BLOCK_SAMPLES); 
     // send the FIR output to the left channel
     transmit(b_new,0);
-  }
-  if(block)release(block);
-  if(b_new)release(b_new);
-
-  // Right Channel
-  block = receiveReadOnly(1);
-  b_new = allocate();
-  if(block && b_new) {
-    arm_fir_q15(&r_fir_inst, (q15_t *)block->data, (q15_t *)b_new->data, AUDIO_BLOCK_SAMPLES);
-    transmit(b_new,1);
   }
   if(block)release(block);
   if(b_new)release(b_new);
