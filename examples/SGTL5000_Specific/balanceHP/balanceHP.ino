@@ -34,28 +34,28 @@ void setup() {
   // Enable the audio shield and set the output volume.
   audioShield.enable();
   audioShield.inputSelect(myInput);
-  audioShield.volume(60);
+  audioShield.volume(0.75);
   audioShield.unmuteLineout();
 }
 
 elapsedMillis chgMsec=0;
 
 float lastBal=1024;
-float vol1=75;
+float vol1=0.75;
 
 void loop() {
   // every 10 ms, check for adjustment
   if (chgMsec > 10) {
     float bal1=analogRead(15);
-    bal1=((bal1-512)/512)*100;
+    bal1=((bal1-512)/512);
     bal1=(int)bal1;
     if(lastBal!=bal1)
     {
       if(bal1<0)
       {
-        audioShield.volume(vol1,(vol1/100)*(100+bal1));
+        audioShield.volume(vol1,vol1*(1+bal1));
       } else {
-        audioShield.volume((vol1/100)*(100-bal1),vol1);
+        audioShield.volume(vol1*(1-bal1),vol1);
       }
       lastBal=bal1;
     }

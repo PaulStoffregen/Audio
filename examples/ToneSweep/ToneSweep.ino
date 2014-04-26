@@ -56,7 +56,7 @@ void setup(void)
   AudioMemory(2);
 
   audioShield.enable();
-  audioShield.volume(50);
+  audioShield.volume(0.5);
     // I want output on the line out too
   audioShield.unmuteLineout();
 //  audioShield.muteHeadphone();

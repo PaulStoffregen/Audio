@@ -26,17 +26,12 @@
 
 #include "analyze_peakdetect.h"
 
-// #define PEAKREPORTVERBS
-
 void AudioPeak::update(void)
 {
 	audio_block_t *block;
 	const int16_t *p, *end;
 	block = receiveReadOnly();
 	if (!block) {
-#ifdef PEAKREPORTVERBS
-		Serial.println("AudioPeak !block");
-#endif
 		return;
 	}
 	if (!m_enabled) {
@@ -50,9 +45,6 @@ void AudioPeak::update(void)
 		if(d<min) min=d;
 		if(d>max) max=d;
 	} while (p < end);
-#ifdef PEAKREPORTVERBS
-	Serial.println("AudioPeak ran");
-#endif
 	release(block);
 }
 
@@ -60,13 +52,13 @@ void AudioPeak::begin(bool noReset)
 {
 	if(!noReset)
 	{
-		min=0;
-		max=0;
+		min=32767;
+		max=-32767;
 	}
 	m_enabled=true;
 }
 uint16_t AudioPeak::Dpp(void)
 {
-	return max-min;
+	if(max>min) return max-min; else return 0;
 }
 
