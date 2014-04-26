@@ -1,4 +1,8 @@
 /*
+c
+  - released
+b
+- Use FIR filters with fast_fft option
 
 The audio board uses the following pins.
  6 - MEMCS
@@ -25,14 +29,15 @@ The audio board uses the following pins.
 #include <Bounce.h>
 #include "filters.h"
 
-// If this pin is grounded the FIR filter is turned which
-// makes just pass through the audio
+// If this pin is grounded the FIR filter is turned off
+// which just passes the audio sraight through
 // Don't use any of the pins listed above
 #define PASSTHRU_PIN 1
 // If this pin goes low the next FIR filter in the list
 // is switched in.
 #define FILTER_PIN 0
 
+// debounce the passthru and filter switching pins
 Bounce b_passthru = Bounce(PASSTHRU_PIN,15);
 Bounce b_filter   = Bounce(FILTER_PIN,15);
 
@@ -41,16 +46,18 @@ const int myInput = AUDIO_INPUT_LINEIN;
 
 
 AudioInputI2S       audioInput;         // audio shield: mic or line-in
-AudioFilterFIR           myFilter;
+// Use the fast FIR filter for left and right channels
+AudioFilterFIR       myFilterL(true);
+AudioFilterFIR       myFilterR(true);
 AudioOutputI2S      audioOutput;        // audio shield: headphones & line-out
 
 // Create Audio connections between the components
-// Both channels of the audio input go to the FIR filter
-AudioConnection c1(audioInput, 0, myFilter, 0);
-AudioConnection c2(audioInput, 1, myFilter, 1);
-// both channels from the FIR filter go to the audio output
-AudioConnection c3(myFilter, 0, audioOutput, 0);
-AudioConnection c4(myFilter, 1, audioOutput, 1);
+// Route audio into the left and right filters
+AudioConnection c1(audioInput, 0, myFilterL, 0);
+AudioConnection c2(audioInput, 1, myFilterR, 0);
+// Route the output of the filters to their respective channels
+AudioConnection c3(myFilterL, 0, audioOutput, 0);
+AudioConnection c4(myFilterR, 0, audioOutput, 1);
 AudioControlSGTL5000 audioShield;
 
 
@@ -62,9 +69,9 @@ struct fir_filter {
 // index of current filter. Start with the low pass.
 int fir_idx = 0;
 struct fir_filter fir_list[] = {
-  low_pass , 100,    // low pass with cutoff at 1kHz and -60dB at 2kHz
-  band_pass, 100,    // bandpass 1200Hz - 1700Hz
-  NULL,      0
+  {low_pass , 100},    // low pass with cutoff at 1kHz and -60dB at 2kHz
+  {band_pass, 100},    // bandpass 1200Hz - 1700Hz
+  {NULL,      0}
 };
 
 
@@ -98,8 +105,8 @@ void setup() {
     Serial.println(") is grounded");
   }  
   // Initialize the filter
-  myFilter.begin(fir_list[0].coeffs,fir_list[0].num_coeffs);
-  
+  myFilterL.begin(fir_list[0].coeffs,fir_list[0].num_coeffs);
+  myFilterR.begin(fir_list[0].coeffs,fir_list[0].num_coeffs);  
   Serial.println("setup done");
 }
 
@@ -108,7 +115,7 @@ int old_idx = -1;
 
 // audio volume
 int volume = 0;
-
+unsigned long last_time = millis();
 void loop()
 {
   // Volume control
@@ -122,18 +129,20 @@ void loop()
   b_passthru.update();
   b_filter.update();
   
-
-  
   // If the passthru button is pushed, save the current
   // filter index and then switch the filter to passthru
   if(b_passthru.fallingEdge()) {
     old_idx = fir_idx;
-    myFilter.begin(FIR_PASSTHRU,0);
+    myFilterL.begin(FIR_PASSTHRU,0);
+    myFilterR.begin(FIR_PASSTHRU,0);
   }
   
   // If passthru button is released, restore previous filter
   if(b_passthru.risingEdge()) {
-    if(old_idx != -1)myFilter.begin(fir_list[fir_idx].coeffs,fir_list[fir_idx].num_coeffs);
+    if(old_idx != -1) {
+      myFilterL.begin(fir_list[fir_idx].coeffs,fir_list[fir_idx].num_coeffs);
+      myFilterR.begin(fir_list[fir_idx].coeffs,fir_list[fir_idx].num_coeffs);
+    }
     old_idx = -1;
   }
   
@@ -141,8 +150,30 @@ void loop()
   if(b_filter.fallingEdge()) {
     fir_idx++;
     if(fir_list[fir_idx].num_coeffs == 0)fir_idx = 0;
-    myFilter.begin(fir_list[fir_idx].coeffs,fir_list[fir_idx].num_coeffs);
+    myFilterL.begin(fir_list[fir_idx].coeffs,fir_list[fir_idx].num_coeffs);
+    myFilterR.begin(fir_list[fir_idx].coeffs,fir_list[fir_idx].num_coeffs);
   }
+
+
+if(1) {
+// With fast_fir
+// Proc = 18 (18),  Mem = 4 (6)
+
+  if(millis() - last_time >= 5000) {
+    Serial.print("Proc = ");
+    Serial.print(AudioProcessorUsage());
+    Serial.print(" (");    
+    Serial.print(AudioProcessorUsageMax());
+    Serial.print("),  Mem = ");
+    Serial.print(AudioMemoryUsage());
+    Serial.print(" (");    
+    Serial.print(AudioMemoryUsageMax());
+    Serial.println(")");
+    last_time = millis();
+  }
+}
+
+
 }
 
 

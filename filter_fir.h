@@ -26,6 +26,10 @@
 #include "AudioStream.h"
 #include "arm_math.h"
 
+#define USE_FAST_FIR true
+#define USE_SLOW_FIR false
+
+
 // Maximum number of coefficients in a FIR filter
 // The audio breaks up with 128 coefficients so a
 // maximum of 150 is more than sufficient
@@ -39,12 +43,12 @@ class AudioFilterFIR :
 public AudioStream
 {
 public:
-  AudioFilterFIR(void): 
-  AudioStream(2,inputQueueArray), coeff_p(NULL)
+  AudioFilterFIR(const boolean a_f): 
+  AudioStream(2,inputQueueArray), arm_fast(a_f), coeff_p(NULL)
   { 
   }
 
-  void begin(short *coeff_p,int f_pin);
+  void begin(short *coeff_p,int n_coeffs);
   virtual void update(void);
   void stop(void);
   
@@ -54,11 +58,11 @@ private:
   // the state arrays are defined to handle a maximum of MAX_COEFFS
   // coefficients in a filter
   q15_t l_StateQ15[AUDIO_BLOCK_SAMPLES + MAX_COEFFS];
-  q15_t r_StateQ15[AUDIO_BLOCK_SAMPLES + MAX_COEFFS];
   arm_fir_instance_q15 l_fir_inst;
-  arm_fir_instance_q15 r_fir_inst;
   // pointer to current coefficients or NULL or FIR_PASSTHRU
   short *coeff_p;
+  // Whether to use the fast arm FIR code 
+  const boolean arm_fast;
 };
 
 #endif
