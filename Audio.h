@@ -66,6 +66,7 @@
 #include "play_sd_raw.h"
 #include "play_sd_wav.h"
 #include "synth_tonesweep.h"
+#include "synth_sine.h"
 #include "synth_waveform.h"
 
 

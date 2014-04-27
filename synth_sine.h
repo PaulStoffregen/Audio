@@ -24,25 +24,34 @@
  * THE SOFTWARE.
  */
 
-#ifndef AudioControl_h_
-#define AudioControl_h_
+#ifndef synth_sine_h_
+#define synth_sine_h_
 
-#include <stdint.h>
-
-// A base class for all Codecs, DACs and ADCs, so at least the
-// most basic functionality is consistent.
-
-#define AUDIO_INPUT_LINEIN  0
-#define AUDIO_INPUT_MIC     1
-
-class AudioControl
+class AudioSynthWaveformSine : public AudioStream
 {
 public:
-	virtual bool enable(void) = 0;
-	virtual bool disable(void) = 0;
-	virtual bool volume(float volume) = 0;      // volume 0.0 to 1.0
-	virtual bool inputLevel(float volume) = 0;  // volume 0.0 to 1.0
-	virtual bool inputSelect(int n) = 0;
+	AudioSynthWaveformSine() : AudioStream(0, NULL) {}
+	void frequency(float freq);
+	//void amplitude(q15 n);
+	virtual void update(void);
+private:
+	uint32_t phase;
+	uint32_t phase_increment;
 };
+
+class AudioSynthWaveformSineModulated : public AudioStream
+{
+public:
+	AudioSynthWaveformSineModulated() : AudioStream(1, inputQueueArray) {}
+	void frequency(float freq);
+	//void amplitude(q15 n);
+	virtual void update(void);
+private:
+	uint32_t phase;
+	uint32_t phase_increment;
+	uint32_t modulation_factor;
+	audio_block_t *inputQueueArray[1];
+};
+
 
 #endif
