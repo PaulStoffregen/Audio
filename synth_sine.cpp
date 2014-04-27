@@ -26,12 +26,12 @@
 
 #include "Audio.h"
 #include "arm_math.h"
+#include "utility/dspinst.h"
 
 // data_waveforms.c
 extern "C" {
 extern const int16_t AudioWaveformSine[257];
 }
-
 
 
 void AudioSynthWaveformSine::frequency(float f)
@@ -46,7 +46,6 @@ void AudioSynthWaveformSine::update(void)
 	uint32_t i, ph, inc, index, scale;
 	int32_t val1, val2;
 
-	//Serial.println("AudioSynthWaveformSine::update");
 	block = allocate();
 	if (block) {
 		ph = phase;
@@ -59,12 +58,8 @@ void AudioSynthWaveformSine::update(void)
 			val2 *= scale;
 			val1 *= 0xFFFF - scale;
 			block->data[i] = (val1 + val2) >> 16;
-			 //Serial.print(block->data[i]);
-			 //Serial.print(", ");
-			 //if ((i % 12) == 11) Serial.println();
 			ph += inc;
 		}
-		 //Serial.println();
 		phase = ph;
 		transmit(block);
 		release(block);
@@ -78,7 +73,10 @@ void AudioSynthWaveformSine::update(void)
 
 void AudioSynthWaveformSineModulated::frequency(float f)
 {
-	if (f > AUDIO_SAMPLE_RATE_EXACT / 2 || f < 0.0) return;
+	// maximum unmodulated carrier frequency is 11025 Hz
+	// input = +1.0 doubles carrier
+	// input = -1.0 DC output
+	if (f >= AUDIO_SAMPLE_RATE_EXACT / 4 || f < 0.0) return;
 	phase_increment = (f / AUDIO_SAMPLE_RATE_EXACT) * 4294967296.0f;
 }
 
@@ -87,8 +85,8 @@ void AudioSynthWaveformSineModulated::update(void)
 	audio_block_t *block, *modinput;
 	uint32_t i, ph, inc, index, scale;
 	int32_t val1, val2;
+	int16_t mod;
 
-	//Serial.println("AudioSynthWaveformSineModulated::update");
 	modinput = receiveReadOnly();
 	ph = phase;
 	inc = phase_increment;
@@ -98,7 +96,8 @@ void AudioSynthWaveformSineModulated::update(void)
 		if (modinput) {
 			// but if we got modulation data, update the phase
 			for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
-				ph += inc + modinput->data[i] * modulation_factor;
+				mod = modinput->data[i];
+				ph += inc + (multiply_32x32_rshift32(inc, mod << 16) << 1);
 			}
 			release(modinput);
 		} else {
@@ -116,10 +115,11 @@ void AudioSynthWaveformSineModulated::update(void)
 			val2 *= scale;
 			val1 *= 0xFFFF - scale;
 			block->data[i] = (val1 + val2) >> 16;
-			 //Serial.print(block->data[i]);
-			 //Serial.print(", ");
-			 //if ((i % 12) == 11) Serial.println();
-			ph += inc + modinput->data[i] * modulation_factor;
+			// -32768 = no phase increment
+			// 32767 = double phase increment
+			mod = modinput->data[i];
+			ph += inc + (multiply_32x32_rshift32(inc, mod << 16) << 1);
+			//ph += inc + (((int64_t)inc * (mod << 16)) >> 31);
 		}
 		release(modinput);
 	} else {
@@ -133,9 +133,6 @@ void AudioSynthWaveformSineModulated::update(void)
 			val2 *= scale;
 			val1 *= 0xFFFF - scale;
 			block->data[i] = (val1 + val2) >> 16;
-			 //Serial.print(block->data[i]);
-			 //Serial.print(", ");
-			 //if ((i % 12) == 11) Serial.println();
 			ph += inc;
 		}
 	}

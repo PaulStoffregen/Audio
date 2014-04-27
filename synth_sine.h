@@ -49,7 +49,6 @@ public:
 private:
 	uint32_t phase;
 	uint32_t phase_increment;
-	uint32_t modulation_factor;
 	audio_block_t *inputQueueArray[1];
 };
 
