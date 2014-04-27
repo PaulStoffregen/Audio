@@ -98,10 +98,6 @@ AudioWindowWelch256	LITERAL1
 AudioWindowHamming256	LITERAL1
 AudioWindowCosine256	LITERAL1
 AudioWindowTukey256	LITERAL1
-AudioWaveformSine	LITERAL1
-AudioWaveformTriangle	LITERAL1
-AudioWaveformSquare	LITERAL1
-AudioWaveformSawtooth	LITERAL1
 
 FILTER_LOPASS	LITERAL1
 FILTER_HIPASS	LITERAL1

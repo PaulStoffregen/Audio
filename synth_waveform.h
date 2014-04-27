@@ -30,60 +30,6 @@
 #include "AudioStream.h"
 #include "arm_math.h"
 
-//#define ORIGINAL_AUDIOSYNTHWAVEFORM
-
-#ifdef ORIGINAL_AUDIOSYNTHWAVEFORM
-// waveforms.c
-extern "C" {
-extern const int16_t AudioWaveformSine[257];
-extern const int16_t AudioWaveformTriangle[257];
-extern const int16_t AudioWaveformSquare[257];
-extern const int16_t AudioWaveformSawtooth[257];
-}
-
-class AudioSynthWaveform : public AudioStream
-{
-public:
-	AudioSynthWaveform(const int16_t *waveform)
-	  : AudioStream(0, NULL), wavetable(waveform), magnitude(0), phase(0)
-					, ramp_down(0), ramp_up(0), ramp_mag(0), ramp_length(0)
-	  				 { }
-	void frequency(float freq) {
-		if (freq > AUDIO_SAMPLE_RATE_EXACT / 2 || freq < 0.0) return;
-		phase_increment = (freq / AUDIO_SAMPLE_RATE_EXACT) * 4294967296.0f;
-	}
-	void amplitude(float n) {        // 0 to 1.0
-		if (n < 0) n = 0;
-		else if (n > 1.0) n = 1.0;
-// Ramp code
-		if(magnitude && (n == 0)) {
-			ramp_down = ramp_length;
-			ramp_up = 0;
-			last_magnitude = magnitude;
-		}
-		else if((magnitude == 0) && n) {
-			ramp_up = ramp_length;
-			ramp_down = 0;
-		}
-// set new magnitude
-		magnitude = n * 32767.0;
-	}
-	virtual void update(void);
-	void set_ramp_length(uint16_t r_length);
-	
-private:
-	const int16_t *wavetable;
-	uint16_t magnitude;
-	uint16_t last_magnitude;
-	uint32_t phase;
-	uint32_t phase_increment;
-	uint32_t ramp_down;
-	uint32_t ramp_up;
-	uint32_t ramp_mag;
-	uint16_t ramp_length;
-};
-
-#else
 // waveforms.c
 extern "C" {
 extern const int16_t AudioWaveformSine[257];
@@ -161,26 +107,6 @@ private:
   uint32_t ramp_up;
   uint16_t ramp_length;
 };
-
-#endif
-
-
-
-#if 0
-class AudioSineWaveMod : public AudioStream
-{
-public:
-	AudioSineWaveMod() : AudioStream(1, inputQueueArray) {}
-	void frequency(float freq);
-	//void amplitude(q15 n);
-	virtual void update(void);
-private:
-	uint32_t phase;
-	uint32_t phase_increment;
-	uint32_t modulation_factor;
-	audio_block_t *inputQueueArray[1];
-};
-#endif
 
 
 
