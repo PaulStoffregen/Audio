@@ -30,26 +30,36 @@
 class AudioSynthWaveformSine : public AudioStream
 {
 public:
-	AudioSynthWaveformSine() : AudioStream(0, NULL) {}
+	AudioSynthWaveformSine() : AudioStream(0, NULL), magnitude(16384) {}
 	void frequency(float freq);
-	//void amplitude(q15 n);
+	void amplitude(float n) {
+		if (n < 0) n = 0;
+		else if (n > 1.0) n = 1.0;
+		magnitude = n * 65536.0;
+	}
 	virtual void update(void);
 private:
 	uint32_t phase;
 	uint32_t phase_increment;
+	int32_t magnitude;
 };
 
 class AudioSynthWaveformSineModulated : public AudioStream
 {
 public:
-	AudioSynthWaveformSineModulated() : AudioStream(1, inputQueueArray) {}
+	AudioSynthWaveformSineModulated() : AudioStream(1, inputQueueArray), magnitude(16384) {}
 	void frequency(float freq);
-	//void amplitude(q15 n);
+	void amplitude(float n) {
+		if (n < 0) n = 0;
+		else if (n > 1.0) n = 1.0;
+		magnitude = n * 65536.0;
+	}
 	virtual void update(void);
 private:
 	uint32_t phase;
 	uint32_t phase_increment;
 	audio_block_t *inputQueueArray[1];
+	int32_t magnitude;
 };
 
 
