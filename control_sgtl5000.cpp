@@ -514,15 +514,14 @@ bool AudioControlSGTL5000::enable(void)
 
 	write(CHIP_ANA_POWER, 0x4060);  // VDDD is externally driven with 1.8V
 	write(CHIP_LINREG_CTRL, 0x006C);  // VDDA & VDDIO both over 3.1V
-	write(CHIP_REF_CTRL, 0x01F1); // VAG=1.575 slow ramp, normal bias current
+	write(CHIP_REF_CTRL, 0x01F2); // VAG=1.575, normal ramp, +12.5% bias current
 	write(CHIP_LINE_OUT_CTRL, 0x0322); // LO_VAGCNTRL=1.65V, OUT_CURRENT=0.36mA
 	write(CHIP_SHORT_CTRL, 0x4446);  // allow up to 125mA
 	write(CHIP_ANA_CTRL, 0x0137);  // enable zero cross detectors
 	write(CHIP_ANA_POWER, 0x40FF); // power up: lineout, hp, adc, dac
 	write(CHIP_DIG_POWER, 0x0073); // power up all digital stuff
 	delay(400);
-	// 40*log((1.575)/(1.65)) + 15 = 13.1391993746043 but it seems wrong, 5 is better...
-	write(CHIP_LINE_OUT_VOL, 0x0505); // TODO: correct value for 3.3V
+	write(CHIP_LINE_OUT_VOL, 0x1515); // default approx 2 volts peak-to-peak
 	write(CHIP_CLK_CTRL, 0x0004);  // 44.1 kHz, 256*Fs
 	write(CHIP_I2S_CTRL, 0x0130); // SCLK=32*Fs, 16bit, I2S format
 	// default signal routing is ok?
@@ -603,18 +602,41 @@ bool AudioControlSGTL5000::volume(float left, float right)
 	return write(CHIP_ANA_HP_CTRL, m);
 }
 
-
 // CHIP_LINE_OUT_VOL
+//  Actual measured full-scale peak-to-peak sine wave output voltage:
+//  0-12: output has clipping
+//  13: 3.16 Volts p-p
+//  14: 2.98 Volts p-p
+//  15: 2.83 Volts p-p
+//  16: 2.67 Volts p-p
+//  17: 2.53 Volts p-p
+//  18: 2.39 Volts p-p
+//  19: 2.26 Volts p-p
+//  20: 2.14 Volts p-p
+//  21: 2.02 Volts p-p
+//  22: 1.91 Volts p-p
+//  23: 1.80 Volts p-p
+//  24: 1.71 Volts p-p
+//  25: 1.62 Volts p-p
+//  26: 1.53 Volts p-p
+//  27: 1.44 Volts p-p
+//  28: 1.37 Volts p-p
+//  29: 1.29 Volts p-p
+//  30: 1.22 Volts p-p
+//  31: 1.16 Volts p-p
 unsigned short AudioControlSGTL5000::lineOutLevel(uint8_t n)
 {
-	n&=31;
+	if (n > 31) n = 31;
+	else if (n < 13) n = 13;
 	return modify(CHIP_LINE_OUT_VOL,(n<<8)|n,(31<<8)|31);
 }
 
 unsigned short AudioControlSGTL5000::lineOutLevel(uint8_t left, uint8_t right)
 {
-	left&=31;
-	right&=31;
+	if (left > 31) left = 31;
+	else if (left < 13) left = 13;
+	if (right > 31) right = 31;
+	else if (right < 13) right = 13;
 	return modify(CHIP_LINE_OUT_VOL,(right<<8)|left,(31<<8)|31);
 }
 
