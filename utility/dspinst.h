@@ -150,7 +150,7 @@ static inline int32_t multiply_16tx16b_add_16bx16t(uint32_t a, uint32_t b) __att
 static inline int32_t multiply_16tx16b_add_16bx16t(uint32_t a, uint32_t b)
 {
 	int32_t out;
-	asm volatile("smuad %0, %1, %2" : "=r" (out) : "r" (a), "r" (b));
+	asm volatile("smuadx %0, %1, %2" : "=r" (out) : "r" (a), "r" (b));
 	return out;
 }
 
