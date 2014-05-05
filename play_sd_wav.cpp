@@ -130,12 +130,12 @@ void AudioPlaySdWav::update(void)
 		buffer_length = wavfile.read(buffer, 512);
 		if (buffer_length == 0) goto end;
 		buffer_offset = 0;
-		if (!consume(buffer_length)) {
-			// no audio was transmitted
-			//Serial.println("consume returned false");
+		bool txok = consume(buffer_length);
+		if (txok) {
+			if (state != STATE_STOP) return;
+		} else {
 			if (state != STATE_STOP) goto cleanup;
 		}
-		return;
 	}
 end:	// end of file reached or other reason to stop
 	wavfile.close();
@@ -180,17 +180,19 @@ bool AudioPlaySdWav::consume(uint32_t size)
 	p = buffer + buffer_offset;
 start:
 	if (size == 0) return false;
-	//Serial.print("AudioPlaySdWav write, ");
-	//Serial.print("size = ");
-	//Serial.print(size);
-	//Serial.print(", buffer_offset = ");
-	//Serial.print(buffer_offset);
-	//Serial.print(", data_length = ");
-	//Serial.print(data_length);
-	//Serial.print(", space = ");
-	//Serial.print((AUDIO_BLOCK_SAMPLES - block_offset) * 2);
-	//Serial.print(", state = ");
-	//Serial.println(state);
+#if 0
+	Serial.print("AudioPlaySdWav consume, ");
+	Serial.print("size = ");
+	Serial.print(size);
+	Serial.print(", buffer_offset = ");
+	Serial.print(buffer_offset);
+	Serial.print(", data_length = ");
+	Serial.print(data_length);
+	Serial.print(", space = ");
+	Serial.print((AUDIO_BLOCK_SAMPLES - block_offset) * 2);
+	Serial.print(", state = ");
+	Serial.println(state);
+#endif
 	switch (state) {
 	  // parse wav file header, is this really a .wav file?
 	  case STATE_PARSE1:
