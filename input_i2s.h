@@ -24,10 +24,17 @@
  * THE SOFTWARE.
  */
 
-#ifndef input_i2s_h_
-#define _input_i2sh_
+#ifndef _input_i2s_h_
+#define _input_i2s_h_
 
 #include "AudioStream.h"
+#include "utility/dma_chan.h"
+
+#ifdef __MK20DX128__
+#define AUDIO_IN_I2S_DMA_CHANNEL 1
+#else
+#define AUDIO_IN_I2S_DMA_CHANNEL 5
+#endif
 
 class AudioInputI2S : public AudioStream
 {
@@ -35,7 +42,7 @@ public:
 	AudioInputI2S(void) : AudioStream(0, NULL) { begin(); }
 	virtual void update(void);
 	void begin(void);
-	friend void dma_ch1_isr(void);
+	friend void DMA_ISR(AUDIO_IN_I2S_DMA_CHANNEL)(void);
 protected:	
 	AudioInputI2S(int dummy): AudioStream(0, NULL) {} // to be used only inside AudioInputI2Sslave !!
 	static bool update_responsibility;

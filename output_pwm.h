@@ -28,6 +28,13 @@
 #define output_pwm_h_
 
 #include "AudioStream.h"
+#include "utility/dma_chan.h"
+
+#ifdef __MK20DX128__
+#define AUDIO_OUT_PWM_DMA_CHANNEL 3
+#else
+#define AUDIO_OUT_PWM_DMA_CHANNEL 7
+#endif
 
 class AudioOutputPWM : public AudioStream
 {
@@ -35,7 +42,7 @@ public:
 	AudioOutputPWM(void) : AudioStream(1, inputQueueArray) { begin(); }
 	virtual void update(void);
 	void begin(void);
-	friend void dma_ch3_isr(void);
+	friend void DMA_ISR(AUDIO_OUT_PWM_DMA_CHANNEL)(void);
 private:
 	static audio_block_t *block_1st;
 	static audio_block_t *block_2nd;
