@@ -44,8 +44,8 @@ public:
 private:
 	File rawfile;
 	uint32_t file_size;
-	uint32_t file_offset;
-	bool playing;
+	volatile uint32_t file_offset;
+	volatile bool playing;
 };
 
 #endif
