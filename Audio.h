@@ -63,6 +63,7 @@
 #include "output_i2s.h"
 #include "output_pwm.h"
 #include "play_memory.h"
+#include "play_queue.h"
 #include "play_sd_raw.h"
 #include "play_sd_wav.h"
 #include "synth_tonesweep.h"
