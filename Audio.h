@@ -46,6 +46,7 @@
 // #include <Audio.h> to get the whole library
 //
 #include "analyze_fft256.h"
+#include "analyze_fft1024.h"
 #include "analyze_print.h"
 #include "analyze_tonedetect.h"
 #include "analyze_peakdetect.h"
