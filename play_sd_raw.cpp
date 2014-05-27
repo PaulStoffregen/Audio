@@ -38,7 +38,9 @@ void AudioPlaySdRaw::begin(void)
 bool AudioPlaySdRaw::play(const char *filename)
 {
 	stop();
+	__disable_irq();
 	rawfile = SD.open(filename);
+	__enable_irq();
 	if (!rawfile) {
 		//Serial.println("unable to open file");
 		return false;
