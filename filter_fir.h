@@ -44,7 +44,7 @@ public AudioStream
 {
 public:
   AudioFilterFIR(const boolean a_f): 
-  AudioStream(2,inputQueueArray), arm_fast(a_f), coeff_p(NULL)
+  AudioStream(1,inputQueueArray), arm_fast(a_f), coeff_p(NULL)
   { 
   }
 
@@ -53,16 +53,18 @@ public:
   void stop(void);
   
 private:
-  audio_block_t *inputQueueArray[2];
+  audio_block_t *inputQueueArray[1];
   // arm state arrays and FIR instances for left and right channels
   // the state arrays are defined to handle a maximum of MAX_COEFFS
   // coefficients in a filter
   q15_t l_StateQ15[AUDIO_BLOCK_SAMPLES + MAX_COEFFS];
-  arm_fir_instance_q15 l_fir_inst;
-  // pointer to current coefficients or NULL or FIR_PASSTHRU
-  short *coeff_p;
+
   // Whether to use the fast arm FIR code 
   const boolean arm_fast;
+  // pointer to current coefficients or NULL or FIR_PASSTHRU
+  short *coeff_p;
+  arm_fir_instance_q15 l_fir_inst;
+
 };
 
 #endif
