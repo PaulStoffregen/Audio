@@ -70,7 +70,7 @@
 #include "synth_tonesweep.h"
 #include "synth_sine.h"
 #include "synth_waveform.h"
-
+#include "multiplier.h"
 
 // TODO: more audio processing objects....
 //  sine wave with frequency modulation (phase)
