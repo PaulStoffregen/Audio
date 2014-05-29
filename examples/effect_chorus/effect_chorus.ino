@@ -1,8 +1,22 @@
 /*
-PROC/MEM 9/4
 
-140219
-  p
+VERSION 2 - use modified library which has been changed to handle
+            one channel instead of two
+140529
+Proc = 7 (7),  Mem = 4 (4)
+  2a
+  - default at startup is to have passthru ON and the button
+    switches the chorus effect in.
+  
+previous performance measures were PROC/MEM 9/4
+
+From: http://www.cs.cf.ac.uk/Dave/CM0268/PDF/10_CM0268_Audio_FX.pdf
+about Comb filter effects
+Effect      Delay range (ms)    Modulation
+Resonator      0 - 20            None
+Flanger        0 - 15            Sinusoidal (approx 1Hz)
+Chorus        25 - 50            None
+Echo            >50              None
 
 FMI:
 The audio board uses the following pins.
@@ -43,18 +57,14 @@ many blocks you provided with AudioMemory().
 
 
 
-// Number of samples in ONE channel
+// Number of samples in each delay line
 #define CHORUS_DELAY_LENGTH (16*AUDIO_BLOCK_SAMPLES)
-// Allocate the delay line for left and right channels
-// The delayline will hold left and right samples so it
-// should be declared to be twice as long as the desired
-// number of samples in one channel
-#define CHORUS_DELAYLINE (CHORUS_DELAY_LENGTH*2)
-// The delay line for left and right channels
-short delayline[CHORUS_DELAYLINE];
+// Allocate the delay lines for left and right channels
+short l_delayline[CHORUS_DELAY_LENGTH];
+short r_delayline[CHORUS_DELAY_LENGTH];
 
-// If this pin is grounded the chorus is turned off
-// which makes it just pass through the audio
+// Default is to just pass the audio through. Grounding this pin
+// applies the chorus effect
 // Don't use any of the pins listed above
 #define PASSTHRU_PIN 1
 
@@ -64,16 +74,17 @@ Bounce b_passthru = Bounce(PASSTHRU_PIN,15);
 const int myInput = AUDIO_INPUT_LINEIN;
 
 AudioInputI2S       audioInput;         // audio shield: mic or line-in
-AudioEffectChorus   myEffect;
+AudioEffectChorus   l_myEffect;
+AudioEffectChorus   r_myEffect;
 AudioOutputI2S      audioOutput;        // audio shield: headphones & line-out
 
 // Create Audio connections between the components
-// Both channels of the audio input go to the chorus effect
-AudioConnection c1(audioInput, 0, myEffect, 0);
-AudioConnection c2(audioInput, 1, myEffect, 1);
-// both channels from the chorus effect go to the audio output
-AudioConnection c3(myEffect, 0, audioOutput, 0);
-AudioConnection c4(myEffect, 1, audioOutput, 1);
+// Both channels of the audio input go to the FIR filter
+AudioConnection c1(audioInput, 0, l_myEffect, 0);
+AudioConnection c2(audioInput, 1, r_myEffect, 0);
+// both channels from the FIR filter go to the audio output
+AudioConnection c3(l_myEffect, 0, audioOutput, 0);
+AudioConnection c4(r_myEffect, 0, audioOutput, 1);
 
 AudioControlSGTL5000 audioShield;
 
@@ -105,15 +116,27 @@ void setup() {
     Serial.println(") is grounded");
   }
 
-  // Initialize the effect
-  // - address of delayline
-  // - total number of samples (left AND right) in the delay line
-  // - number of voices in the chorus INCLUDING the original voice
-  if(!myEffect.begin(delayline,CHORUS_DELAYLINE,n_chorus)) {
-    Serial.println("AudioEffectChorus - begin failed");
+  // Initialize the effect - left channel
+  // address of delayline
+  // total number of samples in the delay line
+  // number of voices in the chorus INCLUDING the original voice
+  if(!l_myEffect.begin(l_delayline,CHORUS_DELAY_LENGTH,n_chorus)) {
+    Serial.println("AudioEffectChorus - left channel begin failed");
     while(1);
   }
-  
+
+  // Initialize the effect - right channel
+  // address of delayline
+  // total number of samples in the delay line
+  // number of voices in the chorus INCLUDING the original voice
+  if(!r_myEffect.begin(r_delayline,CHORUS_DELAY_LENGTH,n_chorus)) {
+    Serial.println("AudioEffectChorus - left channel begin failed");
+    while(1);
+  }
+  // Initially the effect is off. It is switched on when the
+  // PASSTHRU button is pushed.
+  l_myEffect.voices(0);
+  r_myEffect.voices(0);
   // I want output on the line out too
   audioShield.unmuteLineout();
 //  audioShield.muteHeadphone();
@@ -134,7 +157,7 @@ void loop()
   int n = analogRead(15);
   if (n != volume) {
     volume = n;
-    audioShield.volume((float)n / 10.23);
+    audioShield.volume(n / 1023.);
   }
 if(0) {
   if(millis() - last_time >= 5000) {
@@ -153,14 +176,19 @@ if(0) {
   // update the button
   b_passthru.update();
  
-  // If the passthru button is pushed, switch the effect to passthru
+  // If the passthru button is pushed, switch the chorus on
   if(b_passthru.fallingEdge()) {
-    myEffect.modify(0);
+    l_myEffect.voices(n_chorus);
+    r_myEffect.voices(n_chorus);
   }
   
-  // If passthru button is released, restore the previous chorus
+  // If passthru button is released, turn on passthru
   if(b_passthru.risingEdge()) {
-    myEffect.modify(n_chorus);
+    l_myEffect.voices(0);
+    r_myEffect.voices(0);
   }
 
 }
+
+
+

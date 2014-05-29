@@ -32,13 +32,23 @@ FLANGE EFFECT
   -depth to +depth. Thus, the delayed sample will be selected from
   the range (dt-depth) to (dt+depth). This selection will vary
   at whatever rate is specified as the frequency of the effect Fe.
-  I have found that rates of .25 seconds or less are best, otherwise
-  the effect is very "watery" and in extreme cases the sound is
-  even off-key!
+Try these settings:
+#define FLANGE_DELAY_LENGTH (2*AUDIO_BLOCK_SAMPLES)
+and
+int s_idx = 2*FLANGE_DELAY_LENGTH/4;
+int s_depth = FLANGE_DELAY_LENGTH/4;
+double s_freq = 3;
+  The flange effect can also produce a chorus effect if a longer
+  delay line is used with a slower rate, for example try:
+#define FLANGE_DELAY_LENGTH (12*AUDIO_BLOCK_SAMPLES)
+and
+int s_idx = 3*FLANGE_DELAY_LENGTH/4;
+int s_depth = FLANGE_DELAY_LENGTH/8;
+double s_freq = .0625;
 
   When trying out these effects with recorded music as input, it is
   best to use those where there is a solo voice which is clearly
-  "in front" of the accompaninemnt. Tracks which already contain
+  "in front" of the accompaniment. Tracks which already contain
   flange or chorus effects don't work well.
   
 */

@@ -28,6 +28,7 @@
 /******************************************************************/
 //                A u d i o E f f e c t F l a n g e
 // Written by Pete (El Supremo) Jan 2014
+// 140529 - change to handle mono stream and change modify() to voices()
 
 #define FLANGE_DELAY_PASSTHRU 0
 
@@ -36,26 +37,23 @@ public AudioStream
 {
 public:
   AudioEffectFlange(void): 
-  AudioStream(2,inputQueueArray) { 
+  AudioStream(1,inputQueueArray) { 
   }
 
   boolean begin(short *delayline,int d_length,int delay_offset,int d_depth,float delay_rate);
-  boolean modify(int delay_offset,int d_depth,float delay_rate);
+  boolean voices(int delay_offset,int d_depth,float delay_rate);
   virtual void update(void);
   void stop(void);
   
 private:
-  audio_block_t *inputQueueArray[2];
+  audio_block_t *inputQueueArray[1];
   short *l_delayline;
-  short *r_delayline;
   int delay_length;
   short l_circ_idx;
-  short r_circ_idx;
   int delay_depth;
   int delay_offset_idx;
   int   delay_rate_incr;
   unsigned int l_delay_rate_index;
-  unsigned int r_delay_rate_index;
 };
 
 #endif
