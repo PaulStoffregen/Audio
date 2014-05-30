@@ -40,9 +40,9 @@ void AudioOutputAnalog::begin(void)
 	DAC0_C0 = DAC_C0_DACEN;                   // 1.2V VDDA is DACREF_2
 	//DAC0_C0 = DAC_C0_DACEN | DAC_C0_DACRFS; // 3.3V VDDA is DACREF_2
 	// slowly ramp up to DC voltage, approx 1/4 second
-	for (int16_t i=0; i<128; i++) {
-		analogWrite(A14, i);
-		delay(2);
+	for (int16_t i=0; i<2048; i+=8) {
+		*(int16_t *)&(DAC0_DAT0L) = i;
+		delay(1);
 	}
 
 	// set the programmable delay block to trigger DMA requests
