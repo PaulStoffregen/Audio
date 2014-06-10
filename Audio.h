@@ -57,6 +57,7 @@
 #include "effect_flange.h"
 #include "filter_biquad.h"
 #include "filter_fir.h"
+#include "fitler_envelope.h"
 #include "input_adc.h"
 #include "input_i2s.h"
 #include "mixer.h"
@@ -70,6 +71,7 @@
 #include "synth_tonesweep.h"
 #include "synth_sine.h"
 #include "synth_waveform.h"
+#include "synth_lfo.h"
 #include "multiplier.h"
 
 // TODO: more audio processing objects....
