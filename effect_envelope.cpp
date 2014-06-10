@@ -97,8 +97,8 @@ void AudioEffectEnvelope::update(void)
         val = envLevel >> 16;//envLevel is 32 bits, so we have to shift
         
         //if used as envelope effect
-        sample = (sample * val) >> 16;
         sample = block->data[i];
+        sample = (sample * val) >> 16;
         block->data[i] = sample;
         //if used as envelope generator
         //block->data[i] = val;
