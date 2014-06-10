@@ -57,7 +57,7 @@
 #include "effect_flange.h"
 #include "filter_biquad.h"
 #include "filter_fir.h"
-#include "fitler_envelope.h"
+#include "filter_envelope.h"
 #include "input_adc.h"
 #include "input_i2s.h"
 #include "mixer.h"
