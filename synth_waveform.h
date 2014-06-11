@@ -56,9 +56,10 @@ public:
   { 
   }
   
-  void setWavetable(int16_t w)
+  void setWavetable(const int16_t *w)
   {
-    AudioWaveformWavetable = w;
+    for(int i=0; i<sizeof(w); i++)
+    	AudioWaveformWavetable[i] = w[i];
   }
   
   void frequency(float t_hi)

@@ -182,7 +182,7 @@ void AudioSynthWaveform::update(void)
       }
       break;
       
-case TONE_TYPE_SINE:
+case TONE_TYPE_CUSTOM:
       for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
       	// Calculate interpolated sin
 		index = tone_phase >> 23;
