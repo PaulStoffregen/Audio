@@ -43,6 +43,7 @@ extern const int16_t AudioWaveformSine[257];
 #define TONE_TYPE_SAWTOOTH 1
 #define TONE_TYPE_SQUARE   2
 #define TONE_TYPE_TRIANGLE 3
+#define TONE_TYPE_CUSTOM   4
 
 class AudioSynthWaveform : 
 public AudioStream
@@ -53,6 +54,11 @@ public:
   tone_freq(0), tone_phase(0), tone_incr(0), tone_type(0),
   ramp_down(0), ramp_up(0), ramp_length(0)
   { 
+  }
+  
+  void setWavetable(int16_t w)
+  {
+    AudioWaveformWavetable = w;
   }
   
   void frequency(float t_hi)
@@ -102,6 +108,9 @@ private:
   // volatile prevents the compiler optimizing out the frequency function
   volatile uint32_t tone_incr;
   short    tone_type;
+
+  // Wavetable synthesis
+  int16_t AudioWaveformWavetable[257];;
 
   uint32_t ramp_down;
   uint32_t ramp_up;
