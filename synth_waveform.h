@@ -56,9 +56,9 @@ public:
   { 
   }
   
-  void setWavetable(const int16_t *w)
+  void setWavetable(const int16_t w[257])
   {
-    for(int i=0; i<sizeof(w); i++)
+    for(int i=0; i<=257 i++)
     	AudioWaveformWavetable[i] = w[i];
   }
   
@@ -111,7 +111,7 @@ private:
   short    tone_type;
 
   // Wavetable synthesis
-  int16_t AudioWaveformWavetable[257];;
+  int16_t AudioWaveformWavetable[257];
 
   uint32_t ramp_down;
   uint32_t ramp_up;
