@@ -58,7 +58,7 @@ public:
   
   void setWavetable(const int16_t w[257])
   {
-    for(int i=0; i<=257 i++)
+    for(int i=0; i<257 i++)
     	AudioWaveformWavetable[i] = w[i];
   }
   
