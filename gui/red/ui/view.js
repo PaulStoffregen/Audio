@@ -406,7 +406,7 @@ RED.view = (function() {
             // update drag line
             drag_line.attr("class", "drag_line");
             mousePos = mouse_position;
-            var numOutputs = (mousedown_port_type === 0)?(mousedown_node.outputs || 1):1;
+            var numOutputs = (mousedown_port_type === 0)?(mousedown_node.outputs || 1):(mousedown_node._def.inputs || 1);
             var sourcePort = mousedown_port_index;
             var portY = -((numOutputs-1)/2)*13 +13*sourcePort;
 
@@ -813,23 +813,25 @@ RED.view = (function() {
                 resetMouseVars();
                 return;
             }
-            var src,dst,src_port;
+            var src,dst,src_port,dst_port;
             if (mousedown_port_type === 0) {
                 src = mousedown_node;
                 src_port = mousedown_port_index;
                 dst = mouseup_node;
+                dst_port = portIndex;
             } else if (mousedown_port_type == 1) {
                 src = mouseup_node;
-                dst = mousedown_node;
                 src_port = portIndex;
+                dst = mousedown_node;
+                dst_port = mousedown_port_index;
             }
 
             var existingLink = false;
             RED.nodes.eachLink(function(d) {
-                    existingLink = existingLink || (d.source === src && d.target === dst && d.sourcePort == src_port);
+                    existingLink = existingLink || (d.source === src && d.target === dst && d.sourcePort == src_port && d.targetPort == dst_port);
             });
             if (!existingLink) {
-                var link = {source: src, sourcePort:src_port, target: dst};
+                var link = {source: src, sourcePort:src_port, target: dst, targetPort: dst_port};
                 RED.nodes.addLink(link);
                 RED.history.push({t:'add',links:[link],dirty:dirty});
                 setDirty(true);
@@ -965,7 +967,7 @@ RED.view = (function() {
                     var l = d._def.label;
                     l = (typeof l === "function" ? l.call(d) : l)||"";
                     d.w = Math.max(node_width,calculateTextWidth(l)+(d._def.inputs>0?7:0) );
-                    d.h = Math.max(node_height,(d.outputs||0) * 15);
+                    d.h = Math.max(node_height,(Math.max(d.outputs,d._def.inputs)||0) * 15);
 
                     if (d._def.badge) {
                         var badge = node.append("svg:g").attr("class","node_badge_group");
@@ -1139,13 +1141,16 @@ RED.view = (function() {
 
                     //node.append("circle").attr({"class":"centerDot","cx":0,"cy":0,"r":5});
 
-                    if (d._def.inputs > 0) {
+                    var numInputs = d._def.inputs;
+                    for (var n=0; n < numInputs; n++) {
+                        var y = (d.h/2)-((numInputs-1)/2)*13;
+                        y = (y+13*n)-5;
                         text.attr("x",38);
-                        node.append("rect").attr("class","port port_input").attr("rx",3).attr("ry",3).attr("x",-5).attr("width",10).attr("height",10)
-                            .on("mousedown",function(d){portMouseDown(d,1,0);})
-                            .on("touchstart",function(d){portMouseDown(d,1,0);})
-                            .on("mouseup",function(d){portMouseUp(d,1,0);} )
-                            .on("touchend",function(d){portMouseUp(d,1,0);} )
+                        node.append("rect").attr("class","port port_input").attr("rx",3).attr("ry",3).attr("y",y).attr("x",-5).attr("width",10).attr("height",10)
+                            .on("mousedown", (function(nn){return function(d){portMouseDown(d,1,nn);}})(n))
+                            .on("touchstart", (function(nn){return function(d){portMouseDown(d,1,nn);}})(n))
+                            .on("mouseup", (function(nn){return function(d){portMouseUp(d,1,nn);}})(n))
+                            .on("touchend", (function(nn){return function(d){portMouseUp(d,1,nn);}})(n))
                             .on("mouseover",function(d) { var port = d3.select(this); port.classed("port_hovered",(mouse_mode!=RED.state.JOINING || mousedown_port_type != 1 ));})
                             .on("mouseout",function(d) { var port = d3.select(this); port.classed("port_hovered",false);})
                     }
@@ -1162,7 +1167,7 @@ RED.view = (function() {
                             var l = d._def.label;
                             l = (typeof l === "function" ? l.call(d) : l)||"";
                             d.w = Math.max(node_width,calculateTextWidth(l)+(d._def.inputs>0?7:0) );
-                            d.h = Math.max(node_height,(d.outputs||0) * 15);
+                            d.h = Math.max(node_height,(Math.max(d.outputs,d._def.inputs)||0) * 15);
                         }
                         var thisNode = d3.select(this);
                         //thisNode.selectAll(".centerDot").attr({"cx":function(d) { return d.w/2;},"cy":function(d){return d.h/2}});
@@ -1231,8 +1236,11 @@ RED.view = (function() {
                             .classed("hidden",function(d) { return d.valid; });
 
                         thisNode.selectAll(".port_input").each(function(d,i) {
-                                var port = d3.select(this);
-                                port.attr("y",function(d){return (d.h/2)-5;})
+                            var port = d3.select(this);
+                            var numInputs = d._def.inputs;
+                            var y = (d.h/2)-((numInputs-1)/2)*13;
+                            y = (y+13*i)-5;
+                            port.attr("y",y)
                         });
 
                         thisNode.selectAll(".node_icon").attr("y",function(d){return (d.h-d3.select(this).attr("height"))/2;});
@@ -1305,7 +1313,7 @@ RED.view = (function() {
             });
         }
 
-        var link = vis.selectAll(".link").data(RED.nodes.links.filter(function(d) { return d.source.z == activeWorkspace && d.target.z == activeWorkspace }),function(d) { return d.source.id+":"+d.sourcePort+":"+d.target.id;});
+        var link = vis.selectAll(".link").data(RED.nodes.links.filter(function(d) { return d.source.z == activeWorkspace && d.target.z == activeWorkspace }),function(d) { return d.source.id+":"+d.sourcePort+":"+d.target.id+":"+d.targetPort;});
 
         var linkEnter = link.enter().insert("g",".node").attr("class","link");
         
@@ -1338,9 +1346,12 @@ RED.view = (function() {
         links.attr("d",function(d){
                 var numOutputs = d.source.outputs || 1;
                 var sourcePort = d.sourcePort || 0;
-                var y = -((numOutputs-1)/2)*13 +13*sourcePort;
+                var ysource = -((numOutputs-1)/2)*13 +13*sourcePort;
+                var numInputs = d.target._def.inputs || 1;
+                var targetPort = d.targetPort || 0;
+                var ytarget = -((numInputs-1)/2)*13 +13*targetPort;
 
-                var dy = d.target.y-(d.source.y+y);
+                var dy = (d.target.y+ytarget)-(d.source.y+ysource);
                 var dx = (d.target.x-d.target.w/2)-(d.source.x+d.source.w/2);
                 var delta = Math.sqrt(dy*dy+dx*dx);
                 var scale = lineCurveScale;
@@ -1357,14 +1368,14 @@ RED.view = (function() {
                 }
 
                 d.x1 = d.source.x+d.source.w/2;
-                d.y1 = d.source.y+y;
+                d.y1 = d.source.y+ysource;
                 d.x2 = d.target.x-d.target.w/2;
-                d.y2 = d.target.y;
+                d.y2 = d.target.y+ytarget;
 
-                return "M "+(d.source.x+d.source.w/2)+" "+(d.source.y+y)+
-                    " C "+(d.source.x+d.source.w/2+scale*node_width)+" "+(d.source.y+y+scaleY*node_height)+" "+
-                    (d.target.x-d.target.w/2-scale*node_width)+" "+(d.target.y-scaleY*node_height)+" "+
-                    (d.target.x-d.target.w/2)+" "+d.target.y;
+                return "M "+(d.x1)+" "+(d.y1)+
+                    " C "+(d.x1+scale*node_width)+" "+(d.y1+scaleY*node_height)+" "+
+                    (d.x2-scale*node_width)+" "+(d.y2-scaleY*node_height)+" "+
+                    (d.x2)+" "+d.y2;
         })
 
         link.classed("link_selected", function(d) { return d === selected_link || d.selected; });
