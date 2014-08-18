@@ -733,6 +733,15 @@ RED.view = (function() {
             setDirty(true);
         }
         if (selected_link) {
+            // reenable input port
+            var n = selected_link.targetPort;
+            var rect = selected_link.target.inputlist[n];
+            rect.on("mousedown", (function(d,n){return function(d){portMouseDown(d,1,n);}})(rect, n))
+                .on("touchstart", (function(d,n){return function(d){portMouseDown(d,1,n);}})(rect, n))
+                .on("mouseup", (function(d,n){return function(d){portMouseUp(d,1,n);}})(rect, n))
+                .on("touchend", (function(d,n){return function(d){portMouseUp(d,1,n);}})(rect, n))
+                .on("mouseover",function(d) { var port = d3.select(this); port.classed("port_hovered",(mouse_mode!=RED.state.JOINING || mousedown_port_type != 1 ));})
+                .on("mouseout",function(d) { var port = d3.select(this); port.classed("port_hovered",false);})
             RED.nodes.removeLink(selected_link);
             removedLinks.push(selected_link);
             setDirty(true);
@@ -835,6 +844,15 @@ RED.view = (function() {
                 RED.nodes.addLink(link);
                 RED.history.push({t:'add',links:[link],dirty:dirty});
                 setDirty(true);
+                // disallow new links to this destination - each input can have only a single link
+		dst.inputlist[dst_port]
+                    .classed("port_hovered",false)
+		    .on("mousedown",null)
+                    .on("touchstart", null)
+                    .on("mouseup", null)
+                    .on("touchend", null)
+                    .on("mouseover", null)
+                    .on("mouseout", null);
             }
             selected_link = null;
             redraw();
@@ -1142,11 +1160,14 @@ RED.view = (function() {
                     //node.append("circle").attr({"class":"centerDot","cx":0,"cy":0,"r":5});
 
                     var numInputs = d._def.inputs;
+                    var inputlist = [];
                     for (var n=0; n < numInputs; n++) {
                         var y = (d.h/2)-((numInputs-1)/2)*13;
                         y = (y+13*n)-5;
                         text.attr("x",38);
-                        node.append("rect").attr("class","port port_input").attr("rx",3).attr("ry",3).attr("y",y).attr("x",-5).attr("width",10).attr("height",10)
+                        var rect = node.append("rect");
+                        inputlist[n] = rect;
+			rect.attr("class","port port_input").attr("rx",3).attr("ry",3).attr("y",y).attr("x",-5).attr("width",10).attr("height",10).attr("index",n)
                             .on("mousedown", (function(nn){return function(d){portMouseDown(d,1,nn);}})(n))
                             .on("touchstart", (function(nn){return function(d){portMouseDown(d,1,nn);}})(n))
                             .on("mouseup", (function(nn){return function(d){portMouseUp(d,1,nn);}})(n))
@@ -1154,6 +1175,7 @@ RED.view = (function() {
                             .on("mouseover",function(d) { var port = d3.select(this); port.classed("port_hovered",(mouse_mode!=RED.state.JOINING || mousedown_port_type != 1 ));})
                             .on("mouseout",function(d) { var port = d3.select(this); port.classed("port_hovered",false);})
                     }
+                    d.inputlist = inputlist;
 
                     //node.append("path").attr("class","node_error").attr("d","M 3,-3 l 10,0 l -5,-8 z");
                     node.append("image").attr("class","node_error hidden").attr("xlink:href","icons/node-error.png").attr("x",0).attr("y",-6).attr("width",10).attr("height",9);
