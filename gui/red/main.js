@@ -144,20 +144,25 @@ var RED = (function() {
     });
 
     function loadSettings() {
+/*
         $.get('settings', function(data) {
             RED.settings = data;
             console.log("Node-RED: "+data.version);
             loadNodes();
         });
+*/
+        loadNodes();
     }
     function loadNodes() {
-        $.get('nodes', function(data) {
+	console.log("loadNodes");
+        $.get('list.html', function(data) {
+            console.log("loadNodes complete");
             $("body").append(data);
             $(".palette-spinner").hide();
             $(".palette-scroll").show();
             $("#palette-search").show();
-            loadFlows();
-        });
+            //loadFlows();
+        }, "html");
     }
 
     function loadFlows() {

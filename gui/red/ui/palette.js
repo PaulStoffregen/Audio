@@ -1,4 +1,4 @@
-/**
+/**  Modified from original Node-Red source, for audio system visualization
  * Copyright 2013 IBM Corp.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,7 @@
 RED.palette = (function() {
 
     var exclusion = ['config','unknown','deprecated'];
-    var core = ['input', 'output', 'function', 'social', 'storage', 'analysis', 'advanced'];
+    var core = ['input', 'output', 'mixer', 'play', 'record', 'synth', 'effect', 'filter', 'analyze'];
     
     function createCategoryContainer(category){
 
