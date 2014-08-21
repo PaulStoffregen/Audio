@@ -1,4 +1,5 @@
-/**
+/** Modified from original Node-Red source, for audio system visualization
+ * vim: set ts=4:
  * Copyright 2013 IBM Corp.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,7 +30,42 @@ RED.nodes = (function() {
     }
 
     function getID() {
-        return (1+Math.random()*4294967295).toString(16);
+		var str = (1+Math.random()*4294967295).toString(16);
+		console.log("getID = " + str);
+		return str;
+    }
+
+	function checkID(name) {
+        var i;
+        for (i=0;i<nodes.length;i++) {
+			console.log("checkID, nodes[i].id = " + nodes[i].id);
+			if (nodes[i].id == name) return true;
+        }
+/*
+        for (i in workspaces) {
+            if (workspaces.hasOwnProperty(i)) { }
+        }
+        for (i in configNodes) {
+            if (configNodes.hasOwnProperty(i)) { }
+        }
+*/
+		return false;
+	}
+
+    function createUniqueCppName(n) {
+		console.log("getUniqueCppName, n.type=" + n.type + ", n._def.shortName=" + n._def.shortName);
+		var basename = (n._def.shortName) ? n._def.shortName : n.type.replace(/^Analog/, "");
+		console.log("getUniqueCppName, using basename=" + basename);
+		var count = 1;
+		var sep = /[0-9]$/.test(basename) ? "_" : "";
+		var name;
+		while (1) {
+			name = basename + sep + count;
+			if (!checkID(name)) break;
+			count++;
+		}
+		console.log("getUniqueCppName, unique name=" + name);
+		return name;
     }
 
     function getType(type) {
@@ -445,6 +481,7 @@ RED.nodes = (function() {
         createExportableNodeSet: createExportableNodeSet,
         createCompleteNodeSet: createCompleteNodeSet,
         id: getID,
+        cppName: createUniqueCppName,
         nodes: nodes, // TODO: exposed for d3 vis
         links: links  // TODO: exposed for d3 vis
     };

@@ -3,28 +3,20 @@
 
 
 <script type="text/javascript">
-    RED.nodes.registerType('input_i2s',{
-        category: 'input-function',
-        color:"#E6E0F8",
-        defaults: {
-            name: {value:""},
-        },
+    RED.nodes.registerType('AnalogInputI2S',{
+	shortName: "i2s",
         inputs:0,
         outputs:2,
-        icon: "arrow-in.png",
-        label: function() {
-            return this.name||"I2S";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
+        category: 'input-function',
+        color:"#E6E0F8",
+        icon: "arrow-in.png"
     });
 </script>
-<script type="text/x-red" data-help-name="input_i2s">
+<script type="text/x-red" data-help-name="AnalogInputI2S">
     <p>Stereo audio input from the audio shield or other I2S device</p>
     <p><b>TODO</b> Add object documetation here</b>.</p>
 </script>
-<script type="text/x-red" data-template-name="input_i2s">
+<script type="text/x-red" data-template-name="AnalogInputI2S">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -34,27 +26,19 @@
 
 
 <script type="text/javascript">
-    RED.nodes.registerType('input_adc',{
+    RED.nodes.registerType('AnalogInputADC',{
+	shortName: "adc",
+        inputs:0,
+        outputs:1,
         category: 'input-function',
         color:"#E6E0F8",
-        defaults: {
-            name: {value:""},
-        },
-        inputs:0,
-        outputs:1,
-        icon: "arrow-in.png",
-        label: function() {
-            return this.name||"ADC";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
+        icon: "arrow-in.png"
     });
 </script>
-<script type="text/x-red" data-help-name="input_adc">
+<script type="text/x-red" data-help-name="AnalogInputADC">
     <p><b>TODO</b> Add object documetation here</b>.</p>
 </script>
-<script type="text/x-red" data-template-name="input_adc">
+<script type="text/x-red" data-template-name="AnalogInputADC">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -64,57 +48,19 @@
 
 
 <script type="text/javascript">
-    RED.nodes.registerType('output_i2s',{
-        category: 'output-function',
-        color:"#E6E0F8",
-        defaults: {
-            name: {value:""},
-        },
+    RED.nodes.registerType('AnalogOutputI2S',{
+	shortName: "i2s",
         inputs:2,
         outputs:0,
-        icon: "arrow-in.png",
-        label: function() {
-            return this.name||"I2S";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
-    });
-</script>
-<script type="text/x-red" data-help-name="output_i2s">
-    <p><b>TODO</b> Add object documetation here</b>.</p>
-</script>
-<script type="text/x-red" data-template-name="output_i2s">
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
-</script>
-
-
-
-<script type="text/javascript">
-    RED.nodes.registerType('output_dac',{
         category: 'output-function',
         color:"#E6E0F8",
-        defaults: {
-            name: {value:""},
-        },
-        inputs:1,
-        outputs:0,
-        icon: "arrow-in.png",
-        label: function() {
-            return this.name||"DAC";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
+        icon: "arrow-in.png"
     });
 </script>
-<script type="text/x-red" data-help-name="output_dac">
+<script type="text/x-red" data-help-name="AnalogOutputI2S">
     <p><b>TODO</b> Add object documetation here</b>.</p>
 </script>
-<script type="text/x-red" data-template-name="output_dac">
+<script type="text/x-red" data-template-name="AnalogOutputI2S">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -122,28 +68,21 @@
 </script>
 
 
+
 <script type="text/javascript">
-    RED.nodes.registerType('output_pwm',{
+    RED.nodes.registerType('AnalogOutputAnalog',{
+	shortName: "dac",
+        inputs:1,
+        outputs:0,
         category: 'output-function',
         color:"#E6E0F8",
-        defaults: {
-            name: {value:""},
-        },
-        inputs:1,
-        outputs:0,
-        icon: "arrow-in.png",
-        label: function() {
-            return this.name||"PWM";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
+        icon: "arrow-in.png"
     });
 </script>
-<script type="text/x-red" data-help-name="output_pwm">
+<script type="text/x-red" data-help-name="AnalogOutputAnalog">
     <p><b>TODO</b> Add object documetation here</b>.</p>
 </script>
-<script type="text/x-red" data-template-name="output_pwm">
+<script type="text/x-red" data-template-name="AnalogOutputAnalog">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -152,27 +91,40 @@
 
 
 <script type="text/javascript">
-    RED.nodes.registerType('mixer4',{
-        category: 'mixer-function',
+    RED.nodes.registerType('AnalogOutputPWM',{
+	shortName: "pwm",
+        inputs:1,
+        outputs:0,
+        category: 'output-function',
         color:"#E6E0F8",
-        defaults: {
-            name: {value:""},
-        },
+        icon: "arrow-in.png"
+    });
+</script>
+<script type="text/x-red" data-help-name="AnalogOutputPWM">
+    <p><b>TODO</b> Add object documetation here</b>.</p>
+</script>
+<script type="text/x-red" data-template-name="AnalogOutputPWM">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+
+<script type="text/javascript">
+    RED.nodes.registerType('AudioMixer4',{
+	shortName: "mixer",
         inputs:4,
         outputs:1,
-        icon: "arrow-in.png",
-        label: function() {
-            return this.name||"Mixer";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
+        category: 'mixer-function',
+        color:"#E6E0F8",
+        icon: "arrow-in.png"
     });
 </script>
-<script type="text/x-red" data-help-name="mixer4">
+<script type="text/x-red" data-help-name="AudioMixer4">
     <p><b>TODO</b> Add object documetation here</b>.</p>
 </script>
-<script type="text/x-red" data-template-name="mixer4">
+<script type="text/x-red" data-template-name="AudioMixer4">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -182,27 +134,19 @@
 
 
 <script type="text/javascript">
-    RED.nodes.registerType('play_memory',{
-        category: 'play-function',
-        color:"#E6E0F8",
-        defaults: {
-            name: {value:""},
-        },
+    RED.nodes.registerType('AudioPlayMemory',{
+	shortName: "playMem",
         inputs:0,
         outputs:1,
-        icon: "arrow-in.png",
-        label: function() {
-            return this.name||"Memory";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
+        category: 'play-function',
+        color:"#E6E0F8",
+        icon: "arrow-in.png"
     });
 </script>
-<script type="text/x-red" data-help-name="play_memory">
+<script type="text/x-red" data-help-name="AudioPlayMemory">
     <p><b>TODO</b> Add object documetation here</b>.</p>
 </script>
-<script type="text/x-red" data-template-name="play_memory">
+<script type="text/x-red" data-template-name="AudioPlayMemory">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -212,57 +156,19 @@
 
 
 <script type="text/javascript">
-    RED.nodes.registerType('play_sd_wav',{
-        category: 'play-function',
-        color:"#E6E0F8",
-        defaults: {
-            name: {value:""},
-        },
+    RED.nodes.registerType('AudioPlaySdWav',{
+	shortName: "playWav",
         inputs:0,
         outputs:2,
-        icon: "arrow-in.png",
-        label: function() {
-            return this.name||"SD .WAV File";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
-    });
-</script>
-<script type="text/x-red" data-help-name="play_sd_wav">
-    <p><b>TODO</b> Add object documetation here</b>.</p>
-</script>
-<script type="text/x-red" data-template-name="play_sd_wav">
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
-</script>
-
-
-
-<script type="text/javascript">
-    RED.nodes.registerType('play_sd_raw',{
         category: 'play-function',
         color:"#E6E0F8",
-        defaults: {
-            name: {value:""},
-        },
-        inputs:0,
-        outputs:1,
-        icon: "arrow-in.png",
-        label: function() {
-            return this.name||"SD .RAW File";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
+        icon: "arrow-in.png"
     });
 </script>
-<script type="text/x-red" data-help-name="play_sd_raw">
+<script type="text/x-red" data-help-name="AudioPlaySdWav">
     <p><b>TODO</b> Add object documetation here</b>.</p>
 </script>
-<script type="text/x-red" data-template-name="play_sd_raw">
+<script type="text/x-red" data-template-name="AudioPlaySdWav">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -272,27 +178,19 @@
 
 
 <script type="text/javascript">
-    RED.nodes.registerType('play_queue',{
+    RED.nodes.registerType('AudioPlaySdRaw',{
+	shortName: "playRaw",
+        inputs:0,
+        outputs:1,
         category: 'play-function',
         color:"#E6E0F8",
-        defaults: {
-            name: {value:""},
-        },
-        inputs:0,
-        outputs:1,
-        icon: "arrow-in.png",
-        label: function() {
-            return this.name||"Queue";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
+        icon: "arrow-in.png"
     });
 </script>
-<script type="text/x-red" data-help-name="play_queue">
+<script type="text/x-red" data-help-name="AudioPlaySdRaw">
     <p><b>TODO</b> Add object documetation here</b>.</p>
 </script>
-<script type="text/x-red" data-template-name="play_queue">
+<script type="text/x-red" data-template-name="AudioPlaySdRaw">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -302,27 +200,41 @@
 
 
 <script type="text/javascript">
-    RED.nodes.registerType('synth_sine',{
+    RED.nodes.registerType('AudioPlayQueue',{
+	shortName: "queue",
+        inputs:0,
+        outputs:1,
+        category: 'play-function',
+        color:"#E6E0F8",
+        icon: "arrow-in.png"
+    });
+</script>
+<script type="text/x-red" data-help-name="AudioPlayQueue">
+    <p><b>TODO</b> Add object documetation here</b>.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioPlayQueue">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+
+
+<script type="text/javascript">
+    RED.nodes.registerType('AudioSynthWaveformSine',{
+	shortName: "sine",
+        inputs:0,
+        outputs:1,
         category: 'synth-function',
         color:"#E6E0F8",
-        defaults: {
-            name: {value:""},
-        },
-        inputs:0,
-        outputs:1,
-        icon: "arrow-in.png",
-        label: function() {
-            return this.name||"Sine Wave";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
+        icon: "arrow-in.png"
     });
 </script>
-<script type="text/x-red" data-help-name="synth_sine">
+<script type="text/x-red" data-help-name="AudioSynthWaveformSine">
     <p><b>TODO</b> Add object documetation here</b>.</p>
 </script>
-<script type="text/x-red" data-template-name="synth_sine">
+<script type="text/x-red" data-template-name="AudioSynthWaveformSine">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -332,87 +244,85 @@
 
 
 <script type="text/javascript">
-    RED.nodes.registerType('synth_waveform',{
-        category: 'synth-function',
-        color:"#E6E0F8",
-        defaults: {
-            name: {value:""},
-        },
-        inputs:0,
-        outputs:1,
-        icon: "arrow-in.png",
-        label: function() {
-            return this.name||"Waveform";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
-    });
-</script>
-<script type="text/x-red" data-help-name="synth_waveform">
-    <p><b>TODO</b> Add object documetation here</b>.</p>
-</script>
-<script type="text/x-red" data-template-name="synth_waveform">
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
-</script>
-
-
-
-<script type="text/javascript">
-    RED.nodes.registerType('synth_tonesweep',{
-        category: 'synth-function',
-        color:"#E6E0F8",
-        defaults: {
-            name: {value:""},
-        },
-        inputs:0,
-        outputs:1,
-        icon: "arrow-in.png",
-        label: function() {
-            return this.name||"Tonesweep";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
-    });
-</script>
-<script type="text/x-red" data-help-name="synth_tonesweep">
-    <p><b>TODO</b> Add object documetation here</b>.</p>
-</script>
-<script type="text/x-red" data-template-name="synth_tonesweep">
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
-</script>
-
-
-
-<script type="text/javascript">
-    RED.nodes.registerType('effect_fade',{
-        category: 'effect-function',
-        color:"#E6E0F8",
-        defaults: {
-            name: {value:""},
-        },
+    RED.nodes.registerType('AudioSynthWaveformSineModulated',{
+	shortName: "sine_fm",
         inputs:1,
         outputs:1,
-        icon: "arrow-in.png",
-        label: function() {
-            return this.name||"Fade";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
+        category: 'synth-function',
+        color:"#E6E0F8",
+        icon: "arrow-in.png"
     });
 </script>
-<script type="text/x-red" data-help-name="effect_fade">
+<script type="text/x-red" data-help-name="AudioSynthWaveformSineModulated">
     <p><b>TODO</b> Add object documetation here</b>.</p>
 </script>
-<script type="text/x-red" data-template-name="effect_fade">
+<script type="text/x-red" data-template-name="AudioSynthWaveformSineModulated">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+
+
+<script type="text/javascript">
+    RED.nodes.registerType('AudioSynthWaveform',{
+	shortName: "waveform",
+        inputs:0,
+        outputs:1,
+        category: 'synth-function',
+        color:"#E6E0F8",
+        icon: "arrow-in.png"
+    });
+</script>
+<script type="text/x-red" data-help-name="AudioSynthWaveform">
+    <p><b>TODO</b> Add object documetation here</b>.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioSynthWaveform">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+
+
+<script type="text/javascript">
+    RED.nodes.registerType('AudioSynthToneSweep',{
+	shortName: "tonesweep",
+        inputs:0,
+        outputs:1,
+        category: 'synth-function',
+        color:"#E6E0F8",
+        icon: "arrow-in.png"
+    });
+</script>
+<script type="text/x-red" data-help-name="AudioSynthToneSweep">
+    <p><b>TODO</b> Add object documetation here</b>.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioSynthToneSweep">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+
+
+<script type="text/javascript">
+    RED.nodes.registerType('AudioEffectFade',{
+	shortName: "fade",
+        inputs:1,
+        outputs:1,
+        category: 'effect-function',
+        color:"#E6E0F8",
+        icon: "arrow-in.png"
+    });
+</script>
+<script type="text/x-red" data-help-name="AudioEffectFade">
+    <p><b>TODO</b> Add object documetation here</b>.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioEffectFade">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -421,56 +331,40 @@
 
 
 <script type="text/javascript">
-    RED.nodes.registerType('effect_chorus',{
-        category: 'effect-function',
-        color:"#E6E0F8",
-        defaults: {
-            name: {value:""},
-        },
+    RED.nodes.registerType('AudioEffectChorus',{
+	shortName: "chorus",
         inputs:2,
         outputs:2,
-        icon: "arrow-in.png",
-        label: function() {
-            return this.name||"Chorus";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
-    });
-</script>
-<script type="text/x-red" data-help-name="effect_chorus">
-    <p><b>TODO</b> Add object documetation here</b>.</p>
-</script>
-<script type="text/x-red" data-template-name="effect_chorus">
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
-</script>
-
-
-<script type="text/javascript">
-    RED.nodes.registerType('effect_flange',{
         category: 'effect-function',
         color:"#E6E0F8",
-        defaults: {
-            name: {value:""},
-        },
+        icon: "arrow-in.png"
+    });
+</script>
+<script type="text/x-red" data-help-name="AudioEffectChorus">
+    <p><b>TODO</b> Add object documetation here</b>.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioEffectChorus">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+
+<script type="text/javascript">
+    RED.nodes.registerType('AudioEffectFlange',{
+	shortName: "flange",
         inputs:2,
         outputs:2,
-        icon: "arrow-in.png",
-        label: function() {
-            return this.name||"Flange";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
+        category: 'effect-function',
+        color:"#E6E0F8",
+        icon: "arrow-in.png"
     });
 </script>
-<script type="text/x-red" data-help-name="effect_flange">
+<script type="text/x-red" data-help-name="AudioEffectFlange">
     <p><b>TODO</b> Add object documetation here</b>.</p>
 </script>
-<script type="text/x-red" data-template-name="effect_flange">
+<script type="text/x-red" data-template-name="AudioEffectFlange">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -479,57 +373,41 @@
 
 
 <script type="text/javascript">
-    RED.nodes.registerType('filter_biquad',{
-        category: 'filter-function',
-        color:"#E6E0F8",
-        defaults: {
-            name: {value:""},
-        },
+    RED.nodes.registerType('AudioFilterBiquad',{
+	shortName: "biquad",
         inputs:1,
         outputs:1,
-        icon: "arrow-in.png",
-        label: function() {
-            return this.name||"BiQuad";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
-    });
-</script>
-<script type="text/x-red" data-help-name="filter_biquad">
-    <p><b>TODO</b> Add object documetation here</b>.</p>
-</script>
-<script type="text/x-red" data-template-name="filter_biquad">
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
-</script>
-
-
-
-<script type="text/javascript">
-    RED.nodes.registerType('filter_fir',{
         category: 'filter-function',
         color:"#E6E0F8",
-        defaults: {
-            name: {value:""},
-        },
+        icon: "arrow-in.png"
+    });
+</script>
+<script type="text/x-red" data-help-name="AudioFilterBiquad">
+    <p><b>TODO</b> Add object documetation here</b>.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioFilterBiquad">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+
+
+<script type="text/javascript">
+    RED.nodes.registerType('AudioFilterFIR',{
+	shortName: "fir",
         inputs:1,
         outputs:1,
-        icon: "arrow-in.png",
-        label: function() {
-            return this.name||"FIR";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
+        category: 'filter-function',
+        color:"#E6E0F8",
+        icon: "arrow-in.png"
     });
 </script>
-<script type="text/x-red" data-help-name="filter_fir">
+<script type="text/x-red" data-help-name="AudioFilterFIR">
     <p><b>TODO</b> Add object documetation here</b>.</p>
 </script>
-<script type="text/x-red" data-template-name="filter_fir">
+<script type="text/x-red" data-template-name="AudioFilterFIR">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -539,57 +417,19 @@
 
 
 <script type="text/javascript">
-    RED.nodes.registerType('analyze_peak',{
-        category: 'analyze-function',
-        color:"#E6E0F8",
-        defaults: {
-            name: {value:""},
-        },
+    RED.nodes.registerType('AudioPeak',{
+	shortName: "peak",
         inputs:1,
         outputs:0,
-        icon: "arrow-in.png",
-        label: function() {
-            return this.name||"Peak";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
-    });
-</script>
-<script type="text/x-red" data-help-name="analyze_peak">
-    <p><b>TODO</b> Add object documetation here</b>.</p>
-</script>
-<script type="text/x-red" data-template-name="analyze_peak">
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
-</script>
-
-
-
-<script type="text/javascript">
-    RED.nodes.registerType('analyze_fft256',{
         category: 'analyze-function',
         color:"#E6E0F8",
-        defaults: {
-            name: {value:""},
-        },
-        inputs:1,
-        outputs:0,
-        icon: "arrow-in.png",
-        label: function() {
-            return this.name||"FFT256";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
+        icon: "arrow-in.png"
     });
 </script>
-<script type="text/x-red" data-help-name="analyze_fft256">
+<script type="text/x-red" data-help-name="AudioPeak">
     <p><b>TODO</b> Add object documetation here</b>.</p>
 </script>
-<script type="text/x-red" data-template-name="analyze_fft256">
+<script type="text/x-red" data-template-name="AudioPeak">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -599,27 +439,19 @@
 
 
 <script type="text/javascript">
-    RED.nodes.registerType('analyze_fft1024',{
+    RED.nodes.registerType('AudioAnalyzeFFT256',{
+	shortName: "fft256",
+        inputs:1,
+        outputs:0,
         category: 'analyze-function',
         color:"#E6E0F8",
-        defaults: {
-            name: {value:""},
-        },
-        inputs:1,
-        outputs:0,
-        icon: "arrow-in.png",
-        label: function() {
-            return this.name||"FFT1024";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
+        icon: "arrow-in.png"
     });
 </script>
-<script type="text/x-red" data-help-name="analyze_fft1024">
+<script type="text/x-red" data-help-name="AudioAnalyzeFFT256">
     <p><b>TODO</b> Add object documetation here</b>.</p>
 </script>
-<script type="text/x-red" data-template-name="analyze_fft1024">
+<script type="text/x-red" data-template-name="AudioAnalyzeFFT256">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -629,27 +461,19 @@
 
 
 <script type="text/javascript">
-    RED.nodes.registerType('analyze_print',{
+    RED.nodes.registerType('AudioAnalyzeFFT1024',{
+	shortName: "fft1024",
+        inputs:1,
+        outputs:0,
         category: 'analyze-function',
         color:"#E6E0F8",
-        defaults: {
-            name: {value:""},
-        },
-        inputs:1,
-        outputs:0,
-        icon: "arrow-in.png",
-        label: function() {
-            return this.name||"Print";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
+        icon: "arrow-in.png"
     });
 </script>
-<script type="text/x-red" data-help-name="analyze_print">
+<script type="text/x-red" data-help-name="AudioAnalyzeFFT1024">
     <p><b>TODO</b> Add object documetation here</b>.</p>
 </script>
-<script type="text/x-red" data-template-name="analyze_print">
+<script type="text/x-red" data-template-name="AudioAnalyzeFFT1024">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -659,27 +483,41 @@
 
 
 <script type="text/javascript">
-    RED.nodes.registerType('control_sgtl5000',{
-        category: 'control-function',
+    RED.nodes.registerType('AudioAnalyzePrint',{
+	shortName: "print",
+        inputs:1,
+        outputs:0,
+        category: 'analyze-function',
         color:"#E6E0F8",
-        defaults: {
-            name: {value:""},
-        },
+        icon: "arrow-in.png"
+    });
+</script>
+<script type="text/x-red" data-help-name="AudioAnalyzePrint">
+    <p><b>TODO</b> Add object documetation here</b>.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioAnalyzePrint">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+
+
+<script type="text/javascript">
+    RED.nodes.registerType('AudioControlSGTL5000',{
+	shortName: "sgtl5000",
         inputs:0,
         outputs:0,
-        icon: "arrow-in.png",
-        label: function() {
-            return this.name||"SGTL5000";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
+        category: 'control-function',
+        color:"#E6E0F8",
+        icon: "arrow-in.png"
     });
 </script>
-<script type="text/x-red" data-help-name="control_sgtl5000">
+<script type="text/x-red" data-help-name="AudioControlSGTL5000">
     <p><b>TODO</b> Add object documetation here</b>.</p>
 </script>
-<script type="text/x-red" data-template-name="control_sgtl5000">
+<script type="text/x-red" data-template-name="AudioControlSGTL5000">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -689,27 +527,19 @@
 
 
 <script type="text/javascript">
-    RED.nodes.registerType('control_wm8731',{
-        category: 'control-function',
-        color:"#E6E0F8",
-        defaults: {
-            name: {value:""},
-        },
+    RED.nodes.registerType('AudioControlWM8731',{
+	shortName: "wm8731",
         inputs:0,
         outputs:0,
-        icon: "arrow-in.png",
-        label: function() {
-            return this.name||"WM8731";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
+        category: 'control-function',
+        color:"#E6E0F8",
+        icon: "arrow-in.png"
     });
 </script>
-<script type="text/x-red" data-help-name="control_wm8731">
+<script type="text/x-red" data-help-name="AudioControlWM8731">
     <p><b>TODO</b> Add object documetation here</b>.</p>
 </script>
-<script type="text/x-red" data-template-name="control_wm8731">
+<script type="text/x-red" data-template-name="AudioControlWM8731">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">

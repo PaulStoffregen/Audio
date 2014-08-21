@@ -29,6 +29,7 @@
 
 #include "AudioStream.h"
 
+// TODO: this needs to be renamed to AudioAnalyzePeak
 class AudioPeak : public AudioStream
 {
 public:

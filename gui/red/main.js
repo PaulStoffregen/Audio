@@ -79,6 +79,8 @@ var RED = (function() {
             $("#btn-icn-deploy").removeClass('icon-upload');
             $("#btn-icn-deploy").addClass('spinner');
             RED.view.dirty(false);
+
+            console.log(JSON.stringify(nns));
             
             $.ajax({
                 url:"flows",
@@ -119,6 +121,7 @@ var RED = (function() {
     }
 
     $('#btn-deploy').click(function() { save(); });
+
 
     $( "#node-dialog-confirm-deploy" ).dialog({
             title: "Confirm deploy",

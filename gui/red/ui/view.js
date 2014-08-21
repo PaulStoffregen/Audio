@@ -1,4 +1,5 @@
-/**
+/** Modified from original Node-Red source, for audio system visualization
+ * vim: set ts=4:
  * Copyright 2013, 2014 IBM Corp.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -562,10 +563,10 @@ RED.view = (function() {
                 mousePos[1] /= scaleFactor;
                 mousePos[0] /= scaleFactor;
 
-                var nn = { id:(1+Math.random()*4294967295).toString(16),x: mousePos[0],y:mousePos[1],w:node_width,z:activeWorkspace};
-
+                var nn = {x: mousePos[0],y:mousePos[1],w:node_width,z:activeWorkspace};
                 nn.type = selected_tool;
                 nn._def = RED.nodes.getType(nn.type);
+				nn.id = RED.nodes.cppName(nn);
                 nn.outputs = nn._def.outputs;
                 nn.changed = true;
 
@@ -845,9 +846,9 @@ RED.view = (function() {
                 RED.history.push({t:'add',links:[link],dirty:dirty});
                 setDirty(true);
                 // disallow new links to this destination - each input can have only a single link
-		dst.inputlist[dst_port]
+				dst.inputlist[dst_port]
                     .classed("port_hovered",false)
-		    .on("mousedown",null)
+					.on("mousedown",null)
                     .on("touchstart", null)
                     .on("mouseup", null)
                     .on("touchend", null)
@@ -982,8 +983,9 @@ RED.view = (function() {
             nodeEnter.each(function(d,i) {
                     var node = d3.select(this);
                     node.attr("id",d.id);
-                    var l = d._def.label;
-                    l = (typeof l === "function" ? l.call(d) : l)||"";
+                    //var l = d._def.label;
+                    //l = (typeof l === "function" ? l.call(d) : l)||"";
+					var l = d.id;
                     d.w = Math.max(node_width,calculateTextWidth(l)+(d._def.inputs>0?7:0) );
                     d.h = Math.max(node_height,(Math.max(d.outputs,d._def.inputs)||0) * 15);
 
@@ -1186,8 +1188,9 @@ RED.view = (function() {
                     if (d.dirty) {
                         //if (d.x < -50) deleteSelection();  // Delete nodes if dragged back to palette
                         if (d.resize) {
-                            var l = d._def.label;
-                            l = (typeof l === "function" ? l.call(d) : l)||"";
+                            //var l = d._def.label;
+                            //l = (typeof l === "function" ? l.call(d) : l)||"";
+							var l = d.id;
                             d.w = Math.max(node_width,calculateTextWidth(l)+(d._def.inputs>0?7:0) );
                             d.h = Math.max(node_height,(Math.max(d.outputs,d._def.inputs)||0) * 15);
                         }
@@ -1232,14 +1235,15 @@ RED.view = (function() {
                             });
                         }
                         thisNode.selectAll('text.node_label').text(function(d,i){
-                                if (d._def.label) {
+                                /* if (d._def.label) {
                                     if (typeof d._def.label == "function") {
                                         return d._def.label.call(d);
                                     } else {
                                         return d._def.label;
                                     }
                                 }
-                                return "";
+                                return ""; */
+								return d.id;
                         })
                             .attr('y', function(d){return (d.h/2)-1;})
                             .attr('class',function(d){
@@ -1290,14 +1294,15 @@ RED.view = (function() {
 
                         thisNode.selectAll('.node_badge_group').attr("transform",function(d){return "translate("+(d.w-40)+","+(d.h+3)+")";});
                         thisNode.selectAll('text.node_badge_label').text(function(d,i) {
-                            if (d._def.badge) {
+                            /* if (d._def.badge) {
                                 if (typeof d._def.badge == "function") {
                                     return d._def.badge.call(d);
                                 } else {
                                     return d._def.badge;
                                 }
                             }
-                            return "";
+                            return ""; */
+							return d.id;
                         });
                         if (!showStatus || !d.status) {
                             thisNode.selectAll('.node_status_group').style("display","none");

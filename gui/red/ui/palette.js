@@ -1,4 +1,5 @@
 /**  Modified from original Node-Red source, for audio system visualization
+ * vim: set ts=4:
  * Copyright 2013 IBM Corp.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -47,9 +48,10 @@ RED.palette = (function() {
           var d = document.createElement("div");
           d.id = "palette_node_"+nt;
           d.type = nt;
-          
-          var label = /^(.*?)([ -]in|[ -]out)?$/.exec(nt)[1];
-          
+
+          //var label = /^(.*?)([ -]in|[ -]out)?$/.exec(nt)[1];
+          var label = (def.shortName) ? def.shortName : nt;
+
           d.innerHTML = '<div class="palette_label">'+label+"</div>";
           d.className="palette_node";
           if (def.icon) {
