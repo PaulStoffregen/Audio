@@ -1,4 +1,5 @@
-/**
+/** Modified from original Node-Red source, for audio system visualization
+ * vim: set ts=4:
  * Copyright 2013 IBM Corp.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +15,6 @@
  * limitations under the License.
  **/
 RED.validators = {
-    number: function(){return function(v) { return v!=='' && !isNaN(v);}},
-    regex: function(re){return function(v) { return re.test(v);}}
+	number: function(){return function(v) { return v!=='' && !isNaN(v);}},
+	regex: function(re){return function(v) { return re.test(v);}}
 };
