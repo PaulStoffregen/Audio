@@ -247,7 +247,7 @@ RED.nodes = (function() {
 			var wires = links.filter(function(d){return d.source === n;});
 			for (var j=0;j<wires.length;j++) {
 				var w = wires[j];
-				node.wires[w.sourcePort].push(w.target.id);
+				node.wires[w.sourcePort].push(w.target.id + ":" + w.targetPort);
 			}
 		}
 		return node;

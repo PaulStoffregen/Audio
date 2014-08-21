@@ -45,7 +45,6 @@ var RED = (function() {
 		event.preventDefault();
 	});
 
-
 	function save(force) {
 		if (RED.view.dirty()) {
 
@@ -76,13 +75,74 @@ var RED = (function() {
 				}
 			}
 			var nns = RED.nodes.createCompleteNodeSet();
+			// sort by horizontal position, plus slight vertical position,
+			// for well defined update order that follows signal flow
+			nns.sort(function(a,b){ return (a.x + a.y/250) - (b.x + b.y/250); });
+			console.log(JSON.stringify(nns));
 
+			var cpp = "";
+			// generate code for all audio processing nodes
+			for (var i=0; i<nns.length; i++) {
+				var n = nns[i];
+				var node = RED.nodes.node(n.id);
+				if (node && (node.outputs > 0 || node._def.inputs > 0)) {
+					cpp += n.type + " ";
+					for (var j=n.type.length; j<24; j++) cpp += " ";
+					cpp += n.id + "; ";
+					for (var j=n.id.length; j<14; j++) cpp += " ";
+					cpp += "//xy=" + n.x + "," + n.y + "\n";
+				}
+				//console.log("save: node " + n.id + "   " + node.outputs);
+			}
+			// generate code for all connections (aka wires or links)
+			var cordcount = 1;
+			for (var i=0; i<nns.length; i++) {
+				var n = nns[i];
+				if (n.wires) {
+					for (var j=0; j<n.wires.length; j++) {
+						var wires = n.wires[j];
+						if (!wires) continue;
+						for (var k=0; k<wires.length; k++) {
+							var wire = n.wires[j][k];
+							if (wire) {
+								var parts = wire.split(":");
+								if (parts.length == 2) {
+									//console.log("save: wire " + n.id + ":" + j + "   " + parts[0] + "-" + parts[1]);
+									cpp += "AudioConnection          patchCord" + cordcount + "(";
+									var src = RED.nodes.node(n.id);
+									var dst = RED.nodes.node(parts[0]);
+									//console.log("save: src.outputs=" + src.outputs + ",  dst._def.inputs=" +  dst._def.inputs);
+									if (j == 0 && parts[1] == 0 && src && src.outputs == 1 && dst && dst._def.inputs == 1) {
+										cpp += n.id + ", " + parts[0];
+									} else {
+										cpp += n.id + ", " + j + ", " + parts[0] + ", " + parts[1];
+									}
+									cpp += ");\n";
+									cordcount++;
+								}
+							}
+						}
+					}
+				}
+			}
+			// generate code for all control nodes (no inputs or outputs)
+			for (var i=0; i<nns.length; i++) {
+				var n = nns[i];
+				var node = RED.nodes.node(n.id);
+				if (node && node.outputs == 0 && node._def.inputs == 0) {
+					cpp += n.type + " ";
+					for (var j=n.type.length; j<24; j++) cpp += " ";
+					cpp += n.id + "; ";
+					for (var j=n.id.length; j<14; j++) cpp += " ";
+					cpp += "//xy=" + n.x + "," + n.y + "\n";
+				}
+			}
+
+			console.log(cpp);
 			
 			$("#btn-icn-deploy").removeClass('icon-upload');
 			$("#btn-icn-deploy").addClass('spinner');
 			RED.view.dirty(false);
-
-			console.log(JSON.stringify(nns));
 			
 			$.ajax({
 				url:"flows",
