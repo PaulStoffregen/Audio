@@ -78,9 +78,9 @@ var RED = (function() {
 			// sort by horizontal position, plus slight vertical position,
 			// for well defined update order that follows signal flow
 			nns.sort(function(a,b){ return (a.x + a.y/250) - (b.x + b.y/250); });
-			console.log(JSON.stringify(nns));
+			//console.log(JSON.stringify(nns));
 
-			var cpp = "";
+			var cpp = "// GUItool: begin automatically generated code\n";
 			// generate code for all audio processing nodes
 			for (var i=0; i<nns.length; i++) {
 				var n = nns[i];
@@ -92,7 +92,6 @@ var RED = (function() {
 					for (var j=n.id.length; j<14; j++) cpp += " ";
 					cpp += "//xy=" + n.x + "," + n.y + "\n";
 				}
-				//console.log("save: node " + n.id + "   " + node.outputs);
 			}
 			// generate code for all connections (aka wires or links)
 			var cordcount = 1;
@@ -107,11 +106,9 @@ var RED = (function() {
 							if (wire) {
 								var parts = wire.split(":");
 								if (parts.length == 2) {
-									//console.log("save: wire " + n.id + ":" + j + "   " + parts[0] + "-" + parts[1]);
 									cpp += "AudioConnection          patchCord" + cordcount + "(";
 									var src = RED.nodes.node(n.id);
 									var dst = RED.nodes.node(parts[0]);
-									//console.log("save: src.outputs=" + src.outputs + ",  dst._def.inputs=" +  dst._def.inputs);
 									if (j == 0 && parts[1] == 0 && src && src.outputs == 1 && dst && dst._def.inputs == 1) {
 										cpp += n.id + ", " + parts[0];
 									} else {
@@ -137,9 +134,25 @@ var RED = (function() {
 					cpp += "//xy=" + n.x + "," + n.y + "\n";
 				}
 			}
+			cpp += "// GUItool: end automatically generated code\n";
+			//console.log(cpp);
 
-			console.log(cpp);
-			
+			RED.view.state(RED.state.EXPORT);
+			//mouse_mode = RED.state.EXPORT;
+			$("#dialog-form").html($("script[data-template-name='export-clipboard-dialog']").html());
+			$("#node-input-export").val(cpp);
+			$("#node-input-export").focus(function() {
+				var textarea = $(this);
+				textarea.select();
+				textarea.mouseup(function() {
+					textarea.unbind("mouseup");
+					return false;
+				});
+			});
+			$( "#dialog" ).dialog("option","title","Export nodes to clipboard").dialog( "open" );
+			$("#node-input-export").focus();
+
+/*
 			$("#btn-icn-deploy").removeClass('icon-upload');
 			$("#btn-icn-deploy").addClass('spinner');
 			RED.view.dirty(false);
@@ -179,6 +192,7 @@ var RED = (function() {
 				$("#btn-icn-deploy").removeClass('spinner');
 				$("#btn-icn-deploy").addClass('icon-upload');
 			});
+*/
 		}
 	}
 
