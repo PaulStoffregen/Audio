@@ -24,6 +24,28 @@
 </script>
 
 
+<script type="text/javascript">
+    RED.nodes.registerType('AnalogInputI2Sslave',{
+	shortName: "i2ss",
+        inputs:0,
+        outputs:2,
+        category: 'input-function',
+        color:"#E6E0F8",
+        icon: "arrow-in.png"
+    });
+</script>
+<script type="text/x-red" data-help-name="AnalogInputI2Sslave">
+    <p>Stereo audio input from the audio shield or other I2S device</p>
+    <p><b>TODO</b> Add object documetation here</b>.</p>
+</script>
+<script type="text/x-red" data-template-name="AnalogInputI2Sslave">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+
 
 <script type="text/javascript">
     RED.nodes.registerType('AnalogInputADC',{
@@ -66,6 +88,29 @@
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
 </script>
+
+
+
+<script type="text/javascript">
+    RED.nodes.registerType('AnalogOutputI2Sslave',{
+	shortName: "i2ss",
+        inputs:2,
+        outputs:0,
+        category: 'output-function',
+        color:"#E6E0F8",
+        icon: "arrow-in.png"
+    });
+</script>
+<script type="text/x-red" data-help-name="AnalogOutputI2Sslave">
+    <p><b>TODO</b> Add object documetation here</b>.</p>
+</script>
+<script type="text/x-red" data-template-name="AnalogOutputI2Sslave">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
 
 
 
@@ -474,6 +519,28 @@
     <p><b>TODO</b> Add object documetation here</b>.</p>
 </script>
 <script type="text/x-red" data-template-name="AudioAnalyzeFFT1024">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+
+
+<script type="text/javascript">
+    RED.nodes.registerType('AudioAnalyzeToneDetect',{
+	shortName: "tone",
+        inputs:1,
+        outputs:0,
+        category: 'analyze-function',
+        color:"#E6E0F8",
+        icon: "arrow-in.png"
+    });
+</script>
+<script type="text/x-red" data-help-name="AudioAnalyzeToneDetect">
+    <p><b>TODO</b> Add object documetation here</b>.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioAnalyzeToneDetect">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
