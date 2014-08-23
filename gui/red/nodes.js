@@ -431,7 +431,8 @@ RED.nodes = (function() {
 					for (var w2=0;w2<wires.length;w2++) {
 						var parts = wires[w2].split(":");
 						if (parts.length == 2 && parts[0] in node_map) {
-							var link = {source:n,sourcePort:w1,target:node_map[parts[0]],targetPort:parts[1]};
+							var dst = node_map[parts[0]];
+							var link = {source:n,sourcePort:w1,target:dst,targetPort:parts[1]};
 							addLink(link);
 							new_links.push(link);
 						}

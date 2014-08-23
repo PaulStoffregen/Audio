@@ -1165,18 +1165,32 @@ RED.view = (function() {
 					var numInputs = d._def.inputs;
 					var inputlist = [];
 					for (var n=0; n < numInputs; n++) {
+						var link = RED.nodes.links.filter(function(l){return (l.target == d && l.targetPort == n);});
 						var y = (d.h/2)-((numInputs-1)/2)*13;
 						y = (y+13*n)-5;
 						text.attr("x",38);
 						var rect = node.append("rect");
 						inputlist[n] = rect;
-			rect.attr("class","port port_input").attr("rx",3).attr("ry",3).attr("y",y).attr("x",-5).attr("width",10).attr("height",10).attr("index",n)
-							.on("mousedown", (function(nn){return function(d){portMouseDown(d,1,nn);}})(n))
-							.on("touchstart", (function(nn){return function(d){portMouseDown(d,1,nn);}})(n))
-							.on("mouseup", (function(nn){return function(d){portMouseUp(d,1,nn);}})(n))
-							.on("touchend", (function(nn){return function(d){portMouseUp(d,1,nn);}})(n))
-							.on("mouseover",function(d) { var port = d3.select(this); port.classed("port_hovered",(mouse_mode!=RED.state.JOINING || mousedown_port_type != 1 ));})
-							.on("mouseout",function(d) { var port = d3.select(this); port.classed("port_hovered",false);})
+						rect.attr("class","port port_input").attr("rx",3).attr("ry",3)
+							.attr("y",y).attr("x",-5).attr("width",10).attr("height",10).attr("index",n);
+						if (link && link.length > 0) {
+							// this input already has a link connected, so disallow new links
+							rect.on("mousedown",null)
+								.on("touchstart", null)
+								.on("mouseup", null)
+								.on("touchend", null)
+								.on("mouseover", null)
+								.on("mouseout", null)
+								.classed("port_hovered",false);
+						} else {
+							// allow new link on inputs without any link connected
+							rect.on("mousedown", (function(nn){return function(d){portMouseDown(d,1,nn);}})(n))
+								.on("touchstart", (function(nn){return function(d){portMouseDown(d,1,nn);}})(n))
+								.on("mouseup", (function(nn){return function(d){portMouseUp(d,1,nn);}})(n))
+								.on("touchend", (function(nn){return function(d){portMouseUp(d,1,nn);}})(n))
+								.on("mouseover",function(d) { var port = d3.select(this); port.classed("port_hovered",(mouse_mode!=RED.state.JOINING || mousedown_port_type != 1 ));})
+								.on("mouseout",function(d) { var port = d3.select(this); port.classed("port_hovered",false);})
+						}
 					}
 					d.inputlist = inputlist;
 
