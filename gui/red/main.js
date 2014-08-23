@@ -46,6 +46,8 @@ var RED = (function() {
 	});
 
 	function save(force) {
+		RED.storage.update();
+
 		if (RED.view.dirty()) {
 
 			if (!force) {
@@ -138,7 +140,6 @@ var RED = (function() {
 			//console.log(cpp);
 
 			RED.view.state(RED.state.EXPORT);
-			//mouse_mode = RED.state.EXPORT;
 			$("#dialog-form").html($("script[data-template-name='export-clipboard-dialog']").html());
 			$("#node-input-export").val(cpp);
 			$("#node-input-export").focus(function() {
@@ -151,48 +152,7 @@ var RED = (function() {
 			});
 			$( "#dialog" ).dialog("option","title","Export nodes to clipboard").dialog( "open" );
 			$("#node-input-export").focus();
-
-/*
-			$("#btn-icn-deploy").removeClass('icon-upload');
-			$("#btn-icn-deploy").addClass('spinner');
-			RED.view.dirty(false);
-			
-			$.ajax({
-				url:"flows",
-				type: "POST",
-				data: JSON.stringify(nns),
-				contentType: "application/json; charset=utf-8"
-			}).done(function(data,textStatus,xhr) {
-				RED.notify("Successfully deployed","success");
-				RED.nodes.eachNode(function(node) {
-					if (node.changed) {
-						node.dirty = true;
-						node.changed = false;
-					}
-					if(node.credentials) {
-						delete node.credentials;
-					}
-				});
-				RED.nodes.eachConfig(function (confNode) {
-					if (confNode.credentials) {
-						delete confNode.credentials;
-					}
-				});
-				// Once deployed, cannot undo back to a clean state
-				RED.history.markAllDirty();
-				RED.view.redraw();
-			}).fail(function(xhr,textStatus,err) {
-				RED.view.dirty(true);
-				if (xhr.responseText) {
-					RED.notify("<strong>Error</strong>: "+xhr.responseText,"error");
-				} else {
-					RED.notify("<strong>Error</strong>: no response from server","error");
-				}
-			}).always(function() {
-				$("#btn-icn-deploy").removeClass('spinner');
-				$("#btn-icn-deploy").addClass('icon-upload');
-			});
-*/
+			//RED.view.dirty(false);
 		}
 	}
 
@@ -222,67 +182,17 @@ var RED = (function() {
 			]
 	});
 
-	function loadSettings() {
-/*
-		$.get('settings', function(data) {
-			RED.settings = data;
-			console.log("Node-RED: "+data.version);
-			loadNodes();
-		});
-*/
-		loadNodes();
-	}
 	function loadNodes() {
-	console.log("loadNodes");
+		console.log("loadNodes");
 		$.get('list.html', function(data) {
 			console.log("loadNodes complete");
 			$("body").append(data);
 			$(".palette-spinner").hide();
 			$(".palette-scroll").show();
 			$("#palette-search").show();
-			//loadFlows();
-		}, "html");
-	}
-
-	function loadFlows() {
-		$.getJSON("flows",function(nodes) {
-			RED.nodes.import(nodes);
-			RED.view.dirty(false);
+			RED.storage.load();
 			RED.view.redraw();
-			RED.comms.subscribe("status/#",function(topic,msg) {
-				var parts = topic.split("/");
-				var node = RED.nodes.node(parts[1]);
-				if (node) {
-					node.status = msg;
-					if (statusEnabled) {
-						node.dirty = true;
-						RED.view.redraw();
-					}
-				}
-			});
-			RED.comms.subscribe("node/#",function(topic,msg) {
-				var i;
-				if (topic == "node/added") {
-					for (i=0;i<msg.length;i++) {
-						var m = msg[i];
-						var id = m.id;
-						$.get('nodes/'+id, function(data) {
-							$("body").append(data);
-							var typeList = "<ul><li>"+m.types.join("</li><li>")+"</li></ul>";
-							RED.notify("Node"+(m.types.length!=1 ? "s":"")+" added to palette:"+typeList,"success");
-						});
-					}
-				} else if (topic == "node/removed") {
-					if (msg.types) {
-						for (i=0;i<msg.types.length;i++) {
-							RED.palette.remove(msg.types[i]);
-						}
-						var typeList = "<ul><li>"+msg.types.join("</li><li>")+"</li></ul>";
-						RED.notify("Node"+(msg.types.length!=1 ? "s":"")+" removed from palette:"+typeList,"success");
-					}
-				}
-			});
-		});
+		}, "html");
 	}
 
 	$('#btn-node-status').click(function() {toggleStatus();});
@@ -314,8 +224,8 @@ var RED = (function() {
 
 	$(function() {
 		RED.keyboard.add(/* ? */ 191,{shift:true},function(){showHelp();d3.event.preventDefault();});
-		loadSettings();
-		RED.comms.connect();
+		loadNodes();
+		//RED.comms.connect();
 	});
 
 	return {

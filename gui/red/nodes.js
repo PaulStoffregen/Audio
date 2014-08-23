@@ -338,6 +338,7 @@ RED.nodes = (function() {
 					}
 				}
 			}
+/*
 			if (unknownTypes.length > 0) {
 				var typeList = "<ul><li>"+unknownTypes.join("</li><li>")+"</li></ul>";
 				var type = "type"+(unknownTypes.length > 1?"s":"");
@@ -364,7 +365,7 @@ RED.nodes = (function() {
 				addWorkspace(defaultWorkspace);
 				RED.view.addWorkspace(defaultWorkspace);
 			}
-
+*/
 			var node_map = {};
 			var new_nodes = [];
 			var new_links = [];
@@ -428,8 +429,9 @@ RED.nodes = (function() {
 				for (var w1=0;w1<n.wires.length;w1++) {
 					var wires = (n.wires[w1] instanceof Array)?n.wires[w1]:[n.wires[w1]];
 					for (var w2=0;w2<wires.length;w2++) {
-						if (wires[w2] in node_map) {
-							var link = {source:n,sourcePort:w1,target:node_map[wires[w2]]};
+						var parts = wires[w2].split(":");
+						if (parts.length == 2 && parts[0] in node_map) {
+							var link = {source:n,sourcePort:w1,target:node_map[parts[0]],targetPort:parts[1]};
 							addLink(link);
 							new_links.push(link);
 						}

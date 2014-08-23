@@ -523,6 +523,7 @@ RED.view = (function() {
 					ns.push({n:moving_set[j].n,ox:moving_set[j].ox,oy:moving_set[j].oy});
 				}
 				RED.history.push({t:'move',nodes:ns,dirty:dirty});
+				RED.storage.update();
 			}
 		}
 		if (mouse_mode == RED.state.MOVING || mouse_mode == RED.state.MOVING_ACTIVE) {
@@ -1427,6 +1428,7 @@ RED.view = (function() {
 		dirty = d;
 		if (dirty) {
 			$("#btn-deploy").removeClass("disabled").addClass("btn-danger");
+			RED.storage.update();
 		} else {
 			$("#btn-deploy").addClass("disabled").removeClass("btn-danger");
 		}
