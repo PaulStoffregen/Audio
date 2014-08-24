@@ -1,6 +1,9 @@
 <!-- vim: set ts=4: -->
 <!-- TODO: generate some or all of this automatically from the C++ source -->
 
+<!-- TODO: add a field for maximum instance count -->
+<!-- TODO: add a field for exclusive to other objects (not allowed if they're used) -->
+<!-- TODO: add "parameters" fields, to replace the form html stuff -->
 
 <script type="text/javascript">
 	RED.nodes.registerType('AnalogInputI2S',{
@@ -20,7 +23,7 @@
 	<p align=center><img src="audioshield_inputs.jpg"></p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Port</th><th>Function</th></tr>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
 		<tr class=odd><td align=center>Out 0</td><td>Left Channel</td></tr>
 		<tr class=odd><td align=center>Out 1</td><td>Right Channel</td></tr>
 	</table>
@@ -68,7 +71,7 @@
 	<p>Receive 16 bit stereo audio from an I2S device using I2S slave mode.</p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Port</th><th>Function</th></tr>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
 		<tr class=odd><td align=center>Out 0</td><td>Left Channel</td></tr>
 		<tr class=odd><td align=center>Out 1</td><td>Right Channel</td></tr>
 	</table>
@@ -111,10 +114,10 @@
 </script>
 <script type="text/x-red" data-help-name="AnalogInputADC">
 	<h3>Summary</h3>
-	<p>Receive 12 bit audio using the built-in analog to digital converter.</p>
+	<p>Receive audio using the built-in analog to digital converter.</p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Port</th><th>Function</th></tr>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
 		<tr class=odd><td align=center>Out 0</td><td>Audio Channel</td></tr>
 	</table>
 	<h3>Parameters</h3>
@@ -127,14 +130,17 @@
 	<p align=center><img src="adcpins1.jpg"></p>
 	<h3>Functions</h3>
 	<p>This object has no functions to call from the Arduino sketch.  It
-		simply streams data from the ADC to its output ports.</p>
+		simply streams data from the ADC to its output port.</p>
 	<h3>Hardware</h3>
 	<p>Signal range is 0 to 1.2V</p>
 	<p>Need for DC bias, approx 0.6V</p>
+	<p>TODO: suggested circuity for signal input</p>
 	<h3>Notes</h3>
 	<p>Algorithm for automatic DC bias tracking</p>
 	<p>Noise due to high source impedance</p>
 	<p>Power Supply rejection issue with simple DC bias</p>
+	<p>TODO: actual noise measurements with different input circuitry
+		(it's not nearly as quiet as the audio shield)</p>
 </script>
 <script type="text/x-red" data-template-name="AnalogInputADC">
 	<div class="form-row">
@@ -156,7 +162,37 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AnalogOutputI2S">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>Transmit 16 bit stereo audio from the
+	<a href="http://www.pjrc.com/store/teensy3_audio.html" target="_blank">audio shield</a>
+		or another I2S device, using I2S master mode.</p>
+	<p align=center><img src="audioshield_outputs.jpg"></p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Left Channel</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Right Channel</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from its 2 input ports to the I2S hardware.</p>
+	<h3>Hardware</h3>
+	<p align=center><img src="audioshield_backside.jpg"></p>
+	<p>The I2S signals are used in "master" mode, where Teensy creates
+		all 3 clock signals and controls all data timing.</p>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>9</td><td>BCLK</td><td>Output</td></tr>
+		<tr class=odd><td align=center>11</td><td>MCLK</td><td>Output</td></tr>
+		<tr class=odd><td align=center>22</td><td>TX</td><td>Output</td></tr>
+		<tr class=odd><td align=center>23</td><td>LRCLK</td><td>Output</td></tr>
+	</table>
+	<p>Audio from
+		master mode I2S may be used in the same project as ADC, DAC and
+		PWM signals, because all remain in sync to Teensy's timing</p>
+	<h3>Notes</h3>
+	<p>Normally, this object is used with the Audio Shield, which
+		is controlled separately by the "sgtl5000" object.</p>
 </script>
 <script type="text/x-red" data-template-name="AnalogOutputI2S">
 	<div class="form-row">
@@ -178,7 +214,31 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AnalogOutputI2Sslave">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>Transmit 16 bit stereo audio from an I2S device using I2S slave mode.</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Left Channel</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Right Channel</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from its 2 input ports to the I2S hardware.</p>
+	<h3>Hardware</h3>
+	<p>The I2S signals are used in "slave" mode, where the I2S device controls
+		data timing.</p>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>9</td><td>BCLK</td><td>Input</td></tr>
+		<tr class=odd><td align=center>22</td><td>TX</td><td>Output</td></tr>
+		<tr class=odd><td align=center>23</td><td>LRCLK</td><td>Input</td></tr>
+	</table>
+	<p>Slave mode I2S <b>should not used in the same project as ADC, DAC and
+		PWM</b> signals.  Differences in timing between the I2S device and
+		Teensy's clock can cause occasional audio glitches when I2S slave mode
+		is used together with other input or output objects based on Teensy's
+		timing.</p>
 </script>
 <script type="text/x-red" data-template-name="AnalogOutputI2Sslave">
 	<div class="form-row">
@@ -201,7 +261,26 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AnalogOutputAnalog">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>Transmit 12 bit audio using Teensy 3.1's built-in digital to analog converter.</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Audio Channel</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from the ADC to its output port.</p>
+	<h3>Hardware</h3>
+	<p align=center><img src="dacpin.jpg"></p>
+	<p>Signal range is 0 to 1.2V</p>
+	<p>Most applications require at least a 10&micro;F DC-blocking capacitor.</p>
+	<p>TODO: photo of Teensy 3.1 with 10&micro;F capacitor and 3.5mm jack.</p>
+	<h3>Notes</h3>
+	<p>The output rate is 44.1 kHz (no oversampling).  Ultrasonic noise present if
+		not filtered.  This may not
+		be an issue for many uses, but care should be used if amplified and driven
+		to high power tweeters.</p>
 </script>
 <script type="text/x-red" data-template-name="AnalogOutputAnalog">
 	<div class="form-row">
@@ -222,7 +301,39 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AnalogOutputPWM">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>Transmit audio using Teensy 3.1's PWM pins.  Two pins are
+		used for coarse and fine pulses, to be combined by scaled
+		resistors.</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Audio Channel</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from the ADC to its output port.</p>
+	<h3>Hardware</h3>
+	<p>The following circuit is recommended.</p>
+	<p align=center><img src="pwmdualcircuit.jpg"></p>
+	<p>Signal range is approx 1.55 Vp-p.</p>
+	<p>These resistor values assume approx 20 ohms output impedance
+		on the digital pins.  The 127K resistor may be adjusted or
+		trimmed for variation in output drive and tolerance on the
+		475 ohm resistor.</p>
+	<p>A plastic film (Polypropylene, Polyethylene, Polyester, etc) or
+		C0G/NPO ceramic capacitor should be used for filtering.  Low
+		quality ceramic (X7R, Y5V, Z5U, etc) can cause signal distortion.</p>
+	<h3>Notes</h3>
+	<p>The PWM carrier frequency is 88.2 kHz.  The suggested circuit
+		will only slightly filter the carrier.  Extra filtering will be
+		required for a clean signals without the ultrasonic PWM carrier.
+		</p>
+	<p>Analog signals created by filtering PWM waveforms use the digital
+		power supply as their reference voltage.  Any noise on the digital
+		power line can directly couple to the output signal.  The built-in DAC or
+		<a href="http://www.pjrc.com/store/teensy3_audio.html" target="_blank">audio shield</a>
+		should be used when higher quality signals are needed.</p>
 </script>
 <script type="text/x-red" data-template-name="AnalogOutputPWM">
 	<div class="form-row">
@@ -243,7 +354,34 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AudioMixer4">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>Combine up to 4 audio signals together, each with adjustable gain.</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Input signal #1</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Input signal #2</td></tr>
+		<tr class=odd><td align=center>In 2</td><td>Input signal #3</td></tr>
+		<tr class=odd><td align=center>In 3</td><td>Input signal #4</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Sum of all inputs</td></tr>
+	</table>
+	<!--<h3>Parameters</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
+		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
+	</table>
+	<p>Extra description...  Section only present if object has params</p>-->
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>gain</span>(channel, level);</p>
+	<p class=desc>Adjust the amplification or attenuation.  "channel" must
+		be 0 to 3.  "gain" may be any number from 0 to 32767.0.  Gain of
+		1.0 passes the signal through directly.  Gain of 0 shuts the channel
+		off completely.  Between 0 to 1.0 attenuates the signal, and above
+		1.0 amplifies it.  All 4 channels have separate settings.
+	</p>
+	<h3>Notes</h3>
+	<p>Signal clipping can occur when any channel has gain greater than 1.0,
+		or when multiple signals add together to greater than 1.0.</p>
 </script>
 <script type="text/x-red" data-template-name="AudioMixer4">
 	<div class="form-row">
@@ -265,7 +403,25 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AudioPlayMemory">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>description</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center></td><td></td></tr>
+	</table>
+	<!--<h3>Parameters</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
+		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
+	</table>
+	<p>Extra description...  Section only present if object has params</p>-->
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<h3>Notes</h3>
+	<p></p>
 </script>
 <script type="text/x-red" data-template-name="AudioPlayMemory">
 	<div class="form-row">
@@ -287,7 +443,25 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AudioPlaySdWav">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>description</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center></td><td></td></tr>
+	</table>
+	<!--<h3>Parameters</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
+		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
+	</table>
+	<p>Extra description...  Section only present if object has params</p>-->
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<h3>Notes</h3>
+	<p></p>
 </script>
 <script type="text/x-red" data-template-name="AudioPlaySdWav">
 	<div class="form-row">
@@ -309,7 +483,25 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AudioPlaySdRaw">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>description</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center></td><td></td></tr>
+	</table>
+	<!--<h3>Parameters</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
+		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
+	</table>
+	<p>Extra description...  Section only present if object has params</p>-->
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<h3>Notes</h3>
+	<p></p>
 </script>
 <script type="text/x-red" data-template-name="AudioPlaySdRaw">
 	<div class="form-row">
@@ -331,7 +523,25 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AudioPlayQueue">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>description</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center></td><td></td></tr>
+	</table>
+	<!--<h3>Parameters</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
+		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
+	</table>
+	<p>Extra description...  Section only present if object has params</p>-->
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<h3>Notes</h3>
+	<p></p>
 </script>
 <script type="text/x-red" data-template-name="AudioPlayQueue">
 	<div class="form-row">
@@ -353,7 +563,25 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AudioSynthWaveformSine">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>description</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center></td><td></td></tr>
+	</table>
+	<!--<h3>Parameters</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
+		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
+	</table>
+	<p>Extra description...  Section only present if object has params</p>-->
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<h3>Notes</h3>
+	<p></p>
 </script>
 <script type="text/x-red" data-template-name="AudioSynthWaveformSine">
 	<div class="form-row">
@@ -375,7 +603,25 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AudioSynthWaveformSineModulated">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>description</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center></td><td></td></tr>
+	</table>
+	<!--<h3>Parameters</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
+		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
+	</table>
+	<p>Extra description...  Section only present if object has params</p>-->
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<h3>Notes</h3>
+	<p></p>
 </script>
 <script type="text/x-red" data-template-name="AudioSynthWaveformSineModulated">
 	<div class="form-row">
@@ -397,7 +643,25 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AudioSynthWaveform">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>description</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center></td><td></td></tr>
+	</table>
+	<!--<h3>Parameters</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
+		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
+	</table>
+	<p>Extra description...  Section only present if object has params</p>-->
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<h3>Notes</h3>
+	<p></p>
 </script>
 <script type="text/x-red" data-template-name="AudioSynthWaveform">
 	<div class="form-row">
@@ -419,7 +683,25 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AudioSynthToneSweep">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>description</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center></td><td></td></tr>
+	</table>
+	<!--<h3>Parameters</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
+		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
+	</table>
+	<p>Extra description...  Section only present if object has params</p>-->
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<h3>Notes</h3>
+	<p></p>
 </script>
 <script type="text/x-red" data-template-name="AudioSynthToneSweep">
 	<div class="form-row">
@@ -441,7 +723,25 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AudioEffectFade">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>description</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center></td><td></td></tr>
+	</table>
+	<!--<h3>Parameters</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
+		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
+	</table>
+	<p>Extra description...  Section only present if object has params</p>-->
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<h3>Notes</h3>
+	<p></p>
 </script>
 <script type="text/x-red" data-template-name="AudioEffectFade">
 	<div class="form-row">
@@ -462,7 +762,25 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AudioEffectChorus">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>description</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center></td><td></td></tr>
+	</table>
+	<!--<h3>Parameters</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
+		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
+	</table>
+	<p>Extra description...  Section only present if object has params</p>-->
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<h3>Notes</h3>
+	<p></p>
 </script>
 <script type="text/x-red" data-template-name="AudioEffectChorus">
 	<div class="form-row">
@@ -483,7 +801,25 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AudioEffectFlange">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>description</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center></td><td></td></tr>
+	</table>
+	<!--<h3>Parameters</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
+		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
+	</table>
+	<p>Extra description...  Section only present if object has params</p>-->
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<h3>Notes</h3>
+	<p></p>
 </script>
 <script type="text/x-red" data-template-name="AudioEffectFlange">
 	<div class="form-row">
@@ -504,7 +840,25 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AudioFilterBiquad">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>description</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center></td><td></td></tr>
+	</table>
+	<!--<h3>Parameters</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
+		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
+	</table>
+	<p>Extra description...  Section only present if object has params</p>-->
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<h3>Notes</h3>
+	<p></p>
 </script>
 <script type="text/x-red" data-template-name="AudioFilterBiquad">
 	<div class="form-row">
@@ -526,7 +880,25 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AudioFilterFIR">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>description</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center></td><td></td></tr>
+	</table>
+	<!--<h3>Parameters</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
+		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
+	</table>
+	<p>Extra description...  Section only present if object has params</p>-->
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<h3>Notes</h3>
+	<p></p>
 </script>
 <script type="text/x-red" data-template-name="AudioFilterFIR">
 	<div class="form-row">
@@ -548,7 +920,25 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AudioPeak">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>description</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center></td><td></td></tr>
+	</table>
+	<!--<h3>Parameters</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
+		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
+	</table>
+	<p>Extra description...  Section only present if object has params</p>-->
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<h3>Notes</h3>
+	<p></p>
 </script>
 <script type="text/x-red" data-template-name="AudioPeak">
 	<div class="form-row">
@@ -570,7 +960,25 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AudioAnalyzeFFT256">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>description</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center></td><td></td></tr>
+	</table>
+	<!--<h3>Parameters</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
+		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
+	</table>
+	<p>Extra description...  Section only present if object has params</p>-->
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<h3>Notes</h3>
+	<p></p>
 </script>
 <script type="text/x-red" data-template-name="AudioAnalyzeFFT256">
 	<div class="form-row">
@@ -592,7 +1000,25 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AudioAnalyzeFFT1024">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>description</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center></td><td></td></tr>
+	</table>
+	<!--<h3>Parameters</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
+		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
+	</table>
+	<p>Extra description...  Section only present if object has params</p>-->
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<h3>Notes</h3>
+	<p></p>
 </script>
 <script type="text/x-red" data-template-name="AudioAnalyzeFFT1024">
 	<div class="form-row">
@@ -614,7 +1040,25 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AudioAnalyzeToneDetect">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>description</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center></td><td></td></tr>
+	</table>
+	<!--<h3>Parameters</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
+		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
+	</table>
+	<p>Extra description...  Section only present if object has params</p>-->
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<h3>Notes</h3>
+	<p></p>
 </script>
 <script type="text/x-red" data-template-name="AudioAnalyzeToneDetect">
 	<div class="form-row">
@@ -636,7 +1080,25 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AudioAnalyzePrint">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>description</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center></td><td></td></tr>
+	</table>
+	<!--<h3>Parameters</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
+		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
+	</table>
+	<p>Extra description...  Section only present if object has params</p>-->
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<h3>Notes</h3>
+	<p></p>
 </script>
 <script type="text/x-red" data-template-name="AudioAnalyzePrint">
 	<div class="form-row">
@@ -658,7 +1120,25 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AudioControlSGTL5000">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>description</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center></td><td></td></tr>
+	</table>
+	<!--<h3>Parameters</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
+		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
+	</table>
+	<p>Extra description...  Section only present if object has params</p>-->
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<h3>Notes</h3>
+	<p></p>
 </script>
 <script type="text/x-red" data-template-name="AudioControlSGTL5000">
 	<div class="form-row">
@@ -680,7 +1160,25 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AudioControlWM8731">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>description</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center></td><td></td></tr>
+	</table>
+	<!--<h3>Parameters</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
+		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
+	</table>
+	<p>Extra description...  Section only present if object has params</p>-->
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<h3>Notes</h3>
+	<p></p>
 </script>
 <script type="text/x-red" data-template-name="AudioControlWM8731">
 	<div class="form-row">
