@@ -17,7 +17,8 @@
 	<p>Receive 16 bit stereo audio from the
 	<a href="http://www.pjrc.com/store/teensy3_audio.html" target="_blank">audio shield</a>
 		or another I2S device.</p>
-	<h3>Audio Library Ports</h3>
+	<p align=center><img src="audioshield_inputs.jpg"></p>
+	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Function</th></tr>
 		<tr class=odd><td align=center>Out 0</td><td>Left Channel</td></tr>
@@ -27,10 +28,9 @@
 	<p>This object has no functions to call from the Arduino sketch.  It
 		simply streams data from the I2S hardware to its 2 output ports.</p>
 	<h3>Hardware</h3>
-	<p align=center><img src="audioshield_inputs.jpg"></p>
+	<p align=center><img src="audioshield_backside.jpg"></p>
 	<p>The I2S signals are used in "master" mode, where Teensy creates
 		all 3 clock signals and controls all data timing.</p>
-
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Pin</th><th>Signal</th><th>Direction</th></tr>
 		<tr class=odd><td align=center>9</td><td>BCLK</td><td>Output</td></tr>
@@ -44,7 +44,6 @@
 	<h3>Notes</h3>
 	<p>Normally, this object is used with the Audio Shield, which
 		is controlled separately by the "sgtl5000" object.</p>
-	<p align=center><img src="audioshield_backside.jpg"></p>
 </script>
 <script type="text/x-red" data-template-name="AnalogInputI2S">
 	<div class="form-row">

@@ -87,7 +87,7 @@ RED.palette = (function() {
 		  
 		  $("#palette-"+def.category).append(d);
 		  d.onmousedown = function(e) { e.preventDefault(); }
-		  
+
 		  $(d).popover({
 				  title:d.type,
 				  placement:"right",
@@ -95,7 +95,7 @@ RED.palette = (function() {
 				  delay: { show: 750, hide: 50 },
 				  html: true,
 				  container:'body',
-				  content: $(($("script[data-help-name|='"+nt+"']").html()||"<p>no information available</p>").trim())[0] 
+				  content: $(($("script[data-help-name|='"+nt+"']").html()||"<h2>empty</h2><p>no information available</p>").trim())[2] // TODO: how to use jQuery to always select the first <p> within the html?
 		  });
 		  $(d).click(function() {
 				  var help = '<div class="node-help">'+($("script[data-help-name|='"+d.type+"']").html()||"")+"</div>";
