@@ -163,7 +163,7 @@
 </script>
 <script type="text/x-red" data-help-name="AnalogOutputI2S">
 	<h3>Summary</h3>
-	<p>Transmit 16 bit stereo audio from the
+	<p>Transmit 16 bit stereo audio to the
 	<a href="http://www.pjrc.com/store/teensy3_audio.html" target="_blank">audio shield</a>
 		or another I2S device, using I2S master mode.</p>
 	<p align=center><img src="audioshield_outputs.jpg"></p>
@@ -215,7 +215,7 @@
 </script>
 <script type="text/x-red" data-help-name="AnalogOutputI2Sslave">
 	<h3>Summary</h3>
-	<p>Transmit 16 bit stereo audio from an I2S device using I2S slave mode.</p>
+	<p>Transmit 16 bit stereo audio to an I2S device using I2S slave mode.</p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
@@ -312,7 +312,7 @@
 	</table>
 	<h3>Functions</h3>
 	<p>This object has no functions to call from the Arduino sketch.  It
-		simply streams data from the ADC to its output port.</p>
+		simply streams data from the its input port to the PWM pins.</p>
 	<h3>Hardware</h3>
 	<p>The following circuit is recommended.</p>
 	<p align=center><img src="pwmdualcircuit.jpg"></p>
@@ -355,7 +355,8 @@
 </script>
 <script type="text/x-red" data-help-name="AudioMixer4">
 	<h3>Summary</h3>
-	<p>Combine up to 4 audio signals together, each with adjustable gain.</p>
+	<p>Combine up to 4 audio signals together, each with adjustable gain.
+		All channels support signal attenuation or amplification.</p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
@@ -365,23 +366,21 @@
 		<tr class=odd><td align=center>In 3</td><td>Input signal #4</td></tr>
 		<tr class=odd><td align=center>Out 0</td><td>Sum of all inputs</td></tr>
 	</table>
-	<!--<h3>Parameters</h3>
-	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
-		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
-	</table>
-	<p>Extra description...  Section only present if object has params</p>-->
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>gain</span>(channel, level);</p>
 	<p class=desc>Adjust the amplification or attenuation.  "channel" must
-		be 0 to 3.  "gain" may be any number from 0 to 32767.0.  Gain of
-		1.0 passes the signal through directly.  Gain of 0 shuts the channel
+		be 0 to 3.  "level" may be any floating point number from 0 to 32767.
+		1.0 passes the signal through directly.  Level of 0 shuts the channel
 		off completely.  Between 0 to 1.0 attenuates the signal, and above
 		1.0 amplifies it.  All 4 channels have separate settings.
 	</p>
 	<h3>Notes</h3>
 	<p>Signal clipping can occur when any channel has gain greater than 1.0,
 		or when multiple signals add together to greater than 1.0.</p>
+	<p>More than 4 channels may be combined by connecting multiple mixers
+		in tandem.  For example, a 16 channel mixer may be built using 5
+		mixers, where the fifth mixer combines the outputs of the first 4.
+	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioMixer4">
 	<div class="form-row">
@@ -404,24 +403,43 @@
 </script>
 <script type="text/x-red" data-help-name="AudioPlayMemory">
 	<h3>Summary</h3>
-	<p>description</p>
+	<p>Play a short sound clip, stored directly in memory.
+		Data files are created with the
+		<a href="https://github.com/PaulStoffregen/Audio/tree/master/examples/PlayFromSketch/wav2sketch" target="_blank">wav2sketch program</a>,
+		and copied to the sketch folder to become part of your sketch.</p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
-		<tr class=odd><td align=center></td><td></td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Sound Output</td></tr>
 	</table>
-	<!--<h3>Parameters</h3>
-	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
-		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
-	</table>
-	<p>Extra description...  Section only present if object has params</p>-->
 	<h3>Functions</h3>
-	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
-	<p class=desc>blah blah blah blah
+	<p class=func><span class=keyword>play</span>(data);</p>
+	<p class=desc>Begin playing a sound clip.  If already playing, the
+		currently playing clip is stopped and this new data begins
+		playing from the beginning.
+	</p>
+	<p class=func><span class=keyword>stop</span>();</p>
+	<p class=desc>Stop playing.  If not playing, this function has no effect.
+	</p>
+	<p class=func><span class=keyword>isPlaying</span>();</p>
+	<p class=desc>Return true (non-zero) if playing, or false (zero)
+		when not playing.
+	</p>
+	<p class=func><span class=keyword>positionMillis</span>();</p>
+	<p class=desc>While playing, return the current time offset, in
+		milliseconds.  When not playing, the return from this function
+		is undefined.
+	</p>
+	<p class=func><span class=keyword>lengthMillis</span>();</p>
+	<p class=desc>Return the total length of the current sound clip,
+		in milliseconds.  When not playing, the return from this function
+		is undefined.
 	</p>
 	<h3>Notes</h3>
-	<p></p>
+	<p>TODO: supported sample rates: 11.025, 22.05, 44.1</p>
+	<p>TODO: ulaw vs uncompressed encoding</p>
+	<p>Polyphonic playback can be built by creating multiple
+		objects, with their output combined by mixers.</p>
 </script>
 <script type="text/x-red" data-template-name="AudioPlayMemory">
 	<div class="form-row">
@@ -444,24 +462,54 @@
 </script>
 <script type="text/x-red" data-help-name="AudioPlaySdWav">
 	<h3>Summary</h3>
-	<p>description</p>
+	<p>Play a WAV file, stored on a SD card.</p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
-		<tr class=odd><td align=center></td><td></td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Left Channel Output</td></tr>
+		<tr class=odd><td align=center>Out 1</td><td>Right Channel Output</td></tr>
 	</table>
-	<!--<h3>Parameters</h3>
-	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
-		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
-	</table>
-	<p>Extra description...  Section only present if object has params</p>-->
 	<h3>Functions</h3>
-	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
-	<p class=desc>blah blah blah blah
+	<p class=func><span class=keyword>play</span>(filename);</p>
+	<p class=desc>Begin playing a WAV file.  If a file is already playing,
+		it is stopped and this file starts playing from the beginning.
+	</p>
+	<p class=func><span class=keyword>stop</span>();</p>
+	<p class=desc>Stop playing.  If not playing, this function has no effect.
+	</p>
+	<p class=func><span class=keyword>isPlaying</span>();</p>
+	<p class=desc>Return true (non-zero) if playing, or false (zero)
+		when not playing.  See the note below about delayed start.
+	</p>
+	<p class=func><span class=keyword>positionMillis</span>();</p>
+	<p class=desc>While playing, return the current time offset, in
+		milliseconds.  When not playing, the return from this function
+		is undefined.
+	</p>
+	<p class=func><span class=keyword>lengthMillis</span>();</p>
+	<p class=desc>Return the total length of the current sound clip,
+		in milliseconds.  When not playing, the return from this function
+		is undefined.
 	</p>
 	<h3>Notes</h3>
-	<p></p>
+	<p>Only 16 bit PCM, 44100 Hz WAV files are supported.  When mono
+		files are played, both output ports transmit a copy of the
+		single sound.  Of course, stereo WAV files play with the left
+		channel on port 0 and the right channel on port 1.
+	</p>
+	<p>A brief delay after calling play() will usually occur before
+		isPlaying() returns true and positionMillis() returns valid
+		time offset.  WAV files have a header at the beginning of the
+		file, which the audio library must read and parse before
+		playing can begin.
+	</p>
+	<p>While playing, the audio library accesses the SD card automatically.
+		If card access is required, you must
+		<a href="http://www.pjrc.com/teensy/td_libs_AudioProcessorUsage.html" target="_blank">wav2sketch program</a> use AudioNoInterrupts()</a>
+		to prevent the library from accessing the SD card while you use it.
+		Disabling the audio library interrupt for too long may cause audible
+		dropouts or glitches.
+	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioPlaySdWav">
 	<div class="form-row">
@@ -484,24 +532,46 @@
 </script>
 <script type="text/x-red" data-help-name="AudioPlaySdRaw">
 	<h3>Summary</h3>
-	<p>description</p>
+	<p>Play a RAW data file, stored on a SD card.  RAW format is simpler
+		than WAV and begins playing immediately, without parsing WAV file
+		header info.</p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
-		<tr class=odd><td align=center></td><td></td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Sound Output</td></tr>
 	</table>
-	<!--<h3>Parameters</h3>
-	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
-		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
-	</table>
-	<p>Extra description...  Section only present if object has params</p>-->
 	<h3>Functions</h3>
-	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
-	<p class=desc>blah blah blah blah
+	<p class=func><span class=keyword>play</span>(filename);</p>
+	<p class=desc>Begin playing a RAW data file.  If a file is already playing,
+		it is stopped and this file starts playing from the beginning.
+	</p>
+	<p class=func><span class=keyword>stop</span>();</p>
+	<p class=desc>Stop playing.  If not playing, this function has no effect.
+	</p>
+	<p class=func><span class=keyword>isPlaying</span>();</p>
+	<p class=desc>Return true (non-zero) if playing, or false (zero)
+		when not playing.
+	</p>
+	<p class=func><span class=keyword>positionMillis</span>();</p>
+	<p class=desc>While playing, return the current time offset, in
+		milliseconds.  When not playing, the return from this function
+		is undefined.
+	</p>
+	<p class=func><span class=keyword>lengthMillis</span>();</p>
+	<p class=desc>Return the total length of the current sound clip,
+		in milliseconds.  When not playing, the return from this function
+		is undefined.
 	</p>
 	<h3>Notes</h3>
-	<p></p>
+	<p>The data file must be RAW 16 bit signed integers in LSB-first format.
+	</p>
+	<p>While playing, the audio library accesses the SD card automatically.
+		If card access is required, you must
+		<a href="http://www.pjrc.com/teensy/td_libs_AudioProcessorUsage.html" target="_blank">wav2sketch program</a> use AudioNoInterrupts()</a>
+		to prevent the library from accessing the SD card while you use it.
+		Disabling the audio library interrupt for too long may cause audible
+		dropouts or glitches.
+	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioPlaySdRaw">
 	<div class="form-row">
@@ -524,24 +594,36 @@
 </script>
 <script type="text/x-red" data-help-name="AudioPlayQueue">
 	<h3>Summary</h3>
-	<p>description</p>
+	<p>Play audio data provided by the Arduino sketch.  This object provides
+		functions to allow the sketch code to push data into the audio system.</p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
-		<tr class=odd><td align=center></td><td></td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Sound Output</td></tr>
 	</table>
-	<!--<h3>Parameters</h3>
-	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
-		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
-	</table>
-	<p>Extra description...  Section only present if object has params</p>-->
 	<h3>Functions</h3>
-	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
-	<p class=desc>blah blah blah blah
+	<p class=func><span class=keyword>play</span>(int16);</p>
+	<p class=desc>not yet implemented
+	</p>
+	<p class=func><span class=keyword>play</span>(int16[], length);</p>
+	<p class=desc>not yet implemented
+	</p>
+	<p class=func><span class=keyword>getBuffer</span>();</p>
+	<p class=desc>Returns a pointer to an array of 128 int16.  This buffer
+		is within the audio library memory pool, providing the most efficient
+		way to input data to the audio system.  The buffer is likely to be
+		populated by previously used data, so the entire 128 words should be
+		written before calling playBuffer().  Only a single buffer should be
+		requested at a time.  This function may return NULL if no memory is
+		available.
+	</p>
+	<p class=func><span class=keyword>playBuffer</span>();</p>
+	<p class=desc>Transmit the buffer previously obtained from getBuffer().
 	</p>
 	<h3>Notes</h3>
-	<p></p>
+	<p>TODO: many caveats....</p>
+	<p>
+	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioPlayQueue">
 	<div class="form-row">
@@ -564,21 +646,20 @@
 </script>
 <script type="text/x-red" data-help-name="AudioSynthWaveformSine">
 	<h3>Summary</h3>
-	<p>description</p>
+	<p>Create a sine wave signal</p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
-		<tr class=odd><td align=center></td><td></td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Sine Wave Output</td></tr>
 	</table>
-	<!--<h3>Parameters</h3>
-	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
-		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
-	</table>
-	<p>Extra description...  Section only present if object has params</p>-->
 	<h3>Functions</h3>
-	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
-	<p class=desc>blah blah blah blah
+	<p class=func><span class=keyword>frequency</span>(freq);</p>
+	<p class=desc>Set the frequency, from 0 to 22000.  Very low values may
+		be used to create a LFO (Low Frequency Oscillator) for objects
+		with modulation signal inputs.
+	</p>
+	<p class=func><span class=keyword>amplitude</span>(level);</p>
+	<p class=desc>Set the amplitude, from 0 to 1.0.
 	</p>
 	<h3>Notes</h3>
 	<p></p>
@@ -604,21 +685,24 @@
 </script>
 <script type="text/x-red" data-help-name="AudioSynthWaveformSineModulated">
 	<h3>Summary</h3>
-	<p>description</p>
+	<p>Create a modulated sine wave, using any audio signal to continuously
+		modulate the sine wave frequency.</p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
-		<tr class=odd><td align=center></td><td></td></tr>
+		<tr class=odd><td align=center>In 0</td><td>Modulation Signal</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Sine Wave Output</td></tr>
 	</table>
-	<!--<h3>Parameters</h3>
-	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
-		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
-	</table>
-	<p>Extra description...  Section only present if object has params</p>-->
 	<h3>Functions</h3>
-	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
-	<p class=desc>blah blah blah blah
+	<p class=func><span class=keyword>frequency</span>(freq);</p>
+	<p class=desc>Set the center frequency, from 0 to 11000.  The output will
+		be this center frequency when the input modulation signal is zero.
+		Modulation input 1.0 causes the frequency to double, and input -1.0
+		causes zero Hz (DC) output.  For less modulation, attenuate the input
+		signal (perhaps with a mixer object) before it arrives here.
+	</p>
+	<p class=func><span class=keyword>amplitude</span>(level);</p>
+	<p class=desc>Set the amplitude, from 0 to 1.0.
 	</p>
 	<h3>Notes</h3>
 	<p></p>
@@ -644,24 +728,30 @@
 </script>
 <script type="text/x-red" data-help-name="AudioSynthWaveform">
 	<h3>Summary</h3>
-	<p>description</p>
+	<p>Create a waveform: sine, sawtooth, square, or triangle</p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
-		<tr class=odd><td align=center></td><td></td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Waveform Output</td></tr>
 	</table>
-	<!--<h3>Parameters</h3>
-	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
-		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
-	</table>
-	<p>Extra description...  Section only present if object has params</p>-->
 	<h3>Functions</h3>
-	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=func><span class=keyword>begin</span>(level, frequency, waveform);</p>
 	<p class=desc>blah blah blah blah
 	</p>
+	<p class=func><span class=keyword>frequency</span>(freq);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>amplitude</span>(level);</p>
+	<p class=desc>blah blah blah blah
 	<h3>Notes</h3>
-	<p></p>
+	<p>Supported Waveforms:<br>
+		<ul>
+		<li><span class=literal>TONE_TYPE_SINE</span></li>
+		<li><span class=literal>TONE_TYPE_SAWTOOTH</span></li>
+		<li><span class=literal>TONE_TYPE_SQUARE</span></li>
+		<li><span class=literal>TONE_TYPE_TRIANGLE</span></li>
+		</ul>
+	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioSynthWaveform">
 	<div class="form-row">
@@ -684,11 +774,11 @@
 </script>
 <script type="text/x-red" data-help-name="AudioSynthToneSweep">
 	<h3>Summary</h3>
-	<p>description</p>
+	<p>Create a continuously varying (in frequency) sine wave</p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
-		<tr class=odd><td align=center></td><td></td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Continuously varying tone</td></tr>
 	</table>
 	<!--<h3>Parameters</h3>
 	<table class=doc align=center cellpadding=3>
@@ -697,11 +787,14 @@
 	</table>
 	<p>Extra description...  Section only present if object has params</p>-->
 	<h3>Functions</h3>
-	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=func><span class=keyword>play</span>(level, lowFreq, highFreq, time);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>isPlaying</span>();</p>
 	<p class=desc>blah blah blah blah
 	</p>
 	<h3>Notes</h3>
-	<p></p>
+	<p>Uses excessive CPU time</p>
 </script>
 <script type="text/x-red" data-template-name="AudioSynthToneSweep">
 	<div class="form-row">
@@ -730,14 +823,11 @@
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
 		<tr class=odd><td align=center></td><td></td></tr>
 	</table>
-	<!--<h3>Parameters</h3>
-	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
-		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
-	</table>
-	<p>Extra description...  Section only present if object has params</p>-->
 	<h3>Functions</h3>
-	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=func><span class=keyword>fadeIn</span>(milliseconds);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>fadeOut</span>(milliseconds);</p>
 	<p class=desc>blah blah blah blah
 	</p>
 	<h3>Notes</h3>
@@ -776,7 +866,13 @@
 	</table>
 	<p>Extra description...  Section only present if object has params</p>-->
 	<h3>Functions</h3>
-	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=func><span class=keyword>begin</span>(delayBuffer, length, n_chorus);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>stop</span>();</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>modify</span>(n_chorus);</p>
 	<p class=desc>blah blah blah blah
 	</p>
 	<h3>Notes</h3>
@@ -815,7 +911,13 @@
 	</table>
 	<p>Extra description...  Section only present if object has params</p>-->
 	<h3>Functions</h3>
-	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=func><span class=keyword>begin</span>(delayBuffer, length, offset, depth, delayRate);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>modify</span>(offset, depth, delayRate);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>stop</span>();</p>
 	<p class=desc>blah blah blah blah
 	</p>
 	<h3>Notes</h3>
@@ -847,12 +949,12 @@
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
 		<tr class=odd><td align=center></td><td></td></tr>
 	</table>
-	<!--<h3>Parameters</h3>
+	<h3>Parameters</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
 		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
 	</table>
-	<p>Extra description...  Section only present if object has params</p>-->
+	<p>Extra description...  Section only present if object has params</p>
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
 	<p class=desc>blah blah blah blah
@@ -961,24 +1063,46 @@
 </script>
 <script type="text/x-red" data-help-name="AudioAnalyzeFFT256">
 	<h3>Summary</h3>
-	<p>description</p>
+	<p>Compute a 256 point Fast Fourier Transform (FFT) frequency analysis,
+		with real value (magnitude) output, with frequency resolution of
+		approx 172 Hz, useful for simple audio visualization.</p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
-		<tr class=odd><td align=center></td><td></td></tr>
+		<tr class=odd><td align=center>In 0</td><td>Signal to convert to frequency bins</td></tr>
 	</table>
-	<!--<h3>Parameters</h3>
+	<h3>Parameters</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
-		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
+		<tr class=odd><td align=center>Num</td><td>Integer</td><td># FFTs to average</td></tr>
+		<tr class=odd><td align=center>Window</td><td>Array</td><td>Window method to use</td></tr>
 	</table>
-	<p>Extra description...  Section only present if object has params</p>-->
+	<p>Extra description...  Section only present if object has params</p>
 	<h3>Functions</h3>
-	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
-	<p class=desc>blah blah blah blah
+	<p class=func><span class=keyword>available</span>();</p>
+	<p class=desc>Returns true each time the FFT analysis produces new output data.
 	</p>
 	<h3>Notes</h3>
-	<p></p>
+	<p>The raw 16 bit output data bins may be access with myFFT.output[num], where
+		num is 0 to 127.</p>
+	<p>TODO: caveats about spectral leakage vs frequency precision for arbitrary signals</p>
+	<p>Known bug in the library limits to only a single instance of this object.
+		This bug will be fixed someday... allowing 2 or more FFTs to run on simultaneously.</p>
+	<p>Window Types:
+		<ul>
+		<li><span class=literal>AudioWindowHanning256</span> (default)</li>
+		<li><span class=literal>AudioWindowBartlett256</span></li>
+		<li><span class=literal>AudioWindowBlackman256</span></li>
+		<li><span class=literal>AudioWindowFlattop256</span></li>
+		<li><span class=literal>AudioWindowBlackmanHarris256</span></li>
+		<li><span class=literal>AudioWindowNuttall256</span></li>
+		<li><span class=literal>AudioWindowBlackmanNuttall256</span></li>
+		<li><span class=literal>AudioWindowWelch256</span></li>
+		<li><span class=literal>AudioWindowHamming256</span></li>
+		<li><span class=literal>AudioWindowCosine256</span></li>
+		<li><span class=literal>AudioWindowTukey256</span></li>
+		</ul>
+	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioAnalyzeFFT256">
 	<div class="form-row">
@@ -1001,24 +1125,37 @@
 </script>
 <script type="text/x-red" data-help-name="AudioAnalyzeFFT1024">
 	<h3>Summary</h3>
-	<p>description</p>
+	<p>Compute a 1024 point Fast Fourier Transform (FFT) frequency analysis,
+		with real value (magnitude) output, with frequency resolution of 
+		approx 43 Hz, useful detailed for audio visualization.</p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
-		<tr class=odd><td align=center></td><td></td></tr>
+		<tr class=odd><td align=center>In 0</td><td>Signal to convert to frequency bins</td></tr>
 	</table>
-	<!--<h3>Parameters</h3>
+	<h3>Parameters</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
-		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
+		<tr class=odd><td align=center>Num</td><td>Integer</td><td># FFTs to average</td></tr>
+		<tr class=odd><td align=center>Window</td><td>Array</td><td>Window method to use</td></tr>
 	</table>
-	<p>Extra description...  Section only present if object has params</p>-->
+	<p>Extra description...  Section only present if object has params</p>
 	<h3>Functions</h3>
-	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
-	<p class=desc>blah blah blah blah
+	<p class=func><span class=keyword>available</span>();</p>
+	<p class=desc>Returns true each time the FFT analysis produces new output data.
 	</p>
 	<h3>Notes</h3>
-	<p></p>
+	<p>1024 point FFT uses approx 50% of the CPU power on Teensy 3.1</p>
+	<p>The raw 16 bit output data bins may be access with myFFT.output[num], where
+		num is 0 to 511.</p>
+	<p>TODO: caveats about spectral leakage vs frequency precision for arbitrary signals</p>
+	<p>Known bug in the library limits to only a single instance of this object.
+		This bug will be fixed someday... but 2 instances may not run due to CPU limitation</p>
+	<p>Window Types:
+		<ul>
+		<li><span class=literal>AudioWindowHanning1024</span> (default)</li>
+		</ul>
+	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioAnalyzeFFT1024">
 	<div class="form-row">
@@ -1041,24 +1178,32 @@
 </script>
 <script type="text/x-red" data-help-name="AudioAnalyzeToneDetect">
 	<h3>Summary</h3>
-	<p>description</p>
+	<p>Detect the level of a single tone</p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
 		<tr class=odd><td align=center></td><td></td></tr>
 	</table>
-	<!--<h3>Parameters</h3>
-	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
-		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
-	</table>
-	<p>Extra description...  Section only present if object has params</p>-->
 	<h3>Functions</h3>
-	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=func><span class=keyword>frequency</span>(freq);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>available</span>();</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>read</span>();</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>threshold</span>(level);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func>(bool)</p>
 	<p class=desc>blah blah blah blah
 	</p>
 	<h3>Notes</h3>
-	<p></p>
+	<p>Low frequency detection has trouble with numerical precision.
+		Works really well for all 8 DTMF frequencies, but fails for
+		detecting "sub audible tones" used in some control applications.</p>
 </script>
 <script type="text/x-red" data-template-name="AudioAnalyzeToneDetect">
 	<div class="form-row">
