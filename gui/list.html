@@ -16,7 +16,7 @@
 	<h3>Summary</h3>
 	<p>Receive 16 bit stereo audio from the
 	<a href="http://www.pjrc.com/store/teensy3_audio.html" target="_blank">audio shield</a>
-		or another I2S device.</p>
+		or another I2S device, using I2S master mode.</p>
 	<p align=center><img src="audioshield_inputs.jpg"></p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -64,11 +64,31 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AnalogInputI2Sslave">
-	<p>Receive 16 bit stereo audio from a I2S device using slave mode</p>
-
-
-	<p>Stereo audio input from the audio shield or other I2S device</p>
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>Receive 16 bit stereo audio from an I2S device using I2S slave mode.</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Function</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Left Channel</td></tr>
+		<tr class=odd><td align=center>Out 1</td><td>Right Channel</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from the I2S hardware to its 2 output ports.</p>
+	<h3>Hardware</h3>
+	<p>The I2S signals are used in "slave" mode, where the I2S device controls
+		data timing.</p>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>9</td><td>BCLK</td><td>Input</td></tr>
+		<tr class=odd><td align=center>13</td><td>RX</td><td>Input</td></tr>
+		<tr class=odd><td align=center>23</td><td>LRCLK</td><td>Input</td></tr>
+	</table>
+	<p>Slave mode I2S <b>should not used in the same project as ADC, DAC and
+		PWM</b> signals.  Differences in timing between the I2S device and
+		Teensy's clock can cause occasional audio glitches when I2S slave mode
+		is used together with other input or output objects based on Teensy's
+		timing.</p>
 </script>
 <script type="text/x-red" data-template-name="AnalogInputI2Sslave">
 	<div class="form-row">
@@ -90,7 +110,31 @@
 	});
 </script>
 <script type="text/x-red" data-help-name="AnalogInputADC">
-	<p><b>TODO</b> Add object documetation here</b>.</p>
+	<h3>Summary</h3>
+	<p>Receive 12 bit audio using the built-in analog to digital converter.</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Function</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Audio Channel</td></tr>
+	</table>
+	<h3>Parameters</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
+		<tr class=odd><td align=center>Pin</td><td>Integer</td><td>Analog Pin To Use</td></tr>
+	</table>
+	<p>The pin number should be specified as "A0" to "A20"</p>
+	<p align=center><img src="adcpins2.jpg"></p>
+	<p align=center><img src="adcpins1.jpg"></p>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from the ADC to its output ports.</p>
+	<h3>Hardware</h3>
+	<p>Signal range is 0 to 1.2V</p>
+	<p>Need for DC bias, approx 0.6V</p>
+	<h3>Notes</h3>
+	<p>Algorithm for automatic DC bias tracking</p>
+	<p>Noise due to high source impedance</p>
+	<p>Power Supply rejection issue with simple DC bias</p>
 </script>
 <script type="text/x-red" data-template-name="AnalogInputADC">
 	<div class="form-row">
