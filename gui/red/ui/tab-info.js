@@ -23,7 +23,8 @@ RED.sidebar.info = (function() {
 	content.style.paddingRight = "4px";
 
 	RED.sidebar.addTab("info",content);
-	
+	$("#tab-info").html("<p></p><p>Special thanks to Nicholas O'Leary, Dave Conway-Jones and IBM.</p><p>Without their work on the open source <a href=\"http://nodered.org/\" target=\"_blank\">Node-RED</a> project, this GUI front-end for the Teensy Audio Library would not have been possible!</p>");
+
 	function jsonFilter(key,value) {
 		if (key === "") {
 			return value;
