@@ -17,10 +17,11 @@
  
 RED.comms = (function() {
 	
-	var errornotification = null;
-	var subscriptions = {};
-	var ws;
+	//var errornotification = null;
+	//var subscriptions = {};
+	//var ws;
 	function connectWS() {
+		/*
 		var path = location.hostname+":"+location.port+document.location.pathname;
 		path = path+(path.slice(-1) == "/"?"":"/")+"comms";
 		path = "ws"+(document.location.protocol=="https:"?"s":"")+"://"+path;
@@ -60,16 +61,17 @@ RED.comms = (function() {
 			}
 			setTimeout(connectWS,1000);
 		}
+		*/
 	}
 	
 	function subscribe(topic,callback) {
-		if (subscriptions[topic] == null) {
-			subscriptions[topic] = [];
-		}
-		subscriptions[topic].push(callback);
-		if (ws && ws.readyState == 1) {
-			ws.send(JSON.stringify({subscribe:topic}));
-		}
+		//if (subscriptions[topic] == null) {
+			//subscriptions[topic] = [];
+		//}
+		//subscriptions[topic].push(callback);
+		//if (ws && ws.readyState == 1) {
+			//ws.send(JSON.stringify({subscribe:topic}));
+		//}
 	}
 	
 	
