@@ -47,6 +47,11 @@
 	<h3>Notes</h3>
 	<p>Normally, this object is used with the Audio Shield, which
 		is controlled separately by the "sgtl5000" object.</p>
+	<p>Only one I2S input and one I2S output object may be used.  Master
+		and slave modes may not be mixed (both must be of the same type).
+	</p>
+	<p>I2S master objects can be used together with non-I2S input and output
+		objects, for simultaneous audio streaming on different hardware.</p>
 </script>
 <script type="text/x-red" data-template-name="AnalogInputI2S">
 	<div class="form-row">
@@ -87,11 +92,15 @@
 		<tr class=odd><td align=center>13</td><td>RX</td><td>Input</td></tr>
 		<tr class=odd><td align=center>23</td><td>LRCLK</td><td>Input</td></tr>
 	</table>
+	<h3>Notes</h3>
 	<p>Slave mode I2S <b>should not used in the same project as ADC, DAC and
 		PWM</b> signals.  Differences in timing between the I2S device and
 		Teensy's clock can cause occasional audio glitches when I2S slave mode
 		is used together with other input or output objects based on Teensy's
 		timing.</p>
+	<p>Only one I2S input and one I2S output object may be used.  Master
+		and slave modes may not be mixed (both must be of the same type).
+	</p>
 </script>
 <script type="text/x-red" data-template-name="AnalogInputI2Sslave">
 	<div class="form-row">
@@ -193,6 +202,9 @@
 	<h3>Notes</h3>
 	<p>Normally, this object is used with the Audio Shield, which
 		is controlled separately by the "sgtl5000" object.</p>
+	<p>Only one I2S input and one I2S output object may be used.  Master
+		and slave modes may not be mixed (both must be of the same type).
+	</p>
 </script>
 <script type="text/x-red" data-template-name="AnalogOutputI2S">
 	<div class="form-row">
@@ -234,11 +246,15 @@
 		<tr class=odd><td align=center>22</td><td>TX</td><td>Output</td></tr>
 		<tr class=odd><td align=center>23</td><td>LRCLK</td><td>Input</td></tr>
 	</table>
+	<h3>Notes</h3>
 	<p>Slave mode I2S <b>should not used in the same project as ADC, DAC and
 		PWM</b> signals.  Differences in timing between the I2S device and
 		Teensy's clock can cause occasional audio glitches when I2S slave mode
 		is used together with other input or output objects based on Teensy's
 		timing.</p>
+	<p>Only one I2S input and one I2S output object may be used.  Master
+		and slave modes may not be mixed (both must be of the same type).
+	</p>
 </script>
 <script type="text/x-red" data-template-name="AnalogOutputI2Sslave">
 	<div class="form-row">
@@ -327,7 +343,7 @@
 	<h3>Notes</h3>
 	<p>The PWM carrier frequency is 88.2 kHz.  The suggested circuit
 		will only slightly filter the carrier.  Extra filtering will be
-		required for a clean signals without the ultrasonic PWM carrier.
+		required for a clean signal without the ultrasonic PWM carrier.
 		</p>
 	<p>Analog signals created by filtering PWM waveforms use the digital
 		power supply as their reference voltage.  Any noise on the digital
@@ -505,7 +521,7 @@
 	</p>
 	<p>While playing, the audio library accesses the SD card automatically.
 		If card access is required, you must
-		<a href="http://www.pjrc.com/teensy/td_libs_AudioProcessorUsage.html" target="_blank">wav2sketch program</a> use AudioNoInterrupts()</a>
+		<a href="http://www.pjrc.com/teensy/td_libs_AudioProcessorUsage.html" target="_blank">use AudioNoInterrupts()</a>
 		to prevent the library from accessing the SD card while you use it.
 		Disabling the audio library interrupt for too long may cause audible
 		dropouts or glitches.
@@ -567,7 +583,7 @@
 	</p>
 	<p>While playing, the audio library accesses the SD card automatically.
 		If card access is required, you must
-		<a href="http://www.pjrc.com/teensy/td_libs_AudioProcessorUsage.html" target="_blank">wav2sketch program</a> use AudioNoInterrupts()</a>
+		<a href="http://www.pjrc.com/teensy/td_libs_AudioProcessorUsage.html" target="_blank">AudioNoInterrupts()</a>
 		to prevent the library from accessing the SD card while you use it.
 		Disabling the audio library interrupt for too long may cause audible
 		dropouts or glitches.
@@ -736,13 +752,13 @@
 	</table>
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>begin</span>(level, frequency, waveform);</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Output a waveform.
 	</p>
 	<p class=func><span class=keyword>frequency</span>(freq);</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Change the frequency.
 	</p>
 	<p class=func><span class=keyword>amplitude</span>(level);</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Change the amplitude.  Set to 0 to turn the signal off.
 	<h3>Notes</h3>
 	<p>Supported Waveforms:<br>
 		<ul>
@@ -780,18 +796,13 @@
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
 		<tr class=odd><td align=center>Out 0</td><td>Continuously varying tone</td></tr>
 	</table>
-	<!--<h3>Parameters</h3>
-	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
-		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
-	</table>
-	<p>Extra description...  Section only present if object has params</p>-->
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>play</span>(level, lowFreq, highFreq, time);</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Start generating frequency sweep output.  The time is specified
+		in milliseconds.  Level is 0 to 1.0.
 	</p>
 	<p class=func><span class=keyword>isPlaying</span>();</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Returns true (non-zero) while the output is active.
 	</p>
 	<h3>Notes</h3>
 	<p>Uses excessive CPU time</p>
@@ -817,21 +828,35 @@
 </script>
 <script type="text/x-red" data-help-name="AudioEffectFade">
 	<h3>Summary</h3>
-	<p>description</p>
+	<p>Gradually increase or decrease audio level.</p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
-		<tr class=odd><td align=center></td><td></td></tr>
+		<tr class=odd><td align=center>In 0</td><td>Signal Input</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Signal Output</td></tr>
 	</table>
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>fadeIn</span>(milliseconds);</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Begin increasing the audio level, to reach 1.0 (input passed
+		directly to the output) after "milliseconds" time.
 	</p>
 	<p class=func><span class=keyword>fadeOut</span>(milliseconds);</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Begin increasing the audio level, to reach 0 (no output)
+		after "milliseconds" time.
 	</p>
 	<h3>Notes</h3>
-	<p></p>
+	<p>Cross fading can be built with 2 fade objects fed into a mixer.
+		When one fade object is off (fully faded out) and the other on
+		(fully faded in), if both are started at the same moment for the
+		same time duration, their signal gains always add to 1.0.  This
+		allows 2 fade objects to work together for a smooth transition
+		between a pair of signals.
+	</p>
+	<p><a href="http://www.pjrc.com/teensy/td_libs_AudioProcessorUsage.html" target="_blank">AudioNoInterrupts()</a>
+		should be used when changing
+		settings on multiple objects, so all changes always take effect
+		at the same moment.
+	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioEffectFade">
 	<div class="form-row">
@@ -1036,7 +1061,13 @@
 	</table>
 	<p>Extra description...  Section only present if object has params</p>-->
 	<h3>Functions</h3>
-	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=func><span class=keyword>begin</span>(noReset);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>stop</span>();</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>Dpp</span>();</p>
 	<p class=desc>blah blah blah blah
 	</p>
 	<h3>Notes</h3>
@@ -1064,8 +1095,8 @@
 <script type="text/x-red" data-help-name="AudioAnalyzeFFT256">
 	<h3>Summary</h3>
 	<p>Compute a 256 point Fast Fourier Transform (FFT) frequency analysis,
-		with real value (magnitude) output, with frequency resolution of
-		approx 172 Hz, useful for simple audio visualization.</p>
+		with real value (magnitude) output.  The frequency resolution is
+		172 Hz, useful for simple audio visualization.</p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
@@ -1126,8 +1157,8 @@
 <script type="text/x-red" data-help-name="AudioAnalyzeFFT1024">
 	<h3>Summary</h3>
 	<p>Compute a 1024 point Fast Fourier Transform (FFT) frequency analysis,
-		with real value (magnitude) output, with frequency resolution of 
-		approx 43 Hz, useful detailed for audio visualization.</p>
+		with real value (magnitude) output.  The frequency resolution is
+		43 Hz, useful detailed for audio visualization.</p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
@@ -1182,28 +1213,41 @@
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
-		<tr class=odd><td align=center></td><td></td></tr>
+		<tr class=odd><td align=center>In 0</td><td>Signal to analyze</td></tr>
 	</table>
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>frequency</span>(freq);</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Set the frequency to detect.  The default detection time
+		will be 10 cycles of this frequency.
+	</p>
+	<p class=func><span class=keyword>frequency</span>(freq, cycles);</p>
+	<p class=desc>Set the frequency to detect, and the number of cycles.
+		Longer detection time (more cycles) will give higher precision,
+		but of course slower response.
 	</p>
 	<p class=func><span class=keyword>available</span>();</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Returns true (non-zero) each time a detection interval
+		(number of cycles) completed and a new level is detected.
 	</p>
 	<p class=func><span class=keyword>read</span>();</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Read the detected signal level.  Range is 0 to 1.0.
 	</p>
 	<p class=func><span class=keyword>threshold</span>(level);</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Set a detection threshold, where the bool test operation
+		will return true if at or above this level, or false when below.
 	</p>
 	<p class=func>(bool)</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>By testing the object as a boolean value, you can respond
+		to detection of a tone.
 	</p>
 	<h3>Notes</h3>
 	<p>Low frequency detection has trouble with numerical precision.
 		Works really well for all 8 DTMF frequencies, but fails for
 		detecting "sub audible tones" used in some control applications.</p>
+	<p>The (bool) test continues to return true until the next detection
+		interval (the configured number of cycles).  This behavior may
+		change in future versions, for a single true each time the signal
+		is detected, and then false for the remainder of that interval.</p>
 </script>
 <script type="text/x-red" data-template-name="AudioAnalyzeToneDetect">
 	<div class="form-row">
@@ -1226,7 +1270,8 @@
 </script>
 <script type="text/x-red" data-help-name="AudioAnalyzePrint">
 	<h3>Summary</h3>
-	<p>description</p>
+	<p>Print raw audio data to the Arduino Serial Monitor.  This
+		object creates massive output quickly, and should not normall be used.</p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
@@ -1239,7 +1284,16 @@
 	</table>
 	<p>Extra description...  Section only present if object has params</p>-->
 	<h3>Functions</h3>
-	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=func><span class=keyword>trigger</span>();</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>trigger</span>(level, edge);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>delay</span>(samples);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>length</span>(samples);</p>
 	<p class=desc>blah blah blah blah
 	</p>
 	<h3>Notes</h3>
@@ -1266,24 +1320,169 @@
 </script>
 <script type="text/x-red" data-help-name="AudioControlSGTL5000">
 	<h3>Summary</h3>
-	<p>description</p>
+	<p>Control the SGTL5000 chip on the audio shield
+		<a href="http://www.pjrc.com/store/teensy3_audio.html" target="_blank">audio shield</a>.
+		SGTL5000 is always used in slave mode, where Teensy controls
+		all I2S timing.
+	</p>
+	<p align=center><img src="sgtl5000closeup.jpg"></p>
 	<h3>Audio Connections</h3>
-	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Port</th><th>Purpose</th></tr>
-		<tr class=odd><td align=center></td><td></td></tr>
-	</table>
-	<!--<h3>Parameters</h3>
-	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
-		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
-	</table>
-	<p>Extra description...  Section only present if object has params</p>-->
+	<p>This object has no audio inputs or outputs.  Separate i2s objects
+		are used to send and receive audio data.  I2S master mode objects
+		must be used, because this object configures the SGTL5000 in slave
+		mode, where it depends on Teensy to provide all I2S clocks.
+		This object controls
+		how the SGTL5000 will use those I2S audio streams.</p>
+
 	<h3>Functions</h3>
-	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p>These are the most commonly used SGTL5000 functions.</p>
+	<p class=func><span class=keyword>enable</span>();</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>disable</span>();</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>volume</span>(level);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>inputLevel</span>(level);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>muteHeadphone</span>();</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>unmuteHeadphone</span>();</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>muteLineout</span>();</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>unmuteLineout</span>();</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>inputSelect</span>(input);</p>
+	<p class=desc>AUDIO_INPUT_LINEIN or AUDIO_INPUT_MIC
+	</p>
+
+	<h3>Signal Adjustment</h3>
+
+	<p>The SGTL5000 supports flexible signal routing (inside the chip) and
+		many optional signal conditioning features.</p>
+
+	<p class=func><span class=keyword>route</span>(i2s, dac, dap);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>route</span>(i2s, dac, dap, dapmix);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>micGain</span>(n);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>lineOutLevel</span>(both);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>lineOutLevel</span>(left, right);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>dacVolume</span>(both);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>dacVolume</span>(left, right);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>adcHighPassFilterControl</span>(bypass, freeze);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>adcHighPassFilterControl</span>(bypass);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>audioMixerEnable</span>(n);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+
+	<h3>Audio Processor</h3>
+
+	<p>An optional digital audio processor, capable of implementing a
+		simple equalizer, filtering, bass enhancement and surround sound
+		is available.  It can process audio input before the SGTL5000
+		sends it by I2S to Teensy, or it can process Teensy's I2S output
+		before converting the digital data to analog signals.</p>
+
+	<p class=func><span class=keyword>audioProcessorEnable</span>(n);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>audioProcessorEnable</span>();</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>eqFilterCount</span>(n);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>eqSelect</span>(n);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>eqBand</span>(bandNum, n);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>eqBands</span>(bass, mid_bass, midrange, mid_treble, treble);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>eqBands</span>(bass, treble);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>eqFilter</span>(filterNum, filterParameters);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>autoVolumeControl</span>(maxGain, response, hardLimit, threshold, attack, decay);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>autoVolumeEnable</span>(n);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>autoVolumeEnable</span>();</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>enhanceBass</span>(lr_lev, bass_lev);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>enhanceBass</span>(lr_lev, bass_lev, hpf_bypass, cutoff);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>enhanceBassEnable</span>(n);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>enhanceBassEnable</span>();</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>surroundSound</span>(width);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>surroundSound</span>(width, select);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>surroundSoundEnable</span>(n);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>surroundSoundEnable</span>();</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>killAutomation</span>();</p>
 	<p class=desc>blah blah blah blah
 	</p>
 	<h3>Notes</h3>
-	<p></p>
+	<p>TODO: how does the input AGC work
+	</p>
+	<p>TODO: document signal routing
+	</p>
+	<p>TODO: line level output adjust is weird arbitrary integers.  Should this be
+		made into more sensible numbers, or do we just document the integer-voltage
+		measurements that correspond to the audio shield's hardware?
+	</p>
+	<p>TODO: make some sense out of the terribly complex audio processor features &amp; options!
+	</p>
+	<p>TODO: can some of these enable functions be eliminated and have those features
+		automatically enabled or disabled depending on whether the route() function has
+		configured signals to/from them?
+	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioControlSGTL5000">
 	<div class="form-row">
@@ -1306,21 +1505,28 @@
 </script>
 <script type="text/x-red" data-help-name="AudioControlWM8731">
 	<h3>Summary</h3>
-	<p>description</p>
+	<p>Control a WM8731 chip in slave mode, where it receives all clocks from Teensy</p>
 	<h3>Audio Connections</h3>
-	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Port</th><th>Purpose</th></tr>
-		<tr class=odd><td align=center></td><td></td></tr>
-	</table>
-	<!--<h3>Parameters</h3>
-	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
-		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
-	</table>
-	<p>Extra description...  Section only present if object has params</p>-->
+	<p>This object has no audio inputs or outputs.  Separate i2s objects
+		are used to send and receive audio data.  I2S master mode objects
+		must be used, since this control object configures the WM8731 into 
+		slave mode.
+	</p>
 	<h3>Functions</h3>
-	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
+	<p class=func><span class=keyword>enable</span>();</p>
 	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>disable</span>();</p>
+	<p class=desc>not implemented
+	</p>
+	<p class=func><span class=keyword>volume</span>(level);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>inputLevel</span>(level);</p>
+	<p class=desc>not implemented
+	</p>
+	<p class=func><span class=keyword>inputSelect</span>(input);</p>
+	<p class=desc>not implemented
 	</p>
 	<h3>Notes</h3>
 	<p></p>
@@ -1331,6 +1537,58 @@
 		<input type="text" id="node-input-name" placeholder="Name">
 	</div>
 </script>
+
+
+
+<script type="text/javascript">
+	RED.nodes.registerType('AudioControlWM8731master',{
+	shortName: "wm8731m",
+		inputs:0,
+		outputs:0,
+		category: 'control-function',
+		color:"#E6E0F8",
+		icon: "arrow-in.png"
+	});
+</script>
+<script type="text/x-red" data-help-name="AudioControlWM8731master">
+	<h3>Summary</h3>
+	<p>Control a WM8731 chip in master mode, where it controls all I2S timing.</p>
+	<h3>Audio Connections</h3>
+	<p>This object has no audio inputs or outputs.  Separate i2s objects
+		are used to send and receive audio data.  I2S slave mode objects
+		must be used, since this control object configures the WM8731 into
+		master mode.
+	</p>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>enable</span>();</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>disable</span>();</p>
+	<p class=desc>not implemented
+	</p>
+	<p class=func><span class=keyword>volume</span>(level);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>inputLevel</span>(level);</p>
+	<p class=desc>not implemented
+	</p>
+	<p class=func><span class=keyword>inputSelect</span>(input);</p>
+	<p class=desc>not implemented
+	</p>
+	<h3>Notes</h3>
+	<p></p>
+</script>
+<script type="text/x-red" data-template-name="AudioControlWM8731master">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+
+
+
+
 
 
 
