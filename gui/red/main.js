@@ -82,7 +82,9 @@ var RED = (function() {
 			nns.sort(function(a,b){ return (a.x + a.y/250) - (b.x + b.y/250); });
 			//console.log(JSON.stringify(nns));
 
-			var cpp = "// GUItool: begin automatically generated code\n";
+			var cpp = "#include <Audio.h>\n#include <Wire.h>\n"
+				+ "#include <SPI.h>\n#include <SD.h>\n\n"
+				+ "// GUItool: begin automatically generated code\n";
 			// generate code for all audio processing nodes
 			for (var i=0; i<nns.length; i++) {
 				var n = nns[i];
@@ -150,7 +152,7 @@ var RED = (function() {
 					return false;
 				});
 			});
-			$( "#dialog" ).dialog("option","title","Export nodes to clipboard").dialog( "open" );
+			$( "#dialog" ).dialog("option","title","Export to Arduino").dialog( "open" );
 			$("#node-input-export").focus();
 			//RED.view.dirty(false);
 		}
@@ -192,6 +194,9 @@ var RED = (function() {
 			$("#palette-search").show();
 			RED.storage.load();
 			RED.view.redraw();
+			setTimeout(function() {
+				$("#btn-deploy").removeClass("disabled").addClass("btn-danger");
+				}, 1500);
 		}, "html");
 	}
 
@@ -225,7 +230,6 @@ var RED = (function() {
 	$(function() {
 		RED.keyboard.add(/* ? */ 191,{shift:true},function(){showHelp();d3.event.preventDefault();});
 		loadNodes();
-		//RED.comms.connect();
 	});
 
 	return {
