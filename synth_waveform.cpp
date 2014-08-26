@@ -181,6 +181,56 @@ void AudioSynthWaveform::update(void)
         tone_phase += 2*tone_incr;
       }
       break;
+      
+    case TONE_TYPE_CUSTOM:
+      for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
+      	// Calculate interpolated sin
+		index = tone_phase >> 23;
+		val1 = AudioWaveformWavetable[index];
+		val2 = AudioWaveformWavetable[index+1];
+		scale = (tone_phase >> 7) & 0xFFFF;
+		val2 *= scale;
+		val1 *= 0xFFFF - scale;
+		val3 = (val1 + val2) >> 16;
+        // The value of ramp_up is always initialized to RAMP_LENGTH and then is
+        // decremented each time through here until it reaches zero.
+        // The value of ramp_up is used to generate a Q15 fraction which varies
+        // from [0 - 1), and multiplies this by the current sample
+        if(ramp_up) {
+          // ramp up to the new magnitude
+          // ramp_mag is the Q15 representation of the fraction
+          // Since ramp_up can't be zero, this cannot generate +1
+          ramp_mag = ((ramp_length-ramp_up)<<15)/ramp_length;
+          ramp_up--;
+          // adjust tone_phase to Q15 format and then adjust the result
+          // of the multiplication
+      	  // calculate the sample
+          tmp_amp = (short)((val3 * tone_amp) >> 15);
+          *bp++ = (tmp_amp * ramp_mag)>>15;
+        } 
+        else if(ramp_down) {
+          // ramp down to zero from the last magnitude
+          // The value of ramp_down is always initialized to RAMP_LENGTH and then is
+          // decremented each time through here until it reaches zero.
+          // The value of ramp_down is used to generate a Q15 fraction which varies
+          // from [0 - 1), and multiplies this by the current sample
+          // avoid RAMP_LENGTH/RAMP_LENGTH because Q15 format
+          // cannot represent +1
+          ramp_mag = ((ramp_down - 1)<<15)/ramp_length;
+          ramp_down--;
+		  tmp_amp = (short)((val3 * last_tone_amp) >> 15);
+          *bp++ = (tmp_amp * ramp_mag)>>15;
+        } else {
+		  *bp++ = (short)((val3 * tone_amp) >> 15);
+        } 
+        
+        // phase and incr are both unsigned 32-bit fractions
+        tone_phase += tone_incr;
+        // If tone_phase has overflowed, truncate the top bit 
+        if(tone_phase & 0x80000000)tone_phase &= 0x7fffffff;
+      }
+      break;
+      
     }
     // send the samples to the left channel
     transmit(block,0);

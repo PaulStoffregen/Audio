@@ -55,6 +55,7 @@
 #include "effect_chorus.h"
 #include "effect_fade.h"
 #include "effect_flange.h"
+#include "effect_envelope.h"
 #include "filter_biquad.h"
 #include "filter_fir.h"
 #include "input_adc.h"
@@ -70,6 +71,7 @@
 #include "synth_tonesweep.h"
 #include "synth_sine.h"
 #include "synth_waveform.h"
+#include "synth_lfo.h"
 #include "multiplier.h"
 
 // TODO: more audio processing objects....
