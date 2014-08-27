@@ -92,6 +92,34 @@ static inline int32_t multiply_subtract_32x32_rshift32_rounded(int32_t sum, int3
 	return out;
 }
 
+
+// computes (a[31:16] | (b[31:16] >> 16))
+static inline uint32_t pack_16t_16t(int32_t a, int32_t b) __attribute__((always_inline, unused));
+static inline uint32_t pack_16t_16t(int32_t a, int32_t b)
+{
+	int32_t out;
+	asm volatile("pkhtb %0, %1, %2, asr #16" : "=r" (out) : "r" (a), "r" (b));
+	return out;
+}
+
+// computes (a[31:16] | b[15:0])
+static inline uint32_t pack_16t_16b(int32_t a, int32_t b) __attribute__((always_inline, unused));
+static inline uint32_t pack_16t_16b(int32_t a, int32_t b)
+{
+	int32_t out;
+	asm volatile("pkhtb %0, %1, %2" : "=r" (out) : "r" (a), "r" (b));
+	return out;
+}
+
+// computes ((a[15:0] << 16) | b[15:0])
+static inline uint32_t pack_16b_16b(int32_t a, int32_t b) __attribute__((always_inline, unused));
+static inline uint32_t pack_16b_16b(int32_t a, int32_t b)
+{
+	int32_t out;
+	asm volatile("pkhbt %0, %1, %2, lsl #16" : "=r" (out) : "r" (b), "r" (a));
+	return out;
+}
+
 // computes ((a[15:0] << 16) | b[15:0])
 static inline uint32_t pack_16x16(int32_t a, int32_t b) __attribute__((always_inline, unused));
 static inline uint32_t pack_16x16(int32_t a, int32_t b)

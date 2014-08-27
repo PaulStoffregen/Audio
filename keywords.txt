@@ -14,6 +14,7 @@ AudioAnalyzeToneDetect	KEYWORD2
 AudioEffectChorus	KEYWORD2
 AudioEffectFade	KEYWORD2
 AudioEffectFlange	KEYWORD2
+AudioEffectEnvelope	KEYWORD2
 AudioFilterBiquad	KEYWORD2
 AudioFilterFIR	KEYWORD2
 AudioInputAnalog	KEYWORD2
@@ -45,6 +46,11 @@ threshold	KEYWORD2
 enable	KEYWORD2
 disable	KEYWORD2
 volume	KEYWORD2
+attack	KEYWORD2
+hold	KEYWORD2
+decay	KEYWORD2
+sustain	KEYWORD2
+release	KEYWORD2
 inputLevel	KEYWORD2
 inputSelect	KEYWORD2
 muteHeadphone	KEYWORD2
