@@ -57,13 +57,7 @@ static inline int32_t substract_int32_then_divide_int32(int32_t a, int32_t b, in
 
 	if (a >= 0) {
 		if (b >= 0) {
-			if (a >= b) {
-				diff = a - b;
-				negative = 0;
-			} else {
-				diff = b - a;
-				negative = 1;
-			}
+			return (a - b) / c;  // no overflow if both a & b are positive
 		} else {
 			diff = a + (b * -1); // assumes 0x80000000 * -1 == 0x80000000
 			negative = 0;
@@ -73,13 +67,7 @@ static inline int32_t substract_int32_then_divide_int32(int32_t a, int32_t b, in
 			diff = (a * -1) + b; // assumes 0x80000000 * -1 == 0x80000000
 			negative = 1;
 		} else {
-			if (a >= b) {
-				diff = a - b;
-				negative = 0;
-			} else {
-				diff = b - a;
-				negative = 1;
-			}
+			return (a - b) / c;  // no overflow if both a & b are negative
 		}
 	}
 	if (c >= 0) {
