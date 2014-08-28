@@ -218,5 +218,15 @@ static inline int32_t multiply_16tx16t(uint32_t a, uint32_t b)
 	return out;
 }
 
+// computes (a - b), result saturated to 32 bit integer range
+static inline int32_t substract_32_saturate(uint32_t a, uint32_t b) __attribute__((always_inline, unused));
+static inline int32_t substract_32_saturate(uint32_t a, uint32_t b)
+{
+	int32_t out;
+	asm volatile("qsub %0, %1, %2" : "=r" (out) : "r" (a), "r" (b));
+	return out;
+}
+
+
 
 #endif
