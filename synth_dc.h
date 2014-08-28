@@ -48,6 +48,7 @@ static inline int32_t substract_32_then_divide(int32_t a, int32_t b, int32_t c)
 	}
 }
 #else
+// compute (a - b) / c  ... handling 32 bit interger overflow without slow 64 bit math
 static inline int32_t substract_int32_then_divide_int32(int32_t a, int32_t b, int32_t c) __attribute__((always_inline, unused));
 static inline int32_t substract_int32_then_divide_int32(int32_t a, int32_t b, int32_t c)
 {
