@@ -57,6 +57,7 @@
 #include "effect_flange.h"
 #include "effect_envelope.h"
 #include "effect_multiply.h"
+#include "effect_delay.h"
 #include "filter_biquad.h"
 #include "filter_fir.h"
 #include "input_adc.h"

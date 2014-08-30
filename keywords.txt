@@ -16,6 +16,7 @@ AudioEffectFade	KEYWORD2
 AudioEffectFlange	KEYWORD2
 AudioEffectEnvelope	KEYWORD2
 AudioEffectMultiply	KEYWORD2
+AudioEffectDelay	KEYWORD2
 AudioFilterBiquad	KEYWORD2
 AudioFilterFIR	KEYWORD2
 AudioInputAnalog	KEYWORD2
