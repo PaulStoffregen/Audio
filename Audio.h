@@ -75,6 +75,7 @@
 #include "synth_waveform.h"
 #include "synth_dc.h"
 #include "synth_whitenoise.h"
+#include "synth_pinknoise.h"
 #include "multiplier.h"
 
 // TODO: more audio processing objects....
