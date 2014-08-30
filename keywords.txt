@@ -30,6 +30,7 @@ AudioSynthWaveform	KEYWORD2
 AudioSynthWaveformSine	KEYWORD2
 AudioSynthWaveformSineModulated	KEYWORD2
 AudioSynthWaveformDc	KEYWORD2
+AudioSynthNoiseWhite	KEYWORD2
 isPlaying	KEYWORD2
 positionMillis	KEYWORD2
 lengthMillis	KEYWORD2
