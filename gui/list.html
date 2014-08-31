@@ -267,7 +267,7 @@
 
 
 <script type="text/javascript">
-	RED.nodes.registerType('AnalogOutputAnalog',{
+	RED.nodes.registerType('AudioOutputAnalog',{
 	shortName: "dac",
 		inputs:1,
 		outputs:0,
@@ -276,7 +276,7 @@
 		icon: "arrow-in.png"
 	});
 </script>
-<script type="text/x-red" data-help-name="AnalogOutputAnalog">
+<script type="text/x-red" data-help-name="AudioOutputAnalog">
 	<h3>Summary</h3>
 	<p>Transmit 12 bit audio using Teensy 3.1's built-in digital to analog converter.</p>
 	<h3>Audio Connections</h3>
@@ -298,7 +298,7 @@
 		be an issue for many uses, but care should be used if amplified and driven
 		to high power tweeters.</p>
 </script>
-<script type="text/x-red" data-template-name="AnalogOutputAnalog">
+<script type="text/x-red" data-template-name="AudioOutputAnalog">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
