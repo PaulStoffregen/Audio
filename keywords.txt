@@ -19,6 +19,7 @@ AudioEffectMultiply	KEYWORD2
 AudioEffectDelay	KEYWORD2
 AudioFilterBiquad	KEYWORD2
 AudioFilterFIR	KEYWORD2
+AudioFilterStateVariable	KEYWORD2
 AudioInputAnalog	KEYWORD2
 AudioMixer4	KEYWORD2
 AudioOutputAnalog	KEYWORD2
@@ -42,6 +43,7 @@ play	KEYWORD2
 updateCoefs	KEYWORD2
 frequency	KEYWORD2
 amplitude	KEYWORD2
+resonance	KEYWORD2
 modify	KEYWORD2
 output	KEYWORD2
 trigger	KEYWORD2

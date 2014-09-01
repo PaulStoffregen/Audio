@@ -60,6 +60,7 @@
 #include "effect_delay.h"
 #include "filter_biquad.h"
 #include "filter_fir.h"
+#include "filter_variable.h"
 #include "input_adc.h"
 #include "input_i2s.h"
 #include "mixer.h"
