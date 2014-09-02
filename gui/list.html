@@ -6,7 +6,7 @@
 <!-- TODO: add "parameters" fields, to replace the form html stuff -->
 
 <script type="text/javascript">
-	RED.nodes.registerType('AnalogInputI2S',{
+	RED.nodes.registerType('AudioInputI2S',{
 	shortName: "i2s",
 		inputs:0,
 		outputs:2,
@@ -15,7 +15,7 @@
 		icon: "arrow-in.png"
 	});
 </script>
-<script type="text/x-red" data-help-name="AnalogInputI2S">
+<script type="text/x-red" data-help-name="AudioInputI2S">
 	<h3>Summary</h3>
 	<p>Receive 16 bit stereo audio from the
 	<a href="http://www.pjrc.com/store/teensy3_audio.html" target="_blank">audio shield</a>
@@ -53,7 +53,7 @@
 	<p>I2S master objects can be used together with non-I2S input and output
 		objects, for simultaneous audio streaming on different hardware.</p>
 </script>
-<script type="text/x-red" data-template-name="AnalogInputI2S">
+<script type="text/x-red" data-template-name="AudioInputI2S">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -62,7 +62,7 @@
 
 
 <script type="text/javascript">
-	RED.nodes.registerType('AnalogInputI2Sslave',{
+	RED.nodes.registerType('AudioInputI2Sslave',{
 	shortName: "i2ss",
 		inputs:0,
 		outputs:2,
@@ -71,7 +71,7 @@
 		icon: "arrow-in.png"
 	});
 </script>
-<script type="text/x-red" data-help-name="AnalogInputI2Sslave">
+<script type="text/x-red" data-help-name="AudioInputI2Sslave">
 	<h3>Summary</h3>
 	<p>Receive 16 bit stereo audio from an I2S device using I2S slave mode.</p>
 	<h3>Audio Connections</h3>
@@ -102,7 +102,7 @@
 		and slave modes may not be mixed (both must be of the same type).
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AnalogInputI2Sslave">
+<script type="text/x-red" data-template-name="AudioInputI2Sslave">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -112,7 +112,7 @@
 
 
 <script type="text/javascript">
-	RED.nodes.registerType('AnalogInputADC',{
+	RED.nodes.registerType('AudioInputADC',{
 	shortName: "adc",
 		inputs:0,
 		outputs:1,
@@ -121,7 +121,7 @@
 		icon: "arrow-in.png"
 	});
 </script>
-<script type="text/x-red" data-help-name="AnalogInputADC">
+<script type="text/x-red" data-help-name="AudioInputADC">
 	<h3>Summary</h3>
 	<p>Receive audio using the built-in analog to digital converter.</p>
 	<h3>Audio Connections</h3>
@@ -151,7 +151,7 @@
 	<p>TODO: actual noise measurements with different input circuitry
 		(it's not nearly as quiet as the audio shield)</p>
 </script>
-<script type="text/x-red" data-template-name="AnalogInputADC">
+<script type="text/x-red" data-template-name="AudioInputADC">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -161,7 +161,7 @@
 
 
 <script type="text/javascript">
-	RED.nodes.registerType('AnalogOutputI2S',{
+	RED.nodes.registerType('AudioOutputI2S',{
 	shortName: "i2s",
 		inputs:2,
 		outputs:0,
@@ -170,7 +170,7 @@
 		icon: "arrow-in.png"
 	});
 </script>
-<script type="text/x-red" data-help-name="AnalogOutputI2S">
+<script type="text/x-red" data-help-name="AudioOutputI2S">
 	<h3>Summary</h3>
 	<p>Transmit 16 bit stereo audio to the
 	<a href="http://www.pjrc.com/store/teensy3_audio.html" target="_blank">audio shield</a>
@@ -206,7 +206,7 @@
 		and slave modes may not be mixed (both must be of the same type).
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AnalogOutputI2S">
+<script type="text/x-red" data-template-name="AudioOutputI2S">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -216,7 +216,7 @@
 
 
 <script type="text/javascript">
-	RED.nodes.registerType('AnalogOutputI2Sslave',{
+	RED.nodes.registerType('AudioOutputI2Sslave',{
 	shortName: "i2ss",
 		inputs:2,
 		outputs:0,
@@ -225,7 +225,7 @@
 		icon: "arrow-in.png"
 	});
 </script>
-<script type="text/x-red" data-help-name="AnalogOutputI2Sslave">
+<script type="text/x-red" data-help-name="AudioOutputI2Sslave">
 	<h3>Summary</h3>
 	<p>Transmit 16 bit stereo audio to an I2S device using I2S slave mode.</p>
 	<h3>Audio Connections</h3>
@@ -256,7 +256,7 @@
 		and slave modes may not be mixed (both must be of the same type).
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AnalogOutputI2Sslave">
+<script type="text/x-red" data-template-name="AudioOutputI2Sslave">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -307,7 +307,7 @@
 
 
 <script type="text/javascript">
-	RED.nodes.registerType('AnalogOutputPWM',{
+	RED.nodes.registerType('AudioOutputPWM',{
 	shortName: "pwm",
 		inputs:1,
 		outputs:0,
@@ -316,7 +316,7 @@
 		icon: "arrow-in.png"
 	});
 </script>
-<script type="text/x-red" data-help-name="AnalogOutputPWM">
+<script type="text/x-red" data-help-name="AudioOutputPWM">
 	<h3>Summary</h3>
 	<p>Transmit audio using Teensy 3.1's PWM pins.  Two pins are
 		used for coarse and fine pulses, to be combined by scaled
@@ -351,7 +351,7 @@
 		<a href="http://www.pjrc.com/store/teensy3_audio.html" target="_blank">audio shield</a>
 		should be used when higher quality signals are needed.</p>
 </script>
-<script type="text/x-red" data-template-name="AnalogOutputPWM">
+<script type="text/x-red" data-template-name="AudioOutputPWM">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
