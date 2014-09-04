@@ -44,6 +44,7 @@ updateCoefs	KEYWORD2
 frequency	KEYWORD2
 amplitude	KEYWORD2
 resonance	KEYWORD2
+octaveControl	KEYWORD2
 modify	KEYWORD2
 output	KEYWORD2
 trigger	KEYWORD2
