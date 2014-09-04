@@ -106,6 +106,8 @@ void AudioFilterStateVariable::update_variable(const int16_t *in,
 		control *= octavemult;     // octavemult range: 0 to 28671 (12 frac bits)
 		n = control & 0x7FFFFFF;   // 27 fractional control bits
 		#ifdef IMPROVE_EXPONENTIAL_ACCURACY
+		// exp2 polynomial suggested by Stefan Stenzel on "music-dsp"
+		// mail list, Wed, 3 Sep 2014 10:08:55 +0200
 		int32_t x = n << 3;
 		n = multiply_accumulate_32x32_rshift32_rounded(536870912, x, 1494202713);
 		int32_t sq = multiply_32x32_rshift32_rounded(x, x);
@@ -114,6 +116,8 @@ void AudioFilterStateVariable::update_variable(const int16_t *in,
 			multiply_32x32_rshift32_rounded(x, 1358044250)) << 1);
 		n = n << 1;
 		#else
+		// exp2 algorithm by Laurent de Soras
+		// http://www.musicdsp.org/showone.php?id=106
 		n = (n + 134217728) << 3;
 		n = multiply_32x32_rshift32_rounded(n, n);
 		n = multiply_32x32_rshift32_rounded(n, 715827883) << 3;
@@ -129,6 +133,8 @@ void AudioFilterStateVariable::update_variable(const int16_t *in,
 		// high frequencies, but the filter's corner frequency response
 		// can end up about 6% higher than requested.
 		#ifdef IMPROVE_HIGH_FREQUENCY_ACCURACY
+		// From "Fast Polynomial Approximations to Sine and Cosine"
+		// Charles K Garrett, http://krisgarrett.net/
 		fmult = (multiply_32x32_rshift32_rounded(fmult, 2145892402) +
 			multiply_32x32_rshift32_rounded(
 			multiply_32x32_rshift32_rounded(fmult, fmult),
