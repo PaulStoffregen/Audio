@@ -26,7 +26,7 @@
 
 #include "analyze_peakdetect.h"
 
-void AudioPeak::update(void)
+void AudioAnalyzePeak::update(void)
 {
 	audio_block_t *block;
 	const int16_t *p, *end;
@@ -48,7 +48,7 @@ void AudioPeak::update(void)
 	release(block);
 }
 
-void AudioPeak::begin(bool noReset)
+void AudioAnalyzePeak::begin(bool noReset)
 {
 	if(!noReset)
 	{
@@ -57,7 +57,7 @@ void AudioPeak::begin(bool noReset)
 	}
 	m_enabled=true;
 }
-uint16_t AudioPeak::Dpp(void)
+uint16_t AudioAnalyzePeak::Dpp(void)
 {
 	if(max>min) return max-min; else return 0;
 }

@@ -30,10 +30,10 @@
 #include "AudioStream.h"
 
 // TODO: this needs to be renamed to AudioAnalyzePeak
-class AudioPeak : public AudioStream
+class AudioAnalyzePeak : public AudioStream
 {
 public:
-	AudioPeak(void) : AudioStream(1, inputQueueArray) { }
+	AudioAnalyzePeak(void) : AudioStream(1, inputQueueArray) { }
 
 	virtual void update(void);
 

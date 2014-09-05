@@ -15,7 +15,7 @@ const int myInput = AUDIO_INPUT_LINEIN;
 // const int myInput = AUDIO_INPUT_MIC;
 
 AudioInputAnalog        audioInput(A0);         // A0 is pin 14, feel free to change.
-AudioPeak               peak_M;
+AudioAnalyzePeak        peak_M;
 AudioOutputAnalog       audioOutput;            // DAC pin.
 
 AudioConnection c1(audioInput,peak_M);

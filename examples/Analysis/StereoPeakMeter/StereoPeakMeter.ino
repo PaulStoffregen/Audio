@@ -12,8 +12,8 @@ const int myInput = AUDIO_INPUT_LINEIN;
 // const int myInput = AUDIO_INPUT_MIC;
 
 AudioInputI2S        audioInput;         // audio shield: mic or line-in
-AudioPeak            peak_L;
-AudioPeak            peak_R;
+AudioAnalyzePeak     peak_L;
+AudioAnalyzePeak     peak_R;
 AudioOutputI2S       audioOutput;        // audio shield: headphones & line-out
 
 AudioConnection c1(audioInput,0,peak_L,0);
