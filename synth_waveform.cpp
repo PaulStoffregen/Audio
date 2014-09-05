@@ -34,22 +34,6 @@
 //				faster than arm's sin function
 // PAH 140316 - fix calculation of sample (amplitude error)
 // PAH 140314 - change t_hi from int to float
-// PAH - add ramp-up and ramp-down to the onset of the wave
-// the length is specified in samples
-
-void AudioSynthWaveform::set_ramp_length(int16_t r_length)
-{
-  if(r_length < 0) {
-    ramp_length = 0;
-    return;
-  }
-  // Don't set the ramp length longer than about 4 milliseconds
-  if(r_length > 44*4) {
-    ramp_length = 44*4;
-    return;
-  }
-  ramp_length = r_length;
-}
 
 
 boolean AudioSynthWaveform::begin(float t_amp,float t_hi,short type)
@@ -75,13 +59,10 @@ boolean AudioSynthWaveform::begin(float t_amp,float t_hi,short type)
   return(true);
 }
 
-// PAH - 140313 fixed a problem with ramping
 void AudioSynthWaveform::update(void)
 {
   audio_block_t *block;
   short *bp;
-  // temporary for ramp in sine
-  uint32_t ramp_mag;
   int32_t val1, val2, val3;
   uint32_t index, scale;
   
@@ -90,7 +71,6 @@ void AudioSynthWaveform::update(void)
   short tmp_amp;
   
   if(tone_freq == 0)return;
-  //          L E F T  C H A N N E L  O N L Y
   block = allocate();
   if(block) {
     bp = block->data;
@@ -105,37 +85,7 @@ void AudioSynthWaveform::update(void)
 		val2 *= scale;
 		val1 *= 0xFFFF - scale;
 		val3 = (val1 + val2) >> 16;
-        // The value of ramp_up is always initialized to RAMP_LENGTH and then is
-        // decremented each time through here until it reaches zero.
-        // The value of ramp_up is used to generate a Q15 fraction which varies
-        // from [0 - 1), and multiplies this by the current sample
-        if(ramp_up) {
-          // ramp up to the new magnitude
-          // ramp_mag is the Q15 representation of the fraction
-          // Since ramp_up can't be zero, this cannot generate +1
-          ramp_mag = ((ramp_length-ramp_up)<<15)/ramp_length;
-          ramp_up--;
-          // adjust tone_phase to Q15 format and then adjust the result
-          // of the multiplication
-      	  // calculate the sample
-          tmp_amp = (short)((val3 * tone_amp) >> 15);
-          *bp++ = (tmp_amp * ramp_mag)>>15;
-        } 
-        else if(ramp_down) {
-          // ramp down to zero from the last magnitude
-          // The value of ramp_down is always initialized to RAMP_LENGTH and then is
-          // decremented each time through here until it reaches zero.
-          // The value of ramp_down is used to generate a Q15 fraction which varies
-          // from [0 - 1), and multiplies this by the current sample
-          // avoid RAMP_LENGTH/RAMP_LENGTH because Q15 format
-          // cannot represent +1
-          ramp_mag = ((ramp_down - 1)<<15)/ramp_length;
-          ramp_down--;
-		  tmp_amp = (short)((val3 * last_tone_amp) >> 15);
-          *bp++ = (tmp_amp * ramp_mag)>>15;
-        } else {
-		  *bp++ = (short)((val3 * tone_amp) >> 15);
-        } 
+		*bp++ = (short)((val3 * tone_amp) >> 15);
         
         // phase and incr are both unsigned 32-bit fractions
         tone_phase += tone_incr;

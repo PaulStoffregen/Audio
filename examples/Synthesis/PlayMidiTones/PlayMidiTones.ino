@@ -65,20 +65,12 @@ void setup()
   // I want output on the line out too
   codec.unmuteLineout();
 
-// Comment out this code to hear what it sounds like
-// when the tones aren't ramped. (or change 88 to 0)
-  // Set the ramp time for each wave
-  for(int i = 0; i < 8;i++) {
-    waves[i]->set_ramp_length(88);
-  }
-
-  
   delay(200);
   Serial.println("Begin PlayMidiTones");
   delay(50);
   Serial.println("setup done");
-AudioProcessorUsageMaxReset();
-AudioMemoryUsageMaxReset();
+  AudioProcessorUsageMaxReset();
+  AudioMemoryUsageMaxReset();
 }
 
 unsigned long last_time = millis();

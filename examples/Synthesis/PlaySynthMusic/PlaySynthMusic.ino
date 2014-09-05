@@ -99,11 +99,6 @@ void setup()
   // Comment this if you don't it
   codec.unmuteLineout();
 
-  // Set the ramp time for each wave object
-  for(int i = 0; i < 8;i++) {
-    waves[i]->set_ramp_length(88);
-  }
-
   Serial.println("setup done");
   
   // Initialize processor and memory measurements
