@@ -27,6 +27,10 @@
 #ifndef Audio_h_
 #define Audio_h_
 
+#if TEENSYDUINO < 120
+#error "Teensyduino version 1.20 or later is required to compile the Audio library"
+#endif
+
 // When changing multiple audio object settings that must update at
 // the same time, these functions allow the audio library interrupt
 // to be disabled.  For example, you may wish to begin playing a note
