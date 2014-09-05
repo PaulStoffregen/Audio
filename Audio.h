@@ -45,7 +45,6 @@
 #define AudioNoInterrupts() (NVIC_DISABLE_IRQ(IRQ_SOFTWARE))
 #define AudioInterrupts()   (NVIC_ENABLE_IRQ(IRQ_SOFTWARE))
 
-
 // include all the library headers, so a sketch can use a single
 // #include <Audio.h> to get the whole library
 //
@@ -81,11 +80,8 @@
 #include "synth_dc.h"
 #include "synth_whitenoise.h"
 #include "synth_pinknoise.h"
-#include "multiplier.h"
 
 // TODO: more audio processing objects....
-//  sine wave with frequency modulation (phase)
 //  waveforms with bandwidth limited tables for synth
-//  envelope: attack-decay-sustain-release, maybe other more complex?
 
 #endif
