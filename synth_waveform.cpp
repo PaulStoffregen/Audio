@@ -36,33 +36,10 @@
 // PAH 140314 - change t_hi from int to float
 
 
-boolean AudioSynthWaveform::begin(float t_amp,float t_hi,short type)
-{
-  tone_type = type;
-  amplitude(t_amp);
-  tone_freq = t_hi > 0.0;
-  if(t_hi <= 0.0)return false;
-  if(t_hi >= AUDIO_SAMPLE_RATE_EXACT/2)return false;
-  tone_phase = 0;
-  frequency(t_hi);
-  if(0) {
-    Serial.print("AudioSynthWaveform.begin(tone_amp = ");
-    Serial.print(t_amp);
-    Serial.print(", tone_hi = ");
-    Serial.print(t_hi);
-    Serial.print(", tone_incr = ");
-    Serial.print(tone_incr,HEX);
-    //  Serial.print(", tone_hi = ");
-    //  Serial.print(t_hi);
-    Serial.println(")");
-  }
-  return(true);
-}
-
 void AudioSynthWaveform::update(void)
 {
   audio_block_t *block;
-  short *bp;
+  short *bp, *end;
   int32_t val1, val2, val3;
   uint32_t index, scale;
   
@@ -70,12 +47,12 @@ void AudioSynthWaveform::update(void)
   uint32_t mag;
   short tmp_amp;
   
-  if(tone_freq == 0)return;
+  if(tone_amp == 0) return;
   block = allocate();
-  if(block) {
+  if (block) {
     bp = block->data;
     switch(tone_type) {
-    case TONE_TYPE_SINE:
+    case WAVEFORM_SINE:
       for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
       	// Calculate interpolated sin
 		index = tone_phase >> 23;
@@ -93,8 +70,28 @@ void AudioSynthWaveform::update(void)
         if(tone_phase & 0x80000000)tone_phase &= 0x7fffffff;
       }
       break;
+
+    case WAVEFORM_ARBITRARY:
+      if (!arbdata) {
+		release(block);
+		return;
+      }
+      // len = 256
+      for (int i = 0; i < AUDIO_BLOCK_SAMPLES;i++) {
+		index = tone_phase >> 23;
+		val1 = *(arbdata + index);
+		val2 = *(arbdata + ((index + 1) & 255));
+		scale = (tone_phase >> 7) & 0xFFFF;
+		val2 *= scale;
+		val1 *= 0xFFFF - scale;
+		val3 = (val1 + val2) >> 16;
+		*bp++ = (short)((val3 * tone_amp) >> 15);
+		tone_phase += tone_incr;
+		tone_phase &= 0x7fffffff;
+      }
+      break;
       
-    case TONE_TYPE_SQUARE:
+    case WAVEFORM_SQUARE:
       for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
         if(tone_phase & 0x40000000)*bp++ = -tone_amp;
         else *bp++ = tone_amp;
@@ -103,7 +100,7 @@ void AudioSynthWaveform::update(void)
       }
       break;
       
-    case TONE_TYPE_SAWTOOTH:
+    case WAVEFORM_SAWTOOTH:
       for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
         *bp++ = ((short)(tone_phase>>15)*tone_amp) >> 15;
         // phase and incr are both unsigned 32-bit fractions
@@ -111,7 +108,7 @@ void AudioSynthWaveform::update(void)
       }
       break;
 
-    case TONE_TYPE_TRIANGLE:
+    case WAVEFORM_TRIANGLE:
       for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
         if(tone_phase & 0x80000000) {
           // negative half-cycle
@@ -132,7 +129,14 @@ void AudioSynthWaveform::update(void)
       }
       break;
     }
-    // send the samples to the left channel
+    if (tone_offset) {
+	bp = block->data;
+	end = bp + AUDIO_BLOCK_SAMPLES;
+	do {
+		val1 = *bp;
+		*bp++ = signed_saturate_rshift(val1 + tone_offset, 16, 0);
+	} while (bp < end);
+    }
     transmit(block,0);
     release(block);
   }

@@ -27,6 +27,9 @@
 #ifndef synth_sine_h_
 #define synth_sine_h_
 
+#include "AudioStream.h"
+#include "arm_math.h"
+
 // TODO: investigate making a high resolution sine wave
 // using Taylor series expansion.
 // http://www.musicdsp.org/showone.php?id=13

@@ -39,6 +39,13 @@ extern const int16_t AudioWaveformSine[257];
 
 #define DELAY_PASSTHRU -1
 
+#define WAVEFORM_SINE      0
+#define WAVEFORM_SAWTOOTH  1
+#define WAVEFORM_SQUARE    2
+#define WAVEFORM_TRIANGLE  3
+#define WAVEFORM_ARBITRARY 4
+
+// todo: remove these...
 #define TONE_TYPE_SINE     0
 #define TONE_TYPE_SAWTOOTH 1
 #define TONE_TYPE_SQUARE   2
@@ -50,24 +57,20 @@ public AudioStream
 public:
   AudioSynthWaveform(void) : 
   AudioStream(0,NULL), 
-  tone_freq(0), tone_phase(0), tone_incr(0), tone_type(0)
+  tone_phase(0), tone_incr(0), tone_type(0),
+  tone_offset(0), arbdata(NULL)
   { 
   }
   
-  void frequency(float t_hi)
-  {
-    if (t_hi > AUDIO_SAMPLE_RATE_EXACT / 2 || t_hi < 0.0) return;
-    tone_incr = ((0x80000000LL*t_hi)/AUDIO_SAMPLE_RATE_EXACT) + 0.5;
+  void frequency(float t_freq) {
+    if (t_freq < 0.0) t_freq = 0.0;
+    else if (t_freq > AUDIO_SAMPLE_RATE_EXACT / 2) t_freq = AUDIO_SAMPLE_RATE_EXACT / 2;
+    tone_incr = (t_freq * (0x80000000LL/AUDIO_SAMPLE_RATE_EXACT)) + 0.5;
   }
-  
   void amplitude(float n) {        // 0 to 1.0
     if (n < 0) n = 0;
     else if (n > 1.0) n = 1.0;
-    // Ramp code
-    if(tone_amp && (n == 0)) {
-      last_tone_amp = tone_amp;
-    }
-    else if((tone_amp == 0) && n) {
+    if ((tone_amp == 0) && n) {
       // reset the phase when the amplitude was zero
       // and has now been increased.
       tone_phase = 0;
@@ -75,19 +78,31 @@ public:
     // set new magnitude
     tone_amp = n * 32767.0;
   }
-  
-  boolean begin(float t_amp,float t_hi,short t_type);
+  void offset(float n) {
+    if (n < -1.0) n = -1.0;
+    else if (n > 1.0) n = 1.0;
+    tone_offset = n * 32767.0;
+  }
+  void begin(short t_type) {
+	tone_phase = 0;
+	tone_type = t_type;
+  }
+  void begin(float t_amp, float t_freq, short t_type) {
+	amplitude(t_amp);
+	frequency(t_freq);
+	begin(t_type);
+  }
   virtual void update(void);
   
 private:
   short    tone_amp;
-  short    last_tone_amp;
   short    tone_freq;
   uint32_t tone_phase;
   // volatile prevents the compiler optimizing out the frequency function
   volatile uint32_t tone_incr;
   short    tone_type;
-
+  int16_t  tone_offset;
+  const int16_t *arbdata;
 };
 
 

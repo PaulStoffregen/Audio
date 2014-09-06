@@ -24,8 +24,7 @@
  * THE SOFTWARE.
  */
 
-#include "Audio.h"
-#include "arm_math.h"
+#include "synth_sine.h"
 #include "utility/dspinst.h"
 
 // data_waveforms.c
