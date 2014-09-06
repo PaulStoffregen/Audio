@@ -47,6 +47,7 @@
 *      by using C99 standard intN_t and uintN_t types for MIDI structures,
 *      and formatting specifications like "PRId32" instead of "ld".
 */
+// Sept 2014 - Add option for velocity output
 
 #define VERSION "1.6"
 
@@ -140,6 +141,8 @@
 *  -kn  Change the musical key of the output by n chromatic notes.
 *       -k-12 goes one octave down, -k12 goes one octave up, etc.
 *
+*  -v   Add velocity information to output
+*
 *
 *  *****  The score bytestream  *****
 *
@@ -207,7 +210,7 @@ struct track_header {
 #define DEFAULT_TONEGENS 6	/* default number of tone generators */
 #define MAX_TRACKS 24		/* max number of MIDI tracks we will process */
 
-bool loggen, logparse, parseonly, strategy1, strategy2, binaryoutput;
+bool loggen, logparse, parseonly, strategy1, strategy2, binaryoutput, velocityoutput;
 FILE *infile, *outfile, *logfile;
 uint8_t *buffer, *hdrptr;
 unsigned long buflen;
@@ -229,7 +232,7 @@ struct tonegen_status {	/* current status of a tone generator */
     int note;		/* what note is playing? */
 }
 tonegen [MAX_TONEGENS] = {
-    0};
+    {0}};
 
 struct track_status {	/* current processing point of a MIDI track */
     uint8_t		 *trkptr;		/* ptr to the next note change */
@@ -239,11 +242,12 @@ struct track_status {	/* current processing point of a MIDI track */
     unsigned int preferred_tonegen;	/* for strategy2: try to use this generator */
     unsigned char cmd;			/* CMD_xxxx  next to do */
     unsigned char note;			/* for which note */
+    unsigned char velocity;
     unsigned char last_event;	/* the last event, for MIDI's "running status" */
     bool tonegens[MAX_TONEGENS];/* which tone generators our notes are playing on */
 }
 track[MAX_TRACKS] = {
-    0};
+    {0}};
 
 
 /* output bytestream commands, which are also stored in track_status.cmd */
@@ -307,6 +311,9 @@ int HandleOptions(int argc,char *argv[]) {
                 break;
             case 'B':
                 binaryoutput = true;
+                break;
+            case 'V':
+                velocityoutput = true;
                 break;
             case 'S':
                 if (argv[i][2] == '1') strategy1 = true;
@@ -402,7 +409,7 @@ size_t strlcpy(char *dst, const char *src, size_t siz)
 
 /* match a constant character sequence */
 
-int charcmp (char *buf, char *match) {
+int charcmp (const char *buf, const char *match) {
     int len, i;
     len = strlen (match);
     for (i=0; i<len; ++i)
@@ -461,7 +468,7 @@ void process_header (void) {
 
     chk_bufdata(hdrptr, sizeof(struct midi_header));
     hdr = (struct midi_header *) hdrptr;
-    if (!charcmp(hdr->MThd,"MThd")) midi_error("Missing 'MThd'", hdrptr);
+    if (!charcmp((char *)(hdr->MThd),"MThd")) midi_error("Missing 'MThd'", hdrptr);
 
     num_tracks = rev_short(hdr->number_of_tracks);
 
@@ -490,7 +497,7 @@ void start_track (int tracknum) {
 
     chk_bufdata(hdrptr, sizeof(struct track_header));
     hdr = (struct track_header *) hdrptr;
-    if (!charcmp(hdr->MTrk,"MTrk")) midi_error("Missing 'MTrk'", hdrptr);
+    if (!charcmp((char *)(hdr->MTrk),"MTrk")) midi_error("Missing 'MTrk'", hdrptr);
 
     tracklen = rev_long(hdr->track_size);
     if (logparse) fprintf (logfile, "\nTrack %d length %ld\n", tracknum, tracklen);
@@ -530,7 +537,7 @@ void find_note (int tracknum) {
     unsigned long int delta_time;
     int event, chan;
     int i;
-    int note, velocity, parm;
+    int note, velocity; // , parm;
     int meta_cmd, meta_length;
     unsigned long int sysex_length;
     struct track_status *t;
@@ -625,6 +632,7 @@ note_off:
                 t->note = *t->trkptr++;
                 velocity = *t->trkptr++;
                 if (velocity == 0)  /* some scores use note-on with zero velocity for off! */	goto note_off;
+                t->velocity = velocity;
                 if (logparse) fprintf (logfile, "note %02X on,  chan %d, velocity %d\n", t->note, chan, velocity);
                 if ((1<<chan) & channel_mask) {  // if we're processing this channel
                     t->cmd = CMD_PLAYNOTE;
@@ -677,7 +685,7 @@ int main(int argc,char *argv[]) {
 #define MAXPATH 120
     char filename[MAXPATH];
 
-    int i;
+    //int i;
     int tracknum;
     int earliest_tracknum;
     unsigned long earliest_time;
@@ -751,7 +759,7 @@ int main(int argc,char *argv[]) {
         }
         if (!binaryoutput) {  /* create header of C file that initializes score data */
             time_t rawtime;
-            struct tm *ptime;
+            //struct tm *ptime;
             time (&rawtime);
             fprintf(outfile, "// Playtune bytestream for file \"%s.mid\" ", filebasename);
             fprintf(outfile, "created by MIDITONES V%s on %s", VERSION, asctime(localtime(&rawtime)));
@@ -760,7 +768,12 @@ int main(int argc,char *argv[]) {
                 fprintf(outfile, "//   Only the masked channels were processed: %04X\n", channel_mask);
             if (keyshift != 0)
                 fprintf(outfile, "//   Keyshift was %d chromatic notes\n", keyshift);
-            fprintf(outfile, "byte PROGMEM score [] = {\n");
+            fprintf(outfile, "#ifdef __AVR__\n");
+            fprintf(outfile, "#include <avr/pgmspace.h>\n");
+            fprintf(outfile, "#else\n");
+            fprintf(outfile, "#define PROGMEM\n");
+            fprintf(outfile, "#endif\n");
+            fprintf(outfile, "const unsigned char PROGMEM score [] = {\n");
         }
     }
 
@@ -919,10 +932,19 @@ int main(int argc,char *argv[]) {
                         putc (CMD_PLAYNOTE | tgnum, outfile);
                         putc (shifted_note, outfile);
                         outfile_bytecount += 2;
+                        if (velocityoutput) {
+                          putc (shifted_note, outfile);
+                          outfile_bytecount++;
+                        }
                     }
                     else {
-                        fprintf (outfile, "0x%02X,%d, ", CMD_PLAYNOTE | tgnum, shifted_note);
-                        outfile_items(2);
+                        if (velocityoutput == 0) {
+                          fprintf (outfile, "0x%02X,%d, ", CMD_PLAYNOTE | tgnum, shifted_note);
+                          outfile_items(2);
+                        } else {
+                          fprintf (outfile, "0x%02X,%d,%d ", CMD_PLAYNOTE | tgnum, shifted_note, trk->velocity);
+                          outfile_items(3);
+                        }
                     }
             }
             else {
