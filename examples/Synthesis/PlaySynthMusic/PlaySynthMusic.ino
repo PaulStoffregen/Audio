@@ -1,77 +1,125 @@
-// Implement the midi player inside the Audio library.
-// This uses the new version of the waveform generator code
-// See PlayMidiTones for code which uses the old version
+// Implement a 16 note polyphonic midi player  :-)
+//
+// Music data is read from memory.  The "Miditones" program is used to
+// convert from a MIDI file to this compact format.
+//
+// This example code is in the public domain.
  
 #include <Audio.h>
 #include <Wire.h>
-//#include <WM8731.h>
 #include <SD.h>
 #include <SPI.h>
-#include "arm_math.h"
 
 #include "PlaySynthMusic.h"
 
 unsigned char *sp = score;
 
-#define AMPLITUDE (0.4)
+#define AMPLITUDE (0.2)
 
-
-// The midi file has more than 8 channels
-// Those above 7 will be mapped to 0, 1 etc.
-AudioSynthWaveform sine0;
-AudioSynthWaveform sine1;
-AudioSynthWaveform sine2;
-AudioSynthWaveform sine3;
-AudioSynthWaveform sine4;
-AudioSynthWaveform sine5;
-AudioSynthWaveform sine6;
-AudioSynthWaveform sine7;
-AudioSynthWaveform *waves[8] = {
-  &sine0,
-  &sine1,
-  &sine2,
-  &sine3,
-  &sine4,
-  &sine5,
-  &sine6,
-  &sine7,
+// Create 16 waveforms, one for each MIDI channel
+AudioSynthWaveform sine0, sine1, sine2, sine3;
+AudioSynthWaveform sine4, sine5, sine6, sine7;
+AudioSynthWaveform sine8, sine9, sine10, sine11;
+AudioSynthWaveform sine12, sine13, sine14, sine15;
+AudioSynthWaveform *waves[16] = {
+  &sine0, &sine1, &sine2, &sine3,
+  &sine4, &sine5, &sine6, &sine7,
+  &sine8, &sine9, &sine10, &sine11,
+  &sine12, &sine13, &sine14, &sine15
 };
 
 // allocate a wave type to each channel.
 // The types used and their order is purely arbitrary.
-short wave_type[8] = {
-  TONE_TYPE_SINE,
-  TONE_TYPE_SQUARE,
-  TONE_TYPE_SAWTOOTH,
-  TONE_TYPE_TRIANGLE,
-  TONE_TYPE_SINE,
-  TONE_TYPE_SQUARE,
-  TONE_TYPE_SAWTOOTH,
-  TONE_TYPE_TRIANGLE,
+short wave_type[16] = {
+  WAVEFORM_SINE,
+  WAVEFORM_SQUARE,
+  WAVEFORM_SAWTOOTH,
+  WAVEFORM_TRIANGLE,
+  WAVEFORM_SINE,
+  WAVEFORM_SQUARE,
+  WAVEFORM_SAWTOOTH,
+  WAVEFORM_TRIANGLE,
+  WAVEFORM_SINE,
+  WAVEFORM_SQUARE,
+  WAVEFORM_SAWTOOTH,
+  WAVEFORM_TRIANGLE,
+  WAVEFORM_SINE,
+  WAVEFORM_SQUARE,
+  WAVEFORM_SAWTOOTH,
+  WAVEFORM_TRIANGLE
 };
 
-// Two mixers are needed to handle the 8 channels of music
-AudioMixer4              mixer1;
-AudioMixer4              mixer2;
-AudioOutputI2S audioOut;
+// Each waveform will be shaped by an envelope
+AudioEffectEnvelope env0, env1, env2, env3;
+AudioEffectEnvelope env4, env5, env6, env7;
+AudioEffectEnvelope env8, env9, env10, env11;
+AudioEffectEnvelope env12, env13, env14, env15;
+AudioEffectEnvelope *envs[16] = {
+  &env0, &env1, &env2, &env3,
+  &env4, &env5, &env6, &env7,
+  &env8, &env9, &env10, &env11,
+  &env12, &env13, &env14, &env15
+};
 
-// Mix the first four channels into mixer1
-AudioConnection c0(sine0, 0, mixer1, 0);
-AudioConnection c1(sine1, 0, mixer1, 1);
-AudioConnection c2(sine2, 0, mixer1, 2);
-AudioConnection c3(sine3, 0, mixer1, 3);
+// Route each waveform through its own envelope effect
+AudioConnection patchCord01(sine0, env0);
+AudioConnection patchCord02(sine1, env1);
+AudioConnection patchCord03(sine2, env2);
+AudioConnection patchCord04(sine3, env3);
+AudioConnection patchCord05(sine4, env4);
+AudioConnection patchCord06(sine5, env5);
+AudioConnection patchCord07(sine6, env6);
+AudioConnection patchCord08(sine7, env7);
+AudioConnection patchCord09(sine8, env8);
+AudioConnection patchCord10(sine9, env9);
+AudioConnection patchCord11(sine10, env10);
+AudioConnection patchCord12(sine11, env11);
+AudioConnection patchCord13(sine12, env12);
+AudioConnection patchCord14(sine13, env13);
+AudioConnection patchCord15(sine14, env14);
+AudioConnection patchCord16(sine15, env15);
 
-// and the last 4 channels into mixer2
-AudioConnection c4(sine4, 0, mixer2, 0);
-AudioConnection c5(sine5, 0, mixer2, 1);
-AudioConnection c6(sine6, 0, mixer2, 2);
-AudioConnection c7(sine7, 0, mixer2, 3);
+// Four mixers are needed to handle 16 channels of music
+AudioMixer4     mixer1;
+AudioMixer4     mixer2;
+AudioMixer4     mixer3;
+AudioMixer4     mixer4;
 
-// Output mixre1 to the left channel and mixer2 to the right
-AudioConnection c11(mixer1, 0, audioOut, 0);
-AudioConnection c12(mixer2, 0, audioOut, 1);
+// Mix the 16 channels down to 4 audio streams
+AudioConnection patchCord17(env0, 0, mixer1, 0);
+AudioConnection patchCord18(env1, 0, mixer1, 1);
+AudioConnection patchCord19(env2, 0, mixer1, 2);
+AudioConnection patchCord20(env3, 0, mixer1, 3);
+AudioConnection patchCord21(env4, 0, mixer2, 0);
+AudioConnection patchCord22(env5, 0, mixer2, 1);
+AudioConnection patchCord23(env6, 0, mixer2, 2);
+AudioConnection patchCord24(env7, 0, mixer2, 3);
+AudioConnection patchCord25(env8, 0, mixer3, 0);
+AudioConnection patchCord26(env9, 0, mixer3, 1);
+AudioConnection patchCord27(env10, 0, mixer3, 2);
+AudioConnection patchCord28(env11, 0, mixer3, 3);
+AudioConnection patchCord29(env12, 0, mixer4, 0);
+AudioConnection patchCord30(env13, 0, mixer4, 1);
+AudioConnection patchCord31(env14, 0, mixer4, 2);
+AudioConnection patchCord32(env15, 0, mixer4, 3);
 
-//AudioControl_WM8731 codec;
+// Now create 2 mixers for the main output
+AudioMixer4     mixerLeft;
+AudioMixer4     mixerRight;
+AudioOutputI2S  audioOut;
+
+// Mix all channels to both the outputs
+AudioConnection patchCord33(mixer1, 0, mixerLeft, 0);
+AudioConnection patchCord34(mixer2, 0, mixerLeft, 1);
+AudioConnection patchCord35(mixer3, 0, mixerLeft, 2);
+AudioConnection patchCord36(mixer4, 0, mixerLeft, 3);
+AudioConnection patchCord37(mixer1, 0, mixerRight, 0);
+AudioConnection patchCord38(mixer2, 0, mixerRight, 1);
+AudioConnection patchCord39(mixer3, 0, mixerRight, 2);
+AudioConnection patchCord40(mixer4, 0, mixerRight, 3);
+AudioConnection patchCord41(mixerLeft, 0, audioOut, 0);
+AudioConnection patchCord42(mixerRight, 0, audioOut, 1);
+
 AudioControlSGTL5000 codec;
 
 // Initial value of the volume control
@@ -80,8 +128,8 @@ int volume = 50;
 void setup()
 {
   Serial.begin(115200);
-  while (!Serial) ;
-  delay(2000);
+  //while (!Serial) ; // wait for Arduino Serial Monitor
+  delay(200);
   
 // http://gcc.gnu.org/onlinedocs/cpp/Standard-Predefined-Macros.html
   Serial.print("Begin ");
@@ -89,15 +137,37 @@ void setup()
   
   // Proc = 12 (13),  Mem = 2 (8)
   // Audio connections require memory to work.
-  // The memory usage code indicates that 8 is the maximum
-  // so give it 10 just to be sure.
-  AudioMemory(10);
+  // The memory usage code indicates that 10 is the maximum
+  // so give it 12 just to be sure.
+  AudioMemory(18);
   
   codec.enable();
-  codec.volume(0.5);
+  codec.volume(0.45);
   // I want output on the line out too
   // Comment this if you don't it
   codec.unmuteLineout();
+
+  // reduce the gain on some channels, so half of the channels
+  // are "positioned" to the left, half to the right, but all
+  // are heard at least partially on both ears
+  mixerLeft.gain(1, 0.36);
+  mixerLeft.gain(3, 0.36);
+  mixerRight.gain(0, 0.36);
+  mixerRight.gain(2, 0.36);
+
+  // set envelope parameters, for pleasing sound :-)
+  for (int i=0; i<16; i++) {
+    envs[i]->attack(9.2);
+    envs[i]->hold(2.1);
+    envs[i]->decay(31.4);
+    envs[i]->sustain(0.6);
+    envs[i]->release(84.5);
+    // uncomment these to hear without envelope effects
+    //envs[i]->attack(0.0);
+    //envs[i]->hold(0.0);
+    //envs[i]->decay(0.0);
+    //envs[i]->release(0.0);
+  }
 
   Serial.println("setup done");
   
@@ -115,10 +185,6 @@ void loop()
   
 // Change this to if(1) for measurement output every 5 seconds
 if(1) {
-/*
-  For PlaySynthMusic this produces:
-  Proc = 20 (21),  Mem = 2 (8)
-*/
   if(millis() - last_time >= 5000) {
     Serial.print("Proc = ");
     Serial.print(AudioProcessorUsage());
@@ -134,18 +200,19 @@ if(1) {
 }
 
   // Volume control
+  //  uncomment if you have a volume pot soldered to your audio shield
+  /*
   int n = analogRead(15);
   if (n != volume) {
     volume = n;
     codec.volume((float)n / 1023);
   }
+  */
   
   // read the next note from the table
   c = *sp++;
-  opcode = c & 0xf0;
-  // was 0x0f but I'm only handling 8 channels
-  // This will map Ch 8->Ch 0, Ch 9->Ch 1, etc.
-  chan = c & 0x07;
+  opcode = c & 0xF0;
+  chan = c & 0x0F;
 
   if(c < 0x80) {
     // Delay
@@ -154,6 +221,10 @@ if(1) {
     return;
   }
   if(*sp == CMD_STOP) {
+    for (chan=0; chan<10; chan++) {
+      envs[chan]->noteOff();
+      waves[chan]->amplitude(0);
+    }
     Serial.println("DONE");
     while(1);
   }
@@ -162,15 +233,17 @@ if(1) {
   
   // Stop the note on 'chan'
   if(opcode == CMD_STOPNOTE) {
-    waves[chan]->amplitude(0);
+    envs[chan]->noteOff();
     return;
   }
   
-  // Play the note on 'chan' - divide the frequency by two because the
-  // table of frequencies has been doubled.
+  // Play the note on 'chan'
   if(opcode == CMD_PLAYNOTE) {
-    waves[chan]->begin(AMPLITUDE,tune_frequencies2_PGM[*sp++],
+    AudioNoInterrupts();
+    waves[chan]->begin(AMPLITUDE, tune_frequencies2_PGM[*sp++],
                         wave_type[chan]);
+    envs[chan]->noteOn();
+    AudioInterrupts();
     return;
   }
 
