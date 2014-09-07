@@ -669,13 +669,21 @@
 		<tr class=odd><td align=center>Out 0</td><td>Sine Wave Output</td></tr>
 	</table>
 	<h3>Functions</h3>
+	<p class=func><span class=keyword>amplitude</span>(level);</p>
+	<p class=desc>Set the amplitude, from 0 to 1.0.
+	</p>
 	<p class=func><span class=keyword>frequency</span>(freq);</p>
 	<p class=desc>Set the frequency, from 0 to 22000.  Very low values may
 		be used to create a LFO (Low Frequency Oscillator) for objects
 		with modulation signal inputs.
 	</p>
-	<p class=func><span class=keyword>amplitude</span>(level);</p>
-	<p class=desc>Set the amplitude, from 0 to 1.0.
+	<p class=func><span class=keyword>phase</span>(angle);</p>
+	<p class=desc>
+		Cause the generated waveform to jump to a specific point within
+		its cycle.  Angle is from 0 to 360 degrees.  When multiple objects
+		are configured,
+		<a href="http://www.pjrc.com/teensy/td_libs_AudioProcessorUsage.html" target="_blank">AudioNoInterrupts()</a>
+		should be used to guarantee all new settings take effect together.
 	</p>
 	<h3>Notes</h3>
 	<p></p>
@@ -710,6 +718,9 @@
 		<tr class=odd><td align=center>Out 0</td><td>Sine Wave Output</td></tr>
 	</table>
 	<h3>Functions</h3>
+	<p class=func><span class=keyword>amplitude</span>(level);</p>
+	<p class=desc>Set the amplitude, from 0 to 1.0.
+	</p>
 	<p class=func><span class=keyword>frequency</span>(freq);</p>
 	<p class=desc>Set the center frequency, from 0 to 11000.  The output will
 		be this center frequency when the input modulation signal is zero.
@@ -717,8 +728,13 @@
 		causes zero Hz (DC) output.  For less modulation, attenuate the input
 		signal (perhaps with a mixer object) before it arrives here.
 	</p>
-	<p class=func><span class=keyword>amplitude</span>(level);</p>
-	<p class=desc>Set the amplitude, from 0 to 1.0.
+	<p class=func><span class=keyword>phase</span>(angle);</p>
+	<p class=desc>
+		Cause the generated waveform to jump to a specific point within
+		its cycle.  Angle is from 0 to 360 degrees.  When multiple objects
+		are configured,
+		<a href="http://www.pjrc.com/teensy/td_libs_AudioProcessorUsage.html" target="_blank">AudioNoInterrupts()</a>
+		should be used to guarantee all new settings take effect together.
 	</p>
 	<h3>Notes</h3>
 	<p></p>
@@ -751,21 +767,43 @@
 		<tr class=odd><td align=center>Out 0</td><td>Waveform Output</td></tr>
 	</table>
 	<h3>Functions</h3>
+	<p class=func><span class=keyword>begin</span>(waveform);</p>
+	<p class=desc>Configure the waveform type to create.
+	</p>
 	<p class=func><span class=keyword>begin</span>(level, frequency, waveform);</p>
-	<p class=desc>Output a waveform.
+	<p class=desc>Output a waveform, and set the amplitude and frequency.
 	</p>
 	<p class=func><span class=keyword>frequency</span>(freq);</p>
 	<p class=desc>Change the frequency.
 	</p>
 	<p class=func><span class=keyword>amplitude</span>(level);</p>
 	<p class=desc>Change the amplitude.  Set to 0 to turn the signal off.
+	</p>
+	<p class=func><span class=keyword>phase</span>(angle);</p>
+	<p class=desc>
+		Cause the generated waveform to jump to a specific point within
+		its cycle.  Angle is from 0 to 360 degrees.  When multiple objects
+		are configured,
+		<a href="http://www.pjrc.com/teensy/td_libs_AudioProcessorUsage.html" target="_blank">AudioNoInterrupts()</a>
+		should be used to guarantee all new settings take effect together.
+	</p>
+	<p class=func><span class=keyword>arbitraryWaveform</span>(array, maxFreq);</p>
+	<p class=desc>
+		Configure the waveform to be used with WAVEFORM_ARBITRARY.  Array
+		must be an array of 256 samples.  Currently, the data is used
+		without any filtering, which can cause aliasing with frequencies
+		above 172 Hz.  For higher frequency output, you must bandwidth
+		limit your waveform data.  Someday, "maxFreq" will be used to
+		do this automatically.
+	</p>
 	<h3>Notes</h3>
 	<p>Supported Waveforms:<br>
 		<ul>
-		<li><span class=literal>TONE_TYPE_SINE</span></li>
-		<li><span class=literal>TONE_TYPE_SAWTOOTH</span></li>
-		<li><span class=literal>TONE_TYPE_SQUARE</span></li>
-		<li><span class=literal>TONE_TYPE_TRIANGLE</span></li>
+		<li><span class=literal>WAVEFORM_SINE</span></li>
+		<li><span class=literal>WAVEFORM_SAWTOOTH</span></li>
+		<li><span class=literal>WAVEFORM_SQUARE</span></li>
+		<li><span class=literal>WAVEFORM_TRIANGLE</span></li>
+		<li><span class=literal>WAVEFORM_ARBITRARY</span></li>
 		</ul>
 	</p>
 </script>

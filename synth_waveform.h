@@ -100,6 +100,9 @@ public:
 	frequency(t_freq);
 	begin(t_type);
   }
+  void arbitraryWaveform(const int16_t *data, float maxFreq) {
+	arbdata = data;
+  }
   virtual void update(void);
   
 private:
