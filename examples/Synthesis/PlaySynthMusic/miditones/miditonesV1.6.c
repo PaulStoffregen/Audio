@@ -942,7 +942,7 @@ int main(int argc,char *argv[]) {
                           fprintf (outfile, "0x%02X,%d, ", CMD_PLAYNOTE | tgnum, shifted_note);
                           outfile_items(2);
                         } else {
-                          fprintf (outfile, "0x%02X,%d,%d ", CMD_PLAYNOTE | tgnum, shifted_note, trk->velocity);
+                          fprintf (outfile, "0x%02X,%d,%d, ", CMD_PLAYNOTE | tgnum, shifted_note, trk->velocity);
                           outfile_items(3);
                         }
                     }

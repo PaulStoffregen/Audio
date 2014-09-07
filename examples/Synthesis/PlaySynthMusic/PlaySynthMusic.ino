@@ -239,9 +239,12 @@ if(1) {
   
   // Play the note on 'chan'
   if(opcode == CMD_PLAYNOTE) {
+    unsigned char note = *sp++;
+    unsigned char velocity = *sp++;
     AudioNoInterrupts();
-    waves[chan]->begin(AMPLITUDE, tune_frequencies2_PGM[*sp++],
-                        wave_type[chan]);
+    waves[chan]->begin(AMPLITUDE * velocity2amplitude[velocity-1],
+                       tune_frequencies2_PGM[note],
+                       wave_type[chan]);
     envs[chan]->noteOn();
     AudioInterrupts();
     return;
