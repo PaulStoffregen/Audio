@@ -67,6 +67,14 @@ public:
     else if (t_freq > AUDIO_SAMPLE_RATE_EXACT / 2) t_freq = AUDIO_SAMPLE_RATE_EXACT / 2;
     tone_incr = (t_freq * (0x80000000LL/AUDIO_SAMPLE_RATE_EXACT)) + 0.5;
   }
+  void phase(float angle) {
+    if (angle < 0.0) angle = 0.0;
+    else if (angle > 360.0) {
+      angle = angle - 360.0;
+      if (angle >= 360.0) return;
+    }
+    tone_phase = angle * (2147483648.0 / 360.0);
+  }
   void amplitude(float n) {        // 0 to 1.0
     if (n < 0) n = 0;
     else if (n > 1.0) n = 1.0;

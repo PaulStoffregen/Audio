@@ -43,6 +43,7 @@ stop	KEYWORD2
 play	KEYWORD2
 updateCoefs	KEYWORD2
 frequency	KEYWORD2
+phase	KEYWORD2
 amplitude	KEYWORD2
 offset	KEYWORD2
 resonance	KEYWORD2

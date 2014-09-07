@@ -33,12 +33,6 @@ extern const int16_t AudioWaveformSine[257];
 }
 
 
-void AudioSynthWaveformSine::frequency(float f)
-{
-	if (f > AUDIO_SAMPLE_RATE_EXACT / 2 || f < 0.0) return;
-	phase_increment = (f / AUDIO_SAMPLE_RATE_EXACT) * 4294967296.0f;
-}
-
 void AudioSynthWaveformSine::update(void)
 {
 	audio_block_t *block;
@@ -47,7 +41,7 @@ void AudioSynthWaveformSine::update(void)
 
 	block = allocate();
 	if (block) {
-		ph = phase;
+		ph = phase_accumulator;
 		inc = phase_increment;
 		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
 			index = ph >> 24;
@@ -60,25 +54,14 @@ void AudioSynthWaveformSine::update(void)
 			block->data[i] = multiply_32x32_rshift32(val1 + val2, magnitude);
 			ph += inc;
 		}
-		phase = ph;
+		phase_accumulator = ph;
 		transmit(block);
 		release(block);
 		return;
 	}
-	phase += phase_increment * AUDIO_BLOCK_SAMPLES;
+	phase_accumulator += phase_increment * AUDIO_BLOCK_SAMPLES;
 }
 
-
-
-
-void AudioSynthWaveformSineModulated::frequency(float f)
-{
-	// maximum unmodulated carrier frequency is 11025 Hz
-	// input = +1.0 doubles carrier
-	// input = -1.0 DC output
-	if (f >= AUDIO_SAMPLE_RATE_EXACT / 4 || f < 0.0) return;
-	phase_increment = (f / AUDIO_SAMPLE_RATE_EXACT) * 4294967296.0f;
-}
 
 void AudioSynthWaveformSineModulated::update(void)
 {
@@ -88,7 +71,7 @@ void AudioSynthWaveformSineModulated::update(void)
 	int16_t mod;
 
 	modinput = receiveReadOnly();
-	ph = phase;
+	ph = phase_accumulator;
 	inc = phase_increment;
 	block = allocate();
 	if (!block) {
@@ -103,7 +86,7 @@ void AudioSynthWaveformSineModulated::update(void)
 		} else {
 			ph += phase_increment * AUDIO_BLOCK_SAMPLES;
 		}
-		phase = ph;
+		phase_accumulator = ph;
 		return;
 	}
 	if (modinput) {
@@ -124,7 +107,7 @@ void AudioSynthWaveformSineModulated::update(void)
 		}
 		release(modinput);
 	} else {
-		ph = phase;
+		ph = phase_accumulator;
 		inc = phase_increment;
 		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
 			index = ph >> 24;
@@ -137,12 +120,9 @@ void AudioSynthWaveformSineModulated::update(void)
 			ph += inc;
 		}
 	}
-	phase = ph;
+	phase_accumulator = ph;
 	transmit(block);
 	release(block);
 }
-
-
-
 
 
