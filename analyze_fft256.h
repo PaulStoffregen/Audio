@@ -28,6 +28,7 @@
 #define analyze_fft256_h_
 
 #include "AudioStream.h"
+#include "arm_math.h"
 
 // windows.c
 extern "C" {
@@ -47,10 +48,11 @@ extern const int16_t AudioWindowTukey256[];
 class AudioAnalyzeFFT256 : public AudioStream
 {
 public:
-	AudioAnalyzeFFT256(uint8_t navg = 8, const int16_t *win = AudioWindowHanning256)
-	  : AudioStream(1, inputQueueArray), window(win), 
-	    prevblock(NULL), count(0), naverage(navg), outputflag(false) { init(); }
-
+	AudioAnalyzeFFT256() : AudioStream(1, inputQueueArray),
+	  window(AudioWindowHanning256), prevblock(NULL), count(0),
+	  naverage(8), outputflag(false) {
+		arm_cfft_radix4_init_q15(&fft_inst, 256, 0, 1);
+	}
 	bool available() {
 		if (outputflag == true) {
 			outputflag = false;
@@ -58,11 +60,34 @@ public:
 		}
 		return false;
 	}
+	float read(unsigned int binNumber) {
+		if (binNumber > 127) return 0.0;
+		return (float)(output[binNumber]) * (1.0 / 16384.0);
+	}
+	float read(unsigned int binFirst, unsigned int binLast) {
+		if (binFirst > binLast) {
+			unsigned int tmp = binLast;
+			binLast = binFirst;
+			binFirst = tmp;
+		}
+		if (binFirst > 127) return 0.0;
+		if (binLast > 127) binLast = 127;
+		uint32_t sum = 0;
+		do {
+			sum += output[binFirst++];
+		} while (binFirst < binLast);
+		return (float)sum * (1.0 / 16384.0);
+	}
+	void averageTogether(uint8_t n) {
+		if (n == 0) n == 1;
+		naverage = n;
+	}
+	void windowFunction(const int16_t *w) {
+		window = w;
+	}
 	virtual void update(void);
-	//uint32_t cycles;
 	uint16_t output[128] __attribute__ ((aligned (4)));
 private:
-	void init(void);
 	const int16_t *window;
 	audio_block_t *prevblock;
 	int16_t buffer[512] __attribute__ ((aligned (4)));
@@ -71,6 +96,7 @@ private:
 	uint8_t naverage;
 	bool outputflag;
 	audio_block_t *inputQueueArray[1];
+	arm_cfft_radix4_instance_q15 fft_inst;
 };
 
 #endif

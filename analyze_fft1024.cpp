@@ -27,18 +27,7 @@
 #include "analyze_fft1024.h"
 #include "sqrt_integer.h"
 #include "utility/dspinst.h"
-#include "arm_math.h"
 
-// TODO: this should be a class member, so more than one FFT can be used
-static arm_cfft_radix4_instance_q15 fft_inst;
-
-void AudioAnalyzeFFT1024::init(void)
-{
-	// TODO: replace this with static const version
-	arm_cfft_radix4_init_q15(&fft_inst, 1024, 0, 1);
-	//state = 0;
-	//outputflag = false;
-}
 
 // 140312 - PAH - slightly faster copy
 static void copy_to_fft_buffer(void *destination, const void *source)
@@ -133,32 +122,6 @@ void AudioAnalyzeFFT1024::update(void)
 		state = 4;
 		break;
 	}
-/*
-	copy_to_fft_buffer(buffer, prevblock->data);
-	copy_to_fft_buffer(buffer+256, block->data);
-	if (window) apply_window_to_fft_buffer(buffer, window);
-	arm_cfft_radix4_q15(&fft_inst, buffer);
-	if (count == 0) {
-		for (int i=0; i < 128; i++) {
-			uint32_t tmp = *((uint32_t *)buffer + i);
-			uint32_t magsq = multiply_16tx16t_add_16bx16b(tmp, tmp);
-			sum[i] = magsq / naverage;
-		}
-	} else {
-		for (int i=0; i < 128; i++) {
-			uint32_t tmp = *((uint32_t *)buffer + i);
-			uint32_t magsq = multiply_16tx16t_add_16bx16b(tmp, tmp);
-			sum[i] += magsq / naverage;
-		}
-	}
-	if (++count == naverage) {
-		count = 0;
-		for (int i=0; i < 128; i++) {
-			output[i] = sqrt_uint32_approx(sum[i]);
-		}
-		outputflag = true;
-	}
-*/
 }
 
 

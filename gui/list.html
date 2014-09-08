@@ -1512,23 +1512,35 @@
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
 		<tr class=odd><td align=center>In 0</td><td>Signal to convert to frequency bins</td></tr>
 	</table>
-	<h3>Parameters</h3>
-	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
-		<tr class=odd><td align=center>Num</td><td>Integer</td><td># FFTs to average</td></tr>
-		<tr class=odd><td align=center>Window</td><td>Array</td><td>Window method to use</td></tr>
-	</table>
-	<p>Extra description...  Section only present if object has params</p>
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>available</span>();</p>
 	<p class=desc>Returns true each time the FFT analysis produces new output data.
 	</p>
+	<p class=func><span class=keyword>read</span>(binNumber);</p>
+	<p class=desc>Read a single frequency bin, from 0 to 127.  The result is scaled
+		so 1.0 represents a full scale sine wave.
+	</p>
+	<p class=func><span class=keyword>read</span>(firstBin, lastBin);</p>
+	<p class=desc>Read several frequency bins, returning their sum.  The higher
+		audio octaves are represented by many bins, which are typically read
+		as a group for audio visualization.
+	</p>
+	<p class=func><span class=keyword>averageTogether</span>(number);</p>
+	<p class=desc>New data is produced very radidly, approximately 344 times
+		per second.  Multiple outputs can be averaged together, so available()
+		returns true at a slower rate.
+	</p>
+	<p class=func><span class=keyword>windowFunction</span>(window);</p>
+	<p class=desc>Set the window function to be used.  AudioWindowHanning256
+		is the default.  Windowing may be disabled by NULL, but windowing
+		should be used for all non-periodic (music) signals, and all periodic
+		signals that are not exact integer division of the sample rate.
+	</p>
+
 	<h3>Notes</h3>
 	<p>The raw 16 bit output data bins may be access with myFFT.output[num], where
 		num is 0 to 127.</p>
 	<p>TODO: caveats about spectral leakage vs frequency precision for arbitrary signals</p>
-	<p>Known bug in the library limits to only a single instance of this object.
-		This bug will be fixed someday... allowing 2 or more FFTs to run on simultaneously.</p>
 	<p>Window Types:
 		<ul>
 		<li><span class=literal>AudioWindowHanning256</span> (default)</li>
@@ -1574,24 +1586,34 @@
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
 		<tr class=odd><td align=center>In 0</td><td>Signal to convert to frequency bins</td></tr>
 	</table>
-	<h3>Parameters</h3>
-	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
-		<tr class=odd><td align=center>Num</td><td>Integer</td><td># FFTs to average</td></tr>
-		<tr class=odd><td align=center>Window</td><td>Array</td><td>Window method to use</td></tr>
-	</table>
-	<p>Extra description...  Section only present if object has params</p>
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>available</span>();</p>
 	<p class=desc>Returns true each time the FFT analysis produces new output data.
+	</p>
+	<p class=func><span class=keyword>read</span>(binNumber);</p>
+	<p class=desc>Read a single frequency bin, from 0 to 511.  The result is scaled
+		so 1.0 represents a full scale sine wave.
+	</p>
+	<p class=func><span class=keyword>read</span>(firstBin, lastBin);</p>
+	<p class=desc>Read several frequency bins, returning their sum.  The higher
+		audio octaves are represented by many bins, which are typically read
+		as a group for audio visualization.
+	</p>
+	<p class=func><span class=keyword>averageTogether</span>(number);</p>
+	<p class=desc>This function does nothing.  The 1024 point FFT always
+		updates at approximately 86 times per second.
+	</p>
+	<p class=func><span class=keyword>windowFunction</span>(window);</p>
+	<p class=desc>Set the window function to be used.  AudioWindowHanning1024
+		is the default.  Windowing may be disabled by NULL, but windowing
+		should be used for all non-periodic (music) signals, and all periodic
+		signals that are not exact integer division of the sample rate.
 	</p>
 	<h3>Notes</h3>
 	<p>1024 point FFT uses approx 50% of the CPU power on Teensy 3.1</p>
 	<p>The raw 16 bit output data bins may be access with myFFT.output[num], where
 		num is 0 to 511.</p>
 	<p>TODO: caveats about spectral leakage vs frequency precision for arbitrary signals</p>
-	<p>Known bug in the library limits to only a single instance of this object.
-		This bug will be fixed someday... but 2 instances may not run due to CPU limitation</p>
 	<p>Window Types:
 		<ul>
 		<li><span class=literal>AudioWindowHanning1024</span> (default)</li>

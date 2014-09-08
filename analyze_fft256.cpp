@@ -27,18 +27,7 @@
 #include "analyze_fft256.h"
 #include "sqrt_integer.h"
 #include "utility/dspinst.h"
-#include "arm_math.h"
 
-// TODO: this should be a class member, so more than one FFT can be used
-static arm_cfft_radix4_instance_q15 fft_inst;
-
-void AudioAnalyzeFFT256::init(void)
-{
-	// TODO: replace this with static const version
-	arm_cfft_radix4_init_q15(&fft_inst, 256, 0, 1);
-	//state = 0;
-	//outputflag = false;
-}
 
 // 140312 - PAH - slightly faster copy
 static void copy_to_fft_buffer(void *destination, const void *source)
