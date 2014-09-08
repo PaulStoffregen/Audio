@@ -1610,14 +1610,27 @@
 		signals that are not exact integer division of the sample rate.
 	</p>
 	<h3>Notes</h3>
-	<p>1024 point FFT uses approx 50% of the CPU power on Teensy 3.1</p>
 	<p>The raw 16 bit output data bins may be access with myFFT.output[num], where
 		num is 0 to 511.</p>
 	<p>TODO: caveats about spectral leakage vs frequency precision for arbitrary signals</p>
 	<p>Window Types:
 		<ul>
 		<li><span class=literal>AudioWindowHanning1024</span> (default)</li>
+		<li><span class=literal>AudioWindowBartlett1024</span></li>
+		<li><span class=literal>AudioWindowBlackman1024</span></li>
+		<li><span class=literal>AudioWindowFlattop1024</span></li>
+		<li><span class=literal>AudioWindowBlackmanHarris1024</span></li>
+		<li><span class=literal>AudioWindowNuttall1024</span></li>
+		<li><span class=literal>AudioWindowBlackmanNuttall1024</span></li>
+		<li><span class=literal>AudioWindowWelch1024</span></li>
+		<li><span class=literal>AudioWindowHamming1024</span></li>
+		<li><span class=literal>AudioWindowCosine1024</span></li>
+		<li><span class=literal>AudioWindowTukey1024</span></li>
 		</ul>
+	</p>
+	<p>1024 point FFT has a peak CPU usage of approx 50% on Teensy 3.1.
+		Average usage is much lower.  Future versions might distribute the
+		load more evenly over time....
 	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioAnalyzeFFT1024">

@@ -48,6 +48,8 @@ amplitude	KEYWORD2
 offset	KEYWORD2
 resonance	KEYWORD2
 octaveControl	KEYWORD2
+averageTogether	KEYWORD2
+windowFunction	KEYWORD2
 modify	KEYWORD2
 output	KEYWORD2
 trigger	KEYWORD2
