@@ -1,7 +1,21 @@
 /*
-Change the chorus code to produce a flange effect
-140219
-  e
+VERSION 2 - use modified library which has been changed to handle
+            one channel instead of two
+            
+Proc = 21 (22),  Mem = 4 (6)
+140529
+  2a
+  - default at startup is to have passthru ON and the button
+    switches the flange effect in.
+  
+
+From: http://www.cs.cf.ac.uk/Dave/CM0268/PDF/10_CM0268_Audio_FX.pdf
+about Comb filter effects
+Effect      Delay range (ms)    Modulation
+Resonator      0 - 20            None
+Flanger        0 - 15            Sinusoidal (approx 1Hz)
+Chorus        25 - 50            None
+Echo            >50              None
 
 FMI:
 The audio board uses the following pins.
@@ -39,18 +53,14 @@ many blocks you provided with AudioMemory().
 #include <SPI.h>
 #include <Bounce.h>
 
-// Number of samples in ONE channel
+// Number of samples in each delay line
 #define FLANGE_DELAY_LENGTH (6*AUDIO_BLOCK_SAMPLES)
-// Allocate the delay line for left and right channels
-// The delayline will hold left and right samples so it
-// should be declared to be twice as long as the desired
-// number of samples in one channel
-#define FLANGE_DELAYLINE (FLANGE_DELAY_LENGTH*2)
-// The delay line for left and right channels
-short delayline[FLANGE_DELAYLINE];
+// Allocate the delay lines for left and right channels
+short l_delayline[FLANGE_DELAY_LENGTH];
+short r_delayline[FLANGE_DELAY_LENGTH];
 
-// If this pin is grounded the effect is turned off,
-// which makes it just pass through the audio
+// Default is to just pass the audio through. Grounding this pin
+// applies the flange effect
 // Don't use any of the pins listed above
 #define PASSTHRU_PIN 1
 
@@ -60,82 +70,21 @@ Bounce b_passthru = Bounce(PASSTHRU_PIN,15);
 const int myInput = AUDIO_INPUT_LINEIN;
 
 AudioInputI2S       audioInput;         // audio shield: mic or line-in
-AudioEffectFlange   myEffect;
+AudioEffectFlange   l_myEffect;
+AudioEffectFlange   r_myEffect;
 AudioOutputI2S      audioOutput;        // audio shield: headphones & line-out
 
 // Create Audio connections between the components
 // Both channels of the audio input go to the flange effect
-AudioConnection c1(audioInput, 0, myEffect, 0);
-AudioConnection c2(audioInput, 1, myEffect, 1);
+AudioConnection c1(audioInput, 0, l_myEffect, 0);
+AudioConnection c2(audioInput, 1, r_myEffect, 0);
 // both channels from the flange effect go to the audio output
-AudioConnection c3(myEffect, 0, audioOutput, 0);
-AudioConnection c4(myEffect, 1, audioOutput, 1);
+AudioConnection c3(l_myEffect, 0, audioOutput, 0);
+AudioConnection c4(r_myEffect, 0, audioOutput, 1);
 
 AudioControlSGTL5000 audioShield;
 
-/* 
-int s_idx = FLANGE_DELAY_LENGTH/2;
-int s_depth = FLANGE_DELAY_LENGTH/16;
-double s_freq = 1;
 
-// <<<<<<<<<<<<<<>>>>>>>>>>>>>>>>
-// 12
-int s_idx = FLANGE_DELAY_LENGTH/2;
-int s_depth = FLANGE_DELAY_LENGTH/8;
-double s_freq = .125;
-// with .125 the ticking is about 1Hz with music
-// but with the noise sample it is a bit slower than that
-// <<<<<<<<<<<<<<>>>>>>>>>>>>>>>>
-*/
-/*
-// <<<<<<<<<<<<<<>>>>>>>>>>>>>>>>
-// 12
-int s_idx = FLANGE_DELAY_LENGTH/2;
-int s_depth = FLANGE_DELAY_LENGTH/12;
-double s_freq = .125;
-// with .125 the ticking is about 1Hz with music
-// but with the noise sample it is a bit slower than that
-// <<<<<<<<<<<<<<>>>>>>>>>>>>>>>>
-*/
-/*
-//12
-int s_idx = 15*FLANGE_DELAY_LENGTH/16;
-int s_depth = 15*FLANGE_DELAY_LENGTH/16;
-double s_freq = 0;
-*/
-/*
-//12
-int s_idx = 2*FLANGE_DELAY_LENGTH/4;
-int s_depth = FLANGE_DELAY_LENGTH/8;
-double s_freq = .0625;
-*/
-
-/*
-//12 - good with Eric Clapton Unplugged
-int s_idx = 3*FLANGE_DELAY_LENGTH/4;
-int s_depth = FLANGE_DELAY_LENGTH/8;
-double s_freq = .0625;
-*/
-
-/*
-// Real flange effect! delay line is 2*
-int s_idx = 2*FLANGE_DELAY_LENGTH/4;
-int s_depth = FLANGE_DELAY_LENGTH/4;
-double s_freq = 2;
-*/
-
-/* 2 - 
-int s_idx = 2*FLANGE_DELAY_LENGTH/4;
-int s_depth = FLANGE_DELAY_LENGTH/8;
-double s_freq = 4;
-*/
-/*
-// 4
-int s_idx = FLANGE_DELAY_LENGTH/4;
-int s_depth = FLANGE_DELAY_LENGTH/4;
-double s_freq = .25;
-*/
-// 4
 int s_idx = FLANGE_DELAY_LENGTH/4;
 int s_depth = FLANGE_DELAY_LENGTH/4;
 double s_freq = .5;
@@ -164,20 +113,25 @@ void setup() {
     Serial.println(") is grounded");
   }
 
-  // Set up the flange effect
-  // - address of delayline
-  // - total number of samples (left AND right) in the delay line
-  // - Index (in samples) into the delay line for the added voice
-  // - Depth of the flange effect
-  // - frequency of the flange effect
-  myEffect.begin(delayline,FLANGE_DELAYLINE,s_idx,s_depth,s_freq);
+  // Set up the flange effect:
+  // address of delayline
+  // total number of samples in the delay line
+  // Index (in samples) into the delay line for the added voice
+  // Depth of the flange effect
+  // frequency of the flange effect
+  l_myEffect.begin(l_delayline,FLANGE_DELAY_LENGTH,s_idx,s_depth,s_freq);
+  r_myEffect.begin(r_delayline,FLANGE_DELAY_LENGTH,s_idx,s_depth,s_freq);
+  // Initially the effect is off. It is switched on when the
+  // PASSTHRU button is pushed.
+  l_myEffect.voices(FLANGE_DELAY_PASSTHRU,0,0);
+  r_myEffect.voices(FLANGE_DELAY_PASSTHRU,0,0);
 
   // I want output on the line out too
   audioShield.unmuteLineout();
   
   Serial.println("setup done");
-AudioProcessorUsageMaxReset();
-AudioMemoryUsageMaxReset();
+  AudioProcessorUsageMaxReset();
+  AudioMemoryUsageMaxReset();
 }
 
 
@@ -210,15 +164,18 @@ if(0) {
   // update the button
   b_passthru.update();
  
-  // If the passthru button is pushed, save the current
+  // If the passthru button is pushed
+  // turn the flange effect on
   // filter index and then switch the effect to passthru
   if(b_passthru.fallingEdge()) {
-    myEffect.modify(DELAY_PASSTHRU,0,0);
+    l_myEffect.voices(s_idx,s_depth,s_freq);
+    r_myEffect.voices(s_idx,s_depth,s_freq);
   }
   
-  // If passthru button is released, restore the effect
+  // If passthru button is released restore passthru
   if(b_passthru.risingEdge()) {
-    myEffect.modify(s_idx,s_depth,s_freq);
+    l_myEffect.voices(FLANGE_DELAY_PASSTHRU,0,0);
+    r_myEffect.voices(FLANGE_DELAY_PASSTHRU,0,0);
   }
 
 }
