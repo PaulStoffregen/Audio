@@ -38,20 +38,18 @@ public AudioStream
 {
 public:
   AudioEffectChorus(void):
-  AudioStream(2,inputQueueArray), num_chorus(2)
+  AudioStream(1,inputQueueArray), num_chorus(2)
   { }
 
   boolean begin(short *delayline,int delay_length,int n_chorus);
   virtual void update(void);
   void stop(void);
-  void modify(int n_chorus);
+  void voices(int n_chorus);
   
 private:
-  audio_block_t *inputQueueArray[2];
+  audio_block_t *inputQueueArray[1];
   short *l_delayline;
-  short *r_delayline;
   short l_circ_idx;
-  short r_circ_idx;
   int num_chorus;
   int delay_length;
 };

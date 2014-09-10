@@ -26,6 +26,7 @@
 
 //                A u d i o E f f e c t C h o r u s
 // Written by Pete (El Supremo) Jan 2014
+// 140529 - change to handle mono stream - change modify() to voices()
 // 140219 - correct storage class (not static)
 
 boolean AudioEffectChorus::begin(short *delayline,int d_length,int n_chorus)
@@ -37,10 +38,8 @@ Serial.print(n_chorus);
 Serial.println(")");
 
   l_delayline = NULL;
-  r_delayline = NULL;
   delay_length = 0;
   l_circ_idx = 0;
-  r_circ_idx = 0;
 
   if(delayline == NULL) {
     return(false);
@@ -53,14 +52,13 @@ Serial.println(")");
   }
   
   l_delayline = delayline;
-  r_delayline = delayline + d_length/2;
   delay_length = d_length/2;
   num_chorus = n_chorus;
  
   return(true);
 }
 
-void AudioEffectChorus::modify(int n_chorus)
+void AudioEffectChorus::voices(int n_chorus)
 {
   num_chorus = n_chorus;
 }
@@ -74,7 +72,6 @@ void AudioEffectChorus::update(void)
   int c_idx;
 
   if(l_delayline == NULL)return;
-  if(r_delayline == NULL)return;  
   
   // do passthru
   // It stores the unmodified data in the delay line so that
@@ -94,20 +91,6 @@ void AudioEffectChorus::update(void)
       transmit(block,0);
       release(block);
     }
-    block = receiveWritable(1);
-    if(block) {
-      bp = block->data;
-      for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
-        r_circ_idx++;
-        if(r_circ_idx >= delay_length) {
-          r_circ_idx = 0;
-        }
-        r_delayline[r_circ_idx] = *bp++;
-      }
-      transmit(block,1);
-      release(block);
-    }
-    return;
   }
 
   //          L E F T  C H A N N E L
@@ -133,36 +116,8 @@ void AudioEffectChorus::update(void)
       *bp++ = sum/num_chorus;
     }
 
-    // send the effect output to the left channel
+    // transmit the block
     transmit(block,0);
-    release(block);
-  }
-
-  //          R I G H T  C H A N N E L
-
-  block = receiveWritable(1);
-  if(block) {
-    bp = block->data;
-    for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
-      r_circ_idx++;
-      if(r_circ_idx >= delay_length) {
-        r_circ_idx = 0;
-      }
-      r_delayline[r_circ_idx] = *bp;
-      sum = 0;
-      c_idx = r_circ_idx;
-      for(int k = 0; k < num_chorus; k++) {
-        sum += r_delayline[c_idx];
-        if(num_chorus > 1)c_idx -= delay_length/(num_chorus - 1) - 1;
-        if(c_idx < 0) {
-          c_idx += delay_length;
-        }
-      }
-      *bp++ = sum/num_chorus;
-    }
-
-    // send the effect output to the left channel
-    transmit(block,1);
     release(block);
   }
 }
