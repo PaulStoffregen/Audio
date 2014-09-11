@@ -32,15 +32,16 @@
 class AudioAnalyzePrint : public AudioStream
 {
 public:
-	AudioAnalyzePrint(const char *str) : AudioStream(1, inputQueueArray),
-	  name(str), state(0), trigger_edge(0), delay_length(0), print_length(500) {}
+	AudioAnalyzePrint(void) : AudioStream(1, inputQueueArray),
+	  myname(NULL), state(0), trigger_edge(0), delay_length(0), print_length(500) {}
 	virtual void update(void);
+	void name(const char *str) { myname = str; }
 	void trigger(void);
 	void trigger(float level, int edge);
 	void delay(uint32_t num) { delay_length = num; }
 	void length(uint32_t num) { print_length = num; }
 private:
-	const char *name;
+	const char *myname;
 	uint8_t state;
 	uint8_t trigger_edge; // trigger type, 0=none, 2=RISING, 3=FALLING
 	int16_t trigger_level;

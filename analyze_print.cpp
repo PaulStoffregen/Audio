@@ -37,7 +37,6 @@ void AudioAnalyzePrint::update(void)
 	uint32_t offset = 0;
 	uint32_t remain, n;
 
-	//Serial.println(name);
 	block = receiveReadOnly();
 	if (!block) return;
 
@@ -86,14 +85,14 @@ void AudioAnalyzePrint::trigger(void)
 
 	if (n > 0) {
 		Serial.print("trigger ");
-		Serial.print(name);
+		if (myname) Serial.print(myname);
 		Serial.print(", delay=");
 		Serial.println(n);
 		count = n;
 		state = 2;
 	} else {
 		Serial.print("trigger ");
-		Serial.println(name);
+		if (myname) Serial.println(myname);
 		count = print_length;
 		state = 3;
 	}
