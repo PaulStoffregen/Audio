@@ -24,41 +24,39 @@
  * THE SOFTWARE.
  */
 
-#include "analyze_peakdetect.h"
+#ifndef analyze_peakdetect_h_
+#define analyze_peakdetect_h_
 
-void AudioAnalyzePeak::update(void)
-{
-	audio_block_t *block;
-	const int16_t *p, *end;
-	block = receiveReadOnly();
-	if (!block) {
-		return;
-	}
-	if (!m_enabled) {
-		release(block);
-		return;
-	}
-	p = block->data;
-	end = p + AUDIO_BLOCK_SAMPLES;
-	do {
-		int16_t d=*p++;
-		if(d<min) min=d;
-		if(d>max) max=d;
-	} while (p < end);
-	release(block);
-}
+#include "AudioStream.h"
 
-void AudioAnalyzePeak::begin(bool noReset)
+class AudioAnalyzePeak : public AudioStream
 {
-	if(!noReset)
-	{
-		min=32767;
-		max=-32767;
+public:
+	AudioAnalyzePeak(void) : AudioStream(1, inputQueueArray) {
+		min_sample = 32767;
+		max_sample = -32768;
 	}
-	m_enabled=true;
-}
-uint16_t AudioAnalyzePeak::Dpp(void)
-{
-	if(max>min) return max-min; else return 0;
-}
+	bool available(void) {
+		__disable_irq();
+		bool flag = new_output;
+		if (flag) new_output = false;
+		__enable_irq();
+		return flag;
+	}
+	float read(void) {
+		__disable_irq();
+		int diff = max_sample - min_sample;
+		min_sample = 32767;
+		max_sample = -32768;
+		__enable_irq();
+		return diff / 65535.0;
+	}
+	virtual void update(void);
+private:
+	audio_block_t *inputQueueArray[1];
+	volatile bool new_output;
+	int16_t min_sample;
+	int16_t max_sample;
+};
 
+#endif

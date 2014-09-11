@@ -24,28 +24,30 @@
  * THE SOFTWARE.
  */
 
-#ifndef analyze_peakdetect_h_
-#define analyze_peakdetect_h_
+#include "analyze_peak.h"
 
-#include "AudioStream.h"
-
-// TODO: this needs to be renamed to AudioAnalyzePeak
-class AudioAnalyzePeak : public AudioStream
+void AudioAnalyzePeak::update(void)
 {
-public:
-	AudioAnalyzePeak(void) : AudioStream(1, inputQueueArray) { }
+	audio_block_t *block;
+	const int16_t *p, *end;
+	int32_t min, max;
 
-	virtual void update(void);
+	block = receiveReadOnly();
+	if (!block) {
+		return;
+	}
+	p = block->data;
+	end = p + AUDIO_BLOCK_SAMPLES;
+	min = min_sample;
+	max = max_sample;
+	do {
+		int16_t d=*p++;
+		if (d<min) min=d;
+		if (d>max) max=d;
+	} while (p < end);
+	min_sample = min;
+	max_sample = max;
+	new_output = true;
+	release(block);
+}
 
-	void begin(bool noReset);
-	void begin(void) { begin(false); }
-	void stop(void) { m_enabled=false; }
-	uint16_t Dpp(void);
-private:
-	audio_block_t *inputQueueArray[1];
-	bool m_enabled;
-	int16_t max;
-	int16_t min;
-};
-
-#endif

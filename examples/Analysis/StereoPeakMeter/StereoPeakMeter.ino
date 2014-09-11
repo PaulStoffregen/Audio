@@ -30,25 +30,35 @@ void setup() {
   audioShield.inputSelect(myInput);
   audioShield.volume(0.75);
   audioShield.unmuteLineout();
-  Serial.begin(Serial.baud());
+  Serial.begin(9600);
 }
+
+// for best effect make your terminal/monitor a minimum of 62 chars wide and as high as you can.
 
 elapsedMillis fps;
 uint8_t cnt=0;
 
 void loop() {
-  
-  if(fps>24) { // for best effect make your terminal/monitor a minimum of 62 chars wide and as high as you can.
-    Serial.println();
-    fps=0;
-    uint8_t leftPeak=peak_L.Dpp()/2184.5321; // 65536 / 2184.5321 ~ 30.
-    for(cnt=0;cnt<30-leftPeak;cnt++) Serial.print(" ");
-    while(cnt++<30) Serial.print("<");
-    Serial.print("||");
-    uint8_t rightPeak=peak_R.Dpp()/2184.5321;
-    for(cnt=0;cnt<rightPeak;cnt++) Serial.print(">");
-    while(cnt++<30) Serial.print(" ");
-    peak_L.begin(); // no need to call .stop if all you want
-    peak_R.begin(); // is to zero it.
+  if(fps > 24) {
+    if (peak_L.available() && peak_R.available()) {
+      fps=0;
+      uint8_t leftPeak=peak_L.read() * 30.0;
+      uint8_t rightPeak=peak_R.read() * 30.0;
+
+      for(cnt=0;cnt<30-leftPeak;cnt++) {
+        Serial.print(" ");
+      }
+      while(cnt++<30) {
+        Serial.print("<");
+      }
+      Serial.print("||");
+      for(cnt=0;cnt<rightPeak;cnt++) {
+        Serial.print(">");
+      }
+      while(cnt++<30) {
+        Serial.print(" ");
+      }
+      Serial.println();
+    }
   }
 }

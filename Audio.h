@@ -55,7 +55,7 @@
 #include "analyze_fft1024.h"
 #include "analyze_print.h"
 #include "analyze_tonedetect.h"
-#include "analyze_peakdetect.h"
+#include "analyze_peak.h"
 #include "control_sgtl5000.h"
 #include "control_wm8731.h"
 #include "effect_chorus.h"
