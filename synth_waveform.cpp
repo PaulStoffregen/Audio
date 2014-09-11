@@ -128,6 +128,15 @@ void AudioSynthWaveform::update(void)
         tone_phase += 2*tone_incr;
       }
       break;
+      
+    case WAVEFORM_PULSE:
+      for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
+        if(tone_phase < tone_width)*bp++ = -tone_amp;
+        else *bp++ = tone_amp;
+        tone_phase += tone_incr;
+      }
+      break;
+      
     }
     if (tone_offset) {
 	bp = block->data;
