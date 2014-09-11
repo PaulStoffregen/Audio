@@ -28,7 +28,10 @@
 #define Audio_h_
 
 #if TEENSYDUINO < 120
-#error "Teensyduino version 1.20 or later is required to compile the Audio library"
+#error "Teensyduino version 1.20 or later is required to compile the Audio library."
+#endif
+#ifdef __AVR__
+#error "The Audio Library only works with Teensy 3.X.  Teensy 2.0 is unsupported."
 #endif
 
 // When changing multiple audio object settings that must update at
@@ -80,8 +83,5 @@
 #include "synth_dc.h"
 #include "synth_whitenoise.h"
 #include "synth_pinknoise.h"
-
-// TODO: more audio processing objects....
-//  waveforms with bandwidth limited tables for synth
 
 #endif

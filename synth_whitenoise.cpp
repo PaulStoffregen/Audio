@@ -78,5 +78,6 @@ void AudioSynthNoiseWhite::update(void)
 	release(block);
 }
 
+uint16_t AudioSynthNoiseWhite::instance_count = 0;
 
 
