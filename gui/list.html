@@ -1462,23 +1462,15 @@
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
-		<tr class=odd><td align=center></td><td></td></tr>
+		<tr class=odd><td align=center>In 0</td><td>Signal to analyze</td></tr>
 	</table>
-	<!--<h3>Parameters</h3>
-	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
-		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
-	</table>
-	<p>Extra description...  Section only present if object has params</p>-->
 	<h3>Functions</h3>
-	<p class=func><span class=keyword>begin</span>(noReset);</p>
-	<p class=desc>blah blah blah blah
+	<p class=func><span class=keyword>available</span>();</p>
+	<p class=desc>Returns true each time new peak data is available.
 	</p>
-	<p class=func><span class=keyword>stop</span>();</p>
-	<p class=desc>blah blah blah blah
-	</p>
-	<p class=func><span class=keyword>Dpp</span>();</p>
-	<p class=desc>blah blah blah blah
+	<p class=func><span class=keyword>read</span>();</p>
+	<p class=desc>Read the highest peak value since the last read.
+		Return is from 0.0 to 1.0.
 	</p>
 	<h3>Notes</h3>
 	<p></p>
@@ -1729,6 +1721,9 @@
 	</table>
 	<p>Extra description...  Section only present if object has params</p>-->
 	<h3>Functions</h3>
+	<p class=func><span class=keyword>name</span>(string);</p>
+	<p class=desc>blah blah blah blah
+	</p>
 	<p class=func><span class=keyword>trigger</span>();</p>
 	<p class=desc>blah blah blah blah
 	</p>
@@ -1782,31 +1777,20 @@
 	<h3>Functions</h3>
 	<p>These are the most commonly used SGTL5000 functions.</p>
 	<p class=func><span class=keyword>enable</span>();</p>
-	<p class=desc>blah blah blah blah
-	</p>
-	<p class=func><span class=keyword>disable</span>();</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Start the SGTL5000.  This function should be called first.
 	</p>
 	<p class=func><span class=keyword>volume</span>(level);</p>
-	<p class=desc>blah blah blah blah
-	</p>
-	<p class=func><span class=keyword>inputLevel</span>(level);</p>
-	<p class=desc>blah blah blah blah
-	</p>
-	<p class=func><span class=keyword>muteHeadphone</span>();</p>
-	<p class=desc>blah blah blah blah
-	</p>
-	<p class=func><span class=keyword>unmuteHeadphone</span>();</p>
-	<p class=desc>blah blah blah blah
-	</p>
-	<p class=func><span class=keyword>muteLineout</span>();</p>
-	<p class=desc>blah blah blah blah
-	</p>
-	<p class=func><span class=keyword>unmuteLineout</span>();</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Set the headphone volume level.  Range is 0 to 1.0, but
+		0.8 corresponds to the maximum undistorted output for a full scale
+		signal.  Usually 0.5 is a comfortable listening level.  The line
+		level outputs are not changed by this function.
 	</p>
 	<p class=func><span class=keyword>inputSelect</span>(input);</p>
-	<p class=desc>AUDIO_INPUT_LINEIN or AUDIO_INPUT_MIC
+	<p class=desc>Select which input to use: AUDIO_INPUT_LINEIN or AUDIO_INPUT_MIC.
+	</p>
+	<p class=func><span class=keyword>micGain</span>(dB);</p>
+	<p class=desc>When using the microphone input, set the amplifier gain.
+		The input number is in decibells, from 0 to 63.
 	</p>
 
 	<h3>Signal Adjustment</h3>
@@ -1820,7 +1804,22 @@
 	<p class=func><span class=keyword>route</span>(i2s, dac, dap, dapmix);</p>
 	<p class=desc>blah blah blah blah
 	</p>
-	<p class=func><span class=keyword>micGain</span>(n);</p>
+	<p class=func><span class=keyword>muteHeadphone</span>();</p>
+	<p class=desc>Silence the headphone output.
+	</p>
+	<p class=func><span class=keyword>unmuteHeadphone</span>();</p>
+	<p class=desc>Turn the headphone output on.
+	</p>
+	<p class=func><span class=keyword>unmuteLineout</span>();</p>
+	<p class=desc>Turn the line level outputs on.
+	</p>
+	<p class=func><span class=keyword>muteLineout</span>();</p>
+	<p class=desc>Silence the line level outputs.
+	</p>
+	<p class=func><span class=keyword>lineInLevel</span>(both);</p>
+	<p class=desc>blah blah blah blah
+	</p>
+	<p class=func><span class=keyword>lineInLevel</span>(left, right);</p>
 	<p class=desc>blah blah blah blah
 	</p>
 	<p class=func><span class=keyword>lineOutLevel</span>(both);</p>
