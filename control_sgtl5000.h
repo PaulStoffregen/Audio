@@ -46,21 +46,22 @@ public:
 	bool unmuteLineout(void) { return write(0x0024, ana_ctrl & ~(1<<8)); }
 	bool inputSelect(int n) {
 		if (n == AUDIO_INPUT_LINEIN) {
-			return write(0x0024, ana_ctrl | (1<<2));
+			return write(0x0020, 0x055) // +7.5dB gain (1.3Vp-p full scale)
+			 && write(0x0024, ana_ctrl | (1<<2)); // enable linein
 		} else if (n == AUDIO_INPUT_MIC) {
-			//return write(0x002A, 0x0172) && write(0x0024, ana_ctrl & ~(1<<2));
-			return write(0x002A, 0x0173) && write(0x0024, ana_ctrl & ~(1<<2)); // +40dB
+			return write(0x002A, 0x0173) // mic preamp gain = +40dB
+			 && write(0x0020, 0x088)     // input gain +12dB (is this enough?)
+			 && write(0x0024, ana_ctrl & ~(1<<2)); // enable mic
 		} else {
 			return false;
 		}
 	}
-	//bool inputLinein(void) { return write(0x0024, ana_ctrl | (1<<2)); }
-	//bool inputMic(void) { return write(0x002A, 0x0172) && write(0x0024, ana_ctrl & ~(1<<2)); }
-
 	unsigned short route(uint8_t i2s_out, uint8_t dac, uint8_t dap, uint8_t dap_mix);
 	unsigned short route(uint8_t i2s_out, uint8_t dac, uint8_t dap) { return route(i2s_out,dac,dap,0); }
 	bool volume(float left, float right);
-	unsigned short micGain(unsigned int n) { return modify(0x002A, n&3, 3); }
+	bool micGain(unsigned int dB);
+	bool lineInLevel(uint8_t n) { return lineInLevel(n, n); }
+	bool lineInLevel(uint8_t left, uint8_t right);
 	unsigned short lineOutLevel(uint8_t n);
 	unsigned short lineOutLevel(uint8_t left, uint8_t right);
 	unsigned short dacVolume(float n);

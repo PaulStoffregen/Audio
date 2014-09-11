@@ -502,26 +502,24 @@
 
 bool AudioControlSGTL5000::enable(void)
 {
-	//unsigned int n;
-
 	muted = true;
 	Wire.begin();
 	delay(5);
 	//Serial.print("chip ID = ");
 	//delay(5);
-	//n = read(CHIP_ID);
+	//unsigned int n = read(CHIP_ID);
 	//Serial.println(n, HEX);
 
 	write(CHIP_ANA_POWER, 0x4060);  // VDDD is externally driven with 1.8V
 	write(CHIP_LINREG_CTRL, 0x006C);  // VDDA & VDDIO both over 3.1V
 	write(CHIP_REF_CTRL, 0x01F2); // VAG=1.575, normal ramp, +12.5% bias current
-	write(CHIP_LINE_OUT_CTRL, 0x0322); // LO_VAGCNTRL=1.65V, OUT_CURRENT=0.36mA
+	write(CHIP_LINE_OUT_CTRL, 0x0F22); // LO_VAGCNTRL=1.65V, OUT_CURRENT=0.54mA
 	write(CHIP_SHORT_CTRL, 0x4446);  // allow up to 125mA
 	write(CHIP_ANA_CTRL, 0x0137);  // enable zero cross detectors
 	write(CHIP_ANA_POWER, 0x40FF); // power up: lineout, hp, adc, dac
 	write(CHIP_DIG_POWER, 0x0073); // power up all digital stuff
 	delay(400);
-	write(CHIP_LINE_OUT_VOL, 0x1515); // default approx 2 volts peak-to-peak
+	write(CHIP_LINE_OUT_VOL, 0x1D1D); // default approx 1.3 volts peak-to-peak
 	write(CHIP_CLK_CTRL, 0x0004);  // 44.1 kHz, 256*Fs
 	write(CHIP_I2S_CTRL, 0x0130); // SCLK=32*Fs, 16bit, I2S format
 	// default signal routing is ok?
@@ -600,6 +598,54 @@ bool AudioControlSGTL5000::volume(float left, float right)
 {
 	unsigned short m=((0x7F-calcVol(right,0x7F))<<8)|(0x7F-calcVol(left,0x7F));
 	return write(CHIP_ANA_HP_CTRL, m);
+}
+
+bool AudioControlSGTL5000::micGain(unsigned int dB)
+{
+	unsigned int preamp_gain, input_gain;
+
+	if (dB >= 40) {
+		preamp_gain = 3;
+		dB -= 40;
+	} else if (dB >= 30) {
+		preamp_gain = 2;
+		dB -= 30;
+	} else if (dB >= 20) {
+		preamp_gain = 1;
+		dB -= 20;
+	} else {
+		preamp_gain = 0;
+	}
+	input_gain = (dB * 2) / 3;
+	if (input_gain > 15) input_gain = 15;
+
+	return write(CHIP_MIC_CTRL, 0x0170 | preamp_gain)
+	    && write(CHIP_ANA_ADC_CTRL, (input_gain << 4) | input_gain);
+}
+
+// CHIP_ANA_ADC_CTRL
+// Actual measured full-scale peak-to-peak sine wave input for max signal
+//  0: 3.12 Volts p-p
+//  1: 2.63 Volts p-p
+//  2: 2.22 Volts p-p
+//  3: 1.87 Volts p-p
+//  4: 1.58 Volts p-p
+//  5: 1.33 Volts p-p
+//  6: 1.11 Volts p-p
+//  7: 0.94 Volts p-p
+//  8: 0.79 Volts p-p
+//  9: 0.67 Volts p-p
+// 10: 0.56 Volts p-p
+// 11: 0.48 Volts p-p
+// 12: 0.40 Volts p-p
+// 13: 0.34 Volts p-p
+// 14: 0.29 Volts p-p
+// 15: 0.24 Volts p-p
+bool AudioControlSGTL5000::lineInLevel(uint8_t left, uint8_t right)
+{
+	if (left > 15) left = 15;
+	if (right > 15) right = 15;
+	return write(CHIP_ANA_ADC_CTRL, (left << 4) | right);
 }
 
 // CHIP_LINE_OUT_VOL

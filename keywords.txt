@@ -70,6 +70,8 @@ unmuteHeadphone	KEYWORD2
 muteLineout	KEYWORD2
 unmuteLineout	KEYWORD2
 micGain	KEYWORD2
+lineInLevel	KEYWORD2
+lineOutLevel	KEYWORD2
 lo_lvl	KEYWORD2
 dac_vol	KEYWORD2
 dap_mix_enable	KEYWORD2
