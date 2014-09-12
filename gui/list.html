@@ -760,7 +760,7 @@
 </script>
 <script type="text/x-red" data-help-name="AudioSynthWaveform">
 	<h3>Summary</h3>
-	<p>Create a waveform: sine, sawtooth, square, or triangle</p>
+	<p>Create a waveform: sine, sawtooth, square, triangle, pulse or arbitrary.</p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
@@ -787,6 +787,8 @@
 		<a href="http://www.pjrc.com/teensy/td_libs_AudioProcessorUsage.html" target="_blank">AudioNoInterrupts()</a>
 		should be used to guarantee all new settings take effect together.
 	</p>
+	<p class=func><span class=keyword>pulseWidth</span>(amount);</p>
+	<p class=desc>Change the width (duty cycle) of the pulse.</p>
 	<p class=func><span class=keyword>arbitraryWaveform</span>(array, maxFreq);</p>
 	<p class=desc>
 		Configure the waveform to be used with WAVEFORM_ARBITRARY.  Array
@@ -804,6 +806,7 @@
 		<li><span class=literal>WAVEFORM_SQUARE</span></li>
 		<li><span class=literal>WAVEFORM_TRIANGLE</span></li>
 		<li><span class=literal>WAVEFORM_ARBITRARY</span></li>
+		<li><span class=literal>WAVEFORM_PULSE</span></li>
 		</ul>
 	</p>
 </script>

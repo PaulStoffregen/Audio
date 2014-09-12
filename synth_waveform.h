@@ -92,11 +92,11 @@ public:
     else if (n > 1.0) n = 1.0;
     tone_offset = n * 32767.0;
   }
-  void width(float n) {          // 0.0 to 1.0
+  void pulseWidth(float n) {          // 0.0 to 1.0
     if (n < 0) n = 0;
     else if (n > 1.0) n = 1.0;
     tone_width = n * 0x7fffffffLL; 
-    // width is stored as the equivalent phase
+    // pulse width is stored as the equivalent phase
   }
   void begin(short t_type) {
 	tone_phase = 0;
