@@ -63,8 +63,6 @@ public:
 	unsigned short adcHighPassFilterEnable(void);
 	unsigned short adcHighPassFilterFreeze(void);
 	unsigned short adcHighPassFilterDisable(void);
-	//unsigned short adcHighPassFilterControl(uint8_t bypass, uint8_t freeze);
-	//unsigned short adcHighPassFilterControl(uint8_t bypass);
 	unsigned short audioPreProcessorEnable(void);
 	unsigned short audioPostProcessorEnable(void);
 	unsigned short audioProcessorDisable(void);
@@ -91,9 +89,7 @@ protected:
 	bool muted;
 	bool volumeInteger(unsigned int n); // range: 0x00 to 0x80
 	uint16_t ana_ctrl;
-
 	unsigned char calcVol(float n, unsigned char range);
-
 	unsigned int read(unsigned int reg);
 	bool write(unsigned int reg, unsigned int val);
 	unsigned int modify(unsigned int reg, unsigned int val, unsigned int iMask);
