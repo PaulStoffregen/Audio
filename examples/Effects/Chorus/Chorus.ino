@@ -135,10 +135,6 @@ void setup() {
   l_myEffect.voices(0);
   r_myEffect.voices(0);
 
-  // I want output on the line out too
-  audioShield.unmuteLineout();
-//  audioShield.muteHeadphone();
-  
   Serial.println("setup done");
   AudioProcessorUsageMaxReset();
   AudioMemoryUsageMaxReset();

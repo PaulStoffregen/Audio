@@ -143,9 +143,6 @@ void setup()
   
   codec.enable();
   codec.volume(0.45);
-  // I want output on the line out too
-  // Comment this if you don't it
-  codec.unmuteLineout();
 
   // reduce the gain on some channels, so half of the channels
   // are "positioned" to the left, half to the right, but all

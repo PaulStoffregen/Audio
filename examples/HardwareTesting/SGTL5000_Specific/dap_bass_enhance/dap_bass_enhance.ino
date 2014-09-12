@@ -5,6 +5,7 @@ This example code is in the public domain
 
 #include <Audio.h>
 #include <Wire.h>
+#include <SPI.h>
 #include <SD.h>
 
 
@@ -34,9 +35,9 @@ void setup() {
   // Enable the audio shield and set the output volume.
   audioShield.enable();
   audioShield.inputSelect(myInput);
-  audioShield.volume(0.75);
-  audioShield.unmuteLineout();
+  audioShield.volume(0.5);
   // just enable it to use default settings.
+  audioShield.audioPostProcessorEnable();
   audioShield.enhanceBassEnable(); // all we need to do for default bass enhancement settings.
   // audioShield.enhanceBass((float)lr_level,(float)bass_level);
   // audioShield.enhanceBass((float)lr_level,(float)bass_level,(uint8_t)hpf_bypass,(uint8_t)cutoff);
@@ -49,7 +50,7 @@ float lastVol=1024;
 void loop() {
   // every 10 ms, check for adjustment
   if (chgMsec > 10) { // more regular updates for actual changes seems better.
-    float vol1=analogRead(15)/10.23;
+    float vol1=analogRead(15)/1023.0;
     vol1=(int)vol1;
     if(lastVol!=vol1)
     {

@@ -5,6 +5,7 @@ This example code is in the public domain
 
 #include <Audio.h>
 #include <Wire.h>
+#include <SPI.h>
 #include <SD.h>
 
 
@@ -34,8 +35,8 @@ void setup() {
   // Enable the audio shield and set the output volume.
   audioShield.enable();
   audioShield.inputSelect(myInput);
-  audioShield.volume(0.75);
-  audioShield.unmuteLineout();
+  audioShield.volume(0.5);
+  audioShield.audioPreProcessorEnable();
   // here are some settings for AVC that have a fairly obvious effect
   audioShield.autoVolumeControl(2,1,0,-5,0.5,0.5); // see comments starting line #699 of control_sgtl5000.cpp in ./libraries/audio/
   // AVC has its own enable/disable bit
@@ -48,7 +49,7 @@ float lastVol=1024;
 void loop() {
   // every 10 ms, check for adjustment
   if (chgMsec > 10) {
-    float vol1=analogRead(15)/10.23;
+    float vol1=analogRead(15)/1023.0;
     vol1=(int)vol1;
     if(lastVol!=vol1)
     {

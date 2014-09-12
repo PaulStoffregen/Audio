@@ -48,34 +48,7 @@ var RED = (function() {
 	function save(force) {
 		RED.storage.update();
 
-		if (RED.view.dirty()) {
-
-			if (!force) {
-				var invalid = false;
-				var unknownNodes = [];
-				RED.nodes.eachNode(function(node) {
-					invalid = invalid || !node.valid;
-					if (node.type === "unknown") {
-						if (unknownNodes.indexOf(node.name) == -1) {
-							unknownNodes.push(node.name);
-						}
-						invalid = true;
-					}
-				});
-				if (invalid) {
-					if (unknownNodes.length > 0) {
-						$( "#node-dialog-confirm-deploy-config" ).hide();
-						$( "#node-dialog-confirm-deploy-unknown" ).show();
-						var list = "<li>"+unknownNodes.join("</li><li>")+"</li>";
-						$( "#node-dialog-confirm-deploy-unknown-list" ).html(list);
-					} else {
-						$( "#node-dialog-confirm-deploy-config" ).show();
-						$( "#node-dialog-confirm-deploy-unknown" ).hide();
-					}
-					$( "#node-dialog-confirm-deploy" ).dialog( "open" );
-					return;
-				}
-			}
+		if (1) {
 			var nns = RED.nodes.createCompleteNodeSet();
 			// sort by horizontal position, plus slight vertical position,
 			// for well defined update order that follows signal flow
@@ -196,7 +169,8 @@ var RED = (function() {
 			RED.view.redraw();
 			setTimeout(function() {
 				$("#btn-deploy").removeClass("disabled").addClass("btn-danger");
-				}, 1500);
+			}, 1500);
+			$('#btn-deploy').click(function() { save(); });
 		}, "html");
 	}
 

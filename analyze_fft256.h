@@ -79,7 +79,7 @@ public:
 		return (float)sum * (1.0 / 16384.0);
 	}
 	void averageTogether(uint8_t n) {
-		if (n == 0) n == 1;
+		if (n == 0) n = 1;
 		naverage = n;
 	}
 	void windowFunction(const int16_t *w) {
