@@ -36,9 +36,10 @@ bool AudioOutputAnalog::update_responsibility = false;
 
 void AudioOutputAnalog::begin(void)
 {
+	dma(); // Allocate the DMA channel first
+
 	SIM_SCGC2 |= SIM_SCGC2_DAC0;
 	DAC0_C0 = DAC_C0_DACEN;                   // 1.2V VDDA is DACREF_2
-	//DAC0_C0 = DAC_C0_DACEN | DAC_C0_DACRFS; // 3.3V VDDA is DACREF_2
 	// slowly ramp up to DC voltage, approx 1/4 second
 	for (int16_t i=0; i<2048; i+=8) {
 		*(int16_t *)&(DAC0_DAT0L) = i;
@@ -51,25 +52,22 @@ void AudioOutputAnalog::begin(void)
 	PDB0_MOD = PDB_PERIOD;
 	PDB0_SC = PDB_CONFIG | PDB_SC_LDOK;
 	PDB0_SC = PDB_CONFIG | PDB_SC_SWTRIG | PDB_SC_PDBIE | PDB_SC_DMAEN;
-	SIM_SCGC7 |= SIM_SCGC7_DMA;
-	SIM_SCGC6 |= SIM_SCGC6_DMAMUX;
-	DMA_CR = 0;
-	DMA_TCD4_SADDR = dac_buffer;
-	DMA_TCD4_SOFF = 2;
-	DMA_TCD4_ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
-	DMA_TCD4_NBYTES_MLNO = 2;
-	DMA_TCD4_SLAST = -sizeof(dac_buffer);
-	DMA_TCD4_DADDR = &DAC0_DAT0L;
-	DMA_TCD4_DOFF = 0;
-	DMA_TCD4_CITER_ELINKNO = sizeof(dac_buffer) / 2;
-	DMA_TCD4_DLASTSGA = 0;
-	DMA_TCD4_BITER_ELINKNO = sizeof(dac_buffer) / 2;
-	DMA_TCD4_CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
-	DMAMUX0_CHCFG4 = DMAMUX_DISABLE;
-	DMAMUX0_CHCFG4 = DMAMUX_SOURCE_PDB | DMAMUX_ENABLE;
+
+	dma().TCD->SADDR = dac_buffer;
+	dma().TCD->SOFF = 2;
+	dma().TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
+	dma().TCD->NBYTES_MLNO = 2;
+	dma().TCD->SLAST = -sizeof(dac_buffer);
+	dma().TCD->DADDR = &DAC0_DAT0L;
+	dma().TCD->DOFF = 0;
+	dma().TCD->CITER_ELINKNO = sizeof(dac_buffer) / 2;
+	dma().TCD->DLASTSGA = 0;
+	dma().TCD->BITER_ELINKNO = sizeof(dac_buffer) / 2;
+	dma().TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
+	dma().triggerAtHardwareEvent(DMAMUX_SOURCE_PDB);
 	update_responsibility = update_setup();
-	DMA_SERQ = 4;
-	NVIC_ENABLE_IRQ(IRQ_DMA_CH4);
+	dma().enable();
+	dma().attachInterrupt(isr);
 }
 
 void AudioOutputAnalog::analogReference(int ref)
@@ -108,15 +106,17 @@ void AudioOutputAnalog::update(void)
 // TODO: the DAC has much higher bandwidth than the datasheet says
 // can we output a 2X oversampled output, for easier filtering?
 
-void dma_ch4_isr(void)
+void AudioOutputAnalog::isr(void)
 {
 	const int16_t *src, *end;
 	int16_t *dest;
 	audio_block_t *block;
 	uint32_t saddr;
 
-	saddr = (uint32_t)DMA_TCD4_SADDR;
-        DMA_CINT = 4;
+	//saddr = (uint32_t)DMA_TCD4_SADDR;
+        //DMA_CINT = 4;
+	saddr = (uint32_t)(dma().TCD->SADDR);
+	dma().clearInterrupt();
 	if (saddr < (uint32_t)dac_buffer + sizeof(dac_buffer) / 2) {
 		// DMA is transmitting the first half of the buffer
 		// so we must fill the second half

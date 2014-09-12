@@ -37,12 +37,16 @@ public:
 	virtual void update(void);
 	void begin(void);
 	void analogReference(int ref);
-	friend void dma_ch4_isr(void);
 private:
 	static audio_block_t *block_left_1st;
 	static audio_block_t *block_left_2nd;
 	static bool update_responsibility;
 	audio_block_t *inputQueueArray[1];
+	static inline DMAChannel &dma() __attribute__((always_inline)) {
+		static DMAChannel mydma;
+		return mydma;
+	}
+	static void isr(void);
 };
 
 #endif
