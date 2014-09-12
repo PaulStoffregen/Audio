@@ -28,6 +28,7 @@
 #define output_dac_h_
 
 #include "AudioStream.h"
+#include "DMAChannel.h"
 
 class AudioOutputAnalog : public AudioStream
 {

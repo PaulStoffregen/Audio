@@ -28,6 +28,7 @@
 #define input_adc_h_
 
 #include "AudioStream.h"
+#include "DMAChannel.h"
 #include "utility/dma_chan.h"
 
 #ifdef __MK20DX128__

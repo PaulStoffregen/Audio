@@ -36,6 +36,8 @@ bool AudioInputI2S::update_responsibility = false;
 
 void AudioInputI2S::begin(void)
 {
+	dma(); // Allocate the DMA channel first
+
 	//block_left_1st = NULL;
 	//block_right_1st = NULL;
 
@@ -44,30 +46,28 @@ void AudioInputI2S::begin(void)
 
 	CORE_PIN13_CONFIG = PORT_PCR_MUX(4); // pin 13, PTC5, I2S0_RXD0
 
-	DMA_CR = 0;
-	DMA_TCD_SADDR(AUDIO_IN_I2S_DMA_CHANNEL) = &I2S0_RDR0;
-	DMA_TCD_SOFF(AUDIO_IN_I2S_DMA_CHANNEL) = 0;
-	DMA_TCD_ATTR(AUDIO_IN_I2S_DMA_CHANNEL) = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
-	DMA_TCD_NBYTES_MLNO(AUDIO_IN_I2S_DMA_CHANNEL) = 2;
-	DMA_TCD_SLAST(AUDIO_IN_I2S_DMA_CHANNEL) = 0;
-	DMA_TCD_DADDR(AUDIO_IN_I2S_DMA_CHANNEL) = i2s_rx_buffer;
-	DMA_TCD_DOFF(AUDIO_IN_I2S_DMA_CHANNEL) = 2;
-	DMA_TCD_CITER_ELINKNO(AUDIO_IN_I2S_DMA_CHANNEL) = sizeof(i2s_rx_buffer) / 2;
-	DMA_TCD_DLASTSGA(AUDIO_IN_I2S_DMA_CHANNEL) = -sizeof(i2s_rx_buffer);
-	DMA_TCD_BITER_ELINKNO(AUDIO_IN_I2S_DMA_CHANNEL) = sizeof(i2s_rx_buffer) / 2;
-	DMA_TCD_CSR(AUDIO_IN_I2S_DMA_CHANNEL) = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
+	dma().TCD->SADDR = &I2S0_RDR0;
+	dma().TCD->SOFF = 0;
+	dma().TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
+	dma().TCD->NBYTES_MLNO = 2;
+	dma().TCD->SLAST = 0;
+	dma().TCD->DADDR = i2s_rx_buffer;
+	dma().TCD->DOFF = 2;
+	dma().TCD->CITER_ELINKNO = sizeof(i2s_rx_buffer) / 2;
+	dma().TCD->DLASTSGA = -sizeof(i2s_rx_buffer);
+	dma().TCD->BITER_ELINKNO = sizeof(i2s_rx_buffer) / 2;
+	dma().TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
 
-	DMAMUX0_CHCFG(AUDIO_IN_I2S_DMA_CHANNEL) = DMAMUX_DISABLE;
-	DMAMUX0_CHCFG(AUDIO_IN_I2S_DMA_CHANNEL) = DMAMUX_SOURCE_I2S0_RX | DMAMUX_ENABLE;
+	dma().triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_RX);
 	update_responsibility = update_setup();
-	DMA_SERQ = AUDIO_IN_I2S_DMA_CHANNEL;
+	dma().enable();
 
 	I2S0_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE | I2S_RCSR_FR;
 	I2S0_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE; // TX clock enable, because sync'd to TX
-	NVIC_ENABLE_IRQ(IRQ_DMA_CH(AUDIO_IN_I2S_DMA_CHANNEL));
+	dma().attachInterrupt(isr);
 }
 
-void DMA_ISR(AUDIO_IN_I2S_DMA_CHANNEL)(void)
+void AudioInputI2S::isr(void)
 {
 	uint32_t daddr, offset;
 	const int16_t *src, *end;
@@ -75,8 +75,8 @@ void DMA_ISR(AUDIO_IN_I2S_DMA_CHANNEL)(void)
 	audio_block_t *left, *right;
 
 	//digitalWriteFast(3, HIGH);
-	daddr = (uint32_t)(DMA_TCD_DADDR(AUDIO_IN_I2S_DMA_CHANNEL));
-        DMA_CINT = AUDIO_IN_I2S_DMA_CHANNEL;
+	daddr = (uint32_t)(dma().TCD->DADDR);
+	dma().clearInterrupt();
 
 	if (daddr < (uint32_t)i2s_rx_buffer + sizeof(i2s_rx_buffer) / 2) {
 		// DMA is receiving to the first half of the buffer
@@ -170,40 +170,34 @@ void AudioInputI2S::update(void)
 
 void AudioInputI2Sslave::begin(void)
 {
+	dma(); // Allocate the DMA channel first
+
 	//block_left_1st = NULL;
 	//block_right_1st = NULL;
-
-	//pinMode(3, OUTPUT);
-	//digitalWriteFast(3, HIGH);
-	//delayMicroseconds(500);
-	//digitalWriteFast(3, LOW);
 
 	AudioOutputI2Sslave::config_i2s();
 
 	CORE_PIN13_CONFIG = PORT_PCR_MUX(4); // pin 13, PTC5, I2S0_RXD0
 
-	DMA_CR = 0;
-	DMA_TCD_SADDR(AUDIO_IN_I2S_DMA_CHANNEL) = &I2S0_RDR0;
-	DMA_TCD_SOFF(AUDIO_IN_I2S_DMA_CHANNEL) = 0;
-	DMA_TCD_ATTR(AUDIO_IN_I2S_DMA_CHANNEL) = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
-	DMA_TCD_NBYTES_MLNO(AUDIO_IN_I2S_DMA_CHANNEL) = 2;
-	DMA_TCD_SLAST(AUDIO_IN_I2S_DMA_CHANNEL) = 0;
-	DMA_TCD_DADDR(AUDIO_IN_I2S_DMA_CHANNEL) = i2s_rx_buffer;
-	DMA_TCD_DOFF(AUDIO_IN_I2S_DMA_CHANNEL) = 2;
-	DMA_TCD_CITER_ELINKNO(AUDIO_IN_I2S_DMA_CHANNEL) = sizeof(i2s_rx_buffer) / 2;
-	DMA_TCD_DLASTSGA(AUDIO_IN_I2S_DMA_CHANNEL) = -sizeof(i2s_rx_buffer);
-	DMA_TCD_BITER_ELINKNO(AUDIO_IN_I2S_DMA_CHANNEL) = sizeof(i2s_rx_buffer) / 2;
-	DMA_TCD_CSR(AUDIO_IN_I2S_DMA_CHANNEL) = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
+	dma().TCD->SADDR = &I2S0_RDR0;
+	dma().TCD->SOFF = 0;
+	dma().TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
+	dma().TCD->NBYTES_MLNO = 2;
+	dma().TCD->SLAST = 0;
+	dma().TCD->DADDR = i2s_rx_buffer;
+	dma().TCD->DOFF = 2;
+	dma().TCD->CITER_ELINKNO = sizeof(i2s_rx_buffer) / 2;
+	dma().TCD->DLASTSGA = -sizeof(i2s_rx_buffer);
+	dma().TCD->BITER_ELINKNO = sizeof(i2s_rx_buffer) / 2;
+	dma().TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
 
-	DMAMUX0_CHCFG(AUDIO_IN_I2S_DMA_CHANNEL) = DMAMUX_DISABLE;
-	DMAMUX0_CHCFG(AUDIO_IN_I2S_DMA_CHANNEL) = DMAMUX_SOURCE_I2S0_RX | DMAMUX_ENABLE;
+	dma().triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_RX);
 	update_responsibility = update_setup();
-	DMA_SERQ = AUDIO_IN_I2S_DMA_CHANNEL;
+	dma().enable();
 
-	// TODO: is I2S_RCSR_BCE appropriate if sync'd to transmitter clock?
-	//I2S0_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE | I2S_RCSR_FR;
-	I2S0_RCSR |= I2S_RCSR_RE | I2S_RCSR_FRDE | I2S_RCSR_FR;
-	NVIC_ENABLE_IRQ(IRQ_DMA_CH(AUDIO_IN_I2S_DMA_CHANNEL));
+	I2S0_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE | I2S_RCSR_FR;
+	I2S0_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE; // TX clock enable, because sync'd to TX
+	dma().attachInterrupt(isr);
 }
 
 

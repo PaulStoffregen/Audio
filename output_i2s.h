@@ -28,6 +28,7 @@
 #define output_i2s_h_
 
 #include "AudioStream.h"
+#include "DMAChannel.h"
 
 class AudioOutputI2S : public AudioStream
 {
@@ -35,7 +36,6 @@ public:
 	AudioOutputI2S(void) : AudioStream(2, inputQueueArray) { begin(); }
 	virtual void update(void);
 	void begin(void);
-	friend void dma_ch0_isr(void);
 	friend class AudioInputI2S;
 protected:
 	AudioOutputI2S(int dummy): AudioStream(2, inputQueueArray) {} // to be used only inside AudioOutputI2Sslave !!
@@ -43,6 +43,11 @@ protected:
 	static audio_block_t *block_left_1st;
 	static audio_block_t *block_right_1st;
 	static bool update_responsibility;
+	static inline DMAChannel &dma() __attribute__((always_inline)) {
+		static DMAChannel mydma;
+		return mydma;
+	}
+	static void isr(void);
 private:
 	static audio_block_t *block_left_2nd;
 	static audio_block_t *block_right_2nd;

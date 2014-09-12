@@ -28,13 +28,7 @@
 #define _input_i2s_h_
 
 #include "AudioStream.h"
-#include "utility/dma_chan.h"
-
-#ifdef __MK20DX128__
-#define AUDIO_IN_I2S_DMA_CHANNEL 1
-#else
-#define AUDIO_IN_I2S_DMA_CHANNEL 5
-#endif
+#include "DMAChannel.h"
 
 class AudioInputI2S : public AudioStream
 {
@@ -42,10 +36,14 @@ public:
 	AudioInputI2S(void) : AudioStream(0, NULL) { begin(); }
 	virtual void update(void);
 	void begin(void);
-	friend void DMA_ISR(AUDIO_IN_I2S_DMA_CHANNEL)(void);
 protected:	
 	AudioInputI2S(int dummy): AudioStream(0, NULL) {} // to be used only inside AudioInputI2Sslave !!
 	static bool update_responsibility;
+	static inline DMAChannel &dma() __attribute__((always_inline)) {
+		static DMAChannel mydma;
+		return mydma;
+	}
+	static void isr(void);
 private:
 	static audio_block_t *block_left;
 	static audio_block_t *block_right;
