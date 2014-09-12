@@ -44,6 +44,7 @@ extern const int16_t AudioWaveformSine[257];
 #define WAVEFORM_SQUARE    2
 #define WAVEFORM_TRIANGLE  3
 #define WAVEFORM_ARBITRARY 4
+#define WAVEFORM_PULSE     5
 
 // todo: remove these...
 #define TONE_TYPE_SINE     0
@@ -58,7 +59,7 @@ public:
   AudioSynthWaveform(void) : 
   AudioStream(0,NULL), 
   tone_phase(0), tone_incr(0), tone_type(0),
-  tone_offset(0), arbdata(NULL)
+  tone_offset(0), tone_width(0.25), arbdata(NULL)
   { 
   }
   
@@ -91,6 +92,12 @@ public:
     else if (n > 1.0) n = 1.0;
     tone_offset = n * 32767.0;
   }
+  void width(float n) {          // 0.0 to 1.0
+    if (n < 0) n = 0;
+    else if (n > 1.0) n = 1.0;
+    tone_width = n * 0x7fffffffLL; 
+    // width is stored as the equivalent phase
+  }
   void begin(short t_type) {
 	tone_phase = 0;
 	tone_type = t_type;
@@ -109,6 +116,7 @@ private:
   short    tone_amp;
   short    tone_freq;
   uint32_t tone_phase;
+  uint32_t tone_width;
   // volatile prevents the compiler optimizing out the frequency function
   volatile uint32_t tone_incr;
   short    tone_type;
