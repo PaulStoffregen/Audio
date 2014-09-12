@@ -33,10 +33,11 @@ DMAMEM static uint16_t dac_buffer[AUDIO_BLOCK_SAMPLES*2];
 audio_block_t * AudioOutputAnalog::block_left_1st = NULL;
 audio_block_t * AudioOutputAnalog::block_left_2nd = NULL;
 bool AudioOutputAnalog::update_responsibility = false;
+DMAChannel AudioOutputAnalog::dma;
 
 void AudioOutputAnalog::begin(void)
 {
-	dma(); // Allocate the DMA channel first
+	dma.begin(true); // Allocate the DMA channel first
 
 	SIM_SCGC2 |= SIM_SCGC2_DAC0;
 	DAC0_C0 = DAC_C0_DACEN;                   // 1.2V VDDA is DACREF_2
@@ -53,21 +54,21 @@ void AudioOutputAnalog::begin(void)
 	PDB0_SC = PDB_CONFIG | PDB_SC_LDOK;
 	PDB0_SC = PDB_CONFIG | PDB_SC_SWTRIG | PDB_SC_PDBIE | PDB_SC_DMAEN;
 
-	dma().TCD->SADDR = dac_buffer;
-	dma().TCD->SOFF = 2;
-	dma().TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
-	dma().TCD->NBYTES_MLNO = 2;
-	dma().TCD->SLAST = -sizeof(dac_buffer);
-	dma().TCD->DADDR = &DAC0_DAT0L;
-	dma().TCD->DOFF = 0;
-	dma().TCD->CITER_ELINKNO = sizeof(dac_buffer) / 2;
-	dma().TCD->DLASTSGA = 0;
-	dma().TCD->BITER_ELINKNO = sizeof(dac_buffer) / 2;
-	dma().TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
-	dma().triggerAtHardwareEvent(DMAMUX_SOURCE_PDB);
+	dma.TCD->SADDR = dac_buffer;
+	dma.TCD->SOFF = 2;
+	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
+	dma.TCD->NBYTES_MLNO = 2;
+	dma.TCD->SLAST = -sizeof(dac_buffer);
+	dma.TCD->DADDR = &DAC0_DAT0L;
+	dma.TCD->DOFF = 0;
+	dma.TCD->CITER_ELINKNO = sizeof(dac_buffer) / 2;
+	dma.TCD->DLASTSGA = 0;
+	dma.TCD->BITER_ELINKNO = sizeof(dac_buffer) / 2;
+	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
+	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_PDB);
 	update_responsibility = update_setup();
-	dma().enable();
-	dma().attachInterrupt(isr);
+	dma.enable();
+	dma.attachInterrupt(isr);
 }
 
 void AudioOutputAnalog::analogReference(int ref)
@@ -113,10 +114,8 @@ void AudioOutputAnalog::isr(void)
 	audio_block_t *block;
 	uint32_t saddr;
 
-	//saddr = (uint32_t)DMA_TCD4_SADDR;
-        //DMA_CINT = 4;
-	saddr = (uint32_t)(dma().TCD->SADDR);
-	dma().clearInterrupt();
+	saddr = (uint32_t)(dma.TCD->SADDR);
+	dma.clearInterrupt();
 	if (saddr < (uint32_t)dac_buffer + sizeof(dac_buffer) / 2) {
 		// DMA is transmitting the first half of the buffer
 		// so we must fill the second half

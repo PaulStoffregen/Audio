@@ -39,10 +39,7 @@ public:
 protected:	
 	AudioInputI2S(int dummy): AudioStream(0, NULL) {} // to be used only inside AudioInputI2Sslave !!
 	static bool update_responsibility;
-	static inline DMAChannel &dma() __attribute__((always_inline)) {
-		static DMAChannel mydma;
-		return mydma;
-	}
+	static DMAChannel dma;
 	static void isr(void);
 private:
 	static audio_block_t *block_left;

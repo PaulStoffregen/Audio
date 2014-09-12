@@ -42,10 +42,7 @@ private:
 	static audio_block_t *block_left_2nd;
 	static bool update_responsibility;
 	audio_block_t *inputQueueArray[1];
-	static inline DMAChannel &dma() __attribute__((always_inline)) {
-		static DMAChannel mydma;
-		return mydma;
-	}
+	static DMAChannel dma;
 	static void isr(void);
 };
 

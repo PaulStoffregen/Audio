@@ -43,10 +43,7 @@ protected:
 	static audio_block_t *block_left_1st;
 	static audio_block_t *block_right_1st;
 	static bool update_responsibility;
-	static inline DMAChannel &dma() __attribute__((always_inline)) {
-		static DMAChannel mydma;
-		return mydma;
-	}
+	static DMAChannel dma;
 	static void isr(void);
 private:
 	static audio_block_t *block_left_2nd;
