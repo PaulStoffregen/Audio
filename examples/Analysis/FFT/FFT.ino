@@ -41,14 +41,21 @@ void setup() {
 }
 
 void loop() {
+  float n;
+  int i;
+
   if (myFFT.available()) {
     // each time new FFT data is available
     // print it all to the Arduino Serial Monitor
     Serial.print("FFT: ");
-    for (int i=0; i<40; i++) {
-      Serial.print(myFFT.read(i));
-      //Serial.print(myFFT.output[i]);
-      Serial.print(" ");
+    for (i=0; i<40; i++) {
+      n = myFFT.read(i);
+      if (n >= 0.01) {
+        Serial.print(n);
+        Serial.print(" ");
+      } else {
+        Serial.print("  -  ");
+      }
     }
     Serial.println();
   }

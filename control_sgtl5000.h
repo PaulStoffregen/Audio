@@ -29,10 +29,6 @@
 
 #include "AudioControl.h"
 
-#define SGTL_ADC 0
-#define SGTL_I2S_TEENSY 1
-#define SGTL_AUDIO_PROCESSOR 3
-
 class AudioControlSGTL5000 : public AudioControl
 {
 public:
@@ -56,8 +52,6 @@ public:
 			return false;
 		}
 	}
-	unsigned short route(uint8_t i2s_out, uint8_t dac, uint8_t dap, uint8_t dap_mix);
-	unsigned short route(uint8_t i2s_out, uint8_t dac, uint8_t dap) { return route(i2s_out,dac,dap,0); }
 	bool volume(float left, float right);
 	bool micGain(unsigned int dB);
 	bool lineInLevel(uint8_t n) { return lineInLevel(n, n); }
@@ -66,11 +60,14 @@ public:
 	unsigned short lineOutLevel(uint8_t left, uint8_t right);
 	unsigned short dacVolume(float n);
 	unsigned short dacVolume(float left, float right);
-	unsigned short adcHighPassFilterControl(uint8_t bypass, uint8_t freeze);
-	unsigned short adcHighPassFilterControl(uint8_t bypass);
-	unsigned short audioMixerEnable(uint8_t n);
-	unsigned short audioProcessorEnable(uint8_t n);
-	unsigned short audioProcessorEnable(void);
+	unsigned short adcHighPassFilterEnable(void);
+	unsigned short adcHighPassFilterFreeze(void);
+	unsigned short adcHighPassFilterDisable(void);
+	//unsigned short adcHighPassFilterControl(uint8_t bypass, uint8_t freeze);
+	//unsigned short adcHighPassFilterControl(uint8_t bypass);
+	unsigned short audioPreProcessorEnable(void);
+	unsigned short audioPostProcessorEnable(void);
+	unsigned short audioProcessorDisable(void);
 	unsigned short eqFilterCount(uint8_t n);
 	unsigned short eqSelect(uint8_t n);
 	unsigned short eqBand(uint8_t bandNum, float n);
@@ -78,16 +75,16 @@ public:
 	void eqBands(float bass, float treble);
 	void eqFilter(uint8_t filterNum, int *filterParameters);
 	unsigned short autoVolumeControl(uint8_t maxGain, uint8_t lbiResponse, uint8_t hardLimit, float threshold, float attack, float decay);
-	unsigned short autoVolumeEnable(uint8_t n);
 	unsigned short autoVolumeEnable(void);
+	unsigned short autoVolumeDisable(void);
 	unsigned short enhanceBass(float lr_lev, float bass_lev);
 	unsigned short enhanceBass(float lr_lev, float bass_lev, uint8_t hpf_bypass, uint8_t cutoff);
-	unsigned short enhanceBassEnable(uint8_t n);
 	unsigned short enhanceBassEnable(void);
+	unsigned short enhanceBassDisable(void);
 	unsigned short surroundSound(uint8_t width);
 	unsigned short surroundSound(uint8_t width, uint8_t select);
-	unsigned short surroundSoundEnable(uint8_t n);
 	unsigned short surroundSoundEnable(void);
+	unsigned short surroundSoundDisable(void);
 	void killAutomation(void) { semi_automated=false; }
 
 protected:
