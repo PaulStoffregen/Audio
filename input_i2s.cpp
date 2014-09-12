@@ -39,11 +39,6 @@ void AudioInputI2S::begin(void)
 	//block_left_1st = NULL;
 	//block_right_1st = NULL;
 
-	//pinMode(3, OUTPUT);
-	//digitalWriteFast(3, HIGH);
-	//delayMicroseconds(500);
-	//digitalWriteFast(3, LOW);
-
 	// TODO: should we set & clear the I2S_RCSR_SR bit here?
 	AudioOutputI2S::config_i2s();
 
@@ -67,9 +62,8 @@ void AudioInputI2S::begin(void)
 	update_responsibility = update_setup();
 	DMA_SERQ = AUDIO_IN_I2S_DMA_CHANNEL;
 
-	// TODO: is I2S_RCSR_BCE appropriate if sync'd to transmitter clock?
-	//I2S0_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE | I2S_RCSR_FR;
-	I2S0_RCSR |= I2S_RCSR_RE | I2S_RCSR_FRDE | I2S_RCSR_FR;
+	I2S0_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE | I2S_RCSR_FR;
+	I2S0_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE; // TX clock enable, because sync'd to TX
 	NVIC_ENABLE_IRQ(IRQ_DMA_CH(AUDIO_IN_I2S_DMA_CHANNEL));
 }
 
