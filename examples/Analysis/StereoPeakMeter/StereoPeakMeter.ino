@@ -28,8 +28,7 @@ void setup() {
   AudioMemory(6);
   audioShield.enable();
   audioShield.inputSelect(myInput);
-  audioShield.volume(0.75);
-  audioShield.unmuteLineout();
+  audioShield.volume(0.5);
   Serial.begin(9600);
 }
 

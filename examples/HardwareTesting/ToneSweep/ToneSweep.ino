@@ -55,9 +55,6 @@ void setup(void)
 
   audioShield.enable();
   audioShield.volume(0.5);
-    // I want output on the line out too
-  audioShield.unmuteLineout();
-//  audioShield.muteHeadphone();
 
   Serial.println("setup done");
 

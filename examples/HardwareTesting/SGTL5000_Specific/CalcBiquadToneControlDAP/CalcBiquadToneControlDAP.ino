@@ -4,6 +4,7 @@ This example code is in the public domain
 */
 #include <Audio.h>
 #include <Wire.h>
+#include <SPI.h>
 #include <SD.h>
 
 const int myInput = AUDIO_INPUT_LINEIN;
@@ -30,9 +31,8 @@ void setup() {
   // Enable the audio shield, select the input and set the output volume.
   audioShield.enable();
   audioShield.inputSelect(myInput);
-  audioShield.volume(0.75);
-  audioShield.unmuteLineout();
-  // audioShield.audioProcessorEnable(); // enable the DAP block in SGTL5000
+  audioShield.volume(0.5);
+  audioShield.audioPostProcessorEnable(); // enable the DAP block in SGTL5000
   // audioShield.eqSelect(1); // using PEQ Biquad filters
   // audioShield.eqFilterCount(2); // enable filter 0 & filter 1
   calcBiquad(FILTER_PARAEQ,110,0,0.2,524288,44100,updateFilter); // automation negates the need

@@ -104,7 +104,7 @@ void setup() {
 
   audioShield.enable();
   audioShield.inputSelect(myInput);
-  audioShield.volume(0.65);
+  audioShield.volume(0.5);
   
   // Warn that the passthru pin is grounded
   if(!digitalRead(PASSTHRU_PIN)) {
@@ -125,9 +125,6 @@ void setup() {
   // PASSTHRU button is pushed.
   l_myEffect.voices(FLANGE_DELAY_PASSTHRU,0,0);
   r_myEffect.voices(FLANGE_DELAY_PASSTHRU,0,0);
-
-  // I want output on the line out too
-  audioShield.unmuteLineout();
   
   Serial.println("setup done");
   AudioProcessorUsageMaxReset();

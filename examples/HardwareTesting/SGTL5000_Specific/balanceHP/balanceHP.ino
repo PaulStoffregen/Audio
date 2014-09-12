@@ -5,6 +5,7 @@ This example code is in the public domain
 
 #include <Audio.h>
 #include <Wire.h>
+#include <SPI.h>
 #include <SD.h>
 
 const int myInput = AUDIO_INPUT_LINEIN;
@@ -34,8 +35,7 @@ void setup() {
   // Enable the audio shield and set the output volume.
   audioShield.enable();
   audioShield.inputSelect(myInput);
-  audioShield.volume(0.75);
-  audioShield.unmuteLineout();
+  audioShield.volume(0.5);
 }
 
 elapsedMillis chgMsec=0;
