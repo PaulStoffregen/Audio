@@ -26,18 +26,6 @@
 
 #include "output_i2s.h"
 
-// MCLK needs to be 48e6 / 1088 * 256 = 11.29411765 MHz -> 44.117647 kHz sample rate
-// Possible to create using fractional divider for all USB-compatible Kinetis:
-// MCLK = 16e6 * 12 / 17
-// MCLK = 24e6 * 8 / 17
-// MCLK = 48e6 * 4 / 17
-// MCLK = 72e6 * 8 / 51
-// MCLK = 96e6 * 2 / 17
-// MCLK = 120e6 * 8 / 85
-
-// TODO: instigate using I2S0_MCR to select the crystal directly instead of the system
-// clock, which has audio band jitter from the PLL
-
 
 audio_block_t * AudioOutputI2S::block_left_1st = NULL;
 audio_block_t * AudioOutputI2S::block_right_1st = NULL;
@@ -205,6 +193,36 @@ void AudioOutputI2S::update(void)
 }
 
 
+// MCLK needs to be 48e6 / 1088 * 256 = 11.29411765 MHz -> 44.117647 kHz sample rate
+//
+#if F_CPU == 96000000 || F_CPU == 48000000 || F_CPU == 24000000
+  // PLL is at 96 MHz in these modes
+  #define MCLK_MULT 2
+  #define MCLK_DIV  17
+#elif F_CPU == 72000000
+  #define MCLK_MULT 8
+  #define MCLK_DIV  51
+#elif F_CPU == 120000000
+  #define MCLK_MULT 8
+  #define MCLK_DIV  85
+#elif F_CPU == 144000000
+  #define MCLK_MULT 4
+  #define MCLK_DIV  51
+#elif F_CPU == 168000000
+  #define MCLK_MULT 8
+  #define MCLK_DIV  119
+#elif F_CPU == 16000000
+  #define MCLK_MULT 12
+  #define MCLK_DIV  17
+#else
+  #error "This CPU Clock Speed is not supported by the Audio library";
+#endif
+
+#if F_CPU >= 20000000
+  #define MCLK_SRC  3  // the PLL
+#else
+  #define MCLK_SRC  0  // system clock
+#endif
 
 void AudioOutputI2S::config_i2s(void)
 {
@@ -217,8 +235,8 @@ void AudioOutputI2S::config_i2s(void)
 	if (I2S0_RCSR & I2S_RCSR_RE) return;
 
 	// enable MCLK output
-	I2S0_MCR = I2S_MCR_MICS(3) | I2S_MCR_MOE;
-	I2S0_MDR = I2S_MDR_FRACT(1) | I2S_MDR_DIVIDE(16);
+	I2S0_MCR = I2S_MCR_MICS(MCLK_SRC) | I2S_MCR_MOE;
+	I2S0_MDR = I2S_MDR_FRACT(MCLK_MULT-1) | I2S_MDR_DIVIDE(MCLK_DIV-1);
 
 	// configure transmitter
 	I2S0_TMR = 0;
