@@ -31,6 +31,7 @@ DMAMEM static uint16_t analog_rx_buffer[AUDIO_BLOCK_SAMPLES];
 audio_block_t * AudioInputAnalog::block_left = NULL;
 uint16_t AudioInputAnalog::block_offset = 0;
 bool AudioInputAnalog::update_responsibility = false;
+DMAChannel AudioInputAnalog::dma;
 
 // #define PDB_CONFIG (PDB_SC_TRGSEL(15) | PDB_SC_PDBEN | PDB_SC_CONT)
 // #define PDB_PERIOD 1087 // 48e6 / 44100
@@ -45,6 +46,8 @@ void AudioInputAnalog::begin(unsigned int pin)
 	//   constants A0-A9 are actually 14 to 23
 	//   constants A10-A13 are actually 34 to 37
 	if (pin > 23 && !(pin >= 34 && pin <= 37)) return;
+
+	dma.begin(true); // Allocate the DMA channel first
 
 	//pinMode(2, OUTPUT);
 	//pinMode(3, OUTPUT);
@@ -81,28 +84,24 @@ void AudioInputAnalog::begin(unsigned int pin)
 	ADC0_SC2 |= ADC_SC2_ADTRG | ADC_SC2_DMAEN;
 
 	// set up a DMA channel to store the ADC data
-	SIM_SCGC7 |= SIM_SCGC7_DMA;
-	SIM_SCGC6 |= SIM_SCGC6_DMAMUX;
-	DMA_CR = 0;
-	DMA_TCD_SADDR(AUDIO_IN_ADC_DMA_CHANNEL) = &ADC0_RA;
-	DMA_TCD_SOFF(AUDIO_IN_ADC_DMA_CHANNEL) = 0;
-	DMA_TCD_ATTR(AUDIO_IN_ADC_DMA_CHANNEL) = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
-	DMA_TCD_NBYTES_MLNO(AUDIO_IN_ADC_DMA_CHANNEL) = 2;
-	DMA_TCD_SLAST(AUDIO_IN_ADC_DMA_CHANNEL) = 0;
-	DMA_TCD_DADDR(AUDIO_IN_ADC_DMA_CHANNEL) = analog_rx_buffer;
-	DMA_TCD_DOFF(AUDIO_IN_ADC_DMA_CHANNEL) = 2;
-	DMA_TCD_CITER_ELINKNO(AUDIO_IN_ADC_DMA_CHANNEL) = sizeof(analog_rx_buffer) / 2;
-	DMA_TCD_DLASTSGA(AUDIO_IN_ADC_DMA_CHANNEL) = -sizeof(analog_rx_buffer);
-	DMA_TCD_BITER_ELINKNO(AUDIO_IN_ADC_DMA_CHANNEL) = sizeof(analog_rx_buffer) / 2;
-	DMA_TCD_CSR(AUDIO_IN_ADC_DMA_CHANNEL) = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
-	DMAMUX0_CHCFG(AUDIO_IN_ADC_DMA_CHANNEL) = DMAMUX_DISABLE;
-	DMAMUX0_CHCFG(AUDIO_IN_ADC_DMA_CHANNEL) = DMAMUX_SOURCE_ADC0 | DMAMUX_ENABLE;
+	dma.TCD->SADDR = &ADC0_RA;
+	dma.TCD->SOFF = 0;
+	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
+	dma.TCD->NBYTES_MLNO = 2;
+	dma.TCD->SLAST = 0;
+	dma.TCD->DADDR = analog_rx_buffer;
+	dma.TCD->DOFF = 2;
+	dma.TCD->CITER_ELINKNO = sizeof(analog_rx_buffer) / 2;
+	dma.TCD->DLASTSGA = -sizeof(analog_rx_buffer);
+	dma.TCD->BITER_ELINKNO = sizeof(analog_rx_buffer) / 2;
+	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
+	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_ADC0);
 	update_responsibility = update_setup();
-	DMA_SERQ = AUDIO_IN_ADC_DMA_CHANNEL;
-	NVIC_ENABLE_IRQ(IRQ_DMA_CH(AUDIO_IN_ADC_DMA_CHANNEL));
+	dma.enable();
+	dma.attachInterrupt(isr);
 }
 
-void DMA_ISR(AUDIO_IN_ADC_DMA_CHANNEL)(void)
+void AudioInputAnalog::isr(void)
 {
 	uint32_t daddr, offset;
 	const uint16_t *src, *end;
@@ -110,8 +109,8 @@ void DMA_ISR(AUDIO_IN_ADC_DMA_CHANNEL)(void)
 	audio_block_t *left;
 
 	//digitalWriteFast(3, HIGH);
-	daddr = (uint32_t)(DMA_TCD_DADDR(AUDIO_IN_ADC_DMA_CHANNEL));
-	DMA_CINT = AUDIO_IN_ADC_DMA_CHANNEL;
+	daddr = (uint32_t)(dma.TCD->DADDR);
+	dma.clearInterrupt();
 
 	if (daddr < (uint32_t)analog_rx_buffer + sizeof(analog_rx_buffer) / 2) {
 		// DMA is receiving to the first half of the buffer

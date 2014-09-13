@@ -27,6 +27,9 @@
 #ifndef dma_chan_h_
 #define dma_chan_h_
 
+/*
+TODO: remove this file - made obsolete by DMAChannel.h
+
 #define DMA_ISR(ch)                     DMA_ISR_EXP(ch)
 #define DMA_ISR_EXP(ch)                 dma_ch ## ch ## _isr
 
@@ -68,5 +71,6 @@
 
 #define DMA_TCD_CSR(ch)                 DMA_TCD_CSR_EXP(ch)
 #define DMA_TCD_CSR_EXP(ch)             DMA_TCD ## ch ## _CSR
+*/
 
 #endif

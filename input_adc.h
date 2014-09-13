@@ -29,13 +29,6 @@
 
 #include "AudioStream.h"
 #include "DMAChannel.h"
-#include "utility/dma_chan.h"
-
-#ifdef __MK20DX128__
-#define AUDIO_IN_ADC_DMA_CHANNEL 2
-#else
-#define AUDIO_IN_ADC_DMA_CHANNEL 6
-#endif
 
 class AudioInputAnalog : public AudioStream
 {
@@ -43,12 +36,13 @@ public:
         AudioInputAnalog(unsigned int pin) : AudioStream(0, NULL) { begin(pin); }
         virtual void update(void);
         void begin(unsigned int pin);
-        friend void DMA_ISR(AUDIO_IN_ADC_DMA_CHANNEL)(void);
 private:
         static audio_block_t *block_left;
         static uint16_t block_offset;
 	uint16_t dc_average;
         static bool update_responsibility;
+	static DMAChannel dma;
+	static void isr(void);
 };
 
 #endif
