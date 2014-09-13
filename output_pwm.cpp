@@ -33,9 +33,12 @@ bool AudioOutputPWM::update_responsibility = false;
 uint8_t AudioOutputPWM::interrupt_count = 0;
 
 DMAMEM uint32_t pwm_dma_buffer[AUDIO_BLOCK_SAMPLES*2];
+DMAChannel AudioOutputPWM::dma;
 
 void AudioOutputPWM::begin(void)
 {
+	dma.begin(true); // Allocate the DMA channel first
+
 	//Serial.println("AudioPwmOutput constructor");
 	block_1st = NULL;
 	FTM1_SC = 0;
@@ -52,26 +55,22 @@ void AudioOutputPWM::begin(void)
 		pwm_dma_buffer[i] = 120; // zero must not be used
 		pwm_dma_buffer[i+1] = 0;
 	}
-	SIM_SCGC7 |= SIM_SCGC7_DMA;
-	SIM_SCGC6 |= SIM_SCGC6_DMAMUX;
-	DMA_CR = 0;
-	DMA_TCD_SADDR(AUDIO_OUT_PWM_DMA_CHANNEL) = pwm_dma_buffer;
-	DMA_TCD_SOFF(AUDIO_OUT_PWM_DMA_CHANNEL) = 4;
-	DMA_TCD_ATTR(AUDIO_OUT_PWM_DMA_CHANNEL) = DMA_TCD_ATTR_SSIZE(2)
+	dma.TCD->SADDR = pwm_dma_buffer;
+	dma.TCD->SOFF = 4;
+	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(2)
 		| DMA_TCD_ATTR_DSIZE(2) | DMA_TCD_ATTR_DMOD(4);
-	DMA_TCD_NBYTES_MLNO(AUDIO_OUT_PWM_DMA_CHANNEL) = 8;
-	DMA_TCD_SLAST(AUDIO_OUT_PWM_DMA_CHANNEL) = -sizeof(pwm_dma_buffer);
-	DMA_TCD_DADDR(AUDIO_OUT_PWM_DMA_CHANNEL) = &FTM1_C0V;
-	DMA_TCD_DOFF(AUDIO_OUT_PWM_DMA_CHANNEL) = 8;
-	DMA_TCD_CITER_ELINKNO(AUDIO_OUT_PWM_DMA_CHANNEL) = sizeof(pwm_dma_buffer) / 8;
-	DMA_TCD_DLASTSGA(AUDIO_OUT_PWM_DMA_CHANNEL) = 0;
-	DMA_TCD_BITER_ELINKNO(AUDIO_OUT_PWM_DMA_CHANNEL) = sizeof(pwm_dma_buffer) / 8;
-	DMA_TCD_CSR(AUDIO_OUT_PWM_DMA_CHANNEL) = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
-	DMAMUX0_CHCFG(AUDIO_OUT_PWM_DMA_CHANNEL) = DMAMUX_DISABLE;
-	DMAMUX0_CHCFG(AUDIO_OUT_PWM_DMA_CHANNEL) = DMAMUX_SOURCE_FTM1_CH0 | DMAMUX_ENABLE;
-	DMA_SERQ = AUDIO_OUT_PWM_DMA_CHANNEL;
+	dma.TCD->NBYTES_MLNO = 8;
+	dma.TCD->SLAST = -sizeof(pwm_dma_buffer);
+	dma.TCD->DADDR = &FTM1_C0V;
+	dma.TCD->DOFF = 8;
+	dma.TCD->CITER_ELINKNO = sizeof(pwm_dma_buffer) / 8;
+	dma.TCD->DLASTSGA = 0;
+	dma.TCD->BITER_ELINKNO = sizeof(pwm_dma_buffer) / 8;
+	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
+	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_FTM1_CH0);
+	dma.enable();
 	update_responsibility = update_setup();
-	NVIC_ENABLE_IRQ(IRQ_DMA_CH(AUDIO_OUT_PWM_DMA_CHANNEL));
+	dma.attachInterrupt(isr);
 }
 
 void AudioOutputPWM::update(void)
@@ -97,15 +96,15 @@ void AudioOutputPWM::update(void)
 	}
 }
 
-void DMA_ISR(AUDIO_OUT_PWM_DMA_CHANNEL)(void)
+void AudioOutputPWM::isr(void)
 {
 	int16_t *src;
 	uint32_t *dest;
 	audio_block_t *block;
 	uint32_t saddr, offset;
 
-	saddr = (uint32_t)(DMA_TCD_SADDR(AUDIO_OUT_PWM_DMA_CHANNEL));
-        DMA_CINT = AUDIO_OUT_PWM_DMA_CHANNEL;
+	saddr = (uint32_t)(dma.TCD->SADDR);
+	dma.clearInterrupt();
 	if (saddr < (uint32_t)pwm_dma_buffer + sizeof(pwm_dma_buffer) / 2) {
 		// DMA is transmitting the first half of the buffer
 		// so we must fill the second half
