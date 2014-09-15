@@ -39,25 +39,27 @@ void AudioSynthWaveformSine::update(void)
 	uint32_t i, ph, inc, index, scale;
 	int32_t val1, val2;
 
-	block = allocate();
-	if (block) {
-		ph = phase_accumulator;
-		inc = phase_increment;
-		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
-			index = ph >> 24;
-			val1 = AudioWaveformSine[index];
-			val2 = AudioWaveformSine[index+1];
-			scale = (ph >> 8) & 0xFFFF;
-			val2 *= scale;
-			val1 *= 0xFFFF - scale;
-			//block->data[i] = (((val1 + val2) >> 16) * magnitude) >> 16;
-			block->data[i] = multiply_32x32_rshift32(val1 + val2, magnitude);
-			ph += inc;
+	if (magnitude) {
+		block = allocate();
+		if (block) {
+			ph = phase_accumulator;
+			inc = phase_increment;
+			for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+				index = ph >> 24;
+				val1 = AudioWaveformSine[index];
+				val2 = AudioWaveformSine[index+1];
+				scale = (ph >> 8) & 0xFFFF;
+				val2 *= scale;
+				val1 *= 0xFFFF - scale;
+				//block->data[i] = (((val1 + val2) >> 16) * magnitude) >> 16;
+				block->data[i] = multiply_32x32_rshift32(val1 + val2, magnitude);
+				ph += inc;
+			}
+			phase_accumulator = ph;
+			transmit(block);
+			release(block);
+			return;
 		}
-		phase_accumulator = ph;
-		transmit(block);
-		release(block);
-		return;
 	}
 	phase_accumulator += phase_increment * AUDIO_BLOCK_SAMPLES;
 }
