@@ -27,11 +27,28 @@
 #ifndef pdb_h_
 #define pdb_h_
 
+#include "kinetis.h"
+
 // Multiple input & output objects use the Programmable Delay Block
 // to set their sample rate.  They must all configure the same
 // period to avoid chaos.
 
 #define PDB_CONFIG (PDB_SC_TRGSEL(15) | PDB_SC_PDBEN | PDB_SC_CONT)
-#define PDB_PERIOD 1087 // 48e6 / 44100
+
+#if F_BUS == 60000000
+  #define PDB_PERIOD (1360-1)
+#elif F_BUS == 56000000
+  #define PDB_PERIOD (1269-1)  // 0.026% error
+#elif F_BUS == 48000000
+  #define PDB_PERIOD (1088-1)
+#elif F_BUS == 36000000
+  #define PDB_PERIOD (816-1)
+#elif F_BUS == 24000000
+  #define PDB_PERIOD (544-1)
+#elif F_BUS == 16000000
+  #define PDB_PERIOD (363-1)  // 0.092% error
+#else
+  #error "Unsupported F_BUS speed"
+#endif
 
 #endif
