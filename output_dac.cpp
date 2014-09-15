@@ -33,7 +33,7 @@ DMAMEM static uint16_t dac_buffer[AUDIO_BLOCK_SAMPLES*2];
 audio_block_t * AudioOutputAnalog::block_left_1st = NULL;
 audio_block_t * AudioOutputAnalog::block_left_2nd = NULL;
 bool AudioOutputAnalog::update_responsibility = false;
-DMAChannel AudioOutputAnalog::dma;
+DMAChannel AudioOutputAnalog::dma(false);
 
 void AudioOutputAnalog::begin(void)
 {

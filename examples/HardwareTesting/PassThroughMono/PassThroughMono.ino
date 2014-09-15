@@ -22,20 +22,6 @@ void loop() {
   // Do nothing here.  The Audio flows automatically
 
   // When AudioInputAnalog is running, analogRead() must NOT be used.
-  delay(200);
-  Serial.print("PDB: SC=");
-  Serial.print(PDB0_SC, HEX);
-  Serial.print(", CONFIG=");
-  Serial.print(PDB_CONFIG, HEX);
-  Serial.print(", MOD=");
-  Serial.print(PDB0_MOD);
-  Serial.print(", IDLY=");
-  Serial.print(PDB0_IDLY);
-  Serial.print(", CH0C1=");
-  Serial.print(PDB0_CH0C1);
-  Serial.print(", DMA: ");
-  Serial.print(dma_channel_allocated_mask, HEX);
-  Serial.println();
 }
 
 

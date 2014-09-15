@@ -32,7 +32,7 @@ audio_block_t * AudioInputI2S::block_left = NULL;
 audio_block_t * AudioInputI2S::block_right = NULL;
 uint16_t AudioInputI2S::block_offset = 0;
 bool AudioInputI2S::update_responsibility = false;
-DMAChannel AudioInputI2S::dma;
+DMAChannel AudioInputI2S::dma(false);
 
 
 void AudioInputI2S::begin(void)

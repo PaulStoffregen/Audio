@@ -31,7 +31,7 @@ DMAMEM static uint16_t analog_rx_buffer[AUDIO_BLOCK_SAMPLES];
 audio_block_t * AudioInputAnalog::block_left = NULL;
 uint16_t AudioInputAnalog::block_offset = 0;
 bool AudioInputAnalog::update_responsibility = false;
-DMAChannel AudioInputAnalog::dma;
+DMAChannel AudioInputAnalog::dma(false);
 
 
 AudioInputAnalog::AudioInputAnalog() : AudioStream(0, NULL)

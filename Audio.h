@@ -35,7 +35,7 @@
 #endif
 
 #include "DMAChannel.h"
-#ifndef DMACHANNEL_HAS_BEGIN
+#if !defined(DMACHANNEL_HAS_BEGIN) || !defined(DMACHANNEL_HAS_BOOLEAN_CTOR)
 #error "You need to update DMAChannel.h & DMAChannel.cpp"
 #error "https://github.com/PaulStoffregen/cores/blob/master/teensy3/DMAChannel.h"
 #error "https://github.com/PaulStoffregen/cores/blob/master/teensy3/DMAChannel.cpp"

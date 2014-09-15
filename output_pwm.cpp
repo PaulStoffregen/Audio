@@ -33,7 +33,7 @@ bool AudioOutputPWM::update_responsibility = false;
 uint8_t AudioOutputPWM::interrupt_count = 0;
 
 DMAMEM uint32_t pwm_dma_buffer[AUDIO_BLOCK_SAMPLES*2];
-DMAChannel AudioOutputPWM::dma;
+DMAChannel AudioOutputPWM::dma(false);
 
 // TODO: this code assumes F_BUS is 48 MHz.
 // supporting other speeds is not easy, but should be done someday

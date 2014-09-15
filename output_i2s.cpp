@@ -34,7 +34,7 @@ uint16_t  AudioOutputI2S::block_left_offset = 0;
 uint16_t  AudioOutputI2S::block_right_offset = 0;
 bool AudioOutputI2S::update_responsibility = false;
 DMAMEM static uint32_t i2s_tx_buffer[AUDIO_BLOCK_SAMPLES];
-DMAChannel AudioOutputI2S::dma;
+DMAChannel AudioOutputI2S::dma(false);
 
 void AudioOutputI2S::begin(void)
 {
