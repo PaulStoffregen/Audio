@@ -1,4 +1,5 @@
-﻿// demonstrate pulse with slow changes in pulse width
+
+// demonstrate pulse with slow changes in pulse width
 
 #include <Audio.h>
 #include <Wire.h>
