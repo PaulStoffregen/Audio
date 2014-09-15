@@ -1,8 +1,10 @@
 // Dial Tone (DTMF) decoding example.
 //
-// The audio with dial tones is connected to analog input A0,
+// The audio with dial tones is connected to analog input A2,
 // without using the audio shield.  See the "DialTone_DTMF"
 // example for using the audio shield.
+//
+// This example code is in the public domain.
 
 #include <Audio.h>
 #include <Wire.h>
@@ -12,7 +14,7 @@
 // Create the Audio components.  These should be created in the
 // order data flows, inputs/sources -> processing -> outputs
 //
-AudioInputAnalog         audioIn(A0);
+AudioInputAnalog         audioIn;
 AudioAnalyzeToneDetect   row1;     // 7 tone detectors are needed
 AudioAnalyzeToneDetect   row2;     // to receive DTMF dial tones
 AudioAnalyzeToneDetect   row3;
@@ -23,21 +25,21 @@ AudioAnalyzeToneDetect   column3;
 
 // Create Audio connections between the components
 //
-AudioConnection c01(audioIn, 0, row1, 0);
-AudioConnection c02(audioIn, 0, row2, 0);
-AudioConnection c03(audioIn, 0, row3, 0);
-AudioConnection c04(audioIn, 0, row4, 0);
-AudioConnection c05(audioIn, 0, column1, 0);
-AudioConnection c06(audioIn, 0, column2, 0);
-AudioConnection c07(audioIn, 0, column3, 0);
+AudioConnection patchCord1(audioIn, 0, row1, 0);
+AudioConnection patchCord2(audioIn, 0, row2, 0);
+AudioConnection patchCord3(audioIn, 0, row3, 0);
+AudioConnection patchCord4(audioIn, 0, row4, 0);
+AudioConnection patchCord5(audioIn, 0, column1, 0);
+AudioConnection patchCord6(audioIn, 0, column2, 0);
+AudioConnection patchCord7(audioIn, 0, column3, 0);
 
 // pins where the 7 segment LEDs are connected
 const int sevenseg_a = 17;   //  aaa
 const int sevenseg_b = 9;    // f   b
 const int sevenseg_c = 11;   // f   b
 const int sevenseg_d = 12;   //  ggg
-const int sevenseg_e = 15;   // e   c
-const int sevenseg_f = 16;   // e   c
+const int sevenseg_e = 14;   // e   c
+const int sevenseg_f = 15;   // e   c
 const int sevenseg_g = 10;   //  ddd
 
 

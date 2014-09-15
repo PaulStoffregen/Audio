@@ -1,3 +1,15 @@
+// Dial Tone (DTMF) decoding example.
+//
+// The audio with dial tones is connected to audio shield
+// Left Line-In pin.  Dial tone output is produced on the
+// Line-Out and headphones.
+//
+// Use the Arduino Serial Monitor to watch for incoming
+// dial tones, and to send digits to be played as dial tones.
+//
+// This example code is in the public domain.
+
+
 #include <Audio.h>
 #include <Wire.h>
 #include <SPI.h>
@@ -14,24 +26,24 @@ AudioAnalyzeToneDetect   row4;
 AudioAnalyzeToneDetect   column1;
 AudioAnalyzeToneDetect   column2;
 AudioAnalyzeToneDetect   column3;
-AudioSynthWaveform       sine1(AudioWaveformSine);  // 2 sine wave
-AudioSynthWaveform       sine2(AudioWaveformSine);  // to create DTMF
+AudioSynthWaveformSine   sine1;    // 2 sine wave
+AudioSynthWaveformSine   sine2;    // to create DTMF
 AudioMixer4              mixer;
 AudioOutputI2S           audioOut;
 
 // Create Audio connections between the components
 //
-AudioConnection c01(audioIn, 0, row1, 0);
-AudioConnection c02(audioIn, 0, row2, 0);
-AudioConnection c03(audioIn, 0, row3, 0);
-AudioConnection c04(audioIn, 0, row4, 0);
-AudioConnection c05(audioIn, 0, column1, 0);
-AudioConnection c06(audioIn, 0, column2, 0);
-AudioConnection c07(audioIn, 0, column3, 0);
-AudioConnection c10(sine1, 0, mixer, 0);
-AudioConnection c11(sine2, 0, mixer, 1);
-AudioConnection c12(mixer, 0, audioOut, 0);
-AudioConnection c13(mixer, 0, audioOut, 1);
+AudioConnection patchCord01(audioIn, 0, row1, 0);
+AudioConnection patchCord02(audioIn, 0, row2, 0);
+AudioConnection patchCord03(audioIn, 0, row3, 0);
+AudioConnection patchCord04(audioIn, 0, row4, 0);
+AudioConnection patchCord05(audioIn, 0, column1, 0);
+AudioConnection patchCord06(audioIn, 0, column2, 0);
+AudioConnection patchCord07(audioIn, 0, column3, 0);
+AudioConnection patchCord10(sine1, 0, mixer, 0);
+AudioConnection patchCord11(sine2, 0, mixer, 1);
+AudioConnection patchCord12(mixer, 0, audioOut, 0);
+AudioConnection patchCord13(mixer, 0, audioOut, 1);
 
 // Create an object to control the audio shield.
 // 
@@ -45,7 +57,7 @@ void setup() {
 
   // Enable the audio shield and set the output volume.
   audioShield.enable();
-  audioShield.volume(0.75);
+  audioShield.volume(0.5);
   
   while (!Serial) ;
   delay(100);

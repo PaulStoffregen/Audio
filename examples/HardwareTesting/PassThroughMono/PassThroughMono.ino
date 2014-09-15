@@ -1,8 +1,14 @@
+/*
+ * A simple hardware test which receives audio on the A2 analog pin
+ * and sends it to the PWM (pin 3) output and DAC (A14 pin) output.
+ *
+ * This example code is in the public domain.
+ */
+
 #include <Audio.h>
 #include <Wire.h>
 #include <SPI.h>
 #include <SD.h>
-#include "utility/pdb.h"
 
 // GUItool: begin automatically generated code
 AudioInputAnalog         adc1;           //xy=161,80
