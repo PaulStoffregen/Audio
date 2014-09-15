@@ -48,11 +48,18 @@ void AudioOutputAnalog::begin(void)
 	}
 
 	// set the programmable delay block to trigger DMA requests
-	SIM_SCGC6 |= SIM_SCGC6_PDB;
-	PDB0_IDLY = 1;
-	PDB0_MOD = PDB_PERIOD;
-	PDB0_SC = PDB_CONFIG | PDB_SC_LDOK;
-	PDB0_SC = PDB_CONFIG | PDB_SC_SWTRIG | PDB_SC_PDBIE | PDB_SC_DMAEN;
+	if (!(SIM_SCGC6 & SIM_SCGC6_PDB)
+	  || (PDB0_SC & PDB_CONFIG) != PDB_CONFIG
+	  || PDB0_MOD != PDB_PERIOD
+	  || PDB0_IDLY != 1
+	  || PDB0_CH0C1 != 0x0101) {
+		SIM_SCGC6 |= SIM_SCGC6_PDB;
+		PDB0_IDLY = 1;
+		PDB0_MOD = PDB_PERIOD;
+		PDB0_SC = PDB_CONFIG | PDB_SC_LDOK;
+		PDB0_SC = PDB_CONFIG | PDB_SC_SWTRIG;
+		PDB0_CH0C1 = 0x0101;
+	}
 
 	dma.TCD->SADDR = dac_buffer;
 	dma.TCD->SOFF = 2;

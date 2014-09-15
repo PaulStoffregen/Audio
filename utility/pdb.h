@@ -33,7 +33,7 @@
 // to set their sample rate.  They must all configure the same
 // period to avoid chaos.
 
-#define PDB_CONFIG (PDB_SC_TRGSEL(15) | PDB_SC_PDBEN | PDB_SC_CONT)
+#define PDB_CONFIG (PDB_SC_TRGSEL(15) | PDB_SC_PDBEN | PDB_SC_CONT | PDB_SC_PDBIE | PDB_SC_DMAEN)
 
 #if F_BUS == 60000000
   #define PDB_PERIOD (1360-1)

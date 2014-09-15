@@ -112,7 +112,7 @@
 
 
 <script type="text/javascript">
-	RED.nodes.registerType('AudioInputADC',{
+	RED.nodes.registerType('AudioInputAnalog',{
 	shortName: "adc",
 		inputs:0,
 		outputs:1,
@@ -121,7 +121,7 @@
 		icon: "arrow-in.png"
 	});
 </script>
-<script type="text/x-red" data-help-name="AudioInputADC">
+<script type="text/x-red" data-help-name="AudioInputAnalog">
 	<h3>Summary</h3>
 	<p>Receive audio using the built-in analog to digital converter.</p>
 	<h3>Audio Connections</h3>
@@ -129,18 +129,12 @@
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
 		<tr class=odd><td align=center>Out 0</td><td>Audio Channel</td></tr>
 	</table>
-	<h3>Parameters</h3>
-	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
-		<tr class=odd><td align=center>Pin</td><td>Integer</td><td>Analog Pin To Use</td></tr>
-	</table>
-	<p>The pin number should be specified as "A0" to "A20"</p>
-	<p align=center><img src="adcpins2.jpg"></p>
-	<p align=center><img src="adcpins1.jpg"></p>
 	<h3>Functions</h3>
 	<p>This object has no functions to call from the Arduino sketch.  It
 		simply streams data from the ADC to its output port.</p>
 	<h3>Hardware</h3>
+	<p>Pin A2 is used for audio input.</p>
+	<p align=center><img src="adcpins2.jpg"></p>
 	<p>Signal range is 0 to 1.2V</p>
 	<p>Need for DC bias, approx 0.6V</p>
 	<p>TODO: suggested circuity for signal input</p>
@@ -151,7 +145,7 @@
 	<p>TODO: actual noise measurements with different input circuitry
 		(it's not nearly as quiet as the audio shield)</p>
 </script>
-<script type="text/x-red" data-template-name="AudioInputADC">
+<script type="text/x-red" data-template-name="AudioInputAnalog">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">

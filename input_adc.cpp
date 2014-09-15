@@ -33,34 +33,17 @@ uint16_t AudioInputAnalog::block_offset = 0;
 bool AudioInputAnalog::update_responsibility = false;
 DMAChannel AudioInputAnalog::dma;
 
-// #define PDB_CONFIG (PDB_SC_TRGSEL(15) | PDB_SC_PDBEN | PDB_SC_CONT)
-// #define PDB_PERIOD 1087 // 48e6 / 44100
 
-void AudioInputAnalog::begin(unsigned int pin)
+AudioInputAnalog::AudioInputAnalog() : AudioStream(0, NULL)
 {
+	unsigned int pin = A2;
 	uint32_t i, sum=0;
-
-	// pin specified in user sketches should be A0 to A13
-	// numbers can be used, but the recommended usage is
-	// with the named constants A0 to A13
-	//   constants A0-A9 are actually 14 to 23
-	//   constants A10-A13 are actually 34 to 37
-	if (pin > 23 && !(pin >= 34 && pin <= 37)) return;
-
-	dma.begin(true); // Allocate the DMA channel first
-
-	//pinMode(2, OUTPUT);
-	//pinMode(3, OUTPUT);
-	//digitalWriteFast(3, HIGH);
-	//delayMicroseconds(500);
-	//digitalWriteFast(3, LOW);
 
 	// Configure the ADC and run at least one software-triggered
 	// conversion.  This completes the self calibration stuff and
 	// leaves the ADC in a state that's mostly ready to use
 	analogReadRes(16);
 	analogReference(INTERNAL); // range 0 to 1.2 volts
-	//analogReference(DEFAULT); // range 0 to 3.3 volts
 	analogReadAveraging(8);
 	// Actually, do many normal reads, to start with a nice DC level
 	for (i=0; i < 1024; i++) {
@@ -68,22 +51,25 @@ void AudioInputAnalog::begin(unsigned int pin)
 	}
 	dc_average = sum >> 10;
 
-	// testing only, enable adc interrupt
-	//ADC0_SC1A |= ADC_SC1_AIEN;
-	//while ((ADC0_SC1A & ADC_SC1_COCO) == 0) ; // wait
-	//NVIC_ENABLE_IRQ(IRQ_ADC0);
-
 	// set the programmable delay block to trigger the ADC at 44.1 kHz
-	SIM_SCGC6 |= SIM_SCGC6_PDB;
-	PDB0_MOD = PDB_PERIOD;
-	PDB0_SC = PDB_CONFIG | PDB_SC_LDOK;
-	PDB0_SC = PDB_CONFIG | PDB_SC_SWTRIG;
-	PDB0_CH0C1 = 0x0101;
+	if (!(SIM_SCGC6 & SIM_SCGC6_PDB)
+	  || (PDB0_SC & PDB_CONFIG) != PDB_CONFIG
+	  || PDB0_MOD != PDB_PERIOD
+	  || PDB0_IDLY != 1
+	  || PDB0_CH0C1 != 0x0101) {
+		SIM_SCGC6 |= SIM_SCGC6_PDB;
+		PDB0_IDLY = 1;
+		PDB0_MOD = PDB_PERIOD;
+		PDB0_SC = PDB_CONFIG | PDB_SC_LDOK;
+		PDB0_SC = PDB_CONFIG | PDB_SC_SWTRIG;
+		PDB0_CH0C1 = 0x0101;
+	}
 
 	// enable the ADC for hardware trigger and DMA
 	ADC0_SC2 |= ADC_SC2_ADTRG | ADC_SC2_DMAEN;
 
 	// set up a DMA channel to store the ADC data
+	dma.begin(true);
 	dma.TCD->SADDR = &ADC0_RA;
 	dma.TCD->SOFF = 0;
 	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
@@ -101,6 +87,7 @@ void AudioInputAnalog::begin(unsigned int pin)
 	dma.attachInterrupt(isr);
 }
 
+
 void AudioInputAnalog::isr(void)
 {
 	uint32_t daddr, offset;
@@ -108,7 +95,7 @@ void AudioInputAnalog::isr(void)
 	uint16_t *dest_left;
 	audio_block_t *left;
 
-	//digitalWriteFast(3, HIGH);
+	digitalWriteFast(2, HIGH);
 	daddr = (uint32_t)(dma.TCD->DADDR);
 	dma.clearInterrupt();
 
@@ -117,26 +104,26 @@ void AudioInputAnalog::isr(void)
 		// need to remove data from the second half
 		src = (uint16_t *)&analog_rx_buffer[AUDIO_BLOCK_SAMPLES/2];
 		end = (uint16_t *)&analog_rx_buffer[AUDIO_BLOCK_SAMPLES];
-		if (AudioInputAnalog::update_responsibility) AudioStream::update_all();
+		if (update_responsibility) AudioStream::update_all();
 	} else {
 		// DMA is receiving to the second half of the buffer
 		// need to remove data from the first half
 		src = (uint16_t *)&analog_rx_buffer[0];
 		end = (uint16_t *)&analog_rx_buffer[AUDIO_BLOCK_SAMPLES/2];
 	}
-	left = AudioInputAnalog::block_left;
+	left = block_left;
 	if (left != NULL) {
-		offset = AudioInputAnalog::block_offset;
+		offset = block_offset;
 		if (offset > AUDIO_BLOCK_SAMPLES/2) offset = AUDIO_BLOCK_SAMPLES/2;
 		//if (offset <= AUDIO_BLOCK_SAMPLES/2) {
 			dest_left = (uint16_t *)&(left->data[offset]);
-			AudioInputAnalog::block_offset = offset + AUDIO_BLOCK_SAMPLES/2;
+			block_offset = offset + AUDIO_BLOCK_SAMPLES/2;
 			do {
 				*dest_left++ = *src++;
 			} while (src < end);
 		//}
 	}
-	//digitalWriteFast(3, LOW);
+	digitalWriteFast(2, LOW);
 }
 
 
@@ -156,6 +143,8 @@ void AudioInputAnalog::update(void)
 	audio_block_t *new_left=NULL, *out_left=NULL;
 	unsigned int dc, offset;
 	int16_t s, *p, *end;
+
+	//Serial.println("update");
 
 	// allocate new block (ok if NULL)
 	new_left = allocate();

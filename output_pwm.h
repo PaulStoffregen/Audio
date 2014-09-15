@@ -35,7 +35,6 @@ class AudioOutputPWM : public AudioStream
 public:
 	AudioOutputPWM(void) : AudioStream(1, inputQueueArray) { begin(); }
 	virtual void update(void);
-	void begin(void);
 private:
 	static audio_block_t *block_1st;
 	static audio_block_t *block_2nd;
@@ -45,6 +44,7 @@ private:
 	audio_block_t *inputQueueArray[1];
 	static DMAChannel dma;
 	static void isr(void);
+	void begin(void);
 };
 
 #endif
