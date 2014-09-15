@@ -57,9 +57,9 @@ public AudioStream
 {
 public:
   AudioSynthWaveform(void) : 
-  AudioStream(0,NULL), 
-  tone_phase(0), tone_incr(0), tone_type(0),
-  tone_offset(0), tone_width(0.25), arbdata(NULL)
+  AudioStream(0,NULL), tone_amp(0), tone_freq(0),
+  tone_phase(0), tone_width(0.25), tone_incr(0), tone_type(0),
+  tone_offset(0), arbdata(NULL)
   { 
   }
   

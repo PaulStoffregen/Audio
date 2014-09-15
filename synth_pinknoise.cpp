@@ -43,10 +43,10 @@ int16_t AudioSynthNoisePink::instance_cnt = 0;
 // with these coefficients: 1.190566, 0.162580, 0.002208, 0.025475, -0.001522,
 // 0.007322, 0.001774, 0.004529, -0.001561, 0.000776, -0.000486, 0.002017
 #define Fn(cf,m,shift)   (2048*cf*(2*((m)>>shift&1)-1))
-#define FA(n)	Fn(1.190566,n,0)+Fn(0.162580,n,1)+Fn(0.002208,n,2)+\
-		Fn(0.025475,n,3)+Fn(-0.001522,n,4)+Fn(0.007322,n,5)       
-#define FB(n)   Fn(0.001774,n,0)+Fn(0.004529,n,1)+Fn(-0.001561,n,2)+\
-		Fn(0.000776,n,3)+Fn(-0.000486,n,4)+Fn(0.002017,n,5)
+#define FA(n)	(int32_t)(Fn(1.190566,n,0)+Fn(0.162580,n,1)+Fn(0.002208,n,2)+\
+		Fn(0.025475,n,3)+Fn(-0.001522,n,4)+Fn(0.007322,n,5))
+#define FB(n)   (int32_t)(Fn(0.001774,n,0)+Fn(0.004529,n,1)+Fn(-0.001561,n,2)+\
+		Fn(0.000776,n,3)+Fn(-0.000486,n,4)+Fn(0.002017,n,5))
 #define FA8(n)  FA(n),FA(n+1),FA(n+2),FA(n+3),FA(n+4),FA(n+5),FA(n+6),FA(n+7)
 #define FB8(n)  FB(n),FB(n+1),FB(n+2),FB(n+3),FB(n+4),FB(n+5),FB(n+6),FB(n+7)
 const int32_t AudioSynthNoisePink::pfira[64] = // 1st FIR lookup table

@@ -41,8 +41,8 @@ public:
 
 private:
   short tone_amp;
-  int tone_lo;
-  int tone_hi;
+  unsigned int tone_lo;
+  unsigned int tone_hi;
   uint64_t tone_freq;
   uint64_t tone_phase;
   uint64_t tone_incr;
