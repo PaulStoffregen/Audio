@@ -39,6 +39,8 @@ lengthMillis	KEYWORD2
 gain	KEYWORD2
 fadeIn	KEYWORD2
 fadeOut	KEYWORD2
+noteOn	KEYWORD2
+noteOff	KEYWORD2
 stop	KEYWORD2
 play	KEYWORD2
 updateCoefs	KEYWORD2
