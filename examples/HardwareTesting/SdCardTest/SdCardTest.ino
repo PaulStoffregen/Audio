@@ -1,126 +1,283 @@
-/*
-  SD card test 
-   
- This example shows how use the utility libraries on which the'
- SD library is based in order to get info about your SD card.
- Very useful for testing a card when you're not sure whether its working or not.
- 	
- The circuit:
-  * SD card attached to SPI bus as follows:
- ** MOSI - pin 11 on Arduino Uno/Duemilanove/Diecimila
- ** MISO - pin 12 on Arduino Uno/Duemilanove/Diecimila
- ** CLK - pin 13 on Arduino Uno/Duemilanove/Diecimila
- ** CS - depends on your SD card shield or module. 
- 		Pin 4 used here for consistency with other Arduino examples
+// SD Card Test
+//
+// Check if the SD card on the Audio Shield is working,
+// and perform some simple speed measurements to gauge
+// its ability to play 1, 2, 3 and 4 WAV files at a time.
+//
+// Requires the audio shield:
+//   http://www.pjrc.com/store/teensy3_audio.html
+//
+// Data files to put on your SD card can be downloaded here:
+//   http://www.pjrc.com/teensy/td_libs_AudioDataFiles.html
+//
+// This example code is in the public domain.
 
- 
- created  28 Mar 2011
- by Limor Fried 
- modified 9 Apr 2012
- by Tom Igoe
- */
- // include the SD library:
 #include <SD.h>
 #include <SPI.h>
 
-// set up variables using the SD utility library functions:
-Sd2Card card;
-SdVolume volume;
-SdFile root;
+void setup() {
+  Sd2Card card;
+  SdVolume volume;
+  File f1, f2, f3, f4;
+  char buffer[512];
+  boolean status;
+  unsigned long usec, usecMax;
+  elapsedMicros usecTotal, usecSingle;
+  int i, type;
+  float size;
 
-// change this to match your SD shield or module;
-// Arduino Ethernet shield: pin 4
-// Adafruit SD shields and modules: pin 10
-// Sparkfun SD shield: pin 8
-// Teensy 2.0: pin 0
-// Teensy++ 2.0: pin 20
-// Teensy 3.0: pin 10
-// Audio Shield for Teensy 3.0: pin 10
-const int chipSelect = 10;    
+  // wait for the Arduino Serial Monitor to open
+  while (!Serial) ;
+  delay(50);
 
-void setup()
-{
+  // Configure SPI for the audio shield pins
   SPI.setMOSI(7);  // Audio shield has MOSI on pin 7
   SPI.setSCK(14);  // Audio shield has SCK on pin 14
-  
- // Open serial communications and wait for port to open:
+
   Serial.begin(9600);
-   while (!Serial) {
-    ; // wait for serial port to connect. Needed for Leonardo only
-  }
-  delay(250);
+  Serial.println("SD Card Test");
+  Serial.println("------------");
 
-
-  Serial.print("\nInitializing SD card...");
-  // On the Ethernet Shield, CS is pin 4. It's set as an output by default.
-  // Note that even if it's not used as the CS pin, the hardware SS pin 
-  // (10 on most Arduino boards, 53 on the Mega) must be left as an output 
-  // or the SD library functions will not work. 
-  pinMode(10, OUTPUT);     // change this to 53 on a mega
-
-
-  // we'll use the initialization code from the utility libraries
-  // since we're just testing if the card is working!
-  if (!card.init(SPI_HALF_SPEED, chipSelect)) {
-    Serial.println("initialization failed. Things to check:");
-    Serial.println("* is a card is inserted?");
-    Serial.println("* Is your wiring correct?");
-    Serial.println("* did you change the chipSelect pin to match your shield or module?");
-    return;
+  // First, detect the card
+  status = card.init(10); // Audio shield has SD card SD on pin 10
+  if (status) {
+    Serial.println("SD card is connected :-)");
   } else {
-   Serial.println("Wiring is correct and a card is present."); 
+    Serial.println("SD card is not connected or unusable :-(");
+    return;
   }
 
-  // print the type of card
-  Serial.print("\nCard type: ");
-  switch(card.type()) {
-    case SD_CARD_TYPE_SD1:
-      Serial.println("SD1");
-      break;
-    case SD_CARD_TYPE_SD2:
-      Serial.println("SD2");
-      break;
-    case SD_CARD_TYPE_SDHC:
-      Serial.println("SDHC");
-      break;
-    default:
-      Serial.println("Unknown");
+  type = card.type();
+  if (type == SD_CARD_TYPE_SD1 || type == SD_CARD_TYPE_SD2) {
+    Serial.println("Card type is SD");
+  } else if (type == SD_CARD_TYPE_SDHC) {
+    Serial.println("Card type is SDHC");
+  } else {
+    Serial.println("Card is an unknown type (maybe SDXC?)");
   }
 
-  // Now we will try to open the 'volume'/'partition' - it should be FAT16 or FAT32
-  if (!volume.init(card)) {
-    Serial.println("Could not find FAT16/FAT32 partition.\nMake sure you've formatted the card");
+  // Then look at the file system and print its capacity
+  status = volume.init(card);
+  if (!status) {
+    Serial.println("Unable to access the filesystem on this card. :-(");
+    return;
+  }
+
+  size = volume.blocksPerCluster() * volume.clusterCount();
+  size = size * (512.0 / 1e6); // convert blocks to millions of bytes
+  Serial.print("File system space is ");
+  Serial.print(size);
+  Serial.println(" Mbytes.");
+
+  // Now open the SD card normally
+  status = SD.begin(10); // Audio shield has SD card CS on pin 10
+  if (status) {
+    Serial.println("SD library is able to access the filesystem");
+  } else {
+    Serial.println("SD library can not access the filesystem!");
+    Serial.println("Please report this problem, with the make & model of your SD card.");
+    Serial.println("  http://forum.pjrc.com/forums/4-Suggestions-amp-Bug-Reports");
+  }
+
+
+  // Open the 4 sample files.  Hopefully they're on the card
+  f1 = SD.open("SDTEST1.WAV");
+  f2 = SD.open("SDTEST2.WAV");
+  f3 = SD.open("SDTEST3.WAV");
+  f4 = SD.open("SDTEST4.WAV");
+
+  // Speed test reading a single file
+  if (f1) {
+    Serial.println();
+    Serial.println("Reading SDTEST1.WAV:");
+    if (f1.size() >= 514048) {
+      usecMax = 0;
+      usecTotal = 0;
+      for (i=0; i < 1000; i++) {
+        usecSingle = 0;
+        f1.read(buffer, 512);
+        usec = usecSingle;
+        if (usec > usecMax) usecMax = usec;
+      }
+      reportSpeed(1, 1000, usecTotal, usecMax);
+    } else {
+      Serial.println("SDTEST1.WAV is too small for speed testing");
+    }
+  } else {
+    Serial.println("Unable to find SDTEST1.WAV on this card");
+    return;
+  }
+
+  // Speed test reading two files
+  if (f2) {
+    Serial.println();
+    Serial.println("Reading SDTEST1.WAV & SDTEST2.WAV:");
+    if (f2.size() >= 514048) {
+      f1.seek(0);
+      usecMax = 0;
+      usecTotal = 0;
+      for (i=0; i < 1000; i++) {
+        usecSingle = 0;
+        f1.read(buffer, 512);
+        f2.read(buffer, 512);
+        usec = usecSingle;
+        if (usec > usecMax) usecMax = usec;
+      }
+      reportSpeed(2, 1000, usecTotal, usecMax);
+
+      Serial.println();
+      Serial.println("Reading SDTEST1.WAV & SDTEST2.WAV staggered:");
+      f1.seek(0);
+      f2.seek(0);
+      f1.read(buffer, 512);
+      usecMax = 0;
+      usecTotal = 0;
+      for (i=0; i < 1000; i++) {
+        usecSingle = 0;
+        f1.read(buffer, 512);
+        f2.read(buffer, 512);
+        usec = usecSingle;
+        if (usec > usecMax) usecMax = usec;
+      }
+      reportSpeed(2, 1000, usecTotal, usecMax);
+    } else {
+      Serial.println("SDTEST2.WAV is too small for speed testing");
+    }
+  } else {
+    Serial.println("Unable to find SDTEST2.WAV on this card");
     return;
   }
 
 
-  // print the type and size of the first FAT-type volume
-  uint32_t volumesize;
-  Serial.print("\nVolume type is FAT");
-  Serial.println(volume.fatType(), DEC);
-  Serial.println();
-  
-  volumesize = volume.blocksPerCluster();    // clusters are collections of blocks
-  volumesize *= volume.clusterCount();       // we'll have a lot of clusters
-  volumesize *= 512;                            // SD card blocks are always 512 bytes
-  Serial.print("Volume size (bytes): ");
-  Serial.println(volumesize);
-  Serial.print("Volume size (Kbytes): ");
-  volumesize /= 1024;
-  Serial.println(volumesize);
-  Serial.print("Volume size (Mbytes): ");
-  volumesize /= 1024;
-  Serial.println(volumesize);
+  // Speed test reading three files
+  if (f3) {
+    Serial.println();
+    Serial.println("Reading SDTEST1.WAV, SDTEST2.WAV, SDTEST3.WAV:");
+    if (f3.size() >= 514048) {
+      f1.seek(0);
+      f2.seek(0);
+      usecMax = 0;
+      usecTotal = 0;
+      for (i=0; i < 1000; i++) {
+        usecSingle = 0;
+        f1.read(buffer, 512);
+        f2.read(buffer, 512);
+        f3.read(buffer, 512);
+        usec = usecSingle;
+        if (usec > usecMax) usecMax = usec;
+      }
+      reportSpeed(3, 1000, usecTotal, usecMax);
 
-  
-  Serial.println("\nFiles found on the card (name, date and size in bytes): ");
-  root.openRoot(volume);
-  
-  // list all files in the card with date and size
-  root.ls(LS_R | LS_DATE | LS_SIZE);
+      Serial.println();
+      Serial.println("Reading SDTEST1.WAV, SDTEST2.WAV, SDTEST3.WAV staggered:");
+      f1.seek(0);
+      f2.seek(0);
+      f3.seek(0);
+      f1.read(buffer, 512);
+      f1.read(buffer, 512);
+      f2.read(buffer, 512);
+      usecMax = 0;
+      usecTotal = 0;
+      for (i=0; i < 1000; i++) {
+        usecSingle = 0;
+        f1.read(buffer, 512);
+        f2.read(buffer, 512);
+        f3.read(buffer, 512);
+        usec = usecSingle;
+        if (usec > usecMax) usecMax = usec;
+      }
+      reportSpeed(3, 1000, usecTotal, usecMax);
+    } else {
+      Serial.println("SDTEST3.WAV is too small for speed testing");
+    }
+  } else {
+    Serial.println("Unable to find SDTEST3.WAV on this card");
+    return;
+  }
+
+
+  // Speed test reading four files
+  if (f4) {
+    Serial.println();
+    Serial.println("Reading SDTEST1.WAV, SDTEST2.WAV, SDTEST3.WAV, SDTEST4.WAV:");
+    if (f4.size() >= 514048) {
+      f1.seek(0);
+      f2.seek(0);
+      f3.seek(0);
+      usecMax = 0;
+      usecTotal = 0;
+      for (i=0; i < 1000; i++) {
+        usecSingle = 0;
+        f1.read(buffer, 512);
+        f2.read(buffer, 512);
+        f3.read(buffer, 512);
+        f4.read(buffer, 512);
+        usec = usecSingle;
+        if (usec > usecMax) usecMax = usec;
+      }
+      reportSpeed(4, 1000, usecTotal, usecMax);
+
+      Serial.println();
+      Serial.println("Reading SDTEST1.WAV, SDTEST2.WAV, SDTEST3.WAV, SDTEST4.WAV staggered:");
+      f1.seek(0);
+      f2.seek(0);
+      f3.seek(0);
+      f4.seek(0);
+      f1.read(buffer, 512);
+      f1.read(buffer, 512);
+      f1.read(buffer, 512);
+      f2.read(buffer, 512);
+      f2.read(buffer, 512);
+      f3.read(buffer, 512);
+      usecMax = 0;
+      usecTotal = 0;
+      for (i=0; i < 1000; i++) {
+        usecSingle = 0;
+        f1.read(buffer, 512);
+        f2.read(buffer, 512);
+        f3.read(buffer, 512);
+        f4.read(buffer, 512);
+        usec = usecSingle;
+        if (usec > usecMax) usecMax = usec;
+      }
+      reportSpeed(4, 1000, usecTotal, usecMax);
+    } else {
+      Serial.println("SDTEST4.WAV is too small for speed testing");
+    }
+  } else {
+    Serial.println("Unable to find SDTEST4.WAV on this card");
+    return;
+  }
+
+}
+
+
+unsigned long maximum(unsigned long a, unsigned long b,
+  unsigned long c, unsigned long d)
+{
+  if (b > a) a = b;
+  if (c > a) a = c;
+  if (d > a) a = d;
+  return a;
+}
+
+
+void reportSpeed(unsigned int numFiles, unsigned long blockCount,
+  unsigned long usecTotal, unsigned long usecMax)
+{
+  float bytesPerSecond = (float)(blockCount * 512 * numFiles) / usecTotal;
+  Serial.print("  Overall speed = ");
+  Serial.print(bytesPerSecond);
+  Serial.println(" Mbyte/sec");
+  Serial.print("  Worst block time = ");
+  Serial.print((float)usecMax / 1000.0);
+  Serial.println(" ms");
+  Serial.print("    ");
+  Serial.print( (float)usecMax / 29.01333);
+  Serial.println("% of audio frame time");
 }
 
 
 void loop(void) {
-  
+  // do nothing after the test
 }
