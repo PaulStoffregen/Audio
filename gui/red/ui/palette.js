@@ -98,8 +98,9 @@ RED.palette = (function() {
 				  content: $(($("script[data-help-name|='"+nt+"']").html()||"<h2>empty</h2><p>no information available</p>").trim())[2] // TODO: how to use jQuery to always select the first <p> within the html?
 		  });
 		  $(d).click(function() {
-				  var help = '<div class="node-help">'+($("script[data-help-name|='"+d.type+"']").html()||"")+"</div>";
-				  $("#tab-info").html(help);
+				RED.nodes.selectNode(d.type);
+				var help = '<div class="node-help">'+($("script[data-help-name|='"+d.type+"']").html()||"")+"</div>";
+				$("#tab-info").html(help);
 		  });
 		  $(d).draggable({
 			  helper: 'clone',

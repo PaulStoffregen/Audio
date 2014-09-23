@@ -157,10 +157,19 @@ var RED = (function() {
 			]
 	});
 
+	// from http://css-tricks.com/snippets/javascript/get-url-variables/
+	function getQueryVariable(variable) {
+		var query = window.location.search.substring(1);
+		var vars = query.split("&");
+		for (var i=0;i<vars.length;i++) {
+			var pair = vars[i].split("=");
+			if(pair[0] == variable){return pair[1];}
+		}
+		return(false);
+	}
+
 	function loadNodes() {
-		console.log("loadNodes");
 		$.get('list.html', function(data) {
-			console.log("loadNodes complete");
 			$("body").append(data);
 			$(".palette-spinner").hide();
 			$(".palette-scroll").show();
@@ -171,6 +180,12 @@ var RED = (function() {
 				$("#btn-deploy").removeClass("disabled").addClass("btn-danger");
 			}, 1500);
 			$('#btn-deploy').click(function() { save(); });
+			// if the query string has ?info=className, populate info tab
+			var info = getQueryVariable("info");
+			if (info) {
+				$("#tab-info").html('<div class="node-help">'
+					+($("script[data-help-name|='"+info+"']").html()||"")+"</div>");
+			}
 		}, "html");
 	}
 

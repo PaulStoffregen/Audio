@@ -71,7 +71,10 @@ RED.nodes = (function() {
 	function getType(type) {
 		return node_defs[type];
 	}
-
+	function selectNode(name) {
+		window.history.pushState(null, null, window.location.protocol + "//"
+			+ window.location.host + window.location.pathname + '?info=' + name);
+	}
 	function addNode(n) {
 		if (n._def.category == "config") {
 			configNodes[n.id] = n;
@@ -453,6 +456,7 @@ RED.nodes = (function() {
 		registerType: registerType,
 		getType: getType,
 		convertNode: convertNode,
+		selectNode: selectNode,
 		add: addNode,
 		addLink: addLink,
 		remove: removeNode,

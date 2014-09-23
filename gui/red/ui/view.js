@@ -675,6 +675,7 @@ RED.view = (function() {
 		}
 		if (moving_set.length == 1) {
 			RED.sidebar.info.refresh(moving_set[0].n);
+			RED.nodes.selectNode(moving_set[0].n.type);
 		} else {
 			RED.sidebar.info.clear();
 		}
