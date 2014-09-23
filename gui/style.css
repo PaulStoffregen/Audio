@@ -50,13 +50,7 @@ a.brand {
 }
 a.brand span {
     vertical-align: middle;
-    font-size: 16px !important;
-}
-a.brand:hover span.red {
-    color: rgb(197, 112, 112) !important;
-}
-a.brand:hover {
-    color: #bbb !important;
+    font-size: 16px;
 }
 a.brand img {
     height: 16px;
