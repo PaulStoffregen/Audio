@@ -32,17 +32,25 @@
 class AudioRecordQueue : public AudioStream
 {
 public:
-	AudioRecordQueue(void) : AudioStream(0, NULL),
-		userblock(NULL), head(0), tail(0) { }
+	AudioRecordQueue(void) : AudioStream(1, inputQueueArray),
+		userblock(NULL), head(0), tail(0), enabled(0) { }
+	void begin(void) {
+		clear();
+		enabled = 1;
+	}
 	int available(void);
+	void clear(void);
 	int16_t * readBuffer(void);
 	void freeBuffer(void);
+	void end(void) {
+		enabled = 0;
+	}
 	virtual void update(void);
 private:
 	audio_block_t *inputQueueArray[1];
-	audio_block_t *queue[53];
+	audio_block_t * volatile queue[53];
 	audio_block_t *userblock;
-	volatile uint8_t head, tail;
+	volatile uint8_t head, tail, enabled;
 };
 
 #endif

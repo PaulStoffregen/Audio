@@ -26,6 +26,8 @@ AudioOutputAnalog	KEYWORD2
 AudioPlayMemory	KEYWORD2
 AudioPlaySdRaw	KEYWORD2
 AudioPlaySdWav	KEYWORD2
+AudioPlayQueue	KEYWORD2
+AudioRecordQueue	KEYWORD2
 AudioSynthToneSweep	KEYWORD2
 AudioSynthWaveform	KEYWORD2
 AudioSynthWaveformSine	KEYWORD2

@@ -667,6 +667,11 @@
 		<tr class=odd><td align=center>In 0</td><td>Sound To Access</td></tr>
 	</table>
 	<h3>Functions</h3>
+	<p class=func><span class=keyword>begin</span>();</p>
+	<p class=desc>Begin capturing incoming audio to the queue.  After calling
+		begin, readBuffer() and freeBuffer(), or clear() must be used frequently
+		to prevent the queue from filling up.
+	</p>
 	<p class=func><span class=keyword>available</span>();</p>
 	<p class=desc>Returns the number of audio packets available to read.
 	</p>
@@ -681,8 +686,14 @@
 		each packet must be freed with this function, to return the memory to
 		the audio library.
 	</p>
+	<p class=func><span class=keyword>clear</span>();</p>
+	<p class=desc>Discard all audio held in the queue.
+	</p>
+	<p class=func><span class=keyword>end</span>();</p>
+	<p class=desc>Stop capturing incoming audio into the queue.  Data already
+		captured remains in the queue and may be read with readBuffer().
+	</p>
 	<h3>Notes</h3>
-	<p>TODO: many caveats....</p>
 	<p>
 		Up to 52 packets may be queued by this object, which allows approximately
 		150 ms of audio to be held in the queue, to allow time for the Arduino

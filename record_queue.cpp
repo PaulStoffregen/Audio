@@ -34,10 +34,26 @@ int AudioRecordQueue::available(void)
 
 	h = head;
 	t = tail;
-	if (h > t) return h - t;
+	if (h >= t) return h - t;
 	return 53 + h - t;
 }
 
+void AudioRecordQueue::clear(void)
+{
+	audio_block_t *block;
+	uint32_t t;
+
+	if (userblock) {
+		release(userblock);
+		userblock = NULL;
+	}
+	t = tail;
+	while (t != head) {
+		if (++t >= 53) t = 0;
+		release(queue[t]);
+	}
+	tail = t;
+}
 
 int16_t * AudioRecordQueue::readBuffer(void)
 {
@@ -67,6 +83,10 @@ void AudioRecordQueue::update(void)
 
 	block = receiveReadOnly();
 	if (!block) return;
+	if (!enabled) {
+		release(block);
+		return;
+	}
 	h = head + 1;
 	if (h >= 53) h = 0;
 	if (h == tail) {
