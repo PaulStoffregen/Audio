@@ -46,6 +46,11 @@ noteOff	KEYWORD2
 stop	KEYWORD2
 play	KEYWORD2
 updateCoefs	KEYWORD2
+setCoefficients	KEYWORD2
+setLowpass	KEYWORD2
+setHighpass	KEYWORD2
+setBandpass	KEYWORD2
+setNotch	KEYWORD2
 frequency	KEYWORD2
 phase	KEYWORD2
 amplitude	KEYWORD2

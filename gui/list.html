@@ -1378,24 +1378,52 @@ The actual packets are taken
 </script>
 <script type="text/x-red" data-help-name="AudioFilterBiquad">
 	<h3>Summary</h3>
-	<p>description</p>
+	<div>
+	<p>Biquadratic cascaded filter, useful for all sorts of filtering.
+		Up to 4 stages may be cascaded.
+	</p>
+	<p align=center><img src="biquad.png"></p>
+	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
-		<tr class=odd><td align=center></td><td></td></tr>
+		<tr class=odd><td align=center>In 0</td><td>Signal to be filtered</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Filtered Signal Output</td></tr>
 	</table>
-	<h3>Parameters</h3>
-	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
-		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
-	</table>
-	<p>Extra description...  Section only present if object has params</p>
 	<h3>Functions</h3>
-	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
-	<p class=desc>blah blah blah blah
+	<p class=func><span class=keyword>setLowpass</span>(stage, frequency, Q);</p>
+	<p class=desc>Configure one stage of the filter (0 to 3) with low pass
+		response, with the specified corner frequency and Q shape.  If Q is
+		higher that 0.7071, be careful of filter gain (see below).
+	</p>
+	<p class=func><span class=keyword>setLowpass</span>(stage, frequency, Q);</p>
+	<p class=desc>Configure one stage of the filter (0 to 3) with high pass
+		response, with the specified corner frequency and Q shape.  If Q is
+		higher that 0.7071, be careful of filter gain (see below).
+	</p>
+	<p class=func><span class=keyword>setLowpass</span>(stage, frequency, Q);</p>
+	<p class=desc>Configure one stage of the filter (0 to 3) with band pass
+		response.  The filter has unity gain at the specified frequency.  Q
+		controls the width of frequencies allowed to pass.
+	</p>
+	<p class=func><span class=keyword>setLowpass</span>(stage, frequency, Q);</p>
+	<p class=desc>Configure one stage of the filter (0 to 3) with band reject (notch)
+		response.  Q controls the width of rejected frequencies.
+	</p>
+	<p class=func><span class=keyword>setCoefficients</span>(stage, array[5]);</p>
+	<p class=desc>Configure one stage of the filter (0 to 3) with an arbitrary
+		filter response.  The array of coefficients is in order: B0, B1, B2, A1, A2.
+		Each coefficient must be less than 2.0 and greater than -2.0.  The array
+		should be type double.  Alternately, it may be type int, where 1.0 is
+		represented with 1073741824 (2<sup>30</sup>).
 	</p>
 	<h3>Notes</h3>
-	<p></p>
+	<p>Filters can with gain must have their input signals attenuated, so the
+		signal does not exceed 1.0.
+	</p>
+	<p>This object implements up to 4 cascaded stages.  Unconfigured stages will
+		not pass any signal.
+	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioFilterBiquad">
 	<div class="form-row">
