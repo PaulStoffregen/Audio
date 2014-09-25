@@ -1424,6 +1424,11 @@ The actual packets are taken
 	<p>This object implements up to 4 cascaded stages.  Unconfigured stages will
 		not pass any signal.
 	</p>
+	<p>Biquad filters with low corner frequency (under about 400 Hz) can run into
+		trouble with limited numerical precision, causing the filter to perform
+		poorly.  For very low corner frequency, the State Variable (Chamberlin)
+		filter should be used.
+	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioFilterBiquad">
 	<div class="form-row">
