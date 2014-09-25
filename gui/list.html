@@ -1396,17 +1396,17 @@ The actual packets are taken
 		response, with the specified corner frequency and Q shape.  If Q is
 		higher that 0.7071, be careful of filter gain (see below).
 	</p>
-	<p class=func><span class=keyword>setLowpass</span>(stage, frequency, Q);</p>
+	<p class=func><span class=keyword>setHighpass</span>(stage, frequency, Q);</p>
 	<p class=desc>Configure one stage of the filter (0 to 3) with high pass
 		response, with the specified corner frequency and Q shape.  If Q is
 		higher that 0.7071, be careful of filter gain (see below).
 	</p>
-	<p class=func><span class=keyword>setLowpass</span>(stage, frequency, Q);</p>
+	<p class=func><span class=keyword>setBandpass</span>(stage, frequency, Q);</p>
 	<p class=desc>Configure one stage of the filter (0 to 3) with band pass
 		response.  The filter has unity gain at the specified frequency.  Q
 		controls the width of frequencies allowed to pass.
 	</p>
-	<p class=func><span class=keyword>setLowpass</span>(stage, frequency, Q);</p>
+	<p class=func><span class=keyword>setNotch</span>(stage, frequency, Q);</p>
 	<p class=desc>Configure one stage of the filter (0 to 3) with band reject (notch)
 		response.  Q controls the width of rejected frequencies.
 	</p>
