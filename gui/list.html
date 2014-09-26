@@ -133,17 +133,15 @@
 	<p>This object has no functions to call from the Arduino sketch.  It
 		simply streams data from the ADC to its output port.</p>
 	<h3>Hardware</h3>
-	<p>Pin A2 is used for audio input.</p>
-	<p align=center><img src="adcpins2.jpg"></p>
+	<p>Pin A2 is used for audio input.  This circuitry is recommended.</p>
+	<p align=center><img src="adccircuit.png"></p>
 	<p>Signal range is 0 to 1.2V</p>
-	<p>Need for DC bias, approx 0.6V</p>
-	<p>TODO: suggested circuity for signal input</p>
 	<h3>Notes</h3>
 	<p>Algorithm for automatic DC bias tracking</p>
 	<p>Noise due to high source impedance</p>
 	<p>Power Supply rejection issue with simple DC bias</p>
 	<p>TODO: actual noise measurements with different input circuitry
-		(it's not nearly as quiet as the audio shield)</p>
+		(it's not as quiet as the audio shield)</p>
 </script>
 <script type="text/x-red" data-template-name="AudioInputAnalog">
 	<div class="form-row">
@@ -1107,8 +1105,8 @@ The actual packets are taken
 <script type="text/javascript">
 	RED.nodes.registerType('AudioEffectChorus',{
 	shortName: "chorus",
-		inputs:2,
-		outputs:2,
+		inputs:1,
+		outputs:1,
 		category: 'effect-function',
 		color:"#E6E0F8",
 		icon: "arrow-in.png"
@@ -1146,8 +1144,8 @@ The actual packets are taken
 <script type="text/javascript">
 	RED.nodes.registerType('AudioEffectFlange',{
 	shortName: "flange",
-		inputs:2,
-		outputs:2,
+		inputs:1,
+		outputs:1,
 		category: 'effect-function',
 		color:"#E6E0F8",
 		icon: "arrow-in.png"
