@@ -22,54 +22,57 @@
 
 #include "filter_fir.h"
 
-void AudioFilterFIR::begin(short *cp,int n_coeffs)
+void AudioFilterFIR::begin(short *cp, int n_coeffs)
 {
-  // pointer to coefficients
-  coeff_p = cp;
-  // Initialize FIR instances for the left and right channels
-  if(coeff_p && (coeff_p != FIR_PASSTHRU)) {
-    arm_fir_init_q15(&l_fir_inst, n_coeffs, coeff_p, &l_StateQ15[0], AUDIO_BLOCK_SAMPLES);
-  }
+	// pointer to coefficients
+	coeff_p = cp;
+	// Initialize FIR instances for the left and right channels
+	if(coeff_p && (coeff_p != FIR_PASSTHRU)) {
+		arm_fir_init_q15(&l_fir_inst, n_coeffs, coeff_p,
+			&l_StateQ15[0], AUDIO_BLOCK_SAMPLES);
+	}
 }
 
 // This has the same effect as begin(NULL,0);
 void AudioFilterFIR::stop(void)
 {
-  coeff_p = NULL;
+	coeff_p = NULL;
 }
 
 
 void AudioFilterFIR::update(void)
 {
-  audio_block_t *block,*b_new;
+	audio_block_t *block,*b_new;
   
-  // If there's no coefficient table, give up.  
-  if(coeff_p == NULL)return;
+	// If there's no coefficient table, give up.  
+	if(coeff_p == NULL) return;
 
-  // do passthru
-  if(coeff_p == FIR_PASSTHRU) {
-    // Just passthrough
-    block = receiveReadOnly(0);
-    if(block) {
-      transmit(block,0);
-      release(block);
-    }
-    return;
-  }
-  // Left Channel
-  block = receiveReadOnly(0);
-  // get a block for the FIR output
-  b_new = allocate();
-  if(block && b_new) {
-    if(arm_fast)
-    	arm_fir_fast_q15(&l_fir_inst, (q15_t *)block->data, (q15_t *)b_new->data, AUDIO_BLOCK_SAMPLES);
-    else
-    	arm_fir_q15(&l_fir_inst, (q15_t *)block->data, (q15_t *)b_new->data, AUDIO_BLOCK_SAMPLES); 
-    // send the FIR output to the left channel
-    transmit(b_new,0);
-  }
-  if(block)release(block);
-  if(b_new)release(b_new);
+	// do passthru
+	if (coeff_p == FIR_PASSTHRU) {
+		// Just passthrough
+		block = receiveReadOnly(0);
+		if(block) {
+			transmit(block,0);
+			release(block);
+		}
+		return;
+	}
+	// Left Channel
+	block = receiveReadOnly(0);
+	// get a block for the FIR output
+	b_new = allocate();
+	if (block && b_new) {
+		if (arm_fast) {
+			arm_fir_fast_q15(&l_fir_inst, (q15_t *)block->data,
+				(q15_t *)b_new->data, AUDIO_BLOCK_SAMPLES);
+		} else {
+			arm_fir_q15(&l_fir_inst, (q15_t *)block->data,
+				(q15_t *)b_new->data, AUDIO_BLOCK_SAMPLES);
+		}
+		transmit(b_new,0); // send the FIR output
+	}
+	if (block) release(block);
+	if (b_new) release(b_new);
 }
 
 

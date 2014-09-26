@@ -26,45 +26,34 @@
 #include "AudioStream.h"
 #include "arm_math.h"
 
-#define USE_FAST_FIR true
-#define USE_SLOW_FIR false
-
-
-// Maximum number of coefficients in a FIR filter
-// The audio breaks up with 128 coefficients so a
-// maximum of 150 is more than sufficient
-#define MAX_COEFFS 150
-
 // Indicates that the code should just pass through the audio
 // without any filtering (as opposed to doing nothing at all)
 #define FIR_PASSTHRU ((short *) 1)
 
-class AudioFilterFIR : 
-public AudioStream
+#define FIR_MAX_COEFFS 120
+
+class AudioFilterFIR : public AudioStream
 {
 public:
-  AudioFilterFIR(const boolean a_f): 
-  AudioStream(1,inputQueueArray), arm_fast(a_f), coeff_p(NULL)
-  { 
-  }
-
-  void begin(short *coeff_p,int n_coeffs);
-  virtual void update(void);
-  void stop(void);
+	AudioFilterFIR(const boolean a_f): AudioStream(1,inputQueueArray),
+	  arm_fast(a_f), coeff_p(NULL) { 
+	}
+	void begin(short *coeff_p,int n_coeffs);
+	virtual void update(void);
+	void stop(void);
   
 private:
-  audio_block_t *inputQueueArray[1];
-  // arm state arrays and FIR instances for left and right channels
-  // the state arrays are defined to handle a maximum of MAX_COEFFS
-  // coefficients in a filter
-  q15_t l_StateQ15[AUDIO_BLOCK_SAMPLES + MAX_COEFFS];
+	audio_block_t *inputQueueArray[1];
+	// arm state arrays and FIR instances for left and right channels
+	// the state arrays are defined to handle a maximum of MAX_COEFFS
+	// coefficients in a filter
+	q15_t l_StateQ15[AUDIO_BLOCK_SAMPLES + FIR_MAX_COEFFS];
 
-  // Whether to use the fast arm FIR code 
-  const boolean arm_fast;
-  // pointer to current coefficients or NULL or FIR_PASSTHRU
-  short *coeff_p;
-  arm_fir_instance_q15 l_fir_inst;
-
+	// Whether to use the fast arm FIR code 
+	const boolean arm_fast;
+	// pointer to current coefficients or NULL or FIR_PASSTHRU
+	short *coeff_p;
+	arm_fir_instance_q15 l_fir_inst;
 };
 
 #endif
