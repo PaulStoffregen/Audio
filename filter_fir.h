@@ -28,32 +28,36 @@
 
 // Indicates that the code should just pass through the audio
 // without any filtering (as opposed to doing nothing at all)
-#define FIR_PASSTHRU ((short *) 1)
+#define FIR_PASSTHRU ((const short *) 1)
 
-#define FIR_MAX_COEFFS 120
+#define FIR_MAX_COEFFS 200
 
 class AudioFilterFIR : public AudioStream
 {
 public:
-	AudioFilterFIR(const boolean a_f): AudioStream(1,inputQueueArray),
-	  arm_fast(a_f), coeff_p(NULL) { 
+	AudioFilterFIR(void): AudioStream(1,inputQueueArray), coeff_p(NULL) {
 	}
-	void begin(short *coeff_p,int n_coeffs);
+	void begin(const short *cp, int n_coeffs) {
+		coeff_p = cp;
+		// Initialize FIR instance (ARM DSP Math Library)
+		if (coeff_p && (coeff_p != FIR_PASSTHRU) && n_coeffs <= FIR_MAX_COEFFS) {
+			arm_fir_init_q15(&fir_inst, n_coeffs, (q15_t *)coeff_p,
+				&StateQ15[0], AUDIO_BLOCK_SAMPLES);
+		}
+	}
+	void end(void) {
+		coeff_p = NULL;
+	}
 	virtual void update(void);
-	void stop(void);
-  
 private:
 	audio_block_t *inputQueueArray[1];
-	// arm state arrays and FIR instances for left and right channels
-	// the state arrays are defined to handle a maximum of MAX_COEFFS
-	// coefficients in a filter
-	q15_t l_StateQ15[AUDIO_BLOCK_SAMPLES + FIR_MAX_COEFFS];
 
-	// Whether to use the fast arm FIR code 
-	const boolean arm_fast;
 	// pointer to current coefficients or NULL or FIR_PASSTHRU
-	short *coeff_p;
-	arm_fir_instance_q15 l_fir_inst;
+	const short *coeff_p;
+
+	// ARM DSP Math library filter instance
+	arm_fir_instance_q15 fir_inst;
+	q15_t StateQ15[AUDIO_BLOCK_SAMPLES + FIR_MAX_COEFFS];
 };
 
 #endif

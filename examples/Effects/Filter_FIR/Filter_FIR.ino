@@ -18,7 +18,6 @@ The audio board uses the following pins.
 19 - SCL
 22 - TX
 23 - LRCLK
-
 */
 
 //#include <arm_math.h>
@@ -46,9 +45,8 @@ const int myInput = AUDIO_INPUT_LINEIN;
 
 
 AudioInputI2S       audioInput;         // audio shield: mic or line-in
-// Use the fast FIR filter for left and right channels
-AudioFilterFIR       myFilterL(true);
-AudioFilterFIR       myFilterR(true);
+AudioFilterFIR      myFilterL;
+AudioFilterFIR      myFilterR;
 AudioOutputI2S      audioOutput;        // audio shield: headphones & line-out
 
 // Create Audio connections between the components
@@ -76,15 +74,13 @@ struct fir_filter fir_list[] = {
 
 
 void setup() {
-  
   Serial.begin(9600);
-  while (!Serial) ;
-  delay(3000);
+  delay(300);
 
-  pinMode(PASSTHRU_PIN,INPUT_PULLUP);
-  pinMode(FILTER_PIN,INPUT_PULLUP);
+  pinMode(PASSTHRU_PIN, INPUT_PULLUP);
+  pinMode(FILTER_PIN, INPUT_PULLUP);
 
-  // It doesn't work properly with any less than 8
+  // allocate memory for the audio library
   AudioMemory(8);
 
   audioShield.enable();
@@ -105,8 +101,8 @@ void setup() {
     Serial.println(") is grounded");
   }  
   // Initialize the filter
-  myFilterL.begin(fir_list[0].coeffs,fir_list[0].num_coeffs);
-  myFilterR.begin(fir_list[0].coeffs,fir_list[0].num_coeffs);  
+  myFilterL.begin(fir_list[0].coeffs, fir_list[0].num_coeffs);
+  myFilterR.begin(fir_list[0].coeffs, fir_list[0].num_coeffs);
   Serial.println("setup done");
 }
 
@@ -116,13 +112,15 @@ int old_idx = -1;
 // audio volume
 int volume = 0;
 unsigned long last_time = millis();
+
 void loop()
 {
   // Volume control
   int n = analogRead(15);
   if (n != volume) {
     volume = n;
-    audioShield.volume((float)n / 1023);
+    //uncomment this line if your audio shield has the volume pot
+    //audioShield.volume((float)n / 1023);
   }
   
   // update the two buttons
@@ -131,35 +129,32 @@ void loop()
   
   // If the passthru button is pushed, save the current
   // filter index and then switch the filter to passthru
-  if(b_passthru.fallingEdge()) {
+  if (b_passthru.fallingEdge()) {
     old_idx = fir_idx;
-    myFilterL.begin(FIR_PASSTHRU,0);
-    myFilterR.begin(FIR_PASSTHRU,0);
+    myFilterL.begin(FIR_PASSTHRU, 0);
+    myFilterR.begin(FIR_PASSTHRU, 0);
   }
   
   // If passthru button is released, restore previous filter
-  if(b_passthru.risingEdge()) {
+  if (b_passthru.risingEdge()) {
     if(old_idx != -1) {
-      myFilterL.begin(fir_list[fir_idx].coeffs,fir_list[fir_idx].num_coeffs);
-      myFilterR.begin(fir_list[fir_idx].coeffs,fir_list[fir_idx].num_coeffs);
+      myFilterL.begin(fir_list[fir_idx].coeffs, fir_list[fir_idx].num_coeffs);
+      myFilterR.begin(fir_list[fir_idx].coeffs, fir_list[fir_idx].num_coeffs);
     }
     old_idx = -1;
   }
   
   // switch to next filter in the list
-  if(b_filter.fallingEdge()) {
+  if (b_filter.fallingEdge()) {
     fir_idx++;
-    if(fir_list[fir_idx].num_coeffs == 0)fir_idx = 0;
-    myFilterL.begin(fir_list[fir_idx].coeffs,fir_list[fir_idx].num_coeffs);
-    myFilterR.begin(fir_list[fir_idx].coeffs,fir_list[fir_idx].num_coeffs);
+    if (fir_list[fir_idx].num_coeffs == 0) fir_idx = 0;
+    myFilterL.begin(fir_list[fir_idx].coeffs, fir_list[fir_idx].num_coeffs);
+    myFilterR.begin(fir_list[fir_idx].coeffs, fir_list[fir_idx].num_coeffs);
   }
 
-
-if(1) {
-// With fast_fir
-// Proc = 18 (18),  Mem = 4 (6)
-
-  if(millis() - last_time >= 5000) {
+  // print information about resource usage
+  // Proc = 18 (18),  Mem = 4 (5)
+  if (millis() - last_time >= 2500) {
     Serial.print("Proc = ");
     Serial.print(AudioProcessorUsage());
     Serial.print(" (");    
@@ -171,7 +166,6 @@ if(1) {
     Serial.println(")");
     last_time = millis();
   }
-}
 
 
 }

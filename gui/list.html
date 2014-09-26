@@ -1122,12 +1122,6 @@ The actual packets are taken
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
 		<tr class=odd><td align=center></td><td></td></tr>
 	</table>
-	<!--<h3>Parameters</h3>
-	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
-		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
-	</table>
-	<p>Extra description...  Section only present if object has params</p>-->
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>begin</span>(delayBuffer, length, n_chorus);</p>
 	<p class=desc>blah blah blah blah
@@ -1167,12 +1161,6 @@ The actual packets are taken
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
 		<tr class=odd><td align=center></td><td></td></tr>
 	</table>
-	<!--<h3>Parameters</h3>
-	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
-		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
-	</table>
-	<p>Extra description...  Section only present if object has params</p>-->
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>begin</span>(delayBuffer, length, offset, depth, delayRate);</p>
 	<p class=desc>blah blah blah blah
@@ -1451,24 +1439,45 @@ The actual packets are taken
 </script>
 <script type="text/x-red" data-help-name="AudioFilterFIR">
 	<h3>Summary</h3>
-	<p>description</p>
+	<div>
+	<p>Finite impulse response filter, useful for all sorts of filtering.
+	</p>
+	<p align=center><img src="fir_filter.png"></p>
+	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
-		<tr class=odd><td align=center></td><td></td></tr>
+		<tr class=odd><td align=center>In 0</td><td>Signal to be filtered</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Filtered Signal Output</td></tr>
 	</table>
-	<!--<h3>Parameters</h3>
-	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
-		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
-	</table>
-	<p>Extra description...  Section only present if object has params</p>-->
 	<h3>Functions</h3>
-	<p class=func><span class=keyword>function</span>(parm1, parm2);</p>
-	<p class=desc>blah blah blah blah
+	<p class=func><span class=keyword>begin</span>(array, length);</p>
+	<p class=desc>Initialize the filter.  The array must be 16 bit integers (the
+		filter's impulse response), and
+		length indicates the number of points in the array.  Array may also be
+		FIR_PASSTHRU (length = 0), to directly pass the input to output without
+		filtering.
+	</p>
+	<p class=func><span class=keyword>end</span>();</p>
+	<p class=desc>Turn the filter off.
 	</p>
 	<h3>Notes</h3>
-	<p></p>
+	<p>FIR filters requires more CPU time than Biquad (IIR), but they can
+		implement filters with better phase response.
+	</p>
+	<p>A 100 point filter requires 9% CPU time on Teensy 3.1.  The maximum
+		supported filter length is 200 points.
+	</p>
+	<p>The free
+		<a href="http://t-filter.appspot.com/fir/index.html" target="_blank"> TFilter Design Tool</a>
+		can be used to create the impulse response array.  Be sure to set the sampling
+		frequency to 44117 HZ (it defaults to only 2000 Hz) and the output type to "int" (16 bit).
+	</p>
+	<p>
+		If you use TFilter Design's "C/C++ array" option, it's output has "int" definition, which
+		is 32 bits on Teensy 3.1.  Edit "int" to "short" for an array of 16 bit numbers,
+		and add "const" to avoid consuming extra RAM.
+	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioFilterFIR">
 	<div class="form-row">
@@ -1558,7 +1567,8 @@ The actual packets are taken
 </script>
 <script type="text/x-red" data-help-name="AudioAnalyzePeak">
 	<h3>Summary</h3>
-	<p>description</p>
+	<p>Track the signal peak amplitude.  Very useful for simple
+		audio level response projects, and general troubleshooting.</p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
@@ -1808,18 +1818,12 @@ The actual packets are taken
 <script type="text/x-red" data-help-name="AudioAnalyzePrint">
 	<h3>Summary</h3>
 	<p>Print raw audio data to the Arduino Serial Monitor.  This
-		object creates massive output quickly, and should not normall be used.</p>
+		object creates massive output quickly, and should not normally be used.</p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
-		<tr class=odd><td align=center></td><td></td></tr>
+		<tr class=odd><td align=center>In 0</td><td>Signal to print</td></tr>
 	</table>
-	<!--<h3>Parameters</h3>
-	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Name</th><th>Type</th><th>Function</th></tr>
-		<tr class=odd><td align=center></td><td>Integer</td><td></td></tr>
-	</table>
-	<p>Extra description...  Section only present if object has params</p>-->
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>name</span>(string);</p>
 	<p class=desc>blah blah blah blah
@@ -1837,7 +1841,7 @@ The actual packets are taken
 	<p class=desc>blah blah blah blah
 	</p>
 	<h3>Notes</h3>
-	<p></p>
+	<p>This object doesn't work very well and probably should not be used.</p>
 </script>
 <script type="text/x-red" data-template-name="AudioAnalyzePrint">
 	<div class="form-row">
