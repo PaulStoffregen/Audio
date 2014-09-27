@@ -43,7 +43,6 @@ public:
 
   boolean begin(short *delayline,int delay_length,int n_chorus);
   virtual void update(void);
-  void stop(void);
   void voices(int n_chorus);
   
 private:

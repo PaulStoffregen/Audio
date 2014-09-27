@@ -43,7 +43,6 @@ public:
   boolean begin(short *delayline,int d_length,int delay_offset,int d_depth,float delay_rate);
   boolean voices(int delay_offset,int d_depth,float delay_rate);
   virtual void update(void);
-  void stop(void);
   
 private:
   audio_block_t *inputQueueArray[1];
