@@ -202,7 +202,6 @@ start:
 		memcpy((uint8_t *)header + header_offset, p, len);
 		header_offset += len;
 		buffer_offset += len;
-		buffer_length -= len;
 		data_length -= len;
 		if (data_length > 0) return false;
 		// parse the header...
@@ -232,7 +231,6 @@ start:
 		memcpy((uint8_t *)header + header_offset, p, len);
 		header_offset += len;
 		buffer_offset += len;
-		buffer_length -= len;
 		data_length -= len;
 		if (data_length > 0) return false;
 		if (parse_format()) {
@@ -254,7 +252,6 @@ start:
 		memcpy((uint8_t *)header + header_offset, p, len);
 		header_offset += len;
 		buffer_offset += len;
-		buffer_length -= len;
 		data_length -= len;
 		if (data_length > 0) return false;
 		//Serial.print("chunk id = ");
@@ -289,13 +286,11 @@ start:
 		if (size < data_length) {
 			data_length -= size;
 			buffer_offset += size;
-			buffer_length -= size;
 			return false;
 		}
 		p += data_length;
 		size -= data_length;
 		buffer_offset += data_length;
-		buffer_length -= data_length;
 		data_length = 8;
 		header_offset = 0;
 		state = STATE_PARSE3;
