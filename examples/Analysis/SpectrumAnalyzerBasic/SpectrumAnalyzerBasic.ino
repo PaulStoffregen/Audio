@@ -1,51 +1,64 @@
+#include <LiquidCrystal.h>
 #include <Audio.h>
 #include <Wire.h>
 #include <SPI.h>
 #include <SD.h>
-#include <LiquidCrystal.h>
 
-//const int myInput = AUDIO_INPUT_LINEIN;
-const int myInput = AUDIO_INPUT_MIC;
+// GUItool: begin automatically generated code
+AudioInputI2S            i2s1;           //xy=139,91
+AudioMixer4              mixer1;         //xy=312,134
+AudioOutputI2S           i2s2;           //xy=392,32
+AudioAnalyzeFFT1024      fft1024;        //xy=467,147
+AudioConnection          patchCord1(i2s1, 0, mixer1, 0);
+AudioConnection          patchCord2(i2s1, 0, i2s2, 0);
+AudioConnection          patchCord3(i2s1, 1, mixer1, 1);
+AudioConnection          patchCord4(i2s1, 1, i2s2, 1);
+AudioConnection          patchCord5(mixer1, fft1024);
+AudioControlSGTL5000     audioShield;    //xy=366,225
+// GUItool: end automatically generated code
 
-// Create the Audio components.  These should be created in the
-// order data flows, inputs/sources -> processing -> outputs
-//
-AudioInputI2S       audioInput;         // audio shield: mic or line-in
-AudioAnalyzeFFT256  myFFT(11);
-AudioOutputI2S      audioOutput;        // audio shield: headphones & line-out
 
-// Create Audio connections between the components
-//
-AudioConnection c1(audioInput, 0, audioOutput, 0);
-AudioConnection c2(audioInput, 0, myFFT, 0);
-AudioConnection c3(audioInput, 1, audioOutput, 1);
+const int myInput = AUDIO_INPUT_LINEIN;
+//const int myInput = AUDIO_INPUT_MIC;
 
-// Create an object to control the audio shield.
-// 
-AudioControlSGTL5000 audioShield;
+
+// The scale sets how much sound is needed in each frequency range to
+// show all 8 bars.  Higher numbers are more sensitive.
+float scale = 60.0;
+
+// An array to hold the 16 frequency bands
+float level[16];
+
+// This array holds the on-screen levels.  When the signal drops quickly,
+// these are used to lower the on-screen level 1 bar per update, which
+// looks more pleasing to corresponds to human sound perception.
+int   shown[16];
+
+
 
 // Use the LiquidCrystal library to display the spectrum
 //
 LiquidCrystal lcd(0, 1, 2, 3, 4, 5);
 byte bar1[8] = {0,0,0,0,0,0,0,255};
-byte bar2[8] = {0,0,0,0,0,0,255,255};
-byte bar3[8] = {0,0,0,0,0,255,255,255};
-byte bar4[8] = {0,0,0,0,255,255,255,255};
+byte bar2[8] = {0,0,0,0,0,0,255,255};        // 8 bar graph
+byte bar3[8] = {0,0,0,0,0,255,255,255};      // custom
+byte bar4[8] = {0,0,0,0,255,255,255,255};    // characters
 byte bar5[8] = {0,0,0,255,255,255,255,255};
 byte bar6[8] = {0,0,255,255,255,255,255,255};
 byte bar7[8] = {0,255,255,255,255,255,255,255};
 byte bar8[8] = {255,255,255,255,255,255,255,255};
 
+
 void setup() {
-  // Audio connections require memory to work.  For more
-  // detailed information, see the MemoryAndCpuUsage example
+  // Audio requires memory to work.
   AudioMemory(12);
 
   // Enable the audio shield and set the output volume.
   audioShield.enable();
   audioShield.inputSelect(myInput);
-  audioShield.volume(0.6);
-  
+  audioShield.volume(0.5);
+
+  // turn on the LCD and define the custom characters
   lcd.begin(16, 2);
   lcd.print("Audio Spectrum");
   lcd.createChar(0, bar1);
@@ -57,83 +70,72 @@ void setup() {
   lcd.createChar(6, bar7);
   lcd.createChar(7, bar8);
 
+  // configure the mixer to equally add left & right
+  mixer1.gain(0, 0.5);
+  mixer1.gain(1, 0.5);
+
   // pin 21 will select rapid vs animated display
   pinMode(21, INPUT_PULLUP);
 }
 
-int count=0;
-
-const int nsum[16] = {1, 1, 2, 2, 3, 4, 5, 6, 6, 8, 12, 14, 16, 20, 28, 24};
-
-int maximum[16];
 
 void loop() {
-  if (myFFT.available()) {
-    // convert the 128 FFT frequency bins
-    // to only 16 sums, for a 16 character LCD
-    int sum[16];
-    int i;
-    for (i=0; i<16; i++) {
-      sum[i] = 0;
-    }
-    int n=0;
-    int count=0;
-    for (i=0; i<128; i++) {
-      sum[n] = sum[n] + myFFT.output[i];
-      count = count + 1;
-      if (count >= nsum[n]) {
-        Serial.print(count);
-        Serial.print(" ");
-        n = n + 1;
-        if (n >= 16) break;
-        count = 0;
-      }
-    }
+  if (fft1024.available()) {
+    // read the 512 FFT frequencies into 16 levels
+    // music is heard in octaves, but the FFT data
+    // is linear, so for the higher octaves, read
+    // many FFT bins together.
+    level[0] =  fft1024.read(0);
+    level[1] =  fft1024.read(1);
+    level[2] =  fft1024.read(2, 3);
+    level[3] =  fft1024.read(4, 6);
+    level[4] =  fft1024.read(7, 10);
+    level[5] =  fft1024.read(11, 15);
+    level[6] =  fft1024.read(16, 22);
+    level[7] =  fft1024.read(23, 32);
+    level[8] =  fft1024.read(33, 46);
+    level[9] =  fft1024.read(47, 66);
+    level[10] = fft1024.read(67, 93);
+    level[11] = fft1024.read(94, 131);
+    level[12] = fft1024.read(132, 184);
+    level[13] = fft1024.read(185, 257);
+    level[14] = fft1024.read(258, 359);
+    level[15] = fft1024.read(360, 511);
 
-    // The range is set by the audio shield's
-    // knob, which connects to analog pin A1.
-    int scale;
-    scale = 2 + (1023 - analogRead(A1)) / 7;
-    Serial.print(" - ");
-    Serial.print(scale);
-    Serial.print("  ");
+    // if you have the volume pot soldered to your audio shield
+    // uncomment this line to make it adjust the full scale signal
+    //scale = 8.0 + analogRead(A1) / 5.0;
+
+    // begin drawing at the first character on the 2nd row
     lcd.setCursor(0, 1);
  
     for (int i=0; i<16; i++) {
-      // Reduce the range to 0-8
-      int val = sum[i] / scale;
+      Serial.print(level[i]);
+
+      // TODO: conversion from FFT data to display bars should be
+      // exponentially scaled.  But how keep it a simple example?
+      int val = level[i] * scale;
       if (val > 8) val = 8;
 
-      // Compute an animated maximum, where increases
-      // show instantly, but if the number is less that
-      // the last displayed value, decrease it by 1 for
-      // a slow decay (looks pretty)
-      if (val >= maximum[i]) {
-        maximum[i] = val;
+      if (val >= shown[i]) {
+        shown[i] = val;
       } else {
-        if (maximum[i] > 0) maximum[i] = maximum[i] - 1;
+        if (shown[i] > 0) shown[i] = shown[i] - 1;
+        val = shown[i];
       }
 
-      // a switch on pin 22 select whether we show the
-      // slower animation or the direct/fast data
-      if (digitalRead(21) == HIGH) {
-        val = maximum[i];
-      }
+      //Serial.print(shown[i]);
+      Serial.print(" ");
 
       // print each custom digit
-      if (val == 0) {
+      if (shown[i] == 0) {
         lcd.write(' ');
       } else {
-        lcd.write(val - 1);
+        lcd.write(shown[i] - 1);
       }
-      
-      Serial.print(sum[i]);
-      Serial.print("=");
-      Serial.print(val);
-      Serial.print(",");
     }
-    Serial.println();
-    count = 0;
+    Serial.print(" cpu:");
+    Serial.println(AudioProcessorUsageMax());
   }
 }
 
