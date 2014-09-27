@@ -85,6 +85,9 @@ bool AudioControlWM8731::write(unsigned int reg, unsigned int val)
 
 bool AudioControlWM8731::volumeInteger(unsigned int n)
 {
+	// n = 127 for max volume (+6 dB)
+	// n = 48 for min volume (-73 dB)
+	// n = 0 to 47 for mute
 	if (n > 127) n = 127;
 	 //Serial.print("volumeInteger, n = ");
 	 //Serial.println(n);

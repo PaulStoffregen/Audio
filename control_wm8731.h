@@ -34,7 +34,7 @@ class AudioControlWM8731 : public AudioControl
 public:
 	bool enable(void);
 	bool disable(void) { return false; }
-	bool volume(float n) { return volumeInteger(n * 0.8 + 47.499); }
+	bool volume(float n) { return volumeInteger(n * 80.0 + 47.499); }
 	bool inputLevel(float n) { return false; }
 	bool inputSelect(int n) { return false; }
 protected:
