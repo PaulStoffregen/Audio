@@ -729,6 +729,22 @@ RED.view = (function() {
 					node.x = 25
 				}
 				var rmlinks = RED.nodes.remove(node.id);
+				for (var i=0; i < rmlinks.length; i++) {
+					var link = rmlinks[i];
+					//console.log("delete link: " + link.source.id + ":" + link.sourcePort
+					//	+ " -> " + link.target.id + ":" + link.targetPort);
+					if (link.source == node) {
+						// reenable input port
+						var n = link.targetPort;
+						var rect = link.target.inputlist[n];
+						rect.on("mousedown", (function(d,n){return function(d){portMouseDown(d,1,n);}})(rect, n))
+							.on("touchstart", (function(d,n){return function(d){portMouseDown(d,1,n);}})(rect, n))
+							.on("mouseup", (function(d,n){return function(d){portMouseUp(d,1,n);}})(rect, n))
+							.on("touchend", (function(d,n){return function(d){portMouseUp(d,1,n);}})(rect, n))
+							.on("mouseover",function(d) { var port = d3.select(this); port.classed("port_hovered",(mouse_mode!=RED.state.JOINING || mousedown_port_type != 1 ));})
+							.on("mouseout",function(d) { var port = d3.select(this); port.classed("port_hovered",false);})
+					}
+				}
 				removedNodes.push(node);
 				removedLinks = removedLinks.concat(rmlinks);
 			}
