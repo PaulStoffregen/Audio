@@ -1,14 +1,25 @@
 Teensy Audio Library
 ====================
 
-16 bit, 44.1 kHz streaming audio library for Teensy 3.x, featuring audio
-playing, synthesis, analysis, effects & filtering, mixing, etc.
+16 bit, 44.1 kHz streaming audio library for Teensy 3.x, featuring:
 
-Main Audio Library Page:
+* Polyphonic Playback
+* Recording
+* Synthesis
+* Analysis
+* Effects
+* Filtering
+* Mixing
+* Multiple Simultaneous Inputs & Outputs
+
+Main Audio Library Page
+-----------------------
 
 http://www.pjrc.com/teensy/td_libs_Audio.html
 
-Audio System Design Tool:
+
+Audio System Design Tool
+------------------------
 
 http://www.pjrc.com/teensy/gui/
 
@@ -26,7 +37,7 @@ Supported Hardware
 
 [Teensy 3.1](http://www.pjrc.com/store/teensy31.html) or [3.0](http://www.pjrc.com/store/teensy3.html) ADC Input
 
-![ADC Input](/gui/adccircuit.jpg)
+![ADC Input](/gui/adccircuit.png)
 
 [Teensy 3.1](http://www.pjrc.com/store/teensy31.html) or [3.0](http://www.pjrc.com/store/teensy3.html) PWM Output
 
