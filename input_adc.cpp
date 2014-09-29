@@ -26,6 +26,7 @@
 
 #include "input_adc.h"
 #include "utility/pdb.h"
+#include "utility/dspinst.h"
 
 DMAMEM static uint16_t analog_rx_buffer[AUDIO_BLOCK_SAMPLES];
 audio_block_t * AudioInputAnalog::block_left = NULL;
@@ -142,6 +143,7 @@ void AudioInputAnalog::update(void)
 {
 	audio_block_t *new_left=NULL, *out_left=NULL;
 	unsigned int dc, offset;
+	int32_t tmp;
 	int16_t s, *p, *end;
 
 	//Serial.println("update");
@@ -191,9 +193,10 @@ void AudioInputAnalog::update(void)
 	p = out_left->data;
 	end = p + AUDIO_BLOCK_SAMPLES;
 	do {
-		s = (uint16_t)(*p) - dc; // TODO: should be saturating subtract
+		tmp = (uint16_t)(*p) - (int32_t)dc;
+		s = signed_saturate_rshift(tmp, 16, 0);
 		*p++ = s;
-		dc += s >> 13; // approx 5.38 Hz high pass filter
+		dc += s / 12000;  // slow response, remove DC component
 	} while (p < end);
 	dc_average = dc;
 
