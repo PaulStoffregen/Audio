@@ -11,6 +11,8 @@ Teensy Audio Library
 * Filtering
 * Mixing
 * Multiple Simultaneous Inputs & Outputs
+* Flexible signal routing between library objects
+* Automatic Streaming while your Arduino sketch runs
 
 Main Audio Library Page
 -----------------------
@@ -20,6 +22,8 @@ http://www.pjrc.com/teensy/td_libs_Audio.html
 
 Audio System Design Tool
 ------------------------
+
+Use this graphical tool to design your audio project.  Easily browse the library's many features, connect objects, export to Arduino code, and quickly access details for the functions each object provides for you to control it from your Arduino sketch!
 
 http://www.pjrc.com/teensy/gui/
 
