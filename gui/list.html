@@ -1932,7 +1932,7 @@ double s_freq = .0625;</p>
 	<p class=desc>Set the headphone volume level.  Range is 0 to 1.0, but
 		0.8 corresponds to the maximum undistorted output for a full scale
 		signal.  Usually 0.5 is a comfortable listening level.  The line
-		level outputs are not changed by this function.
+		level outputs are <em>not</em> changed by this function.
 	</p>
 	<p class=func><span class=keyword>inputSelect</span>(input);</p>
 	<p class=desc>Select which input to use: AUDIO_INPUT_LINEIN or AUDIO_INPUT_MIC.
@@ -2025,7 +2025,7 @@ double s_freq = .0625;</p>
 	<p class=func><span class=keyword>adcHighPassFilterFreeze</span>();</p>
 	<p class=desc>By default, the analog input (either line-level inputs or mic)
 		is high-pass filtered, to remove any DC component.  This function
-		freezes the filter, so the DC component is still substracted, but
+		freezes the filter, so the current DC component is still substracted, but
 		the filter stops tracking any DC or low frequency changes.
 	</p>
 	<p class=func><span class=keyword>adcHighPassFilterDisable</span>();</p>
@@ -2035,14 +2035,18 @@ double s_freq = .0625;</p>
 	<p class=func><span class=keyword>adcHighPassFilterEnable</span>();</p>
 	<p class=desc>Turn the DC-blocking filter back on, if disabled, or
 		allows it to resume tracking DC and low frequency changes, if
-		previously frozen.
+		previously frozen. This is the default setting.
 	</p>
 	<p class=func><span class=keyword>dacVolume</span>(both);</p>
 	<p class=desc>Normally output volume should be used with volume(), which
 		changes the analog gain in the headphone amplifier.  This function
-		controls digital attenuation before conversion to analog, which
+		on the other hand controls digital attenuation before conversion to analog, which
 		reduces resolution, but allows another fine control of output
-		signal level.  The ranges is 0 to 1.0, with the default at 1.0.
+		signal level.  The ranges is 0 to 1.0, with the default (no digital attenuation) 
+		at 1.0.
+	</p>
+	<p  class=desc>dacVolume uses zero-crossing detect to avoid clicks, and ramping is handled by 
+	the chip so that a new volume may be set directly in a single call.
 	</p>
 	<p class=func><span class=keyword>dacVolume</span>(left, right);</p>
 	<p class=desc>Adjust the digital output volume separately on left and
@@ -2053,12 +2057,17 @@ double s_freq = .0625;</p>
 	<h3>Audio Processor</h3>
 
 	<p>The optional digital audio processor is capable of implementing 
-		automatic volume control, a
-		simple equalizer, filtering, bass enhancement and surround sound
-		is available.
+		one or more of: automatic volume control, surround sound control,
+		bass enhancement, and tonal adjustments (either a
+		simple tone control, or a parametric equalizer, or a graphic equalizer),
+		in that order.
 	</p>
 	<p>These signal processing features are implemented in the SGTL5000 chip,
-		so they do not consume CPU time on Teensy.
+		so they do not consume CPU time on Teensy. However, the order of 
+		these processes is fixed in the hardware.
+	</p>
+	<p>It is good practice to mute the outputs before enabling or disabling 
+	the Audio Processor, to avoid clicks or thumps.
 	</p>
 
 	<p class=func><span class=keyword>audioPreProcessorEnable</span>();</p>
@@ -2074,59 +2083,138 @@ double s_freq = .0625;</p>
 	<p class=func><span class=keyword>audioProcessorDisable</span>();</p>
 	<p class=desc>Disable the audio processor.
 	</p>
-	<p class=func><span class=keyword>eqFilterCount</span>(n);</p>
-	<p class=desc>blah blah blah blah
-	</p>
-	<p class=func><span class=keyword>eqSelect</span>(n);</p>
-	<p class=desc>blah blah blah blah
-	</p>
-	<p class=func><span class=keyword>eqBand</span>(bandNum, n);</p>
-	<p class=desc>blah blah blah blah
-	</p>
-	<p class=func><span class=keyword>eqBands</span>(bass, mid_bass, midrange, mid_treble, treble);</p>
-	<p class=desc>blah blah blah blah
-	</p>
-	<p class=func><span class=keyword>eqBands</span>(bass, treble);</p>
-	<p class=desc>blah blah blah blah
-	</p>
-	<p class=func><span class=keyword>eqFilter</span>(filterNum, filterParameters);</p>
-	<p class=desc>blah blah blah blah
-	</p>
 	<p class=func><span class=keyword>autoVolumeControl</span>(maxGain, response, hardLimit, threshold, attack, decay);</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Configures the auto volume control, which is implemented as a compressor/expander
+	or hard limiter. 	<em>maxGain</em> is the maximum gain that can be applied for expanding, and
+	can take one of three values: 0 (0dB), 1 (6.0dB) and 2 (12dB). Values greater than 2 are treated
+	as 2. <em>response</em> controls the integration time for the compressor and can take
+	four values: 0 (0ms), 1 (25ms), 2 (50ms) or 3 (100ms). Larger values average the volume
+	over a longer time, allowing short-term peaks through.
+	</p>
+	<p class=desc>If <em>hardLimit</em> is 0, a 'soft 
+	knee' compressor is used to progressively compress louder values which are near to or above the 
+	threashold (the louder they are, the greater the compression). If it is 1, a hard compressor 
+	is used (all values above the threashold are the same loudness). The <em>threashold</em> is specified
+	as a float in the range 0dBFS to -96dBFS, where -18dBFS is a typical value. 
+	<em>attack</em> is a float controlling the rate of decrease in gain when the signal is over 
+	threashold, in dB/s. <em>decay</em> controls how fast gain is restored once the level
+	drops below threashold, again in dB/s. It is typically set to a longer value than attack.
 	</p>
 	<p class=func><span class=keyword>autoVolumeEnable</span>();</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Enables auto volume control, using the previously specified settings.
 	</p>
 	<p class=func><span class=keyword>autoVolumeDisable</span>();</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Disables auto volume control.
 	</p>
-	<p class=func><span class=keyword>enhanceBass</span>(lr_lev, bass_lev);</p>
-	<p class=desc>blah blah blah blah
-	</p>
-	<p class=func><span class=keyword>enhanceBass</span>(lr_lev, bass_lev, hpf_bypass, cutoff);</p>
-	<p class=desc>blah blah blah blah
-	</p>
-	<p class=func><span class=keyword>enhanceBassEnable</span>();</p>
-	<p class=desc>blah blah blah blah
-	</p>
-	<p class=func><span class=keyword>enhanceBassDisable</span>();</p>
-	<p class=desc>blah blah blah blah
-	</p>
-	<p class=func><span class=keyword>surroundSound</span>(width);</p>
-	<p class=desc>blah blah blah blah
-	</p>
-	<p class=func><span class=keyword>surroundSound</span>(width, select);</p>
-	<p class=desc>blah blah blah blah
-	</p>
+
 	<p class=func><span class=keyword>surroundSoundEnable</span>();</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Enable virtual surround processing, to give a broader and 
+	deeper stereo image (even with mono input).
 	</p>
 	<p class=func><span class=keyword>surroundSoundDisable</span>();</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Disable virtual surround processing. Before disabling, ramp up
+	the width to maximum to avoid pops.
 	</p>
+	<p class=func><span class=keyword>surroundSound</span>(width);</p>
+	<p class=desc>Configures virtual surround width from 0 (mono) to 7 (widest).
+	</p>
+	<p class=func><span class=keyword>surroundSound</span>(width, select);</p>
+	<p class=desc>Configures virtual surround width from 0 (mono) to 7 (widest).
+	<em>select</em> may be set to 1 (disable), 2 (mono input) or 3 (stereo input).
+	</p>
+	
+	<p class=func><span class=keyword>enhanceBassEnable</span>();</p>
+	<p class=desc>Enable bass enhancement. A mono, low-pass filtered copy of
+	the original stereo signal has bass levels boosted and is then mixed back into
+	the stereo signal, which is then optionally high pass filtered (to remove 
+	inaudible subsonic frequencies).
+	</p>
+	<p class=func><span class=keyword>enhanceBassDisable</span>();</p>
+	<p class=desc>Disable bass enhancement. Before disabling, ramp down the bass 
+	enhancement level to zero.
+	</p>
+	<p class=func><span class=keyword>enhanceBass</span>(lr_lev, bass_lev);</p>
+	<p class=desc>Configures the bass enhancement by setting the levels of the 
+	original stereo signal and the bass-enhanced mono level which will be mixed together.
+	There is no high-pass filter.
+	</p>
+	<p  class=desc>When changing bass level, call this function repeatedly to ramp up or down the bass in 
+	steps of 0.5dB, to avoid pops.
+	</p>
+	<p class=func><span class=keyword>enhanceBass</span>(lr_lev, bass_lev, hpf_bypass, cutoff);</p>
+	<p class=desc>Configures the bass enhancement by setting the levels of the 
+	original stereo signal and the bass-enhanced mono level which will be mixed together.
+	The high-pass filter may be enabled (0) or bypassed (1). The cutoff frequency is specified
+	as follows:
+	</p>
+	<pre class="desc">
+value  frequency
+ 0      80Hz
+ 1     100Hz
+ 2     125Hz
+ 3     150Hz
+ 4     175Hz
+ 5     200Hz
+ 6     225Hz
+</pre>
+	<p  class=desc>When changing bass level, call this function repeatedly to ramp up or down the bass in 
+	steps of 0.5dB, to avoid pops.
+	</p>
+	
+	<p class=func><span class=keyword>eqSelect</span>(n);</p>
+	<p class=desc>Selects the type of frequency control, where <em>n</em> is 
+	one of</p>
+	<p class=desc><b>FLAT_FREQUENCY (0)</b><br>
+    Equalizers and tone controls disabled, flat frequency response.</p>
+    <p class=desc><b>PARAMETRIC_EQUALIZER (1)</b><br>
+    Enables the 7-band parametric equalizer, thus disabling the 
+	tone controls and graphic equalizer.</p>
+    <p class=desc><b>TONE_CONTROLS (2)</b><br>
+    Enables bass and treble tone controls, disabling the parametric 
+	equalization and graphic equalizer.</p>
+    <p class=desc><b>GRAPHIC_EQUALIZER (3)</b><br>
+    Enables the five-band graphic equalizer, disabling the parametric 
+	equalization and tone controls.</p>
+
+	
+	<p class=func><span class=keyword>eqBands</span>(bass, treble);</p>
+	<p class=desc>Configures bass and treble tone controls, which are
+	implemented as one second order low pass filter (bass) in parallel with 
+	one second order high pass filter (treble). 
+	</p>
+	<p class=desc>When changing bass or treble level, call this function repeatedly to ramp 
+	up or down the level in steps of 0.5dB, to avoid pops.
+	</p>
+	<p class=func><span class=keyword>eqBands</span>(bass, mid_bass, midrange, mid_treble, treble);</p>
+	<p class=desc>Configures the graphic equalizer. It is implemented by five parallel, 
+	second order biquad filters with fixed frequencies of 115Hz, 330Hz, 990Hz, 3kHz, 
+	and 9.9kHz. Each band has a range of adjustment from 100.0 (+12dB) to -100.0 (-11.75dB).
+	</p>
+	<p class=func><span class=keyword>eqBand</span>(bandNum, n);</p>
+	<p class=desc>Configures the gain or cut on one band in the graphic equalizer.
+	<em>bandnum</em> can range from 1 to 5; <em>n</em> is a float in the range 100.0 to -100.0.
+	</p>
+	<p  class=desc>When changing a band, call this function repeatedly to ramp up the gain in steps of 0.5dB,
+	to avoid pops.
+	</p>
+	
+	<p class=func><span class=keyword>eqFilter</span>(filterNum, filterParameters);</p>
+	<p class=desc>Configurs the parametric equalizer. The number of filters (1 to 7) 
+	is specified along with  a pointer to an array of filter coefficients. 
+	The parametric equalizer is implemented using 7 cascaded, second order bi-quad 
+	filters whose frequencies, gain, and Q may be freely configured, but each filter 
+	can only be specified as a set of filter coefficients.
+	</p>
+	<p class=func><span class=keyword>eqFilterCount</span>(n);</p>
+	<p class=desc>Enables zero or more of the already enabled parametric filters.
+	</p>	
+	
 	<h3>Notes</h3>
-	<p>TODO: document the many audio processor features &amp; functions!
+	<p>TODO: add example with rock/classical/speech presets, where rock uses bass boost 
+	and surround enhancement while speech uses bandpass filtering and auto volume control
+	compression.
+	</p>
+	<p>TODO: add example with two analogRead pots for bass and treble to demonstrate ramping.
 	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioControlSGTL5000">

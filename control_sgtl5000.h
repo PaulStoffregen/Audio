@@ -108,6 +108,13 @@ private:
   #define FILTER_PARAEQ 4
   #define FILTER_LOSHELF 5
   #define FILTER_HISHELF 6
+  
+//For frequency adjustment
+  #define FLAT_FREQUENCY 0
+  #define PARAMETRIC_EQUALIZER 1
+  #define TONE_CONTROLS 2
+  #define GRAPHIC_EQUALIZER 3
+
 
 void calcBiquad(uint8_t filtertype, float fC, float dB_Gain, float Q, uint32_t quantization_unit, uint32_t fS, int *coef);
 
