@@ -44,6 +44,25 @@
 	<p>Audio from
 		master mode I2S may be used in the same project as ADC, DAC and
 		PWM signals, because all remain in sync to Teensy's timing</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughStereo
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Recorder
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; PeakMeterStereo
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; FFT
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; SpectrumAnalyzerBasic
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Chorus
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Flange
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Filter
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Filter_FIR
+	</p>
 	<h3>Notes</h3>
 	<p>Normally, this object is used with the Audio Shield, which
 		is controlled separately by the "sgtl5000" object.</p>
@@ -92,6 +111,9 @@
 		<tr class=odd><td align=center>13</td><td>RX</td><td>Input</td></tr>
 		<tr class=odd><td align=center>23</td><td>LRCLK</td><td>Input</td></tr>
 	</table>
+	<!--<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; 
+	</p>-->
 	<h3>Notes</h3>
 	<p>Slave mode I2S <b>should not used in the same project as ADC, DAC and
 		PWM</b> signals.  Differences in timing between the I2S device and
@@ -136,6 +158,13 @@
 	<p>Pin A2 is used for audio input.  This circuitry is recommended.</p>
 	<p align=center><img src="adccircuit.png"></p>
 	<p>Signal range is 0 to 1.2V</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughMono
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; PeakMeterMono
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; DialTone_7segment
+	</p>
 	<h3>Notes</h3>
 	<p>Algorithm for automatic DC bias tracking</p>
 	<p>Noise due to high source impedance</p>
@@ -191,6 +220,20 @@
 	<p>Audio from
 		master mode I2S may be used in the same project as ADC, DAC and
 		PWM signals, because all remain in sync to Teensy's timing</p>
+	<h3>Examples</h3>
+	<p>Nearly all the examples use this object.  Here are some of the highlights:</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughStereo
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; SamplePlayer
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Recorder
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; WavFilePlayer
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Chorus
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; PlaySynthMusic
+	</p>
 	<h3>Notes</h3>
 	<p>Normally, this object is used with the Audio Shield, which
 		is controlled separately by the "sgtl5000" object.</p>
@@ -238,6 +281,9 @@
 		<tr class=odd><td align=center>22</td><td>TX</td><td>Output</td></tr>
 		<tr class=odd><td align=center>23</td><td>LRCLK</td><td>Input</td></tr>
 	</table>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; WM8731MikroSine
+	</p>
 	<h3>Notes</h3>
 	<p>Slave mode I2S <b>should not used in the same project as ADC, DAC and
 		PWM</b> signals.  Differences in timing between the I2S device and
@@ -284,6 +330,11 @@
 	<p>Signal range is 0 to 1.2V</p>
 	<p>Most applications require at least a 10&micro;F DC-blocking capacitor.</p>
 	<p>TODO: photo of Teensy 3.1 with 10&micro;F capacitor and 3.5mm jack.</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughMono
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; SamplePlayer
+	</p>
 	<h3>Notes</h3>
 	<p>The output rate is 44.1 kHz (no oversampling).  Ultrasonic noise present if
 		not filtered.  This may not
@@ -332,6 +383,9 @@
 	<p>A plastic film (Polypropylene, Polyethylene, Polyester, etc) or
 		C0G/NPO ceramic capacitor should be used for filtering.  Low
 		quality ceramic (X7R, Y5V, Z5U, etc) can cause signal distortion.</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughMono
+	</p>
 	<h3>Notes</h3>
 	<p>This object only works properly when Tools > CPU_Speed is set to
 		48 or 96 MHz.  Other speeds aren't supported and will likely fail
@@ -384,6 +438,17 @@
 		1.0 passes the signal through directly.  Level of 0 shuts the channel
 		off completely.  Between 0 to 1.0 attenuates the signal, and above
 		1.0 amplifies it.  All 4 channels have separate settings.
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; SamplePlayer
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; PlaySynthMusic
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; SpectrumAnalyzerBasic
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; DialTone_Serial
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; MemoryAndCpuUsage
 	</p>
 	<h3>Notes</h3>
 	<p>Signal clipping can occur when any channel has gain greater than 1.0,
@@ -446,6 +511,9 @@
 		in milliseconds.  When not playing, the return from this function
 		is undefined.
 	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; SamplePlayer
+	</p>
 	<h3>Notes</h3>
 	<p>TODO: supported sample rates: 11.025, 22.05, 44.1</p>
 	<p>TODO: ulaw vs uncompressed encoding</p>
@@ -501,6 +569,9 @@
 	<p class=desc>Return the total length of the current sound clip,
 		in milliseconds.  When not playing, the return from this function
 		is undefined.
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; WavFilePlayer
 	</p>
 	<h3>Notes</h3>
 	<p>Only 16 bit PCM, 44100 Hz WAV files are supported.  When mono
@@ -573,6 +644,9 @@
 		in milliseconds.  When not playing, the return from this function
 		is undefined.
 	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Recorder
+	</p>
 	<h3>Notes</h3>
 	<p>The data file must be RAW 16 bit signed integers in LSB-first format.
 	</p>
@@ -631,6 +705,11 @@
 	<p class=func><span class=keyword>playBuffer</span>();</p>
 	<p class=desc>Transmit the buffer previously obtained from getBuffer().
 	</p>
+	<h3>Examples</h3>
+		<p><a href="http://community.arm.com/groups/embedded/blog/2014/05/23/led-video-panel-at-maker-faire-2014" target="_blank">4320 LED Video+Sound Project</a>
+		</p>
+	<!--<p class=exam>File &gt; Examples &gt; Audio &gt; 
+	</p>-->
 	<h3>Notes</h3>
 	<p>TODO: many caveats....</p>
 	<p>
@@ -691,6 +770,9 @@
 	<p class=desc>Stop capturing incoming audio into the queue.  Data already
 		captured remains in the queue and may be read with readBuffer().
 	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Recorder
+	</p>
 	<h3>Notes</h3>
 	<p>
 		Up to 52 packets may be queued by this object, which allows approximately
@@ -747,6 +829,13 @@ The actual packets are taken
 		<a href="http://www.pjrc.com/teensy/td_libs_AudioProcessorUsage.html" target="_blank">AudioNoInterrupts()</a>
 		should be used to guarantee all new settings take effect together.
 	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; MemoryAndCpuUsage
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; DialTone_Serial
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; FFT
+	</p>
 	<h3>Notes</h3>
 	<p></p>
 </script>
@@ -798,6 +887,9 @@ The actual packets are taken
 		<a href="http://www.pjrc.com/teensy/td_libs_AudioProcessorUsage.html" target="_blank">AudioNoInterrupts()</a>
 		should be used to guarantee all new settings take effect together.
 	</p>
+	<!--<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; 
+	</p>-->
 	<h3>Notes</h3>
 	<p></p>
 </script>
@@ -860,6 +952,13 @@ The actual packets are taken
 		limit your waveform data.  Someday, "maxFreq" will be used to
 		do this automatically.
 	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; PlaySynthMusic
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; pulseWidth
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; WM8731MikroSine
+	</p>
 	<h3>Notes</h3>
 	<p>Supported Waveforms:<br>
 		<ul>
@@ -907,6 +1006,9 @@ The actual packets are taken
 	<p class=func><span class=keyword>isPlaying</span>();</p>
 	<p class=desc>Returns true (non-zero) while the output is active.
 	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; ToneSweep
+	</p>
 	<h3>Notes</h3>
 	<p>Uses excessive CPU time</p>
 </script>
@@ -949,6 +1051,9 @@ The actual packets are taken
 		be specified, but periods longer than 1 second may be automatically
 		shortened for small level changes, due to numerical precision limits.
 	</p>
+	<!--<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; 
+	</p>-->
 	<h3>Notes</h3>
 	<p>Of course, the term "DC", for Direct Current, doesn't properly apply
 		to a pure digital stream of numerical values.  But the term is widely
@@ -989,6 +1094,9 @@ The actual packets are taken
 	<p class=desc>Set the output peak level, from 0 (off) to 1.0.
 		The default is off.  Noise is generated only after setting
 		to a non-zero level.
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; 
 	</p>
 	<h3>Notes</h3>
 	<p>Setting the amplitude to zero causes this object to stop using
@@ -1031,6 +1139,9 @@ The actual packets are taken
 	<p class=desc>Set the output peak level, from 0 (off) to 1.0.
 		The default is off.  Noise is generated only after setting
 		to a non-zero level.
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; MemoryAndCpuUsage
 	</p>
 	<h3>Notes</h3>
 	<p>Setting the amplitude to zero causes this object to stop using
@@ -1080,6 +1191,9 @@ The actual packets are taken
 	<p class=desc>Begin decreasing the audio level, to reach 0 (no output)
 		after "milliseconds" time.
 	</p>
+	<!--<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; 
+	</p>-->
 	<h3>Notes</h3>
 	<p>Cross fading can be built with 2 fade objects fed into a mixer.
 		When one fade object is off (fully faded out) and the other on
@@ -1148,6 +1262,9 @@ The actual packets are taken
 	<p class=func><span class=keyword>modify</span>(n_chorus);</p>
 	<p class=desc>Alters the number of voices in a running chorus (previously started with begin).
 	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Chorus
+	</p>
 	<h3>Notes</h3>
 	<p>The longer the length of the chorus, the more memory blocks are used.</p>
 </script>
@@ -1203,6 +1320,9 @@ The actual packets are taken
 	<p class=desc>Alters the parameters in a running flanger (previously started with begin).
 	</p>
 
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Flange
+	</p>
 	<h3>Notes</h3>
 	<p>The longer the length of the delay buffer, the more memory blocks are used.</p>
 	<p>Try these settings:<br>
@@ -1281,6 +1401,13 @@ double s_freq = .0625;</p>
 	<p class=func><span class=keyword>release</span>(milliseconds);</p>
 	<p class=desc>Set the release time.  The default is 30 millisecond.
 	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; PlaySynthMusic
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; pulseWidth
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; MemoryAndCpuUsage
+	</p>
 	<h3>Notes</h3>
 	<p>To achieve the more common ADSR shape, simply
         set delay and hold to zero.</p>
@@ -1327,6 +1454,9 @@ double s_freq = .0625;</p>
 		This object simply multiplies the 2 signals to create
 		a continuous output
 	</p>
+	<!--<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; 
+	</p>-->
 	<h3>Notes</h3>
 	<p>
     </p>
@@ -1382,6 +1512,9 @@ double s_freq = .0625;</p>
 		silent.  If this channel is the longest delay, memory usage is
 		automatically reduced to accomodate only the remaining channels used.
 	</p>
+	<!--<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; 
+	</p>-->
 	<h3>Notes</h3>
 	<p>Memory for the delayed signal is take from the memory pool allocated by
 		<a href="http://www.pjrc.com/teensy/td_libs_AudioConnection.html" target="_blank">AudioMemory()</a>.
@@ -1450,6 +1583,9 @@ double s_freq = .0625;</p>
 		should be type double.  Alternately, it may be type int, where 1.0 is
 		represented with 1073741824 (2<sup>30</sup>).
 	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Filter
+	</p>
 	<h3>Notes</h3>
 	<p>Filters can with gain must have their input signals attenuated, so the
 		signal does not exceed 1.0.
@@ -1505,6 +1641,9 @@ double s_freq = .0625;</p>
 	</p>
 	<p class=func><span class=keyword>end</span>();</p>
 	<p class=desc>Turn the filter off.
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Filter_FIR
 	</p>
 	<h3>Notes</h3>
 	<p>FIR filters requires more CPU time than Biquad (IIR), but they can
@@ -1576,6 +1715,9 @@ double s_freq = .0625;</p>
 		shift the filter frequency up 2.5 octaves, and a full scale negative
 		signal will shift it down 2.5 octaves.
 	</p>
+	<!--<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; 
+	</p>-->
 	<h3>Notes</h3>
 	<p>
 		When controlled by a signal, the equation for the filter
@@ -1626,6 +1768,11 @@ double s_freq = .0625;</p>
 	<p class=func><span class=keyword>read</span>();</p>
 	<p class=desc>Read the highest peak value since the last read.
 		Return is from 0.0 to 1.0.
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; PeakMeterMono
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; PeakMeterStereo
 	</p>
 	<h3>Notes</h3>
 	<p></p>
@@ -1684,6 +1831,9 @@ double s_freq = .0625;</p>
 		signals that are not exact integer division of the sample rate.
 	</p>
 
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; MemoryAndCpuUsage
+	</p>
 	<h3>Notes</h3>
 	<p>The raw 16 bit output data bins may be access with myFFT.output[num], where
 		num is 0 to 127.</p>
@@ -1755,6 +1905,11 @@ double s_freq = .0625;</p>
 		is the default.  Windowing may be disabled by NULL, but windowing
 		should be used for all non-periodic (music) signals, and all periodic
 		signals that are not exact integer division of the sample rate.
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; FFT
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; SpectrumAnalyzerBasic
 	</p>
 	<h3>Notes</h3>
 	<p>The raw 16 bit output data bins may be access with myFFT.output[num], where
@@ -1832,6 +1987,11 @@ double s_freq = .0625;</p>
 	<p class=desc>By testing the object as a boolean value, you can respond
 		to detection of a tone.
 	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; DialTone_Serial
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; DialTone_7segment
+	</p>
 	<h3>Notes</h3>
 	<p>Low frequency detection has trouble with numerical precision.
 		Works really well for all 8 DTMF frequencies, but fails for
@@ -1885,6 +2045,9 @@ double s_freq = .0625;</p>
 	<p class=func><span class=keyword>length</span>(samples);</p>
 	<p class=desc>blah blah blah blah
 	</p>
+	<!--<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; 
+	</p>-->
 	<h3>Notes</h3>
 	<p>This object doesn't work very well and probably should not be used.</p>
 </script>
@@ -1909,7 +2072,7 @@ double s_freq = .0625;</p>
 </script>
 <script type="text/x-red" data-help-name="AudioControlSGTL5000">
 	<h3>Summary</h3>
-	<p>Control the SGTL5000 chip on the audio shield
+	<p>Control the SGTL5000 chip on the
 		<a href="http://www.pjrc.com/store/teensy3_audio.html" target="_blank">audio shield</a>.
 		SGTL5000 is always used in slave mode, where Teensy controls
 		all I2S timing.
@@ -2209,6 +2372,22 @@ value  frequency
 	<p class=desc>Enables zero or more of the already enabled parametric filters.
 	</p>	
 	
+	<h3>Examples</h3>
+	<p>Nearly all of the library's examples use this object.  These
+		examples demonstrate its special features.
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughStereo
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; SGTL5000 &gt; dap_bass_enhance
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; SGTL5000 &gt; dap_avc_agc
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; SGTL5000 &gt; balanceDAC
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; SGTL5000 &gt; balanceHP
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; SGTL5000 &gt; CalcBiquadToneControlDAP
+	</p>
 	<h3>Notes</h3>
 	<p>TODO: add example with rock/classical/speech presets, where rock uses bass boost 
 	and surround enhancement while speech uses bandpass filtering and auto volume control
@@ -2261,6 +2440,9 @@ value  frequency
 	<p class=func><span class=keyword>inputSelect</span>(input);</p>
 	<p class=desc>not implemented
 	</p>
+	<!--<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; 
+	</p>-->
 	<h3>Notes</h3>
 	<p></p>
 </script>
@@ -2307,6 +2489,9 @@ value  frequency
 	</p>
 	<p class=func><span class=keyword>inputSelect</span>(input);</p>
 	<p class=desc>not implemented
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; WM8731MikroSine
 	</p>
 	<h3>Notes</h3>
 	<p></p>
