@@ -35,9 +35,8 @@ bool AudioInputAnalog::update_responsibility = false;
 DMAChannel AudioInputAnalog::dma(false);
 
 
-AudioInputAnalog::AudioInputAnalog() : AudioStream(0, NULL)
+AudioInputAnalog::AudioInputAnalog(uint8_t pin) : AudioStream(0, NULL)
 {
-	unsigned int pin = A2;
 	uint32_t i, sum=0;
 
 	// Configure the ADC and run at least one software-triggered
