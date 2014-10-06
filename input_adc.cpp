@@ -95,7 +95,6 @@ void AudioInputAnalog::isr(void)
 	uint16_t *dest_left;
 	audio_block_t *left;
 
-	digitalWriteFast(2, HIGH);
 	daddr = (uint32_t)(dma.TCD->DADDR);
 	dma.clearInterrupt();
 
@@ -115,27 +114,14 @@ void AudioInputAnalog::isr(void)
 	if (left != NULL) {
 		offset = block_offset;
 		if (offset > AUDIO_BLOCK_SAMPLES/2) offset = AUDIO_BLOCK_SAMPLES/2;
-		//if (offset <= AUDIO_BLOCK_SAMPLES/2) {
-			dest_left = (uint16_t *)&(left->data[offset]);
-			block_offset = offset + AUDIO_BLOCK_SAMPLES/2;
-			do {
-				*dest_left++ = *src++;
-			} while (src < end);
-		//}
+		dest_left = (uint16_t *)&(left->data[offset]);
+		block_offset = offset + AUDIO_BLOCK_SAMPLES/2;
+		do {
+			*dest_left++ = *src++;
+		} while (src < end);
 	}
-	digitalWriteFast(2, LOW);
 }
 
-
-#if 0
-void adc0_isr(void)
-{
-	uint32_t tmp = ADC0_RA; // read ADC result to clear interrupt
-	digitalWriteFast(3, HIGH);
-	delayMicroseconds(1);
-	digitalWriteFast(3, LOW);
-}
-#endif
 
 
 void AudioInputAnalog::update(void)
