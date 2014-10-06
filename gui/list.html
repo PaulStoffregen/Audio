@@ -166,9 +166,18 @@
 	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; DialTone_7segment
 	</p>
 	<h3>Notes</h3>
+	<p>A different pin may be used, but adding it as an parameter
+		to the AudioInputAnalog object definition.
+	</p>
+	<p>For example, to use pin A3:
+	</p>
+	<p class=desc><span class=keyword>AudioInputAnalog</span>  adc1(<span class=literal>A3</span>);
+	</p>
+
+	<p>Noise due to high source impedance, which allows rapidly switching digital signals
+		to capacitively couple... avoiding higher analog impedance is the solution.</p>
+	<p>Power Supply rejection issue with simple DC bias (bigger capacitor may be needed if 3.3V has low frequency noise)</p>
 	<p>Algorithm for automatic DC bias tracking</p>
-	<p>Noise due to high source impedance</p>
-	<p>Power Supply rejection issue with simple DC bias</p>
 	<p>TODO: actual noise measurements with different input circuitry
 		(it's not as quiet as the audio shield)</p>
 </script>
