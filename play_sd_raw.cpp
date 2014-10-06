@@ -25,6 +25,7 @@
  */
 
 #include "play_sd_raw.h"
+#include "spi_interrupt.h"
 
 
 void AudioPlaySdRaw::begin(void)
@@ -38,6 +39,7 @@ void AudioPlaySdRaw::begin(void)
 bool AudioPlaySdRaw::play(const char *filename)
 {
 	stop();
+	AudioStartUsingSPI();
 	__disable_irq();
 	rawfile = SD.open(filename);
 	__enable_irq();
@@ -59,6 +61,7 @@ void AudioPlaySdRaw::stop(void)
 		playing = false;
 		__enable_irq();
 		rawfile.close();
+		AudioStopUsingSPI();
 	} else {
 		__enable_irq();
 	}
@@ -87,6 +90,7 @@ void AudioPlaySdRaw::update(void)
 		transmit(block);
 	} else {
 		rawfile.close();
+		AudioStopUsingSPI();
 		playing = false;
 	}
 	release(block);

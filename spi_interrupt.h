@@ -43,7 +43,7 @@ static inline void AudioStartUsingSPI(void) {
 }
 
 static inline void AudioStopUsingSPI(void) {
-	if (--AudioUsingSPICount == 0)
+	if (AudioUsingSPICount == 0 || --AudioUsingSPICount == 0)
 		SPI.notUsingInterrupt(IRQ_SOFTWARE);
 }
 

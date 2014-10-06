@@ -25,6 +25,7 @@
  */
 
 #include "play_sd_wav.h"
+#include "spi_interrupt.h"
 
 #define STATE_DIRECT_8BIT_MONO		0  // playing mono at native sample rate
 #define STATE_DIRECT_8BIT_STEREO	1  // playing stereo at native sample rate
@@ -59,6 +60,7 @@ void AudioPlaySdWav::begin(void)
 bool AudioPlaySdWav::play(const char *filename)
 {
 	stop();
+	AudioStartUsingSPI();
 	__disable_irq();
 	wavfile = SD.open(filename);
 	__enable_irq();
@@ -85,6 +87,7 @@ void AudioPlaySdWav::stop(void)
 		if (b1) release(b1);
 		if (b2) release(b2);
 		wavfile.close();
+		AudioStopUsingSPI();
 	} else {
 		__enable_irq();
 	}
@@ -140,6 +143,7 @@ void AudioPlaySdWav::update(void)
 	}
 end:	// end of file reached or other reason to stop
 	wavfile.close();
+	AudioStopUsingSPI();
 	state_play = STATE_STOP;
 	state = STATE_STOP;
 cleanup:
