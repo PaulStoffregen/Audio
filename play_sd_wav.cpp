@@ -463,7 +463,7 @@ bool AudioPlaySdWav::parse_format(void)
 	rate = header[1];
 	//Serial.print("  rate = ");
 	//Serial.println(rate);
-	if (rate == AUDIO_SAMPLE_RATE) {
+	if (rate == 44100) {
 		b2m = B2M_44100;
 	} else if (rate == 22050) {
 		b2m = B2M_22050;
