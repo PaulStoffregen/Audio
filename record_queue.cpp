@@ -40,7 +40,6 @@ int AudioRecordQueue::available(void)
 
 void AudioRecordQueue::clear(void)
 {
-	audio_block_t *block;
 	uint32_t t;
 
 	if (userblock) {
@@ -57,7 +56,6 @@ void AudioRecordQueue::clear(void)
 
 int16_t * AudioRecordQueue::readBuffer(void)
 {
-	audio_block_t *block;
 	uint32_t t;
 
 	if (userblock) return NULL;
