@@ -33,17 +33,18 @@
 class AudioInputAnalog : public AudioStream
 {
 public:
-        AudioInputAnalog(uint8_t pin);
-        AudioInputAnalog() : AudioStream(0, NULL) { AudioInputAnalog(A2); }
+        AudioInputAnalog() : AudioStream(0, NULL) { init(A2); }
+        AudioInputAnalog(uint8_t pin) : AudioStream(0, NULL) { init(pin); }
         virtual void update(void);
         friend void dma_ch9_isr(void);
 private:
         static audio_block_t *block_left;
         static uint16_t block_offset;
-	uint16_t dc_average;
+	static uint16_t dc_average;
         static bool update_responsibility;
 	static DMAChannel dma;
 	static void isr(void);
+	static void init(uint8_t pin);
 };
 
 #endif
