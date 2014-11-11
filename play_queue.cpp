@@ -27,9 +27,17 @@
 #include "play_queue.h"
 #include "utility/dspinst.h"
 
+bool AudioPlayQueue::available(void)
+{
+        if (userblock) return true;
+        userblock = allocate();
+        if (userblock) return true;
+        return false;
+}
 
 int16_t * AudioPlayQueue::getBuffer(void)
 {
+	if (userblock) return userblock->data;
 	while (1) {
 		userblock = allocate();
 		if (userblock) return userblock->data;
