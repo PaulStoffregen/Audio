@@ -36,6 +36,7 @@ public:
 		userblock(NULL), head(0), tail(0) { }
 	void play(int16_t data);
 	void play(const int16_t *data, uint32_t len);
+	bool available(void);
 	int16_t * getBuffer(void);
 	void playBuffer(void);
 	void stop(void);
