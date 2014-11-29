@@ -25,6 +25,7 @@
  */
 
 #include "output_i2s.h"
+#include "memcpy_Audio.h"
 
 audio_block_t * AudioOutputI2S::block_left_1st = NULL;
 audio_block_t * AudioOutputI2S::block_right_1st = NULL;
@@ -69,74 +70,74 @@ void AudioOutputI2S::begin(void)
 
 void AudioOutputI2S::isr(void)
 {
-	const int16_t *src, *end;
-	int16_t *dest;
-	audio_block_t *block;
-	uint32_t saddr, offset;
-
+	
+	int16_t *dest;	
+	audio_block_t *blockL, *blockR;
+	uint32_t saddr;	
+	uint32_t oL,oR;
+	
 	saddr = (uint32_t)(dma.TCD->SADDR);
 	dma.clearInterrupt();
 	if (saddr < (uint32_t)i2s_tx_buffer + sizeof(i2s_tx_buffer) / 2) {
 		// DMA is transmitting the first half of the buffer
 		// so we must fill the second half
-		dest = (int16_t *)&i2s_tx_buffer[AUDIO_BLOCK_SAMPLES/2];
-		end = (int16_t *)&i2s_tx_buffer[AUDIO_BLOCK_SAMPLES];
+		dest = (int16_t *)&i2s_tx_buffer[AUDIO_BLOCK_SAMPLES / 2];
 		if (AudioOutputI2S::update_responsibility) AudioStream::update_all();
 	} else {
 		// DMA is transmitting the second half of the buffer
 		// so we must fill the first half
 		dest = (int16_t *)i2s_tx_buffer;
-		end = (int16_t *)&i2s_tx_buffer[AUDIO_BLOCK_SAMPLES/2];
 	}
 
-	// TODO: these copy routines could be merged and optimized, maybe in assembly?
-	block = AudioOutputI2S::block_left_1st;
-	if (block) {
-		offset = AudioOutputI2S::block_left_offset;
-		src = &block->data[offset];
-		do {
-			*dest = *src++;
-			dest += 2;
-		} while (dest < end);
-		offset += AUDIO_BLOCK_SAMPLES/2;
-		if (offset < AUDIO_BLOCK_SAMPLES) {
-			AudioOutputI2S::block_left_offset = offset;
-		} else {
+	blockL = AudioOutputI2S::block_left_1st;
+	blockR = AudioOutputI2S::block_right_1st;
+
+	oL = AudioOutputI2S::block_left_offset;
+	oR = AudioOutputI2S::block_right_offset;
+
+	if ((blockL!=NULL) && (blockR!=NULL)) {
+		memcpy_tointerlaceLR(dest, &blockL->data[oL], &blockL->data[oR]);
+		oL += AUDIO_BLOCK_SAMPLES / 2;
+		oR += AUDIO_BLOCK_SAMPLES / 2;
+	} else
+
+	if (blockL!=NULL) {
+		memcpy_tointerlaceL(dest, &blockL->data[oL]);
+		oL += AUDIO_BLOCK_SAMPLES / 2;
+
+	} else
+
+	if (blockR!=NULL) {
+		memcpy_tointerlaceR(dest, &blockL->data[oL]);
+		oR += AUDIO_BLOCK_SAMPLES / 2;
+	} else
+	{
+
+		memset(dest,0,AUDIO_BLOCK_SAMPLES * 2);
+		return;
+	}
+
+
+	if (oL < AUDIO_BLOCK_SAMPLES) {
+			AudioOutputI2S::block_left_offset = oL;
+	} else {
 			AudioOutputI2S::block_left_offset = 0;
-			AudioStream::release(block);
+			AudioStream::release(blockL);
 			AudioOutputI2S::block_left_1st = AudioOutputI2S::block_left_2nd;
 			AudioOutputI2S::block_left_2nd = NULL;
-		}
-	} else {
-		do {
-			*dest = 0;
-			dest += 2;
-		} while (dest < end);
 	}
-	dest -= AUDIO_BLOCK_SAMPLES - 1;
-	block = AudioOutputI2S::block_right_1st;
-	if (block) {
-		offset = AudioOutputI2S::block_right_offset;
-		src = &block->data[offset];
-		do {
-			*dest = *src++;
-			dest += 2;
-		} while (dest < end);
-		offset += AUDIO_BLOCK_SAMPLES/2;
-		if (offset < AUDIO_BLOCK_SAMPLES) {
-			AudioOutputI2S::block_right_offset = offset;
-		} else {
+
+
+	if (oR < AUDIO_BLOCK_SAMPLES) {
+			AudioOutputI2S::block_right_offset = oR;
+	} else {
 			AudioOutputI2S::block_right_offset = 0;
-			AudioStream::release(block);
+			AudioStream::release(blockR);
 			AudioOutputI2S::block_right_1st = AudioOutputI2S::block_right_2nd;
 			AudioOutputI2S::block_right_2nd = NULL;
-		}
-	} else {
-		do {
-			*dest = 0;
-			dest += 2;
-		} while (dest < end);
 	}
+
+
 }
 
 
