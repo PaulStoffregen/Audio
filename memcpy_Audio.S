@@ -61,8 +61,7 @@
 	@ r0: dst
 	@ r1: srcL
 
-	push	{r0,r3-r12}
-	mov r12, #0
+	push	{r0,r3-r11}
 	mov r11, #256 - 1
 	.align 2
 .loopL:
@@ -89,7 +88,7 @@
 	subs r11, #32
 	bhs .loopL
 
-	pop	{r0,r3-r12}
+	pop	{r0,r3-r11}
 	BX lr
 
 
