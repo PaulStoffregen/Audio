@@ -96,19 +96,19 @@ void AudioOutputI2S::isr(void)
 	oR = AudioOutputI2S::block_right_offset;
 
 	if ((blockL!=NULL) && (blockR!=NULL)) {
-		memcpy_tointerlaceLR(dest, &blockL->data[oL], &blockL->data[oR]);
+		memcpy_tointerlaceLR(dest, blockL->data+oL, blockR->data+oR);
 		oL += AUDIO_BLOCK_SAMPLES / 2;
 		oR += AUDIO_BLOCK_SAMPLES / 2;
 	} else
 
 	if (blockL!=NULL) {
-		memcpy_tointerlaceL(dest, &blockL->data[oL]);
+		memcpy_tointerlaceL(dest, blockL->data+oL);
 		oL += AUDIO_BLOCK_SAMPLES / 2;
 
 	} else
 
 	if (blockR!=NULL) {
-		memcpy_tointerlaceR(dest, &blockL->data[oL]);
+		memcpy_tointerlaceR(dest, blockR->data+oR);
 		oR += AUDIO_BLOCK_SAMPLES / 2;
 	} else
 	{

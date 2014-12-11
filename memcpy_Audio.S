@@ -16,45 +16,47 @@
 
 	@ r0: dst
 	@ r1: srcL
-	@ r2: srcL
+	@ r2: srcR
 
-	push	{r0,r3-r11}
-	mov r11, #256 - 1
+	push	{r3-r12,r14}
+	add r14,r0,#256
 	.align 2
 .loopLR:
 
 	.irp offset, 1,2
+	
+	//Load 2*4 words
+	ldmia r1!, {r5,r7,r9,r11}  //1+4
+	ldmia r2!, {r6,r8,r10,r12} //1+4
 
-	ldrh r3,[r1],#2
-	ldrh r4,[r2],#2
-	ldrh r5,[r1],#2
-	ldrh r6,[r2],#2
-	ldrh r7,[r1],#2
-	ldrh r8,[r2],#2
-	ldrh r9,[r1],#2
-	ldrh r10,[r2],#2
+	pkhbt r3,r5,r6 //1
+	pkhbt r4,r6,r5	//1
 
-	strh r3,[r0],#2
-	strh r4,[r0],#2
-	strh r5,[r0],#2
-	strh r6,[r0],#2
-	strh r7,[r0],#2
-	strh r8,[r0],#2
-	strh r9,[r0],#2
-	strh r10,[r0],#2
+	pkhbt r5,r7,r8  //1
+	pkhbt r6,r8,r7  //1
 
-	.endr
+	pkhbt r7,r9,r10  //1
+	pkhbt r8,r10,r9	//1
 
-	subs r11, #2 * 16
-	bhs .loopLR
+	pkhbt r9,r11,r12 //1
+	pkhbt r10,r12,r11 //1
 
-	pop	{r0,r3-r11}
+	//Write 8 Words
+	stmia r0!, {r3,r4,r5,r6,r7,r8,r9,r10} //1+8
+
+	.endr //5+5+8+9 = 27 Cycles to interleave 32 bytes.
+
+
+	cmp r14, r0
+	bne .loopLR
+
+	pop	{r3-r12,r14}
 	BX lr
 
 
 
 /* void memcpy_tointerlaceL(short *dst, short *srcL); */
- .global	memcpy_tointerlaceL
+.global	memcpy_tointerlaceL
 .thumb_func
 	memcpy_tointerlaceL:
 
