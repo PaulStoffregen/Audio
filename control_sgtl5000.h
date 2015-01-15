@@ -58,6 +58,8 @@ public:
 	bool lineInLevel(uint8_t left, uint8_t right);
 	unsigned short lineOutLevel(uint8_t n);
 	unsigned short lineOutLevel(uint8_t left, uint8_t right);
+	unsigned short dacRampEnable(bool exponential);
+	unsigned short dacRampDisable();
 	unsigned short dacVolume(float n);
 	unsigned short dacVolume(float left, float right);
 	unsigned short adcHighPassFilterEnable(void);

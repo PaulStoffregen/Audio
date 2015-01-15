@@ -676,6 +676,22 @@ unsigned short AudioControlSGTL5000::lineOutLevel(uint8_t left, uint8_t right)
 	return modify(CHIP_LINE_OUT_VOL,(right<<8)|left,(31<<8)|31);
 }
 
+/** 
+ * Enable ramping to a new volume value, and soft mute. The ramping is done in the digital domain, by the chip, before the DAC
+ *
+ * \param exponential If true then Exponential ramp over full volume range, else Linear ramp over top 4 volume octaves.
+ */
+unsigned short AudioControlSGTL5000::dacRampEnable(bool exponential) {
+	return modify(CHIP_ADCDAC_CTRL, (exponential ? 0x300 : 0x200), 0x300); // reg, val, iMask
+}
+
+/**
+ * Disable ramping to new volume value, and disable soft mute.
+ */
+unsigned short AudioControlSGTL5000::dacRampDisable() {
+	return modify(CHIP_ADCDAC_CTRL, 0, 0x300); // reg, val, iMask
+}
+
 unsigned short AudioControlSGTL5000::dacVolume(float n) // set both directly
 {
 	if ((read(CHIP_ADCDAC_CTRL)&(3<<2)) != ((n>0 ? 0:3)<<2)) {
