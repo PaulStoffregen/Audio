@@ -2355,16 +2355,16 @@ value  frequency
 	one second order high pass filter (treble). 
 	</p>
 	<p class=desc>When changing bass or treble level, call this function repeatedly to ramp 
-	up or down the level in steps of 0.5dB, to avoid pops.
+	up or down the level in steps of 0.04 (=0.5dB) or so, to avoid pops.
 	</p>
 	<p class=func><span class=keyword>eqBands</span>(bass, mid_bass, midrange, mid_treble, treble);</p>
 	<p class=desc>Configures the graphic equalizer. It is implemented by five parallel, 
 	second order biquad filters with fixed frequencies of 115Hz, 330Hz, 990Hz, 3kHz, 
-	and 9.9kHz. Each band has a range of adjustment from 100.0 (+12dB) to -100.0 (-11.75dB).
+	and 9.9kHz. Each band has a range of adjustment from 1.00 (+12dB) to -1.00 (-11.75dB).
 	</p>
 	<p class=func><span class=keyword>eqBand</span>(bandNum, n);</p>
 	<p class=desc>Configures the gain or cut on one band in the graphic equalizer.
-	<em>bandnum</em> can range from 1 to 5; <em>n</em> is a float in the range 100.0 to -100.0.
+	<em>bandnum</em> can range from 1 to 5; <em>n</em> is a float in the range 1.00 to -1.00.
 	</p>
 	<p  class=desc>When changing a band, call this function repeatedly to ramp up the gain in steps of 0.5dB,
 	to avoid pops.
