@@ -45,12 +45,24 @@ public:
 	}
 	float read(void) {
 		__disable_irq();
+		int max = max_sample;
+		min_sample = abs(min_sample);
+		if (min_sample > max)
+			max = min_sample;
+		min_sample = 32767;
+		max_sample = -32768;
+		__enable_irq();
+		return max / 32767.0;
+	}
+	float readDiffPosNeg(void) { // read the (pos)peak-to-(neg)peak difference 
+		__disable_irq();
 		int diff = max_sample - min_sample;
 		min_sample = 32767;
 		max_sample = -32768;
 		__enable_irq();
 		return diff / 65535.0;
 	}
+
 	virtual void update(void);
 private:
 	audio_block_t *inputQueueArray[1];
