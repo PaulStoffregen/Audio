@@ -63,6 +63,7 @@
 #include "analyze_print.h"
 #include "analyze_tonedetect.h"
 #include "analyze_peak.h"
+#include "analyze_rms.h"
 #include "control_sgtl5000.h"
 #include "control_wm8731.h"
 #include "effect_chorus.h"
