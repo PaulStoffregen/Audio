@@ -71,6 +71,32 @@ void applyGainThenAdd(int16_t *data, const int16_t *in, int32_t mult)
 	}
 }
 
+void AudioMixer2::update(void)
+{
+	audio_block_t *in, *out=NULL;
+	unsigned int channel;
+
+	for (channel=0; channel < 2; channel++) {
+		if (!out) {
+			out = receiveWritable(channel);
+			if (out) {
+				int32_t mult = multiplier[channel];
+				if (mult != 65536) applyGain(out->data, mult);
+			}
+			} else {
+			in = receiveReadOnly(channel);
+			if (in) {
+				applyGainThenAdd(out->data, in->data, multiplier[channel]);
+				release(in);
+			}
+		}
+	}
+	if (out) {
+		transmit(out);
+		release(out);
+	}
+}
+
 
 void AudioMixer4::update(void)
 {
