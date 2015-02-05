@@ -1727,6 +1727,59 @@ double s_freq = .0625;</p>
 
 
 
+<script type="text/javascript">
+	RED.nodes.registerType('AudioEffectBitCrusher',{
+	shortName: "bitcrusher",
+		inputs:1,
+		outputs:1,
+		category: 'effect-function',
+		color:"#E6E0F8",
+		icon: "arrow-in.png"
+	});
+</script>
+<script type="text/x-red" data-help-name="AudioEffectBitCrusher">
+	<h3>Summary</h3>
+	<p>Reduce the samplerate and/or bitdepth of a source signal.</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Signal Input</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Signal Output</td></tr>
+	</table>
+	<h3>Parameters</h3>
+	<p class=func><span class=keyword>updateCrusher</span>(xcrushBits,xsampleRate);</p>
+	<p class=desc>xcrushBits sets the bitdepth, from 1 to 16. A Value of 16 
+	does not crush the bitdepth, and is effectively a passthru for this part 
+	of the function.</p>
+	<p class=desc>xsampleRate sets the frequency, from 1 to 44100Hz, however it works in integer
+	steps so you will only really get a handful of results from the many 
+	samplerates you can pass. 44100 is passthru.</p>
+	
+	set xbitDepth to 16 and xsampleRate to 44100 to passthru the function.
+	
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Bitcrusher
+	</p>-->
+	<h3>Notes</h3>
+	<p>Needs a lot of improvement. Options for anti-aliasing would be nice in 
+	the future, but for now, it's rough, it's dirty and it sounds a bit like 
+	Nine Inch Nails.
+	</p>
+	<p><a href="http://www.pjrc.com/teensy/td_libs_AudioProcessorUsage.html" target="_blank">AudioNoInterrupts()</a>
+		should be used when changing
+		settings on multiple objects, so all changes always take effect
+		at the same moment.
+	</p>
+</script>
+<script type="text/x-red" data-template-name="AudioEffectBitCrusher">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+
 
 <script type="text/javascript">
 	RED.nodes.registerType('AudioFilterBiquad',{
