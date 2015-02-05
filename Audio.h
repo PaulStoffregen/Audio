@@ -72,6 +72,8 @@
 #include "effect_envelope.h"
 #include "effect_multiply.h"
 #include "effect_delay.h"
+#include "effect_midside_encode.h"
+#include "effect_midside_decode.h"
 #include "filter_biquad.h"
 #include "filter_fir.h"
 #include "filter_variable.h"
