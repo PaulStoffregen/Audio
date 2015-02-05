@@ -27,26 +27,6 @@
 
 #include "utility/dspinst.h"
 
-// computes limit(val, 2**bits)
-static inline int16_t saturate16(int32_t val) __attribute__((always_inline, unused));
-static inline int16_t saturate16(int32_t val)
-{
-	int16_t out;
-	int32_t tmp;
-	asm volatile("ssat %0, %1, %2" : "=r" (tmp) : "I" (16), "r" (val) );
-	out = (int16_t) (tmp & 0xffff); // not sure if the & 0xffff is necessary. test.
-	return out;
-}
-// saturating add: signed_add_16_and_16()
-
-// saturating subtract:
-static inline int32_t signed_subtract_16_and_16(int32_t a, int32_t b) __attribute__((always_inline, unused));
-static inline int32_t signed_subtract_16_and_16(int32_t a, int32_t b)
-{
-	int32_t out;
-	asm volatile("qsub16 %0, %1, %2" : "=r" (out) : "r" (a), "r" (b));
-	return out;
-}
 
 /**
  * This object performs the decoding of mid/side signals into a stereo signal.
