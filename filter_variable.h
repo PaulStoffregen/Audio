@@ -52,7 +52,7 @@ public:
 	}
 	void resonance(float q) {
 		if (q < 0.7) q = 0.7;
-		else if (q > 25.0) q = 25.0;
+		else if (q > 5.0) q = 5.0;
 		// TODO: allow lower Q when frequency is lower
 		setting_damp = (1.0 / q) * 1073741824.0;
 	}
