@@ -40,11 +40,10 @@ bool AudioPlaySdRaw::play(const char *filename)
 {
 	stop();
 	AudioStartUsingSPI();
-	__disable_irq();
 	rawfile = SD.open(filename);
-	__enable_irq();
 	if (!rawfile) {
 		//Serial.println("unable to open file");
+		AudioStopUsingSPI();
 		return false;
 	}
 	file_size = rawfile.size();
