@@ -17,7 +17,7 @@ AudioConnection Patch4(sine3000,0,mix1,3);
 
 AudioConnection Patch5(mix1,dac1);
 
-Void Setup()
+void setup()
 {
 	AudioMemory(6);
 	Serial.begin(9600);
