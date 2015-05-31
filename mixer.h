@@ -39,7 +39,7 @@ public:
 	void gain(unsigned int channel, float gain) {
 		if (channel >= 4) return;
 		if (gain > 32767.0f) gain = 32767.0f;
-		else if (gain < 0.0f) gain = 0.0f;
+		else if (gain < -32767.0f) gain = -32767.0f;
 		multiplier[channel] = gain * 65536.0f; // TODO: proper roundoff?
 	}
 private:
