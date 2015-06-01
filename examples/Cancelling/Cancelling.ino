@@ -1,3 +1,12 @@
+/* Audio cancelling using a regular mixer object, just by selecting negative gain.
+
+It is worth noting that this can be done in the analog domain reasonably easy.
+
+Send numbers 0 to 9 for 0.0 to 0.9, A for 1.0, and if listening out loud send a 'B', via serial, observe
+difference(s) on DAC out pin and consider application of gain in mix1.gain(..) calls below.
+
+*/
+
 #include <Audio.h>
 #include <Wire.h>
 #include <SPI.h>
