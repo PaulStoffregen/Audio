@@ -25,7 +25,7 @@
  */
 
 #include "analyze_fft1024.h"
-#include "sqrt_integer.h"
+#include "utility/sqrt_integer.h"
 #include "utility/dspinst.h"
 
 
