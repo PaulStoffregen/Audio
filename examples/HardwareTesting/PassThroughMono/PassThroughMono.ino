@@ -9,6 +9,7 @@
 #include <Wire.h>
 #include <SPI.h>
 #include <SD.h>
+#include <SerialFlash.h>
 
 // GUItool: begin automatically generated code
 AudioInputAnalog         adc1;           //xy=161,80

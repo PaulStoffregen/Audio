@@ -25,6 +25,7 @@ The audio board uses the following pins.
 #include <Wire.h>
 #include <SD.h>
 #include <SPI.h>
+#include <SerialFlash.h>
 #include <Bounce.h>
 #include "filters.h"
 

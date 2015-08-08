@@ -2,6 +2,7 @@
 #include <Wire.h>
 #include <SPI.h>
 #include <SD.h>
+#include <SerialFlash.h>
 #include <Bounce.h>
 
 // WAV files converted to code by wav2sketch

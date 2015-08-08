@@ -50,6 +50,7 @@ many blocks you provided with AudioMemory().
 #include <Wire.h>
 #include <SD.h>
 #include <SPI.h>
+#include <SerialFlash.h>
 #include <Bounce.h>
 
 

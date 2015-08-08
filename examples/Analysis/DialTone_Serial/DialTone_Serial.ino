@@ -14,6 +14,7 @@
 #include <Wire.h>
 #include <SPI.h>
 #include <SD.h>
+#include <SerialFlash.h>
 
 // Create the Audio components.  These should be created in the
 // order data flows, inputs/sources -> processing -> outputs

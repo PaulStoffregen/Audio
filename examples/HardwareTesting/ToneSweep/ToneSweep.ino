@@ -26,6 +26,7 @@ The audio board uses the following pins.
 #include <Wire.h>
 #include <SPI.h>
 #include <SD.h>
+#include <SerialFlash.h>
 #include <Bounce.h>
 
 AudioSynthToneSweep myEffect;

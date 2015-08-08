@@ -7,6 +7,7 @@ This example code is in the public domain
 #include <Wire.h>
 #include <SPI.h>
 #include <SD.h>
+#include <SerialFlash.h>
 
 
 const int myInput = AUDIO_INPUT_LINEIN;
