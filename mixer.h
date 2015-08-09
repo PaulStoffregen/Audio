@@ -29,6 +29,24 @@
 
 #include "AudioStream.h"
 
+class AudioMixer2 : public AudioStream
+{
+	public:
+	AudioMixer2(void) : AudioStream(2, inputQueueArray) {
+		for (int i=0; i<2; i++) multiplier[i] = 65536;
+	}
+	virtual void update(void);
+	void gain(unsigned int channel, float gain) {
+		if (channel >= 2) return;
+		if (gain > 32767.0f) gain = 32767.0f;
+		else if (gain < 0.0f) gain = 0.0f;
+		multiplier[channel] = gain * 65536.0f; // TODO: proper roundoff?
+	}
+	private:
+	int32_t multiplier[2];
+	audio_block_t *inputQueueArray[2];
+};
+
 class AudioMixer4 : public AudioStream
 {
 public:
@@ -45,6 +63,42 @@ public:
 private:
 	int32_t multiplier[4];
 	audio_block_t *inputQueueArray[4];
+};
+
+class AudioMixer8 : public AudioStream
+{
+	public:
+	AudioMixer8(void) : AudioStream(8, inputQueueArray) {
+		for (int i=0; i<8; i++) multiplier[i] = 65536;
+	}
+	virtual void update(void);
+	void gain(unsigned int channel, float gain) {
+		if (channel >= 8) return;
+		if (gain > 32767.0f) gain = 32767.0f;
+		else if (gain < 0.0f) gain = 0.0f;
+		multiplier[channel] = gain * 65536.0f; // TODO: proper roundoff?
+	}
+	private:
+	int32_t multiplier[8];
+	audio_block_t *inputQueueArray[8];
+};
+
+class AudioMixer16 : public AudioStream
+{
+	public:
+	AudioMixer16(void) : AudioStream(16, inputQueueArray) {
+		for (int i=0; i<16; i++) multiplier[i] = 65536;
+	}
+	virtual void update(void);
+	void gain(unsigned int channel, float gain) {
+		if (channel >= 16) return;
+		if (gain > 32767.0f) gain = 32767.0f;
+		else if (gain < 0.0f) gain = 0.0f;
+		multiplier[channel] = gain * 65536.0f; // TODO: proper roundoff?
+	}
+	private:
+	int32_t multiplier[16];
+	audio_block_t *inputQueueArray[16];
 };
 
 #endif
