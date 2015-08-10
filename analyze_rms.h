@@ -24,51 +24,43 @@
  * THE SOFTWARE.
  */
 
-#ifndef analyze_peakdetect_h_
-#define analyze_peakdetect_h_
+#ifndef analyze_rms_h_
+#define analyze_rms_h_
 
 #include "AudioStream.h"
 
-class AudioAnalyzePeak : public AudioStream
+class AudioAnalyzeRMS : public AudioStream
 {
-public:
-	AudioAnalyzePeak(void) : AudioStream(1, inputQueueArray) {
-		min_sample = 32767;
-		max_sample = -32768;
-	}
-	bool available(void) {
-		__disable_irq();
-		bool flag = new_output;
-		if (flag) new_output = false;
-		__enable_irq();
-		return flag;
-	}
-	float read(void) {
-		__disable_irq();
-		int max = max_sample;
-		min_sample = abs(min_sample);
-		if (min_sample > max)
-			max = min_sample;
-		min_sample = 32767;
-		max_sample = -32768;
-		__enable_irq();
-		return max / 32767.0;
-	}
-	float readDiffPosNeg(void) { // read the (pos)peak-to-(neg)peak difference 
-		__disable_irq();
-		int diff = max_sample - min_sample;
-		min_sample = 32767;
-		max_sample = -32768;
-		__enable_irq();
-		return diff / 65535.0;
-	}
-
-	virtual void update(void);
 private:
 	audio_block_t *inputQueueArray[1];
 	volatile bool new_output;
-	int16_t min_sample;
-	int16_t max_sample;
+	int16_t lastRMS;
+
+public:
+	AudioAnalyzeRMS(void) : AudioStream(1, inputQueueArray) {
+		lastRMS = 0;
+	}
+
+	bool available(void) {
+		__disable_irq();
+		bool flag = new_output; // we don't reset new_output here, because if you don't read it, 
+		//it'll still be available on the next call of available() 
+		// (different from AnalyzePeak behavior, which resets it in available())
+		__enable_irq();
+		return flag;
+	}
+
+	float read(void) {
+		__disable_irq();
+		int rms = lastRMS;
+		new_output = false; // we can always set the new_output to false, even if it was false already
+		__enable_irq();
+		
+		return rms / 32767.0;
+	}
+
+	virtual void update(void);
 };
 
 #endif
+

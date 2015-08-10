@@ -1723,6 +1723,96 @@ double s_freq = .0625;</p>
 
 
 
+<script type="text/javascript">
+	RED.nodes.registerType('AudioEffectMidSideEncode',{
+	shortName: "ms_enc",
+		inputs:2,
+		outputs:2,
+		category: 'effect-function',
+		color:"#E6E0F8",
+		icon: "arrow-in.png"
+	});
+</script>
+<script type="text/x-red" data-help-name="AudioEffectMidSideEncode">
+	<h3>Summary</h3>
+	<div>
+	<p>Encode a stereo signal into its mid and side components</p>
+	<p>Mid-side encoding can be used, for instance, to increase stereo width, make the lower frequencies mono (to please your sub), or as the basis of audio compression.</p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Left signal Input</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Right signal Input</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Mid signal Output</td></tr>
+		<tr class=odd><td align=center>Out 1</td><td>Side signal Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Mid-Side
+	</p>
+	<h3>Notes</h3>
+	<p>To prevent saturation, halving is done in the encoding, that is:</p>
+	<p>Mid = (left+right)/2</p>
+	<p>Side = (left-right)/2</p>
+	<p>And to decode:</p>
+	<p>Left = Mid+Side</p>
+	<p>Right = Mid-Side</p>
+</script>
+<script type="text/x-red" data-template-name="AudioEffectMidSideEncode">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+
+
+<script type="text/javascript">
+	RED.nodes.registerType('AudioEffectMidSideDecode',{
+	shortName: "ms_dec",
+		inputs:2,
+		outputs:2,
+		category: 'effect-function',
+		color:"#E6E0F8",
+		icon: "arrow-in.png"
+	});
+</script>
+<script type="text/x-red" data-help-name="AudioEffectMidSideDecode">
+	<h3>Summary</h3>
+	<div>
+	<p>Decode a mid-side signal into a stereo (left right) signal</p>
+	<p>Mid-side encoding can be used, for instance, to increase stereo width, make the lower frequencies mono (to please your sub), or as the basis of audio compression.</p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Mid signal Input</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Side signal Input</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Left signal Output</td></tr>
+		<tr class=odd><td align=center>Out 1</td><td>Right signal Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Mid-Side
+	</p>
+	<h3>Notes</h3>
+	<p>To prevent saturation, halving is done in the encoding, that is:</p>
+	<p>Mid = (left+right)/2</p>
+	<p>Side = (left-right)/2</p>
+	<p>And to decode:</p>
+	<p>Left = Mid+Side</p>
+	<p>Right = Mid-Side</p>
+</script>
+<script type="text/x-red" data-template-name="AudioEffectMidSideDecode">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+
+
 
 <script type="text/javascript">
 	RED.nodes.registerType('AudioFilterBiquad',{
@@ -1970,6 +2060,48 @@ double s_freq = .0625;</p>
 	<p></p>
 </script>
 <script type="text/x-red" data-template-name="AudioAnalyzePeak">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+
+
+<script type="text/javascript">
+	RED.nodes.registerType('AudioAnalyzeRMS',{
+	shortName: "rms",
+		inputs:1,
+		outputs:0,
+		category: 'analyze-function',
+		color:"#E6E0F8",
+		icon: "arrow-in.png"
+	});
+</script>
+<script type="text/x-red" data-help-name="AudioAnalyzeRMS">
+	<h3>Summary</h3>
+	<p>Track the signal RMS amplitude.  Useful for 
+		audio level response projects, and general troubleshooting.</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Signal to analyze</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>available</span>();</p>
+	<p class=desc>Returns true if new RMS data is available.
+	</p>
+	<p class=func><span class=keyword>read</span>();</p>
+	<p class=desc>Read the new RMS value.
+		Return is from 0.0 to 1.0.
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; PeakAndRMSMeterStereo</p>
+	</p>
+	<h3>Notes</h3>
+	<p></p>
+</script>
+<script type="text/x-red" data-template-name="AudioAnalyzeRMS">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -2316,18 +2448,19 @@ double s_freq = .0625;</p>
 	</p>
 	<p class=func><span class=keyword>lineInLevel</span>(both);</p>
 	<p class=desc style="padding-bottom:0.2em;">Adjust the sensitivity of the line-level inputs.
+		Note that professional audio line level is +4dBu, and consumer audio line level -10dBV (also note the unit difference).
 		Fifteen settings are possible:
 	</p>
 <pre class="desc">
- 0: 3.12 Volts p-p
+ 0: 3.12 Volts p-p  (+3 dBu)
  1: 2.63 Volts p-p
  2: 2.22 Volts p-p
  3: 1.87 Volts p-p
  4: 1.58 Volts p-p
  5: 1.33 Volts p-p  (default)
- 6: 1.11 Volts p-p
- 7: 0.94 Volts p-p
- 8: 0.79 Volts p-p
+ 6: 1.11 Volts p-p  
+ 7: 0.94 Volts p-p  (-10 dBV)
+ 8: 0.79 Volts p-p  
  9: 0.67 Volts p-p
 10: 0.56 Volts p-p
 11: 0.48 Volts p-p
@@ -2341,18 +2474,19 @@ double s_freq = .0625;</p>
 		settings for left and right.  The same 15 settings are available.
 	</p>
 	<p class=func><span class=keyword>lineOutLevel</span>(both);</p>
-	<p class=desc style="padding-bottom:0.2em;">Adjust the line level output
-		voltage range.  The following settings are possible:
+	<p class=desc style="padding-bottom:0.2em;">Adjust the line level output voltage range.
+		Note that professional audio line level is +4dBu, and consumer audio line level -10dBV (also note the unit difference).
+		The following settings are possible:
 	</p>
 <pre class="desc">
-13: 3.16 Volts p-p
+13: 3.16 Volts p-p (+3.2 dBu)
 14: 2.98 Volts p-p
 15: 2.83 Volts p-p
 16: 2.67 Volts p-p
 17: 2.53 Volts p-p
 18: 2.39 Volts p-p
 19: 2.26 Volts p-p
-20: 2.14 Volts p-p
+20: 2.14 Volts p-p (0 dBu)
 21: 2.02 Volts p-p
 22: 1.91 Volts p-p
 23: 1.80 Volts p-p
@@ -2363,7 +2497,7 @@ double s_freq = .0625;</p>
 28: 1.37 Volts p-p
 29: 1.29 Volts p-p  (default)
 30: 1.22 Volts p-p
-31: 1.16 Volts p-p
+31: 1.16 Volts p-p  (-7.7 dBV)
 </pre>
 	<p class=func><span class=keyword>lineOutLevel</span>(left, right);</p>
 	<p class=desc>Adjust the line level outout voltage range, with separate

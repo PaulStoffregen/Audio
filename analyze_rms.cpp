@@ -24,51 +24,29 @@
  * THE SOFTWARE.
  */
 
-#ifndef analyze_peakdetect_h_
-#define analyze_peakdetect_h_
 
-#include "AudioStream.h"
+#include "analyze_rms.h"
+#include <arm_math.h>
 
-class AudioAnalyzePeak : public AudioStream
+void AudioAnalyzeRMS::update(void)
 {
-public:
-	AudioAnalyzePeak(void) : AudioStream(1, inputQueueArray) {
-		min_sample = 32767;
-		max_sample = -32768;
-	}
-	bool available(void) {
-		__disable_irq();
-		bool flag = new_output;
-		if (flag) new_output = false;
-		__enable_irq();
-		return flag;
-	}
-	float read(void) {
-		__disable_irq();
-		int max = max_sample;
-		min_sample = abs(min_sample);
-		if (min_sample > max)
-			max = min_sample;
-		min_sample = 32767;
-		max_sample = -32768;
-		__enable_irq();
-		return max / 32767.0;
-	}
-	float readDiffPosNeg(void) { // read the (pos)peak-to-(neg)peak difference 
-		__disable_irq();
-		int diff = max_sample - min_sample;
-		min_sample = 32767;
-		max_sample = -32768;
-		__enable_irq();
-		return diff / 65535.0;
+	audio_block_t *block;
+	int16_t rmsResult;
+
+	block = receiveReadOnly();
+	if (!block) {
+		return;
 	}
 
-	virtual void update(void);
-private:
-	audio_block_t *inputQueueArray[1];
-	volatile bool new_output;
-	int16_t min_sample;
-	int16_t max_sample;
-};
+	// not reinventing the wheel:
+	// use DSP packed 32i instructions as found in arm_math.h, with 64b accumulator
+	arm_rms_q15(block->data, AUDIO_BLOCK_SAMPLES, &rmsResult); // seems to use ~2% CPU
+	lastRMS = rmsResult; // prevent threading issues
+	// for optimization, one could re-implement arm_rms_q15 to do the sqrt on read().
+	// This way, the rms in dB could also be implemented faster:
+	// Instead of 20*log10(sqrt(MSerror)), one could do write 10*log10(MSerror)
 
-#endif
+	new_output = true;
+	release(block);
+}
+
