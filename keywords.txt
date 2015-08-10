@@ -18,6 +18,8 @@ AudioEffectFlange	KEYWORD2
 AudioEffectEnvelope	KEYWORD2
 AudioEffectMultiply	KEYWORD2
 AudioEffectDelay	KEYWORD2
+AudioEffectDelayExternal	KEYWORD2
+AudioEffectBitcrusher	KEYWORD2
 AudioFilterBiquad	KEYWORD2
 AudioFilterFIR	KEYWORD2
 AudioFilterStateVariable	KEYWORD2
@@ -104,8 +106,8 @@ enhanceBassDisable	KEYWORD2
 surroundSound	KEYWORD2
 surroundSoundEnable	KEYWORD2
 calcBiquad	KEYWORD2
-
-
+sampleRate	KEYWORD2
+bits	KEYWORD2
 
 AudioMemoryUsage	KEYWORD2
 AudioMemoryUsageMax	KEYWORD2
@@ -150,3 +152,5 @@ WAVEFORM_TRIANGLE	LITERAL1
 WAVEFORM_ARBITRARY	LITERAL1
 WAVEFORM_PULSE	LITERAL1
 
+AUDIO_MEMORY_23LC1024	LITERAL1
+AUDIO_MEMORY_MEMORYBOARD	LITERAL1

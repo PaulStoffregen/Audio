@@ -72,6 +72,7 @@
 #include "effect_envelope.h"
 #include "effect_multiply.h"
 #include "effect_delay.h"
+#include "effect_delay_ext.h"
 #include "filter_biquad.h"
 #include "filter_fir.h"
 #include "filter_variable.h"
