@@ -27,7 +27,7 @@
 #ifndef effect_delay_ext_h_
 #define effect_delay_ext_h_
 #include "AudioStream.h"
-#include "utility/dspinst.h"
+#include "spi_interrupt.h"
 
 enum AudioEffectDelayMemoryType_t {
 	AUDIO_MEMORY_23LC1024 = 0,
