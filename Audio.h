@@ -65,6 +65,7 @@
 #include "analyze_peak.h"
 #include "control_sgtl5000.h"
 #include "control_wm8731.h"
+#include "effect_bitcrusher.h"
 #include "effect_chorus.h"
 #include "effect_fade.h"
 #include "effect_flange.h"
