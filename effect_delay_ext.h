@@ -39,7 +39,7 @@ class AudioEffectDelayExternal : public AudioStream
 {
 public:
 	AudioEffectDelayExternal() : AudioStream(1, inputQueueArray) {
-		initialize(AUDIO_MEMORY_23LC1024, 8000);
+		initialize(AUDIO_MEMORY_23LC1024, 65536);
 	}
 	AudioEffectDelayExternal(AudioEffectDelayMemoryType_t type, float milliseconds=1e6)
 	  : AudioStream(1, inputQueueArray) {
