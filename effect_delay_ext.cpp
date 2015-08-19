@@ -35,6 +35,9 @@
 
 #define SPIRAM_CS_PIN    6
 
+#define MEMBOARD_CS0_PIN 2
+#define MEMBOARD_CS1_PIN 3
+#define MEMBOARD_CS2_PIN 4
 
 void AudioEffectDelayExternal::update(void)
 {
@@ -119,6 +122,12 @@ void AudioEffectDelayExternal::initialize(AudioEffectDelayMemoryType_t type, uin
 		digitalWriteFast(SPIRAM_CS_PIN, HIGH);
 	} else if (type == AUDIO_MEMORY_MEMORYBOARD) {
 		memsize = 393216;
+		pinMode(MEMBOARD_CS0_PIN, OUTPUT);
+		pinMode(MEMBOARD_CS1_PIN, OUTPUT);
+		pinMode(MEMBOARD_CS2_PIN, OUTPUT);
+		digitalWriteFast(MEMBOARD_CS0_PIN, LOW);
+		digitalWriteFast(MEMBOARD_CS1_PIN, LOW);
+		digitalWriteFast(MEMBOARD_CS2_PIN, LOW);
 	} else {
 		return;
 	}
@@ -168,7 +177,27 @@ void AudioEffectDelayExternal::read(uint32_t offset, uint32_t count, int16_t *da
 		digitalWriteFast(SPIRAM_CS_PIN, HIGH);
 		SPI.endTransaction();
 	} else if (memory_type == AUDIO_MEMORY_MEMORYBOARD) {
-		// TODO.... similar, but handle partition across 6 chips
+		SPI.beginTransaction(SPISETTING);
+		while (count) {
+			uint32_t chip = (addr >> 16) + 1;
+			digitalWriteFast(MEMBOARD_CS0_PIN, chip & 1);
+			digitalWriteFast(MEMBOARD_CS1_PIN, chip & 2);
+			digitalWriteFast(MEMBOARD_CS2_PIN, chip & 4);
+			uint32_t chipaddr = (addr & 0xFFFF) << 1;
+			SPI.transfer16((0x03 << 8) | (chipaddr >> 16));
+			SPI.transfer16(chipaddr & 0xFFFF);
+			uint32_t num = 0x10000 - (addr & 0xFFFF);
+			if (num > count) num = count;
+			count -= num;
+			addr += num;
+			do {
+				*data++ = (int16_t)(SPI.transfer16(0));
+			} while (--num > 0);
+		}
+		digitalWriteFast(MEMBOARD_CS0_PIN, LOW);
+		digitalWriteFast(MEMBOARD_CS1_PIN, LOW);
+		digitalWriteFast(MEMBOARD_CS2_PIN, LOW);
+		SPI.endTransaction();
 	}
 #endif
 }
@@ -187,53 +216,40 @@ void AudioEffectDelayExternal::write(uint32_t offset, uint32_t count, const int1
 		SPI.transfer16((0x02 << 8) | (addr >> 16));
 		SPI.transfer16(addr & 0xFFFF);
 		while (count) {
-			SPI.transfer16(*data++);
+			int16_t w = 0;
+			if (data) w = *data++;
+			SPI.transfer16(w);
 			count--;
 		}
 		digitalWriteFast(SPIRAM_CS_PIN, HIGH);
 		SPI.endTransaction();
 	} else if (memory_type == AUDIO_MEMORY_MEMORYBOARD) {
-		// TODO.... similar, but handle partition across 6 chips
-	}
-#endif
-}
-
-void AudioEffectDelayExternal::zero(uint32_t offset, uint32_t count)
-{
-	uint32_t addr = memory_begin + offset;
-
-#ifdef INTERNAL_TEST
-	while (count) { testmem[addr++] = 0; count--; } // testing only
-#else
-	if (memory_type == AUDIO_MEMORY_23LC1024) {
-		addr *= 2;
 		SPI.beginTransaction(SPISETTING);
-		//digitalWriteFast(SPIRAM_CS_PIN, LOW);
-		//SPI.transfer16((0x01 << 8) | 0x40);  // not needed, defaults to this mode
-		//digitalWriteFast(SPIRAM_CS_PIN, HIGH);
-		//delayMicroseconds(1);
-		//digitalWriteFast(SPIRAM_CS_PIN, LOW);
-		//SPI.transfer16((0x05 << 8) | 0x40);  // not needed, defaults to this mode
-		//digitalWriteFast(SPIRAM_CS_PIN, HIGH);
-		//delayMicroseconds(1);
-		digitalWriteFast(SPIRAM_CS_PIN, LOW);
-		SPI.transfer16((0x02 << 8) | (addr >> 16));
-		SPI.transfer16(addr & 0xFFFF);
 		while (count) {
-			SPI.transfer16(0);
-			count--;
+			uint32_t chip = (addr >> 16) + 1;
+			digitalWriteFast(MEMBOARD_CS0_PIN, chip & 1);
+			digitalWriteFast(MEMBOARD_CS1_PIN, chip & 2);
+			digitalWriteFast(MEMBOARD_CS2_PIN, chip & 4);
+			uint32_t chipaddr = (addr & 0xFFFF) << 1;
+			SPI.transfer16((0x02 << 8) | (chipaddr >> 16));
+			SPI.transfer16(chipaddr & 0xFFFF);
+			uint32_t num = 0x10000 - (addr & 0xFFFF);
+			if (num > count) num = count;
+			count -= num;
+			addr += num;
+			do {
+				int16_t w = 0;
+				if (data) w = *data++;
+				SPI.transfer16(w);
+			} while (--num > 0);
 		}
-		digitalWriteFast(SPIRAM_CS_PIN, HIGH);
+		digitalWriteFast(MEMBOARD_CS0_PIN, LOW);
+		digitalWriteFast(MEMBOARD_CS1_PIN, LOW);
+		digitalWriteFast(MEMBOARD_CS2_PIN, LOW);
 		SPI.endTransaction();
-	} else if (memory_type == AUDIO_MEMORY_MEMORYBOARD) {
-		// TODO.... similar, but handle partition across 6 chips
 	}
 #endif
 }
-
-
-
-
 
 
 

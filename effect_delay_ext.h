@@ -70,7 +70,9 @@ private:
 	void initialize(AudioEffectDelayMemoryType_t type, uint32_t samples);
 	void read(uint32_t address, uint32_t count, int16_t *data);
 	void write(uint32_t address, uint32_t count, const int16_t *data);
-	void zero(uint32_t address, uint32_t count);
+	void zero(uint32_t address, uint32_t count) {
+		write(address, count, NULL);
+	}
 	uint32_t memory_begin;    // the first address in the memory we're using
 	uint32_t memory_length;   // the amount of memory we're using
 	uint32_t head_offset;     // head index (incoming) data into external memory
