@@ -36,20 +36,20 @@ public:
 	friend class AudioInputSPDIF;
 	static void mute_PCM(const bool mute);
 protected:
-	AudioOutputSPDIF(int dummy): AudioStream(2, inputQueueArray) {}	
+	AudioOutputSPDIF(int dummy): AudioStream(2, inputQueueArray) {}
 	static void config_SPDIF(void);
 	static audio_block_t *block_left_1st;
 	static audio_block_t *block_right_1st;
 	static bool update_responsibility;
 	static DMAChannel dma;
-	static void isr(void);		
+	static void isr(void);
 private:
     static uint32_t vucp;
 	static audio_block_t *block_left_2nd;
 	static audio_block_t *block_right_2nd;
 	static uint16_t block_left_offset;
 	static uint16_t block_right_offset;
-	audio_block_t *inputQueueArray[2];	
+	audio_block_t *inputQueueArray[2];
 };
 
 
