@@ -21,7 +21,16 @@
  * THE SOFTWARE.
  */
 
+ // 2015/08/23: (FB) added mute_PCM() - sets or unsets VALID in VUCP (and adjusts PARITY)
+
 #include "output_spdif.h"
+
+#define PREAMBLE_B  (0xE8) //11101000
+#define PREAMBLE_M  (0xE2) //11100010
+#define PREAMBLE_W  (0xE4) //11100100
+
+#define VUCP_VALID   ((0xCC) << 24)
+#define VUCP_INVALID ((0xD4) << 24)// To mute PCM, set VUCP = invalid.
 
 audio_block_t * AudioOutputSPDIF::block_left_1st = NULL;
 audio_block_t * AudioOutputSPDIF::block_right_1st = NULL;
@@ -30,6 +39,7 @@ audio_block_t * AudioOutputSPDIF::block_right_2nd = NULL;
 uint16_t  AudioOutputSPDIF::block_left_offset = 0;
 uint16_t  AudioOutputSPDIF::block_right_offset = 0;
 bool AudioOutputSPDIF::update_responsibility = false;
+uint32_t  AudioOutputSPDIF::vucp = VUCP_VALID;
 
 DMAMEM static uint32_t SPDIF_tx_buffer[AUDIO_BLOCK_SAMPLES * 4]; //2 KB
 
@@ -71,9 +81,6 @@ uint16_t bmclookup[256] = { //biphase mark encoded values (least significant bit
 	0x32aa, 0xb2aa, 0xd2aa, 0x52aa, 0xcaaa, 0x4aaa, 0x2aaa, 0xaaaa
 };
 
-#define PREAMBLE_B  (0xE8) //11101000
-#define PREAMBLE_M  (0xE2) //11100010
-#define PREAMBLE_W  (0xE4) //11100100
 
 void AudioOutputSPDIF::begin(void)
 {
@@ -165,10 +172,10 @@ void AudioOutputSPDIF::isr(void)
 
 			if (++frame > 191) {
 				// VUCP-Bits ("Valid, Subcode, Channelstatus, Parity) = 0 (0xcc) | Preamble (depends on Framno.) | Auxillary
-				*(dest+0) = 0xcc000000 | (PREAMBLE_B << 16 ) | aux; //special preamble for one of 192 frames
+				*(dest+0) =  vucp | (PREAMBLE_B << 16 ) | aux; //special preamble for one of 192 frames
 				frame = 0;
 			} else {
-				*(dest+0) = 0xcc000000 | (PREAMBLE_M << 16 ) | aux;
+				*(dest+0) = vucp | (PREAMBLE_M << 16 ) | aux;
 			}
 			dest += 4;
 
@@ -185,10 +192,10 @@ void AudioOutputSPDIF::isr(void)
 	} else {
 		do {
 			if ( ++frame > 191 ) {
-				*(dest+0) = 0xcce8cccc;
+				*(dest+0) = vucp | 0x00e8cccc;
 				frame = 0;
 			} else {
-				*(dest+0) = 0xcce2cccc;
+				*(dest+0) = vucp | 0x00e2cccc;
 			}
 			*(dest+1) = 0xccccccccUL;
 
@@ -214,7 +221,7 @@ void AudioOutputSPDIF::isr(void)
 			*(dest+1) = ( ((uint32_t)lo << 16) | hi );
 
 			aux = (0xB333 ^ (((uint32_t)((int16_t)lo)) >> 17));
-			*(dest+0)  =  0xcc000000 | (PREAMBLE_W << 16 ) | aux;
+			*(dest+0)  =  vucp | (PREAMBLE_W << 16 ) | aux;
 
 			dest += 4;
 		} while (dest < end);
@@ -230,12 +237,17 @@ void AudioOutputSPDIF::isr(void)
 		}
 	} else {
 		do {
-			*dest 	= 0xcce4ccccUL;
+			*dest 	= vucp | 0x00e4ccccUL;
 			*(dest+1) = 0xccccccccUL;
 			dest += 4 ;
 		} while (dest < end);
 	}
 
+}
+
+void AudioOutputSPDIF::mute_PCM(const bool mute)
+{
+	vucp = mute?VUCP_INVALID:VUCP_VALID;
 }
 
 void AudioOutputSPDIF::update(void)
