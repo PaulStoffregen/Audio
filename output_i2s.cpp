@@ -47,6 +47,7 @@ void AudioOutputI2S::begin(void)
 	config_i2s();
 	CORE_PIN22_CONFIG = PORT_PCR_MUX(6); // pin 22, PTC1, I2S0_TXD0
 
+#if defined(KINETISK)
 	dma.TCD->SADDR = i2s_tx_buffer;
 	dma.TCD->SOFF = 2;
 	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
@@ -58,6 +59,7 @@ void AudioOutputI2S::begin(void)
 	dma.TCD->DLASTSGA = 0;
 	dma.TCD->BITER_ELINKNO = sizeof(i2s_tx_buffer) / 2;
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
+#endif
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_TX);
 	update_responsibility = update_setup();
 	dma.enable();
@@ -74,7 +76,9 @@ void AudioOutputI2S::isr(void)
 	audio_block_t *block;
 	uint32_t saddr, offset;
 
+#if defined(KINETISK)
 	saddr = (uint32_t)(dma.TCD->SADDR);
+#endif
 	dma.clearInterrupt();
 	if (saddr < (uint32_t)i2s_tx_buffer + sizeof(i2s_tx_buffer) / 2) {
 		// DMA is transmitting the first half of the buffer
@@ -276,7 +280,7 @@ void AudioOutputI2Sslave::begin(void)
 
 	AudioOutputI2Sslave::config_i2s();
 	CORE_PIN22_CONFIG = PORT_PCR_MUX(6); // pin 22, PTC1, I2S0_TXD0
-
+#if defined(KINETISK)
 	dma.TCD->SADDR = i2s_tx_buffer;
 	dma.TCD->SOFF = 2;
 	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
@@ -288,7 +292,7 @@ void AudioOutputI2Sslave::begin(void)
 	dma.TCD->DLASTSGA = 0;
 	dma.TCD->BITER_ELINKNO = sizeof(i2s_tx_buffer) / 2;
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
-
+#endif
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_TX);
 	update_responsibility = update_setup();
 	dma.enable();

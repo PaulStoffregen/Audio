@@ -53,6 +53,7 @@ void AudioInputAnalog::init(uint8_t pin)
 	dc_average = sum >> 10;
 
 	// set the programmable delay block to trigger the ADC at 44.1 kHz
+#if defined(KINETISK)
 	if (!(SIM_SCGC6 & SIM_SCGC6_PDB)
 	  || (PDB0_SC & PDB_CONFIG) != PDB_CONFIG
 	  || PDB0_MOD != PDB_PERIOD
@@ -65,12 +66,13 @@ void AudioInputAnalog::init(uint8_t pin)
 		PDB0_SC = PDB_CONFIG | PDB_SC_SWTRIG;
 		PDB0_CH0C1 = 0x0101;
 	}
-
+#endif
 	// enable the ADC for hardware trigger and DMA
 	ADC0_SC2 |= ADC_SC2_ADTRG | ADC_SC2_DMAEN;
 
 	// set up a DMA channel to store the ADC data
 	dma.begin(true);
+#if defined(KINETISK)
 	dma.TCD->SADDR = &ADC0_RA;
 	dma.TCD->SOFF = 0;
 	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
@@ -82,6 +84,7 @@ void AudioInputAnalog::init(uint8_t pin)
 	dma.TCD->DLASTSGA = -sizeof(analog_rx_buffer);
 	dma.TCD->BITER_ELINKNO = sizeof(analog_rx_buffer) / 2;
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
+#endif
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_ADC0);
 	update_responsibility = update_setup();
 	dma.enable();
@@ -96,7 +99,9 @@ void AudioInputAnalog::isr(void)
 	uint16_t *dest_left;
 	audio_block_t *left;
 
+#if defined(KINETISK)
 	daddr = (uint32_t)(dma.TCD->DADDR);
+#endif
 	dma.clearInterrupt();
 
 	if (daddr < (uint32_t)analog_rx_buffer + sizeof(analog_rx_buffer) / 2) {

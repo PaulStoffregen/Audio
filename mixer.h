@@ -31,6 +31,7 @@
 
 class AudioMixer4 : public AudioStream
 {
+#if defined(KINETISK)
 public:
         AudioMixer4(void) : AudioStream(4, inputQueueArray) {
 		for (int i=0; i<4; i++) multiplier[i] = 65536;
@@ -45,6 +46,23 @@ public:
 private:
 	int32_t multiplier[4];
 	audio_block_t *inputQueueArray[4];
+
+#elif defined(KINETISL)
+public:
+        AudioMixer4(void) : AudioStream(4, inputQueueArray) {
+		for (int i=0; i<4; i++) multiplier[i] = 256;
+	}
+        virtual void update(void);
+	void gain(unsigned int channel, float gain) {
+		if (channel >= 4) return;
+		if (gain > 127.0f) gain = 127.0f;
+		else if (gain < 0.0f) gain = 0.0f;
+		multiplier[channel] = gain * 256.0f; // TODO: proper roundoff?
+	}
+private:
+	int16_t multiplier[4];
+	audio_block_t *inputQueueArray[4];
+#endif
 };
 
 #endif
