@@ -44,6 +44,7 @@ void AudioSynthNoiseWhite::update(void)
 	end = p + AUDIO_BLOCK_SAMPLES/2;
 	lo = seed;
 	do {
+#if defined(KINETISK)
 		hi = multiply_16bx16t(16807, lo); // 16807 * (lo >> 16)
 		lo = 16807 * (lo & 0xFFFF);
 		lo += (hi & 0x7FFF) << 16;
@@ -72,6 +73,22 @@ void AudioSynthNoiseWhite::update(void)
 		val2 = pack_16b_16b(n2, n1);
 		*p++ = val1;
 		*p++ = val2;
+#elif defined(KINETISL)
+		hi = 16807 * (lo >> 16);
+		lo = 16807 * (lo & 0xFFFF);
+		lo += (hi & 0x7FFF) << 16;
+		lo += hi >> 15;
+		lo = (lo & 0x7FFFFFFF) + (lo >> 31);
+		n1 = signed_multiply_32x16b(gain, lo);
+		hi = 16807 * (lo >> 16);
+		lo = 16807 * (lo & 0xFFFF);
+		lo += (hi & 0x7FFF) << 16;
+		lo += hi >> 15;
+		lo = (lo & 0x7FFFFFFF) + (lo >> 31);
+		n2 = signed_multiply_32x16b(gain, lo);
+		val1 = pack_16b_16b(n2, n1);
+		*p++ = val1;
+#endif
 	} while (p < end);
 	seed = lo;
 	transmit(block);

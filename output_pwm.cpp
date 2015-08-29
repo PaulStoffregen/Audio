@@ -38,6 +38,8 @@ DMAChannel AudioOutputPWM::dma(false);
 // TODO: this code assumes F_BUS is 48 MHz.
 // supporting other speeds is not easy, but should be done someday
 
+#if defined(KINETISK)
+
 void AudioOutputPWM::begin(void)
 {
 	dma.begin(true); // Allocate the DMA channel first
@@ -188,5 +190,13 @@ void AudioOutputPWM::isr(void)
 //  biter = sizeof(buffer) / 8   (no minor loop linking)
 
 
+#elif defined(KINETISL)
 
+void AudioOutputPWM::update(void)
+{
+	audio_block_t *block;
+	block = receiveReadOnly();
+	if (block) release(block);
+}
 
+#endif

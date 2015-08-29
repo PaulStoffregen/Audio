@@ -27,6 +27,8 @@
 #include "analyze_tonedetect.h"
 #include "utility/dspinst.h"
 
+#if defined(KINETISK)
+
 static inline int32_t multiply_32x32_rshift30(int32_t a, int32_t b) __attribute__((always_inline));
 static inline int32_t multiply_32x32_rshift30(int32_t a, int32_t b)
 {
@@ -148,11 +150,21 @@ AudioAnalyzeToneDetect::operator bool()
 	trigger = (uint32_t)len * thresh;
 	trigger = multiply_32x32_rshift32(trigger, trigger);
 
-	Serial.printf("bool: power=%d, trig=%d\n", power, trigger);
+	//Serial.printf("bool: power=%d, trig=%d\n", power, trigger);
 	return (power >= trigger);
 	// TODO: this should really remember if it's retuned true previously,
 	// so it can give a single true response each time a tone is seen.
 }
 
 
+#elif defined(KINETISL)
+
+void AudioAnalyzeToneDetect::update(void)
+{
+	audio_block_t *block;
+	block = receiveReadOnly();
+	if (block) release(block);
+}
+
+#endif
 

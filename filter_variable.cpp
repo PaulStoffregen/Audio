@@ -45,6 +45,8 @@
 // no audible difference.
 //#define IMPROVE_EXPONENTIAL_ACCURACY
 
+#if defined(KINETISK)
+
 void AudioFilterStateVariable::update_fixed(const int16_t *in,
 	int16_t *lp, int16_t *bp, int16_t *hp)
 {
@@ -220,4 +222,18 @@ void AudioFilterStateVariable::update(void)
 	release(highpass_block);
 	return;
 }
+
+#elif defined(KINETISL)
+
+void AudioFilterStateVariable::update(void)
+{
+	audio_block_t *block;
+
+	block = receiveReadOnly(0);
+	if (block) release(block);
+	block = receiveReadOnly(1);
+	if (block) release(block);
+}
+
+#endif
 

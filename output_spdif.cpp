@@ -25,6 +25,8 @@
 
 #include "output_spdif.h"
 
+#if defined(KINETISK)
+
 #define PREAMBLE_B  (0xE8) //11101000
 #define PREAMBLE_M  (0xE2) //11100010
 #define PREAMBLE_W  (0xE4) //11100100
@@ -356,3 +358,18 @@ void AudioOutputSPDIF::config_SPDIF(void)
 //	CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK
 #endif
 }
+
+
+#elif defined(KINETISL)
+
+void AudioOutputSPDIF::update(void)
+{
+
+	audio_block_t *block;
+	block = receiveReadOnly(0); // input 0 = left channel
+	if (block) release(block);
+	block = receiveReadOnly(1); // input 1 = right channel
+	if (block) release(block);
+}
+
+#endif

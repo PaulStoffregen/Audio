@@ -28,6 +28,7 @@
 
 void AudioEffectMultiply::update(void)
 {
+#if defined(KINETISK)
 	audio_block_t *blocka, *blockb;
 	uint32_t *pa, *pb, *end;
 	uint32_t a12, a34; //, a56, a78;
@@ -75,5 +76,14 @@ void AudioEffectMultiply::update(void)
 	transmit(blocka);
 	release(blocka);
 	release(blockb);
+
+#elif defined(KINETISL)
+	audio_block_t *block;
+
+	block = receiveReadOnly(0);
+	if (block) release(block);
+	block = receiveReadOnly(1);
+	if (block) release(block);
+#endif
 }
 
