@@ -32,7 +32,7 @@
 void AudioEffectBitcrusher::update(void)
 {
 	audio_block_t *block;
-	uint32_t i,j;
+	uint32_t i;
 	uint32_t sampleSquidge, sampleSqueeze; //squidge is bitdepth, squeeze is for samplerate
 			
 	if (crushBits == 16 && sampleStep <= 1) {
@@ -92,30 +92,5 @@ void AudioEffectBitcrusher::update(void)
 	transmit(block);
 	release(block);
 }
-
-#if 0
-void AudioEffectBitcrusher::updateCrush(uint8_t xxcrushBits, uint32_t xxsampleRate )
-{
-	__disable_irq();
-	if (xxcrushBits >= 16) { //too high a bitdepth or specifying full 16 bit range?
-		crushBits = 16; // this will simply passthrough the crusher clean
-	} else if(xxcrushBits >= 1) { // anywhere between 1 and 15, send it through to the Squidger.
-		crushBits = xxcrushBits;
-	} else {
-		crushBits =1; // now lets be honest, crushing to 0 bits is going to be a mute command. send a 1 through instead.
-	} 
-
-	if (xxsampleRate >=44100) {// maximum sample rate to be 44100
-		sampleRate = 44100; //thats that
-	} else if(xxsampleRate >= 1) { // anywhere between 1 and 44100, send it through to the Squeezer.
-		sampleRate = xxsampleRate; 
-		sampleStep = 44100 / sampleRate; // calcualte the number of samples to duplicate as we reduce the samplerate.
-	} else {
-		sampleRate = 1;
-		sampleStep = 44100 / sampleRate; // calcualte the number of samples to duplicate as we reduce the samplerate.
-	}
-	__enable_irq();
-}
-#endif
 
 
