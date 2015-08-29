@@ -51,7 +51,6 @@ static void apply_window_to_fft_buffer(void *buffer, const void *window)
 		*buf = val >> 15;
 		buf += 2;
 	}
-
 }
 
 void AudioAnalyzeFFT256::update(void)
@@ -60,6 +59,7 @@ void AudioAnalyzeFFT256::update(void)
 
 	block = receiveReadOnly();
 	if (!block) return;
+#if AUDIO_BLOCK_SAMPLES == 128
 	if (!prevblock) {
 		prevblock = block;
 		return;
@@ -94,6 +94,36 @@ void AudioAnalyzeFFT256::update(void)
 	}
 	release(prevblock);
 	prevblock = block;
+#elif AUDIO_BLOCK_SAMPLES == 64
+	if (prevblocks[2] == NULL) {
+		prevblocks[2] = prevblocks[1];
+		prevblocks[1] = prevblocks[0];
+		prevblocks[0] = block;
+		return;
+	}
+	if (count == 0) {
+		count = 1;
+		copy_to_fft_buffer(buffer, prevblocks[2]->data);
+		copy_to_fft_buffer(buffer+128, prevblocks[1]->data);
+		copy_to_fft_buffer(buffer+256, prevblocks[1]->data);
+		copy_to_fft_buffer(buffer+384, block->data);
+		if (window) apply_window_to_fft_buffer(buffer, window);
+		arm_cfft_radix4_q15(&fft_inst, buffer);
+	} else {
+		count = 2;
+		const uint32_t *p = (uint32_t *)buffer;
+		for (int i=0; i < 128; i++) {
+			uint32_t tmp = *p++;
+			int16_t v1 = tmp & 0xFFFF;
+			int16_t v2 = tmp >> 16;
+			output[i] = sqrt_uint32_approx(v1 * v1 + v2 * v2);
+		}
+	}
+	release(prevblocks[2]);
+	prevblocks[2] = prevblocks[1];
+	prevblocks[1] = prevblocks[0];
+	prevblocks[0] = block;
+#endif
 }
 
 

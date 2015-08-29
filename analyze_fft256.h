@@ -49,9 +49,16 @@ class AudioAnalyzeFFT256 : public AudioStream
 {
 public:
 	AudioAnalyzeFFT256() : AudioStream(1, inputQueueArray),
-	  window(AudioWindowHanning256), prevblock(NULL), count(0),
-	  naverage(8), outputflag(false) {
+	  window(AudioWindowHanning256), count(0), outputflag(false) {
 		arm_cfft_radix4_init_q15(&fft_inst, 256, 0, 1);
+#if AUDIO_BLOCK_SAMPLES == 128
+		prevblock = NULL;
+		naverage = 8;
+#elif AUDIO_BLOCK_SAMPLES == 64
+		prevblocks[0] = NULL;
+		prevblocks[1] = NULL;
+		prevblocks[2] = NULL;
+#endif
 	}
 	bool available() {
 		if (outputflag == true) {
@@ -79,8 +86,10 @@ public:
 		return (float)sum * (1.0 / 16384.0);
 	}
 	void averageTogether(uint8_t n) {
+#if AUDIO_BLOCK_SAMPLES == 128
 		if (n == 0) n = 1;
 		naverage = n;
+#endif
 	}
 	void windowFunction(const int16_t *w) {
 		window = w;
@@ -89,11 +98,17 @@ public:
 	uint16_t output[128] __attribute__ ((aligned (4)));
 private:
 	const int16_t *window;
+#if AUDIO_BLOCK_SAMPLES == 128
 	audio_block_t *prevblock;
+#elif AUDIO_BLOCK_SAMPLES == 64
+	audio_block_t *prevblocks[3];
+#endif
 	int16_t buffer[512] __attribute__ ((aligned (4)));
+#if AUDIO_BLOCK_SAMPLES == 128
 	uint32_t sum[128];
-	uint8_t count;
 	uint8_t naverage;
+#endif
+	uint8_t count;
 	bool outputflag;
 	audio_block_t *inputQueueArray[1];
 	arm_cfft_radix4_instance_q15 fft_inst;
