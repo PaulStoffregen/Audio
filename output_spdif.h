@@ -44,7 +44,7 @@ protected:
 	static DMAChannel dma;
 	static void isr(void);
 private:
-    static uint32_t vucp;
+	static uint32_t vucp;
 	static audio_block_t *block_left_2nd;
 	static audio_block_t *block_right_2nd;
 	static uint16_t block_left_offset;
