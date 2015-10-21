@@ -56,7 +56,7 @@ var RED = (function() {
 			//console.log(JSON.stringify(nns));
 
 			var cpp = "#include <Audio.h>\n#include <Wire.h>\n"
-				+ "#include <SPI.h>\n#include <SD.h>\n\n"
+				+ "#include <SPI.h>\n#include <SD.h>\n#include <SerialFlash.h>\n\n"
 				+ "// GUItool: begin automatically generated code\n";
 			// generate code for all audio processing nodes
 			for (var i=0; i<nns.length; i++) {
