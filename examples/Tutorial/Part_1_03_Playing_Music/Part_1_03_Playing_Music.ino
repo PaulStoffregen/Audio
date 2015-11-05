@@ -1,6 +1,9 @@
 // Advanced Microcontroller-based Audio Workshop
 // 
 // Part 1-3: First "Hello World" program, play a music file
+//
+// WAV files for this and other Tutorials are here:
+// http://www.pjrc.com/teensy/td_libs_AudioDataFiles.html
 
 #include <Audio.h>
 #include <Wire.h>
