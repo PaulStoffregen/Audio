@@ -169,8 +169,9 @@ var RED = (function() {
 	}
 
 	function loadNodes() {
-		$.get('list.html', function(data) {
-			$("body").append(data);
+		//$.get('list.html', function(data) {
+			//$("body").append(data);
+		//setTimeout(function() {
 			$(".palette-spinner").hide();
 			$(".palette-scroll").show();
 			$("#palette-search").show();
@@ -186,7 +187,8 @@ var RED = (function() {
 				$("#tab-info").html('<div class="node-help">'
 					+($("script[data-help-name|='"+info+"']").html()||"")+"</div>");
 			}
-		}, "html");
+		//}, 100);
+		//}, "html");
 	}
 
 	$('#btn-node-status').click(function() {toggleStatus();});
