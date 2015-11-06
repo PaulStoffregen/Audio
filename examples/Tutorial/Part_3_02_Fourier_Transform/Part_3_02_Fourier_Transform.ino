@@ -54,7 +54,7 @@ const char * filenames[4] = {
 
 int noteNumber = 0;
 const float noteFrequency[12] = {
-  200.00,  // A3
+  220.00,  // A3
   233.08,  // A#3
   246.94,  // B3
   261.63,  // C4
