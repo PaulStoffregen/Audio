@@ -62,7 +62,7 @@ void loop() {
   wait(1750);
 }
 
-void wait(int milliseconds)
+void wait(unsigned int milliseconds)
 {
   elapsedMillis msec=0;
 
