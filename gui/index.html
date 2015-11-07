@@ -100,7 +100,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 </div>
 <div id="main-container" class="sidebar-closed">
 	<div id="palette">
-		<img src="spin.svg" class="palette-spinner"/>
+		<img src="img/spin.svg" class="palette-spinner"/>
 		<div id="palette-container" class="palette-scroll">
 		</div>
 		<div id="palette-search">
@@ -286,7 +286,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 <script src="jquery/js/jquery-ui-1.10.3.custom.min.js"></script>
 <script src="jquery/js/jquery.ui.touch-punch.min.js"></script>
 <script src="orion/built-editor.min.js"></script>
-<script src="d3.v3.min.js"></script>
+<script src="red/d3/d3.v3.min.js"></script>
 <script src="red/main.js"></script>
 <script src="red/ui/state.js"></script>
 <script src="red/nodes.js"></script>
@@ -327,7 +327,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>Receive 16 bit stereo audio from the
 	<a href="http://www.pjrc.com/store/teensy3_audio.html" target="_blank">audio shield</a>
 		or another I2S device, using I2S master mode.</p>
-	<p align=center><img src="audioshield_inputs.jpg"></p>
+	<p align=center><img src="img/audioshield_inputs.jpg"></p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
@@ -338,7 +338,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>This object has no functions to call from the Arduino sketch.  It
 		simply streams data from the I2S hardware to its 2 output ports.</p>
 	<h3>Hardware</h3>
-	<p align=center><img src="audioshield_backside.jpg"></p>
+	<p align=center><img src="img/audioshield_backside.jpg"></p>
 	<p>The I2S signals are used in "master" mode, where Teensy creates
 		all 3 clock signals and controls all data timing.</p>
 	<table class=doc align=center cellpadding=3>
@@ -410,7 +410,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		simply streams data from the ADC to its output port.</p>
 	<h3>Hardware</h3>
 	<p>Pin A2 is used for audio input.  This circuitry is recommended.</p>
-	<p align=center><img src="adccircuit.png"></p>
+	<p align=center><img src="img/adccircuit.png"></p>
 	<p>Signal range is 0 to 1.2V</p>
 	<h3>Examples</h3>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughMono
@@ -512,7 +512,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>Transmit 16 bit stereo audio to the
 	<a href="http://www.pjrc.com/store/teensy3_audio.html" target="_blank">audio shield</a>
 		or another I2S device, using I2S master mode.</p>
-	<p align=center><img src="audioshield_outputs.jpg"></p>
+	<p align=center><img src="img/audioshield_outputs.jpg"></p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
@@ -523,7 +523,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>This object has no functions to call from the Arduino sketch.  It
 		simply streams data from its 2 input ports to the I2S hardware.</p>
 	<h3>Hardware</h3>
-	<p align=center><img src="audioshield_backside.jpg"></p>
+	<p align=center><img src="img/audioshield_backside.jpg"></p>
 	<p>The I2S signals are used in "master" mode, where Teensy creates
 		all 3 clock signals and controls all data timing.</p>
 	<table class=doc align=center cellpadding=3>
@@ -578,7 +578,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 <script type="text/x-red" data-help-name="AudioOutputSPDIF">
 	<h3>Summary</h3>
 	<p>Transmit 16 bit stereo audio as Digital S/PDIF.</p>
-	<p align=center><img src="spdif_proto.jpg"></p>
+	<p align=center><img src="img/spdif_proto.jpg"></p>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Port</th><th>Purpose</th></tr>
@@ -649,7 +649,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>This object has no functions to call from the Arduino sketch.  It
 		simply streams data from the ADC to its output port.</p>
 	<h3>Hardware</h3>
-	<p align=center><img src="dacpin.jpg"></p>
+	<p align=center><img src="img/dacpin.jpg"></p>
 	<p>Signal range is 0 to 1.2V</p>
 	<p>Most applications require at least a 10&micro;F DC-blocking capacitor.</p>
 	<p>TODO: photo of Teensy 3.1 with 10&micro;F capacitor and 3.5mm jack.</p>
@@ -697,7 +697,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		simply streams data from the its input port to the PWM pins.</p>
 	<h3>Hardware</h3>
 	<p>The following circuit is recommended.</p>
-	<p align=center><img src="pwmdualcircuit.jpg"></p>
+	<p align=center><img src="img/pwmdualcircuit.jpg"></p>
 	<p>Signal range is approx 1.55 Vp-p.</p>
 	<p>These resistor values assume approx 20 ohms output impedance
 		on the digital pins.  The 127K resistor may be adjusted or
@@ -1058,7 +1058,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		are far more efficient than SD cards, allowing many files to be
 		played simultaneously by copies of this object.
 		</p>
-	<p align=center><img src="w25q128fv.jpg"><br><small>W25Q128FV Serial Flash</small></p>
+	<p align=center><img src="img/w25q128fv.jpg"><br><small>W25Q128FV Serial Flash</small></p>
 	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -1527,7 +1527,7 @@ The actual packets are taken
 	<div>
 	<p>Create white noise.
 		</p>
-	<p align=center><img src="whitenoise.png"></p>
+	<p align=center><img src="img/whitenoise.png"></p>
 	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -1572,7 +1572,7 @@ The actual packets are taken
 	<div>
 	<p>Create pink noise, using Stefan Stenzel's "New Shade Of Pink" algorithm.
 		</p>
-	<!--<p align=center><img src="whitenoise.png"></p>-->
+	<!--<p align=center><img src="img/whitenoise.png"></p>-->
 	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -1809,7 +1809,7 @@ double s_freq = .0625;</p>
 	<p>Modify a signal with a DAHDSR (Delay Attack Hold Decay Sustain
 		Release) envelope.
 	</p>
-	<p align=center><img src="dahdsr.png"></p>
+	<p align=center><img src="img/dahdsr.png"></p>
 	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -1885,7 +1885,7 @@ double s_freq = .0625;</p>
 	<p>Multiply two signals together, useful for amplitude modulation
 		or "voltage controlled amplification".
 	</p>
-	<p align=center><img src="multiply.png"><br><small>56 Hz and 1 kHz sine waves multiplied.</small></p>
+	<p align=center><img src="img/multiply.png"><br><small>56 Hz and 1 kHz sine waves multiplied.</small></p>
 	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -1929,7 +1929,7 @@ double s_freq = .0625;</p>
 	<h3>Summary</h3>
 	<div>
 	<p>Delay a signal.  Up to 8 separate delay taps can be used.</p>
-	<p align=center><img src="delay.png"><br><small>1 kHz burst, delayed 5.2 ms.</small></p>
+	<p align=center><img src="img/delay.png"><br><small>1 kHz burst, delayed 5.2 ms.</small></p>
 	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -1989,7 +1989,7 @@ double s_freq = .0625;</p>
 	<h3>Summary</h3>
 	<div>
 	<p>Delay a signal, using external memory for longer delay times!  Up to 8 separate delay taps can be used.</p>
-	<p align=center><img src="delay.png"><br><small>1 kHz burst, delayed 5.2 ms.</small></p>
+	<p align=center><img src="img/delay.png"><br><small>1 kHz burst, delayed 5.2 ms.</small></p>
 	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -2031,7 +2031,7 @@ double s_freq = .0625;</p>
 	<p>When <span class=literal>AUDIO_MEMORY_MEMORYBOARD</span> is used, up to six
 		23LC1024 chips are used.
 	</p>
-	<p align=center><img src="memoryboard.jpg"><br><small><a href="https://oshpark.com/shared_projects/KZt5PaU7" target="_blank">Memoryboard 4</a></small></p>
+	<p align=center><img src="img/memoryboard.jpg"><br><small><a href="https://oshpark.com/shared_projects/KZt5PaU7" target="_blank">Memoryboard 4</a></small></p>
 	<p>
     <table class=doc align=center cellpadding=3>
         <tr class=top><th>Pin</th><th>Signal</th></tr>
@@ -2161,7 +2161,7 @@ double s_freq = .0625;</p>
 	<p>Biquadratic cascaded filter, useful for all sorts of filtering.
 		Up to 4 stages may be cascaded.
 	</p>
-	<p align=center><img src="biquad.png"></p>
+	<p align=center><img src="img/biquad.png"></p>
 	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -2236,7 +2236,7 @@ double s_freq = .0625;</p>
 	<div>
 	<p>Finite impulse response filter, useful for all sorts of filtering.
 	</p>
-	<p align=center><img src="fir_filter.png"></p>
+	<p align=center><img src="img/fir_filter.png"></p>
 	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -2690,7 +2690,7 @@ double s_freq = .0625;</p>
 		SGTL5000 is always used in slave mode, where Teensy controls
 		all I2S timing.
 	</p>
-	<p align=center><img src="sgtl5000closeup.jpg"></p>
+	<p align=center><img src="img/sgtl5000closeup.jpg"></p>
 	<h3>Audio Connections</h3>
 	<p>This object has no audio inputs or outputs.  Separate i2s objects
 		are used to send and receive audio data.  I2S master mode objects

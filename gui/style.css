@@ -17,7 +17,7 @@
 body {
   font: 13px "Helvetica" !important;
   padding-top: 100px;
-  background: url("pw_maze_white.png");
+  background: url("img/pw_maze_white.png");
 }
 #dropTarget {
     position: absolute;
@@ -286,7 +286,7 @@ a.brand img {
 }
 #sidebar-separator {
     width: 15px;
-    background: url(grip.png) no-repeat 50% 50%;
+    background: url("img/grip.png") no-repeat 50% 50%;
     position: absolute;
     right: 316px; top: 5px; bottom:10px;
     cursor: col-resize;
@@ -867,7 +867,7 @@ i.spinner {
     line-height: 14px;
     vertical-align: text-top;
     margin-top: 0px;
-    background: url(spin.svg) no-repeat 50% 50%;
+    background: url("img/spin.svg") no-repeat 50% 50%;
     background-size: contain
 }
     
