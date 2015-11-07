@@ -65,7 +65,7 @@ RED.library = (function() {
 			$("#flow-menu-parent>ul").replaceWith(menu);
 		});
 	}
-	loadFlowLibrary();
+	//loadFlowLibrary();
 
 
 	
