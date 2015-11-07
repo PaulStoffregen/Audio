@@ -35,6 +35,7 @@ void setup() {
       delay(500);
     }
   }
+  pinMode(13, OUTPUT); // LED on pin 13
   pinMode(0, INPUT_PULLUP);
   pinMode(2, INPUT_PULLUP);
   delay(1000);
