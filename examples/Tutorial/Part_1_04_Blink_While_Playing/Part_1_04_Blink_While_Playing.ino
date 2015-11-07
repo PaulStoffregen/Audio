@@ -43,14 +43,26 @@ void loop() {
     playSdWav1.play("SDTEST3.WAV");
     delay(10); // wait for library to parse WAV info
   }
-  // blink LED and print info while playing
-  digitalWrite(13, HIGH);
+
+  // print the play time offset
   Serial.print("Playing, now at ");
   Serial.print(playSdWav1.positionMillis());
   Serial.println(" ms");
+
+  // blink LED and print info while playing
+  digitalWrite(13, HIGH);
   delay(250);
   digitalWrite(13, LOW);
   delay(250);
+
+  // read the knob position (analog input A2)
+  /*
+  int knob = analogRead(A2);
+  float vol = (float)knob / 1280.0;
+  sgtl5000_1.volume(vol);
+  Serial.print("volume = ");
+  Serial.println(vol);
+  */
 }
 
 
