@@ -2,6 +2,7 @@
 // 
 // Part 2-1: Using the Microphone
 
+
 ///////////////////////////////////
 // copy the Design Tool code here
 ///////////////////////////////////
@@ -15,7 +16,7 @@ void setup() {
   sgtl5000_1.enable();
   sgtl5000_1.volume(0.5);
   sgtl5000_1.inputSelect(AUDIO_INPUT_MIC);
-  sgtl5000_1.micGain(40);
+  sgtl5000_1.micGain(32);
   delay(1000);
 }
 
