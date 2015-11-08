@@ -16,7 +16,7 @@ void setup() {
   sgtl5000_1.enable();
   sgtl5000_1.volume(0.6);
   sgtl5000_1.inputSelect(AUDIO_INPUT_MIC);
-  sgtl5000_1.micGain(32);
+  sgtl5000_1.micGain(36);
   mixer1.gain(0, 0.2);
   mixer1.gain(1, 0.2);
   mixer1.gain(2, 0.2);
