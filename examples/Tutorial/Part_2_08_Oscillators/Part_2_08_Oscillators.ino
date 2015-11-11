@@ -84,25 +84,27 @@ void loop() {
 
   // middle button switch which source we hear from mixer1
   if (button1.fallingEdge()) {
-    mixer1_setting = mixer1_setting + 1;
     if (mixer1_setting == 0) {
       mixer1.gain(0, 0.75);
       mixer1.gain(1, 0.0);
       mixer1.gain(2, 0.0);
       mixer1.gain(3, 0.0);
       Serial.println("Mixer1: Control oscillator");
+      mixer1_setting = 1;
     } else if (mixer1_setting == 1) {
       mixer1.gain(0, 0.0);
       mixer1.gain(1, 0.75);
       mixer1.gain(2, 0.0);
       mixer1.gain(3, 0.0);
       Serial.println("Mixer1: Frequency Modulated Oscillator");
+      mixer1_setting = 2;
     } else if (mixer1_setting == 2) {
       mixer1.gain(0, 0.0);
       mixer1.gain(1, 0.0);
       mixer1.gain(2, 0.75);
       mixer1.gain(3, 0.0);
       Serial.println("Mixer1: Regular Sine Wave Oscillator");
+      mixer1_setting = 3;
     } else if (mixer1_setting == 3) {
       mixer1.gain(0, 0.0);
       mixer1.gain(1, 0.0);
