@@ -33,19 +33,19 @@ Supported Hardware
 
 [Audio Adaptor Board](http://www.pjrc.com/store/teensy3_audio.html) for 16 bit stereo input and output.
 
-![Inputs](/gui/audioshield_inputs.jpg)      ![Outputs](/gui/audioshield_outputs.jpg)
+![Inputs](/gui/img/audioshield_inputs.jpg)      ![Outputs](/gui/img/audioshield_outputs.jpg)
 
 [Teensy 3.1](http://www.pjrc.com/store/teensy31.html) 12 bit DAC
 
-![DAC Output](/gui/dacpin.jpg)
+![DAC Output](/gui/img/dacpin.jpg)
 
 [Teensy 3.1](http://www.pjrc.com/store/teensy31.html) or [3.0](http://www.pjrc.com/store/teensy3.html) ADC Input
 
-![ADC Input](/gui/adccircuit.png)
+![ADC Input](/gui/img/adccircuit.png)
 
 [Teensy 3.1](http://www.pjrc.com/store/teensy31.html) or [3.0](http://www.pjrc.com/store/teensy3.html) PWM Output
 
-![PWM Output](/gui/pwmdualcircuit.jpg)
+![PWM Output](/gui/img/pwmdualcircuit.jpg)
 
 
 
