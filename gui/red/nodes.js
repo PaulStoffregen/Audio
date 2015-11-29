@@ -146,7 +146,7 @@ RED.nodes = (function() {
 							if (configNode) {
 								updatedConfigNode = true;
 								var users = configNode.users;
-								users.splice(users.indexOf(node),1);
+								users.splice(users.indexOf(node), 1);
 							}
 						}
 					}
@@ -304,6 +304,147 @@ RED.nodes = (function() {
 			nns.push(convertNode(node, true));
 		}
 		return nns;
+	}
+
+	/**
+	 * Parses the input string which contains copied code from the Arduino IDE, scans the
+	 * nodes and connections and forms them into a JSON representation which will be
+	 * returned as string.
+	 *
+	 * So the result may directly imported in the localStorage or the import dialog.
+	 */
+	function cppToJSON(newNodesStr) {
+
+		var data = "";
+		var nodes = [];
+		var cables = [];
+
+		const CODE_START 	= "// GUItool: begin automatically generated code";
+		const CODE_END		= "// GUItool: end automatically generated code";
+		const NODE_COMMENT	= "//";
+		const NODE_AC		= "AudioConnection";
+		const NODE_AI_I2S	= "AudioInputI2S";
+		const NODE_AM_4     = "AudioMixer4";
+		const NODE_AC_SGTL  = "AudioControlSGTL5000";
+
+		var parseLine = function(line) {
+			var parts = line.match(/^(\S+)\s(.*)/).slice(1);
+			var type = $.trim(parts[0]);
+			line = $.trim(parts[1]) + " ";
+
+			var description = "";
+			var coords = [0, 0];
+			var conn = [];
+
+			parts = line.match(/^([^;]{0,});(.*)/);
+			if (parts) {
+				parts = parts.slice(1);
+				description = $.trim(parts[0]);
+				coords = $.trim(parts[1]);
+				parts = coords.match(/^([^\/]{0,})\/\/xy=(.*)/);
+				if (parts) {
+					parts = parts.slice(1);
+					coords = $.trim(parts[1]).split(",");
+				}
+			}
+
+			switch (type) {
+				case NODE_AC:
+					parts = description.match(/^([^\(]*\()([^\)]*)(.*)/);
+					if (parts) {
+						conn = $.trim(parts[2]).split(",");
+						cables.push(conn);
+					}
+					break;
+				case NODE_COMMENT:
+					// do nothing ...
+					break;
+				default:
+					var node = new Object({
+						"id": description,
+						"type": type,
+						"x": parseInt(coords ? coords[0] : 0),
+						"y": parseInt(coords ? coords[1] : 0),
+						"z": 0,
+						"wires": []
+					});
+					nodes.push(node);
+					break;
+			}
+		};
+
+		var findNode = function(name) {
+			var len = nodes.length;
+			for (var key = 0; key < len; key++) {
+				if (nodes[key].id == name) {
+					return nodes[key];
+				}
+			}
+		};
+
+		var linkCables = function(cables) {
+			$.each(cables, function(i, item) {
+				var conn = item;
+				// when there are only two entries in the array, there
+				// is only one output to connect to one input, so we have
+				// to extend the array with the appropriate index "0" for
+				// both parst (in and out)
+				if (conn.length == 2) {
+					conn[2] = conn[1];
+					conn[1] = conn[3] = 0;
+				}
+				// now we assign the outputs (marked by the "idx" of the array)
+				// to the inputs describend by text
+				var currNode = findNode($.trim(conn[0]));
+				var idx = parseInt($.trim(conn[1]));
+				if (currNode) {
+					if ($.trim(conn[2]) != "" && $.trim(conn[3]) != "") {
+						var wire = $.trim(conn[2]) + ":" + $.trim(conn[3]);
+						var tmp = currNode.wires[idx] ? currNode.wires[idx] : [];
+						tmp.push(wire);
+						currNode.wires[idx] = tmp;
+					}
+				}
+			});
+		};
+
+		var traverseLines = function(raw) {
+			var lines = raw.split("\n");
+			var useLine = 0;
+
+			for (var i = 0; i < lines.length; i++) {
+				var line = lines[i];
+				useLine += (line.indexOf(CODE_START) >= 0) ? (useLine ? 0 : 1) : 0;
+				if (useLine > 0) {
+					parseLine(line);
+				}
+				useLine -= (line.indexOf(CODE_END) >= 0) ? (useLine ? 1 : 0) : 0;
+			}
+		};
+
+		var readCode = function() {
+
+			var fileImport = $("#importInput")[0];
+			var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.ino|.txt)$/;
+
+			if (regex.test(fileImport.value.toLowerCase())) {
+				if (typeof (FileReader) != "undefined") {
+					var reader = new FileReader();
+					$(reader).on("load", function (e) {
+					});
+					reader.readAsText(fileImport.files[0]);
+				} else {
+					alert("This browser does not support HTML5.");
+				}
+			} else {
+				alert("Please upload a valid INO or text file.");
+			}
+		};
+
+		traverseLines(newNodesStr);
+		linkCables(cables);
+
+		return JSON.stringify(nodes);
 	}
 
 	function importNodes(newNodesObj,createNewIds) {
@@ -483,6 +624,7 @@ RED.nodes = (function() {
 		},
 		node: getNode,
 		import: importNodes,
+		cppToJSON: cppToJSON,
 		refreshValidation: refreshValidation,
 		getAllFlowNodes: getAllFlowNodes,
 		createExportableNodeSet: createExportableNodeSet,
