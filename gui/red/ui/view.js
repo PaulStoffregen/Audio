@@ -1476,6 +1476,8 @@ RED.view = (function() {
 	 */
 	function importNodes(newNodesStr,touchImport) {
 		
+		var createNewIds = true;
+		
 		// TODO: solve this more elegant as the system expects
 		if ($("#node-input-arduino").prop('checked') === true) {
 			newNodesStr = RED.nodes.cppToJSON(newNodesStr);
@@ -1488,8 +1490,7 @@ RED.view = (function() {
 		}
 
 		try {
-			var createNewIds = true;
-			var result = RED.nodes.import(newNodesStr,true);
+			var result = RED.nodes.import(newNodesStr,createNewIds);
 			if (result) {
 				var new_nodes = result[0];
 				var new_links = result[1];
