@@ -1475,7 +1475,20 @@ RED.view = (function() {
 	 *  - attached to mouse for placing - 'IMPORT_DRAGGING'
 	 */
 	function importNodes(newNodesStr,touchImport) {
+		
+		// TODO: solve this more elegant as the system expects
+		if ($("#node-input-arduino").prop('checked') === true) {
+			newNodesStr = RED.nodes.cppToJSON(newNodesStr);
+			createNewIds = false;
+			RED.storage.clear();
+			localStorage.setItem("audio_library_guitool", newNodesStr);
+			RED.storage.load();
+			redraw();
+			return;
+		}
+
 		try {
+			var createNewIds = true;
 			var result = RED.nodes.import(newNodesStr,true);
 			if (result) {
 				var new_nodes = result[0];
