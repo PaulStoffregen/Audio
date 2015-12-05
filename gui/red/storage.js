@@ -18,8 +18,16 @@ RED.storage = (function() {
 			if (data) RED.nodes.import(data, false);
 		}
 	}
+	function clear() {
+		// TOOD: use setTimeout to limit the rate of changes?
+		if (localStorage) {
+			localStorage.removeItem("audio_library_guitool");
+			//console.log("localStorage write");
+		}
+	}
 	return {
 		update: update,
-		load: load
+		load: load,
+		clear: clear
 	}
 })();
