@@ -94,6 +94,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 			</div>
 			<div class="btn-group pull-left">
 				<a id="btn-deploy" class="btn action-deploy disabled" href="#"><i id="btn-icn-deploy" class="icon-upload"></i>Export</a>
+				<a id="btn-import" class="btn action-import disabled" href="#"><i id="btn-icn-download" class="icon-download"></i>Import</a>
 			</div>
 		</div>
 	</div>
@@ -276,8 +277,14 @@ span.mainfunction {color: #993300; font-weight: bolder}
 </script>
 <script type="text/x-red" data-template-name="import-dialog">
 	<div class="form-row">
-		<label for="node-input-export"><i class="icon-share"></i>Nodes:</label>
-		<textarea style="font-family: monospace; font-size: 12px; background:rgb(226, 229, 255); padding-left: 0.5em;" class="input-block-level" id="node-input-import" rows="5" placeholder="Paste nodes here, or lookup in the library"></textarea>
+		<label for="node-input-import"><i class="icon-share"></i>Nodes:</label>
+		<textarea style="font-family: monospace; font-size: 12px; background:rgb(226, 229, 255); padding-left: 0.5em;" class="input-block-level" id="node-input-import" rows="5" placeholder="Paste nodes here, or lookup in the library. When importing Arduino code, the whole flow will be replaced."></textarea>
+	</div>
+	<div class="form-tips">
+		<label for="node-input-arduino" style="font-size: 13px; padding: 2px 0px 0px 4px;">
+			<input style="margin-bottom: 4px; margin-right: 4px;" type="checkbox" id="node-input-arduino" checked="checked" class="input-block-level" />
+				&nbsp;Import copied code from the Arduino IDE
+		</label>
 	</div>
 </script>
 

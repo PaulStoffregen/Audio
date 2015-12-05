@@ -179,6 +179,7 @@ var RED = (function() {
 			RED.view.redraw();
 			setTimeout(function() {
 				$("#btn-deploy").removeClass("disabled").addClass("btn-danger");
+				$("#btn-import").removeClass("disabled").addClass("btn-success");
 			}, 1500);
 			$('#btn-deploy').click(function() { save(); });
 			// if the query string has ?info=className, populate info tab
