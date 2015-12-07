@@ -434,7 +434,7 @@ RED.editor = (function() {
 					$("#"+prefix+"-"+d).change();
 				}
 			}
-		}
+		};
 		
 		if (definition.credentials) {
 			if (node.credentials) {
@@ -456,9 +456,11 @@ RED.editor = (function() {
 	function showEditDialog(node) {
 		editing_node = node;
 		RED.view.state(RED.state.EDITING);
-		$("#dialog-form").html($("script[data-template-name='"+node.type+"']").html());
-		prepareEditDialog(node,node._def,"node-input");
-		$( "#dialog" ).dialog("option","title","Edit "+node.type+" node").dialog( "open" );
+		//$("#dialog-form").html(RED.view.getForm(node.type));
+		RED.view.getForm("dialog-form", node.type, function (d, f) {
+			prepareEditDialog(node,node._def,"node-input");
+			$( "#dialog" ).dialog("option","title","Edit "+node.type+" node").dialog( "open" );
+		});
 	}
 
 	function showEditConfigNodeDialog(name,type,id) {
@@ -471,7 +473,7 @@ RED.editor = (function() {
 				id: (1+Math.random()*4294967295).toString(16),
 				_def: node_def,
 				type: type
-			}
+			};
 			for (var d in node_def.defaults) {
 				if (node_def.defaults[d].value) {
 					configNode[d] = node_def.defaults[d].value;
@@ -479,7 +481,9 @@ RED.editor = (function() {
 			}
 		}
 
-		$("#dialog-config-form").html($("script[data-template-name='"+type+"']").html());
+		//$("#dialog-config-form").html(RED.view.getForm(type));
+		RED.view.getForm("dialog-config-form", type, function (d, f) {
+
 		prepareEditDialog(configNode,node_def,"node-config-input");
 
 		var buttons = $( "#node-config-dialog" ).dialog("option","buttons");
@@ -533,6 +537,7 @@ RED.editor = (function() {
 			.dialog("option","node-type",type)
 			.dialog("option","title",(adding?"Add new ":"Edit ")+type+" config node")
 			.dialog( "open" );
+		});
 	}
 
 	function updateConfigNodeSelect(name,type,value) {

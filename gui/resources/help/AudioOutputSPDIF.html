@@ -1,0 +1,43 @@
+
+	<h3>Summary</h3>
+	<p>Transmit 16 bit stereo audio as Digital S/PDIF.</p>
+	<p align=center><img src="img/spdif_proto.jpg"></p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Left Channel</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Right Channel</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from its 2 input ports S/PDIF encoded digital
+		audio on pin 22.</p>
+	<h3>Hardware</h3>
+	<p>The S/PDIF output signal can be used to drive an optical TOSLINK
+		cable, or a standard (usually orange) RCA jack.</p>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>22</td><td>S/PDIF</td><td>Output</td></tr>
+	</table>
+	<p>For optical TOSLINK output, this
+		<a href="https://www.oshpark.com/shared_projects/KcDBKHta" target="_blank">OSH Park board</a>
+		can be used with the inexpensive Everlight PLT133/T6A connector, available
+		at Digikey, 1080-1434-ND.
+		</p>
+	<h3>Examples</h3>
+	<p>The AudioOutputSPDIF object can be used in place of the AudioOutputI2S object,
+	<p>used in nearly all the examples.  The WavFilePlayer shows how to substitute
+		output objects for different hardware types.
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; WavFilePlayer
+	</p>
+	<h3>Credits</h3>
+	<p><a href="https://github.com/FrankBoesing" target="_blank">Frank Boesing</a>
+		developed the AudioOutputSPDIF code.  The original
+		<a href="https://forum.pjrc.com/threads/28639-S-pdif" target="_blank">forum disussion</a>
+		included valuable input and code from "kpc".
+	<h3>Notes</h3>
+	<p>S/PDIF output uses the I2S hardware.  This object can not be used
+		together with any of the I2S objects, because it requires the I2S
+		hardware with different internal settings.</p>
+	</p>

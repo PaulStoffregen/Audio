@@ -1,0 +1,45 @@
+
+	<h3>Summary</h3>
+	<p>Play a RAW data file, stored on a SD card.  RAW format is simpler
+		than WAV and begins playing immediately, without parsing WAV file
+		header info.</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Sound Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>play</span>(filename);</p>
+	<p class=desc>Begin playing a RAW data file.  If a file is already playing,
+		it is stopped and this file starts playing from the beginning.
+	</p>
+	<p class=func><span class=keyword>stop</span>();</p>
+	<p class=desc>Stop playing.  If not playing, this function has no effect.
+	</p>
+	<p class=func><span class=keyword>isPlaying</span>();</p>
+	<p class=desc>Return true (non-zero) if playing, or false (zero)
+		when not playing.
+	</p>
+	<p class=func><span class=keyword>positionMillis</span>();</p>
+	<p class=desc>While playing, return the current time offset, in
+		milliseconds.  When not playing, the return from this function
+		is undefined.
+	</p>
+	<p class=func><span class=keyword>lengthMillis</span>();</p>
+	<p class=desc>Return the total length of the current sound clip,
+		in milliseconds.  When not playing, the return from this function
+		is undefined.
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Recorder
+	</p>
+	<h3>Notes</h3>
+	<p>The data file must be RAW 16 bit signed integers in LSB-first format.
+	</p>
+	<p>While playing, the audio library accesses the SD card automatically.
+		If card access is required, you must
+		<a href="http://www.pjrc.com/teensy/td_libs_AudioProcessorUsage.html" target="_blank">AudioNoInterrupts()</a>
+		to prevent the library from accessing the SD card while you use it.
+		Disabling the audio library interrupt for too long may cause audible
+		dropouts or glitches.
+	</p>

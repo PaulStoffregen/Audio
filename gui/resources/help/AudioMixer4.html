@@ -1,0 +1,39 @@
+
+	<h3>Summary</h3>
+	<p>Combine up to 4 audio signals together, each with adjustable gain.
+		All channels support signal attenuation or amplification.</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Input signal #1</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Input signal #2</td></tr>
+		<tr class=odd><td align=center>In 2</td><td>Input signal #3</td></tr>
+		<tr class=odd><td align=center>In 3</td><td>Input signal #4</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Sum of all inputs</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>gain</span>(channel, level);</p>
+	<p class=desc>Adjust the amplification or attenuation.  "channel" must
+		be 0 to 3.  "level" may be any floating point number from 0 to 32767.
+		1.0 passes the signal through directly.  Level of 0 shuts the channel
+		off completely.  Between 0 to 1.0 attenuates the signal, and above
+		1.0 amplifies it.  All 4 channels have separate settings.
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; SamplePlayer
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; PlaySynthMusic
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; SpectrumAnalyzerBasic
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; DialTone_Serial
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; MemoryAndCpuUsage
+	</p>
+	<h3>Notes</h3>
+	<p>Signal clipping can occur when any channel has gain greater than 1.0,
+		or when multiple signals add together to greater than 1.0.</p>
+	<p>More than 4 channels may be combined by connecting multiple mixers
+		in tandem.  For example, a 16 channel mixer may be built using 5
+		mixers, where the fifth mixer combines the outputs of the first 4.
+	</p>

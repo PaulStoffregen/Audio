@@ -78,14 +78,22 @@ RED.sidebar.info = (function() {
 			}
 		}
 		table += "</tbody></table><br/>";
-		table  += '<div class="node-help">'+($("script[data-help-name|='"+node.type+"']").html()||"")+"</div>";
-		$("#tab-info").html(table);
+		this.setHelpContent(table, node.type);
+	}
+
+	function setHelpContent(empty, key) {
+		$.get( "resources/help/" + key + ".html", function( data ) {
+			$("#tab-info").html(empty + '<div class="node-help">' + data + '</div>');
+		}).fail(function () {
+			$("#tab-info").html(empty);
+		});
 	}
 	
 	return {
 		refresh:refresh,
 		clear: function() {
 			$("#tab-info").html("");
-		}
+		},
+		setHelpContent: setHelpContent
 	}
 })();

@@ -65,7 +65,9 @@ var RED = (function() {
 				if (node && (node.outputs > 0 || node._def.inputs > 0)) {
 					cpp += n.type + " ";
 					for (var j=n.type.length; j<24; j++) cpp += " ";
-					cpp += n.id + "; ";
+					var name = (n.name ? n.name : n.id);
+					name = name.replace(" ", "_").replace("+", "_").replace("-", "_");
+					cpp += name + "; ";
 					for (var j=n.id.length; j<14; j++) cpp += " ";
 					cpp += "//xy=" + n.x + "," + n.y + "\n";
 				}
@@ -115,18 +117,17 @@ var RED = (function() {
 			//console.log(cpp);
 
 			RED.view.state(RED.state.EXPORT);
-			$("#dialog-form").html($("script[data-template-name='export-clipboard-dialog']").html());
-			$("#node-input-export").val(cpp);
-			$("#node-input-export").focus(function() {
+			RED.view.getForm('dialog-form', 'export-clipboard-dialog', function (d, f) {
+				$("#node-input-export").val(cpp).focus(function() {
 				var textarea = $(this);
 				textarea.select();
 				textarea.mouseup(function() {
 					textarea.unbind("mouseup");
 					return false;
 				});
-			});
+				}).focus();
 			$( "#dialog" ).dialog("option","title","Export to Arduino").dialog( "open" );
-			$("#node-input-export").focus();
+			});
 			//RED.view.dirty(false);
 		}
 	}
@@ -169,10 +170,6 @@ var RED = (function() {
 	}
 
 	function loadNodes() {
-		//$.get('list.html', function(data) {
-			//$("body").append(data);
-		//setTimeout(function() {
-			$(".palette-spinner").hide();
 			$(".palette-scroll").show();
 			$("#palette-search").show();
 			RED.storage.load();
@@ -185,11 +182,8 @@ var RED = (function() {
 			// if the query string has ?info=className, populate info tab
 			var info = getQueryVariable("info");
 			if (info) {
-				$("#tab-info").html('<div class="node-help">'
-					+($("script[data-help-name|='"+info+"']").html()||"")+"</div>");
+			RED.sidebar.info.setHelpContent('', info);
 			}
-		//}, 100);
-		//}, "html");
 	}
 
 	$('#btn-node-status').click(function() {toggleStatus();});
@@ -220,8 +214,16 @@ var RED = (function() {
 	}
 
 	$(function() {
+		$(".palette-spinner").show();
+		$.getJSON( "resources/nodes_def.json", function( data ) {
+			var nodes = data["nodes"];
+			$.each(nodes, function(key, val) {
+				RED.nodes.registerType(val["type"], val["data"]);
+			});
 		RED.keyboard.add(/* ? */ 191,{shift:true},function(){showHelp();d3.event.preventDefault();});
 		loadNodes();
+			$(".palette-spinner").hide();
+		})
 	});
 
 	return {

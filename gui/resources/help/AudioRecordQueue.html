@@ -1,0 +1,48 @@
+
+	<h3>Summary</h3>
+	<p>Record audio data by sending to the Arduino sketch.  This object allows
+		sketch code to receive audio packets.</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Sound To Access</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>begin</span>();</p>
+	<p class=desc>Begin capturing incoming audio to the queue.  After calling
+		begin, readBuffer() and freeBuffer(), or clear() must be used frequently
+		to prevent the queue from filling up.
+	</p>
+	<p class=func><span class=keyword>available</span>();</p>
+	<p class=desc>Returns the number of audio packets available to read.
+	</p>
+	<p class=func><span class=keyword>readBuffer</span>();</p>
+	<p class=desc>Read a single audio packet.  A pointer to a 128 sample
+		array of 16 bit integers is returned.  NULL is returned if no packets
+		are available.
+	</p>
+	<p class=func><span class=keyword>freeBuffer</span>();</p>
+	<p class=desc>Release the memory from the previously read packet returned
+		from readBuffer().  Only a single packet at a time may be read, and
+		each packet must be freed with this function, to return the memory to
+		the audio library.
+	</p>
+	<p class=func><span class=keyword>clear</span>();</p>
+	<p class=desc>Discard all audio held in the queue.
+	</p>
+	<p class=func><span class=keyword>end</span>();</p>
+	<p class=desc>Stop capturing incoming audio into the queue.  Data already
+		captured remains in the queue and may be read with readBuffer().
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Recorder
+	</p>
+	<h3>Notes</h3>
+	<p>
+		Up to 52 packets may be queued by this object, which allows approximately
+		150 ms of audio to be held in the queue, to allow time for the Arduino
+		sketch to write data to media or do other high-latency tasks.
+
+The actual packets are taken
+		from the pool created by AudioMemory().
+	</p>

@@ -1,0 +1,92 @@
+
+	<h3>Summary</h3>
+	<div>
+	<p>Delay a signal, using external memory for longer delay times!  Up to 8 separate delay taps can be used.</p>
+	<p align=center><img src="img/delay.png"><br><small>1 kHz burst, delayed 5.2 ms.</small></p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Signal Input</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Delay Tap #1</td></tr>
+		<tr class=odd><td align=center>Out 1</td><td>Delay Tap #2</td></tr>
+		<tr class=odd><td align=center>Out 2</td><td>Delay Tap #3</td></tr>
+		<tr class=odd><td align=center>Out 3</td><td>Delay Tap #4</td></tr>
+		<tr class=odd><td align=center>Out 4</td><td>Delay Tap #5</td></tr>
+		<tr class=odd><td align=center>Out 5</td><td>Delay Tap #6</td></tr>
+		<tr class=odd><td align=center>Out 6</td><td>Delay Tap #7</td></tr>
+		<tr class=odd><td align=center>Out 7</td><td>Delay Tap #8</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>delay</span>(channel, milliseconds);</p>
+	<p class=desc>Set output channel (0 to 7) to delay the signals by
+		milliseconds.  The maximum delay is approx 333 ms.  The actual delay
+		is rounded to the nearest sample.  Each channel can be configured for
+		any delay.  There is no requirement to configure the "taps" in increasing
+		delay order.
+	</p>
+	<p class=func><span class=keyword>disable</span>(channel);</p>
+	<p class=desc>Disable a channel.  The output of this channel becomes
+		silent.  If this channel is the longest delay, memory usage is
+		automatically reduced to accomodate only the remaining channels used.
+	</p>
+	<h3>Hardware</h3>
+	<p>By default, or when <span class=literal>AUDIO_MEMORY_23LC1024</span> is used (see below),
+		 a single 23LC1024 RAM chip is used, with these pins:
+    <table class=doc align=center cellpadding=3>
+        <tr class=top><th>Pin</th><th>Signal</th></tr>
+        <tr class=odd><td align=center>6</td><td>CS</td></tr>
+        <tr class=odd><td align=center>7</td><td>MOSI</td></tr>
+        <tr class=odd><td align=center>12</td><td>MISO</td></tr>
+        <tr class=odd><td align=center>14</td><td>SCK</td></tr>
+    </table>
+	</p>
+	<p>When <span class=literal>AUDIO_MEMORY_MEMORYBOARD</span> is used, up to six
+		23LC1024 chips are used.
+	</p>
+	<p align=center><img src="img/memoryboard.jpg"><br><small><a href="https://oshpark.com/shared_projects/KZt5PaU7" target="_blank">Memoryboard 4</a></small></p>
+	<p>
+    <table class=doc align=center cellpadding=3>
+        <tr class=top><th>Pin</th><th>Signal</th></tr>
+        <tr class=odd><td align=center>2</td><td>CS0 (encoded)</td></tr>
+        <tr class=odd><td align=center>3</td><td>CS1 (encoded)</td></tr>
+        <tr class=odd><td align=center>4</td><td>CS2 (encoded)</td></tr>
+        <tr class=odd><td align=center>7</td><td>MOSI</td></tr>
+        <tr class=odd><td align=center>12</td><td>MISO</td></tr>
+        <tr class=odd><td align=center>14</td><td>SCK</td></tr>
+    </table>
+	</p>
+	<p>
+	If fewer than 6 chips are soldered, the optional parameter for maximum delay
+	must be used.  See below for details.  Each chip provides 1485 ms of delay
+	memory, so the total of all objects using AUDIO_MEMORY_MEMORYBOARD must not
+	exceed the amount of memory physically present.
+	</p>
+	<h3>Examples</h3>
+	<p>
+	<a href="https://www.youtube.com/watch?v=d80d1HWy5_s" target="_blank">Demo Video</a> (YouTube)
+	</p>
+	<!-- <p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Delay
+	</p> -->
+	<p>
+	<a href="https://forum.pjrc.com/threads/29276-Limits-of-delay-effect-in-audio-library?p=79436&viewfull=1#post79436" target="_blank">Forum Conversaton</a> (with sample code)
+	</p>
+	<h3>Notes</h3>
+	<p>External RAM allows for longer delays without consuming
+		limited internal RAM.  However, SPI communication is required,
+		which consumes much more CPU time.  The
+		<a href="http://www.pjrc.com/teensy/td_libs_AudioProcessorUsage.html">AudioProcessorUsageMax</a>
+		function may be used to monitor how much CPU time is consumed.
+	</p>
+	<p>You may specify the type of hardware to be used by editing the code.  AUDIO_MEMORY_23LC1024
+		specifies a single 23LC1024 chip.  AUDIO_MEMORY_MEMORYBOARD allows using up to 6 of these
+		chips.
+	</p>
+	<p class=desc><span class=keyword>AudioEffectDelayExternal</span>  delayExt1(<span class=literal>AUDIO_MEMORY_23LC1024</span>);
+	</p>
+	<p>You may also create more than one delay using the same hardware, where the memory is partitioned
+		by specifying a maximum delay in milliseconds.  This can be useful if you wish to delay both
+		channels of a stereo signal.
+
+	<p class=desc><span class=keyword>AudioEffectDelayExternal</span>  delayExt1(<span class=literal>AUDIO_MEMORY_23LC1024</span>, 700);<br><span class=keyword>AudioEffectDelayExternal</span>  delayExt2(<span class=literal>AUDIO_MEMORY_23LC1024</span>, 700);
+	</p>

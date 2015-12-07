@@ -1,0 +1,46 @@
+
+	<h3>Summary</h3>
+	<p>Detect the level of a single tone</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Signal to analyze</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>frequency</span>(freq);</p>
+	<p class=desc>Set the frequency to detect.  The default detection time
+		will be 10 cycles of this frequency.
+	</p>
+	<p class=func><span class=keyword>frequency</span>(freq, cycles);</p>
+	<p class=desc>Set the frequency to detect, and the number of cycles.
+		Longer detection time (more cycles) will give higher precision,
+		but of course slower response.
+	</p>
+	<p class=func><span class=keyword>available</span>();</p>
+	<p class=desc>Returns true (non-zero) each time a detection interval
+		(number of cycles) completed and a new level is detected.
+	</p>
+	<p class=func><span class=keyword>read</span>();</p>
+	<p class=desc>Read the detected signal level.  Range is 0 to 1.0.
+	</p>
+	<p class=func><span class=keyword>threshold</span>(level);</p>
+	<p class=desc>Set a detection threshold, where the bool test operation
+		will return true if at or above this level, or false when below.
+	</p>
+	<p class=func>(bool)</p>
+	<p class=desc>By testing the object as a boolean value, you can respond
+		to detection of a tone.
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; DialTone_Serial
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; DialTone_7segment
+	</p>
+	<h3>Notes</h3>
+	<p>Low frequency detection has trouble with numerical precision.
+		Works really well for all 8 DTMF frequencies, but fails for
+		detecting "sub audible tones" used in some control applications.</p>
+	<p>The (bool) test continues to return true until the next detection
+		interval (the configured number of cycles).  This behavior may
+		change in future versions, for a single true each time the signal
+		is detected, and then false for the remainder of that interval.</p>

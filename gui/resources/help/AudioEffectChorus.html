@@ -1,0 +1,41 @@
+
+<h3>Summary</h3>
+	<p>The chorus effect simulates the richness of several nearly-identical
+	sound sources (like the way a choir sounds different to a single singer).
+	It does this by sampling from a delay line, so each voice is actually
+	the same but at a slightly different point in time. This is a type of
+	comb filtering.</p>
+	<p>Chorus combines one or more samples ranging from the most recent
+	sample back to about 50ms ago. The additional samples are evenly spread
+	through the supplied delay line, and there is no modulation.</p>
+	<p>If the number of voices is specified as 2, then the
+	effect combines the current sample and the oldest sample (the last one
+	in the delay line). If the number of voices is 3 then the effect combines
+	the most recent sample, the oldest sample and the sample in the middle of
+	the delay line.</p>
+	<p>For two voices the effect can be represented as:<br/>
+	result = (sample(0) + sample(dt))/2<br/>
+	where sample(0) represents the current sample and sample(dt)
+	is the sample in the delay line from dt milliseconds ago.</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class="top"><th>Port</th><th>Purpose</th></tr>
+		<tr class="odd"><td align="center">In 0</td><td>Signal Input</td></tr>
+		<tr class="odd"><td align="center">Out 0</td><td>Chorused Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>begin</span>(delayBuffer, length, n_chorus);</p>
+	<p class=desc>Create a chorus by specifying the address of the delayline, the
+	total number of samples in the delay line (often done as an integer multiple of
+	AUDIO_BLOCK_SAMPLES) and the number of voices in the chorus <em>including</em>
+	the original voice (so, 2 and up to get a chorus effect, although you can
+	specify 1 if you want).
+	</p>
+	<p class=func><span class=keyword>modify</span>(n_chorus);</p>
+	<p class=desc>Alters the number of voices in a running chorus (previously started with begin).
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Chorus
+	</p>
+	<h3>Notes</h3>
+	<p>The longer the length of the chorus, the more memory blocks are used.</p>

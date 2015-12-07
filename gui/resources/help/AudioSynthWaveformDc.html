@@ -1,0 +1,28 @@
+
+	<h3>Summary</h3>
+	<p>Create constant (DC) signal, useful for control of objects that take
+		a modulation or control input signal.  This constant level can be
+		used to modify other waveforms using mixer or multiplier objects</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Output constant DC level</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>amplitude</span>(level);</p>
+	<p class=desc>Set the output.  Level is -1.0 to 1.0.  The output is
+		changed immediately.
+	</p>
+	<p class=func><span class=keyword>amplitude</span>(level, milliseconds);</p>
+	<p class=desc>Set the output.  Level is -1.0 to 1.0.  The output is
+		gradually changed over a "milliseconds" time period.  Any time may
+		be specified, but periods longer than 1 second may be automatically
+		shortened for small level changes, due to numerical precision limits.
+	</p>
+	<!--<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; 
+	</p>-->
+	<h3>Notes</h3>
+	<p>Of course, the term "DC", for Direct Current, doesn't properly apply
+		to a pure digital stream of numerical values.  But the term is widely
+		understood in audio applications, so hopefully it's not too confusing?</p>

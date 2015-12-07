@@ -1,0 +1,42 @@
+
+	<h3>Summary</h3>
+	<p>Play a short sound clip, stored directly in memory.
+		Data files are created with the
+		<a href="https://github.com/PaulStoffregen/Audio/tree/master/examples/SamplePlayer/wav2sketch" target="_blank">wav2sketch program</a>,
+		and copied to the sketch folder to become part of your sketch.</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Sound Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>play</span>(data);</p>
+	<p class=desc>Begin playing a sound clip.  If already playing, the
+		currently playing clip is stopped and this new data begins
+		playing from the beginning.
+	</p>
+	<p class=func><span class=keyword>stop</span>();</p>
+	<p class=desc>Stop playing.  If not playing, this function has no effect.
+	</p>
+	<p class=func><span class=keyword>isPlaying</span>();</p>
+	<p class=desc>Return true (non-zero) if playing, or false (zero)
+		when not playing.
+	</p>
+	<p class=func><span class=keyword>positionMillis</span>();</p>
+	<p class=desc>While playing, return the current time offset, in
+		milliseconds.  When not playing, the return from this function
+		is undefined.
+	</p>
+	<p class=func><span class=keyword>lengthMillis</span>();</p>
+	<p class=desc>Return the total length of the current sound clip,
+		in milliseconds.  When not playing, the return from this function
+		is undefined.
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; SamplePlayer
+	</p>
+	<h3>Notes</h3>
+	<p>TODO: supported sample rates: 11.025, 22.05, 44.1</p>
+	<p>TODO: ulaw vs uncompressed encoding</p>
+	<p>Polyphonic playback can be built by creating multiple
+		objects, with their output combined by mixers.</p>
