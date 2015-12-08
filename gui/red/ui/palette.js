@@ -108,19 +108,33 @@ RED.palette = (function() {
 		}
 	}
 
-	function setTooltipContent(empty, key, elem) {
-		$.get( "resources/help/" + key + ".html", function( data ) {
+	function setTooltipContent(prefix, key, elem) {
+		// server test switched off - test purposes only
+		var patt = new RegExp(/^[http|https]/);
+		var server = false && patt.test(location.protocol);
+
+		var options = {
+			title: elem.type,
+			placement: "right",
+			trigger: "hover",
+			delay: { show: 750, hide: 50 },
+			html: true,
+			container:'body',
+			content : ""
+		};
+
+		if (!server) {
+			data = $("script[data-help-name|='" + key + "']").html();
 			var firstP = $("<div/>").append(data).children("p").first().html();
-			$(elem).popover({
-				title: elem.type,
-				placement: "right",
-				trigger: "hover",
-				delay: { show: 750, hide: 50 },
-				html: true,
-				container:'body',
-				content: firstP
+			options.content = firstP;
+			$(elem).popover(options);
+		} else {
+			$.get( "resources/help/" + key + ".html", function( data ) {
+				var firstP = $("<div/>").append(data).children("p").first().html();
+				options.content = firstP;
+				$(elem).popover(options);
 			});
-		});
+		}
 	}
 	
 	function removeNodeType(type) {

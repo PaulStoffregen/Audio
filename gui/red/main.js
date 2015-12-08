@@ -215,6 +215,11 @@ var RED = (function() {
 
 	$(function() {
 		$(".palette-spinner").show();
+		$.ajaxSetup({beforeSend: function(xhr){
+			if (xhr.overrideMimeType) {
+				xhr.overrideMimeType("application/json");
+			}
+		}});
 		$.getJSON( "resources/nodes_def.json", function( data ) {
 			var nodes = data["nodes"];
 			$.each(nodes, function(key, val) {

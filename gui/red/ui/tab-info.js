@@ -81,12 +81,23 @@ RED.sidebar.info = (function() {
 		this.setHelpContent(table, node.type);
 	}
 
-	function setHelpContent(empty, key) {
-		$.get( "resources/help/" + key + ".html", function( data ) {
-			$("#tab-info").html(empty + '<div class="node-help">' + data + '</div>');
-		}).fail(function () {
-			$("#tab-info").html(empty);
-		});
+	function setHelpContent(prefix, key) {
+		// server test switched off - test purposes only
+		var patt = new RegExp(/^[http|https]/);
+		var server = false && patt.test(location.protocol);
+
+
+		prefix = prefix == "" ? "<h3>" + key + "</h3>" : prefix;
+		if (!server) {
+			data = $("script[data-help-name|='" + key + "']").html();
+			$("#tab-info").html(prefix + '<div class="node-help">' + data + '</div>');
+		} else {
+			$.get( "resources/help/" + key + ".html", function( data ) {
+				$("#tab-info").html(prefix + '<h2>' + key + '</h2><div class="node-help">' + data + '</div>');
+			}).fail(function () {
+				$("#tab-info").html(prefix);
+			});
+		}
 	}
 	
 	return {
