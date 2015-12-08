@@ -86,21 +86,13 @@ RED.palette = (function() {
 		  }
 		  
 		  $("#palette-"+def.category).append(d);
-		  d.onmousedown = function(e) { e.preventDefault(); }
+		  d.onmousedown = function(e) { e.preventDefault(); };
 
-		  $(d).popover({
-				  title:d.type,
-				  placement:"right",
-				  trigger: "hover",
-				  delay: { show: 750, hide: 50 },
-				  html: true,
-				  container:'body',
-				  content: $(($("script[data-help-name|='"+nt+"']").html()||"<h2>empty</h2><p>no information available</p>").trim())[2] // TODO: how to use jQuery to always select the first <p> within the html?
-		  });
+		  setTooltipContent('', nt, d);
+
 		  $(d).click(function() {
 				RED.nodes.selectNode(d.type);
-				var help = '<div class="node-help">'+($("script[data-help-name|='"+d.type+"']").html()||"")+"</div>";
-				$("#tab-info").html(help);
+			  RED.sidebar.info.setHelpContent('', d.type);
 		  });
 		  $(d).draggable({
 			  helper: 'clone',
@@ -113,7 +105,35 @@ RED.palette = (function() {
 			  $(this).next().slideToggle();
 			  $(this).children("i").toggleClass("expanded");
 		  });
+		}
+	}
 
+	function setTooltipContent(prefix, key, elem) {
+		// server test switched off - test purposes only
+		var patt = new RegExp(/^[http|https]/);
+		var server = false && patt.test(location.protocol);
+
+		var options = {
+			title: elem.type,
+			placement: "right",
+			trigger: "hover",
+			delay: { show: 750, hide: 50 },
+			html: true,
+			container:'body',
+			content : ""
+		};
+
+		if (!server) {
+			data = $("script[data-help-name|='" + key + "']").html();
+			var firstP = $("<div/>").append(data).children("p").first().html();
+			options.content = firstP;
+			$(elem).popover(options);
+		} else {
+			$.get( "resources/help/" + key + ".html", function( data ) {
+				var firstP = $("<div/>").append(data).children("p").first().html();
+				options.content = firstP;
+				$(elem).popover(options);
+			});
 		}
 	}
 	

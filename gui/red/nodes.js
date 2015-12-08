@@ -20,7 +20,7 @@ RED.nodes = (function() {
 	var nodes = [];
 	var configNodes = {};
 	var links = [];
-	var defaultWorkspace;
+	//var defaultWorkspace;
 	var workspaces = {};
 
 	function registerType(nt,def) {
@@ -87,7 +87,7 @@ RED.nodes = (function() {
 				if (n._def.defaults.hasOwnProperty(d)) {
 					var property = n._def.defaults[d];
 					if (property.type) {
-						var type = getType(property.type)
+						var type = getType(property.type);
 						if (type && type.category == "config") {
 							var configNode = configNodes[n[d]];
 							if (configNode) {
@@ -106,9 +106,11 @@ RED.nodes = (function() {
 	function addLink(l) {
 		links.push(l);
 	}
+/*
 	function addConfig(c) {
 		configNodes[c.id] = c;
 	}
+*/
 
 	function getNode(id) {
 		if (id in configNodes) {
@@ -140,7 +142,7 @@ RED.nodes = (function() {
 				if (node._def.defaults.hasOwnProperty(d)) {
 					var property = node._def.defaults[d];
 					if (property.type) {
-						var type = getType(property.type)
+						var type = getType(property.type);
 						if (type && type.category == "config") {
 							var configNode = configNodes[node[d]];
 							if (configNode) {
@@ -315,17 +317,14 @@ RED.nodes = (function() {
 	 */
 	function cppToJSON(newNodesStr) {
 
-		var data = "";
 		var nodes = [];
+		var skipped = [];
 		var cables = [];
 
 		const CODE_START 	= "// GUItool: begin automatically generated code";
 		const CODE_END		= "// GUItool: end automatically generated code";
 		const NODE_COMMENT	= "//";
 		const NODE_AC		= "AudioConnection";
-		const NODE_AI_I2S	= "AudioInputI2S";
-		const NODE_AM_4     = "AudioMixer4";
-		const NODE_AC_SGTL  = "AudioControlSGTL5000";
 
 		var parseLine = function(line) {
 			var parts = line.match(/^(\S+)\s(.*)/).slice(1);
@@ -368,7 +367,12 @@ RED.nodes = (function() {
 						"z": 0,
 						"wires": []
 					});
+					// first solution: skip existing id
+					if (!RED.nodes.node(node.id)) {
 					nodes.push(node);
+					} else {
+						skipped.push(node.id);
+					}
 					break;
 			}
 		};
@@ -422,6 +426,7 @@ RED.nodes = (function() {
 			}
 		};
 
+/*
 		var readCode = function() {
 
 			var fileImport = $("#importInput")[0];
@@ -440,11 +445,16 @@ RED.nodes = (function() {
 				alert("Please upload a valid INO or text file.");
 			}
 		};
+ */
 
 		traverseLines(newNodesStr);
 		linkCables(cables);
 
-		return JSON.stringify(nodes);
+		return {
+			count: nodes.length,
+			skipped: skipped.length,
+			data: count > 0 ? JSON.stringify(nodes) : ""
+		};
 	}
 
 	function importNodes(newNodesObj,createNewIds) {

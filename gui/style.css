@@ -97,7 +97,7 @@ a.brand img {
 
 #palette {
    background: #f3f3f3;
-   width: 140px;
+   width: 160px;
    text-align: center;
    -webkit-user-select: none;
    -khtml-user-select: none;
@@ -220,7 +220,7 @@ a.brand img {
    border: 2px solid #999;
    background-position: 5% 50%;
    background-repeat: no-repeat;
-   width: 90px;
+   width: 110px;
    background-size: contain;
    position: relative;
 }
@@ -241,7 +241,7 @@ a.brand img {
    border: 1px solid #999;
 }
 .palette_port_output {
-    left:85px;
+    left:105px;
 }
 
 .palette_node:hover .palette_port {

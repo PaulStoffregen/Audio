@@ -60,8 +60,10 @@ span.mainfunction {color: #993300; font-weight: bolder}
 					<li><a id="btn-sidebar" tabindex="-1" href="#"><i class="icon-ok pull-right"></i><i class="icon-list-alt"></i> Sidebar</a></li>
 					<li class="divider"></li>
 					<!-- <li><a id="btn-node-status" tabindex="-1" href="#"><i class="icon-ok pull-right"></i><i class="icon-info-sign"></i> Node Status</a></li>
-					<li class="divider"></li> -->
-					<!--<li class="dropdown-submenu pull-left"><a tabindex="-1" href="#"><i class="icon-edit"></i> Import from...</a>
+					<li class="divider"></li>
+-->
+					<!--
+<li class="dropdown-submenu pull-left"><a tabindex="-1" href="#"><i class="icon-edit"></i> Import from...</a>
 						<ul class="dropdown-menu">
 							<li><a id="btn-import" tabindex="-1" href="#"><i class="icon-edit"></i> Clipboard...</a></li>
 							<li id="flow-menu-parent" class="dropdown-submenu pull-left">
@@ -76,10 +78,14 @@ span.mainfunction {color: #993300; font-weight: bolder}
 							<li id="li-menu-export-library" class="disabled"><a id="btn-export-library" tabindex="-1" href="#"><i class="icon-book"></i> Library...</a></li>
 						</ul>
 					</li>
-					<li class="divider"></li>-->
-					<!-- <li><a id="btn-config-nodes" tabindex="-1" href="#"><i class="icon-th-list"></i> Configuration nodes...</a></li>
-					<li class="divider"></li>-->
-					<!--<li class="dropdown-submenu pull-left"><a tabindex="-1" href="#"><i class="icon-th-large"></i> Workspaces</a>
+					<li class="divider"></li>
+-->
+					<!--
+ <li><a id="btn-config-nodes" tabindex="-1" href="#"><i class="icon-th-list"></i> Configuration nodes...</a></li>
+					<li class="divider"></li>
+-->
+					<!--
+<li class="dropdown-submenu pull-left"><a tabindex="-1" href="#"><i class="icon-th-large"></i> Workspaces</a>
 						<ul id="workspace-menu-list" class="dropdown-menu">
 							<li><a id="btn-workspace-add" tabindex="-1" href="#"><i class="icon-plus"></i> Add</a></li>
 							<li><a id="btn-workspace-edit" tabindex="-1" href="#"><i class="icon-edit"></i> Rename</a></li>
@@ -311,24 +317,20 @@ span.mainfunction {color: #993300; font-weight: bolder}
 <script src="red/ui/notifications.js"></script>
 <script src="red/ui/touch/radialMenu.js"></script>
 
+<!--
+ TODO: generate some or all of this automatically from the C++ source
+-->
 
+<!--
+ TODO: add a field for maximum instance count
+-->
+<!--
+ TODO: add a field for exclusive to other objects (not allowed if they're used)
+-->
+<!--
+ TODO: add "parameters" fields, to replace the form html stuff
+-->
 
-<!-- TODO: generate some or all of this automatically from the C++ source -->
-
-<!-- TODO: add a field for maximum instance count -->
-<!-- TODO: add a field for exclusive to other objects (not allowed if they're used) -->
-<!-- TODO: add "parameters" fields, to replace the form html stuff -->
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioInputI2S',{
-	shortName: "i2s",
-		inputs:0,
-		outputs:2,
-		category: 'input-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioInputI2S">
 	<h3>Summary</h3>
 	<p>Receive 16 bit stereo audio from the
@@ -393,17 +395,6 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</div>
 </script>
 
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioInputAnalog',{
-	shortName: "adc",
-		inputs:0,
-		outputs:1,
-		category: 'input-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioInputAnalog">
 	<h3>Summary</h3>
 	<p>Receive audio using the built-in analog to digital converter.</p>
@@ -449,17 +440,6 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</div>
 </script>
 
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioInputI2Sslave',{
-	shortName: "i2ss",
-		inputs:0,
-		outputs:2,
-		category: 'input-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioInputI2Sslave">
 	<h3>Summary</h3>
 	<p>Receive 16 bit stereo audio from an I2S device using I2S slave mode.</p>
@@ -481,9 +461,11 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		<tr class=odd><td align=center>13</td><td>RX</td><td>Input</td></tr>
 		<tr class=odd><td align=center>23</td><td>LRCLK</td><td>Input</td></tr>
 	</table>
-	<!--<h3>Examples</h3>
-	<p class=exam>File &gt; Examples &gt; Audio &gt; 
-	</p>-->
+	<!--
+<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt;
+	</p>
+-->
 	<h3>Notes</h3>
 	<p>Slave mode I2S <b>should not used in the same project as ADC, DAC and
 		PWM</b> signals.  Differences in timing between the I2S device and
@@ -501,19 +483,6 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</div>
 </script>
 
-
-
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioOutputI2S',{
-	shortName: "i2s",
-		inputs:2,
-		outputs:0,
-		category: 'output-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioOutputI2S">
 	<h3>Summary</h3>
 	<p>Transmit 16 bit stereo audio to the
@@ -571,17 +540,6 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</div>
 </script>
 
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioOutputSPDIF',{
-	shortName: "spdif",
-		inputs:2,
-		outputs:0,
-		category: 'output-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioOutputSPDIF">
 	<h3>Summary</h3>
 	<p>Transmit 16 bit stereo audio as Digital S/PDIF.</p>
@@ -633,17 +591,6 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</div>
 </script>
 
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioOutputAnalog',{
-	shortName: "dac",
-		inputs:1,
-		outputs:0,
-		category: 'output-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioOutputAnalog">
 	<h3>Summary</h3>
 	<p>Transmit 12 bit audio using Teensy 3.1's built-in digital to analog converter.</p>
@@ -678,17 +625,6 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</div>
 </script>
 
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioOutputPWM',{
-	shortName: "pwm",
-		inputs:1,
-		outputs:0,
-		category: 'output-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioOutputPWM">
 	<h3>Summary</h3>
 	<p>Transmit audio using Teensy 3.1's PWM pins.  Two pins are
@@ -737,17 +673,6 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</div>
 </script>
 
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioOutputI2Sslave',{
-	shortName: "i2ss",
-		inputs:2,
-		outputs:0,
-		category: 'output-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioOutputI2Sslave">
 	<h3>Summary</h3>
 	<p>Transmit 16 bit stereo audio to an I2S device using I2S slave mode.</p>
@@ -789,17 +714,6 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</div>
 </script>
 
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioMixer4',{
-	shortName: "mixer",
-		inputs:4,
-		outputs:1,
-		category: 'mixer-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioMixer4">
 	<h3>Summary</h3>
 	<p>Combine up to 4 audio signals together, each with adjustable gain.
@@ -847,18 +761,6 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</div>
 </script>
 
-
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioPlayMemory',{
-	shortName: "playMem",
-		inputs:0,
-		outputs:1,
-		category: 'play-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioPlayMemory">
 	<h3>Summary</h3>
 	<p>Play a short sound clip, stored directly in memory.
@@ -909,18 +811,6 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</div>
 </script>
 
-
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioPlaySdWav',{
-	shortName: "playSdWav",
-		inputs:0,
-		outputs:2,
-		category: 'play-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioPlaySdWav">
 	<h3>Summary</h3>
 	<p>Play a WAV file, stored on a SD card.</p>
@@ -982,18 +872,6 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</div>
 </script>
 
-
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioPlaySdRaw',{
-	shortName: "playSdRaw",
-		inputs:0,
-		outputs:1,
-		category: 'play-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioPlaySdRaw">
 	<h3>Summary</h3>
 	<p>Play a RAW data file, stored on a SD card.  RAW format is simpler
@@ -1047,17 +925,6 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</div>
 </script>
 
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioPlaySerialflashRaw',{
-	shortName: "playFlashRaw",
-		inputs:0,
-		outputs:1,
-		category: 'play-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioPlaySerialflashRaw">
 	<h3>Summary</h3>
 	<div>
@@ -1095,7 +962,9 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		is undefined.
 	</p>
 	<h3>Examples</h3>
-	<!--<p class=exam>File &gt; Examples &gt; Audio &gt; Recorder-->
+	<!--
+<p class=exam>File &gt; Examples &gt; Audio &gt; Recorder
+-->
 	<p class=exam>TODO: play example needed....
 	</p>
 	<p class=exam>File &gt; Examples &gt; SerialFlash &gt; CopyFromSD
@@ -1118,17 +987,6 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</div>
 </script>
 
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioPlayQueue',{
-	shortName: "queue",
-		inputs:0,
-		outputs:1,
-		category: 'play-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioPlayQueue">
 	<h3>Summary</h3>
 	<p>Play audio data provided by the Arduino sketch.  This object provides
@@ -1160,8 +1018,10 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<h3>Examples</h3>
 		<p><a href="http://community.arm.com/groups/embedded/blog/2014/05/23/led-video-panel-at-maker-faire-2014" target="_blank">4320 LED Video+Sound Project</a>
 		</p>
-	<!--<p class=exam>File &gt; Examples &gt; Audio &gt; 
-	</p>-->
+	<!--
+<p class=exam>File &gt; Examples &gt; Audio &gt;
+	</p>
+-->
 	<h3>Notes</h3>
 	<p>TODO: many caveats....</p>
 	<p>
@@ -1174,18 +1034,6 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</div>
 </script>
 
-
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioRecordQueue',{
-	shortName: "queue",
-		inputs:1,
-		outputs:0,
-		category: 'record-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioRecordQueue">
 	<h3>Summary</h3>
 	<p>Record audio data by sending to the Arduino sketch.  This object allows
@@ -1242,20 +1090,6 @@ The actual packets are taken
 	</div>
 </script>
 
-
-
-
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioSynthWaveformSine',{
-	shortName: "sine",
-		inputs:0,
-		outputs:1,
-		category: 'synth-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioSynthWaveformSine">
 	<h3>Summary</h3>
 	<p>Create a sine wave signal</p>
@@ -1298,18 +1132,6 @@ The actual packets are taken
 	</div>
 </script>
 
-
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioSynthWaveformSineModulated',{
-	shortName: "sine_fm",
-		inputs:1,
-		outputs:1,
-		category: 'synth-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioSynthWaveformSineModulated">
 	<h3>Summary</h3>
 	<p>Create a modulated sine wave, using any audio signal to continuously
@@ -1339,9 +1161,11 @@ The actual packets are taken
 		<a href="http://www.pjrc.com/teensy/td_libs_AudioProcessorUsage.html" target="_blank">AudioNoInterrupts()</a>
 		should be used to guarantee all new settings take effect together.
 	</p>
-	<!--<h3>Examples</h3>
-	<p class=exam>File &gt; Examples &gt; Audio &gt; 
-	</p>-->
+	<!--
+<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt;
+	</p>
+-->
 	<h3>Notes</h3>
 	<p></p>
 </script>
@@ -1352,18 +1176,6 @@ The actual packets are taken
 	</div>
 </script>
 
-
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioSynthWaveform',{
-	shortName: "waveform",
-		inputs:0,
-		outputs:1,
-		category: 'synth-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioSynthWaveform">
 	<h3>Summary</h3>
 	<p>Create a waveform: sine, sawtooth, square, triangle, pulse or arbitrary.</p>
@@ -1430,18 +1242,6 @@ The actual packets are taken
 	</div>
 </script>
 
-
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioSynthToneSweep',{
-	shortName: "tonesweep",
-		inputs:0,
-		outputs:1,
-		category: 'synth-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioSynthToneSweep">
 	<h3>Summary</h3>
 	<p>Create a continuously varying (in frequency) sine wave</p>
@@ -1471,17 +1271,6 @@ The actual packets are taken
 	</div>
 </script>
 
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioSynthWaveformDc',{
-	shortName: "dc",
-		inputs:0,
-		outputs:1,
-		category: 'synth-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioSynthWaveformDc">
 	<h3>Summary</h3>
 	<p>Create constant (DC) signal, useful for control of objects that take
@@ -1503,9 +1292,11 @@ The actual packets are taken
 		be specified, but periods longer than 1 second may be automatically
 		shortened for small level changes, due to numerical precision limits.
 	</p>
-	<!--<h3>Examples</h3>
-	<p class=exam>File &gt; Examples &gt; Audio &gt; 
-	</p>-->
+	<!--
+<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt;
+	</p>
+-->
 	<h3>Notes</h3>
 	<p>Of course, the term "DC", for Direct Current, doesn't properly apply
 		to a pure digital stream of numerical values.  But the term is widely
@@ -1518,17 +1309,6 @@ The actual packets are taken
 	</div>
 </script>
 
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioSynthNoiseWhite',{
-	shortName: "noise",
-		inputs:0,
-		outputs:1,
-		category: 'synth-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioSynthNoiseWhite">
 	<h3>Summary</h3>
 	<div>
@@ -1548,7 +1328,7 @@ The actual packets are taken
 		to a non-zero level.
 	</p>
 	<h3>Examples</h3>
-	<p class=exam>File &gt; Examples &gt; Audio &gt; 
+	<p class=exam>File &gt; Examples &gt; Audio &gt;
 	</p>
 	<h3>Notes</h3>
 	<p>Setting the amplitude to zero causes this object to stop using
@@ -1562,24 +1342,14 @@ The actual packets are taken
 	</div>
 </script>
 
-
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioSynthNoisePink',{
-	shortName: "pink",
-		inputs:0,
-		outputs:1,
-		category: 'synth-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioSynthNoisePink">
 	<h3>Summary</h3>
 	<div>
 	<p>Create pink noise, using Stefan Stenzel's "New Shade Of Pink" algorithm.
 		</p>
-	<!--<p align=center><img src="img/whitenoise.png"></p>-->
+	<!--
+<p align=center><img src="img/whitenoise.png"></p>
+-->
 	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -1612,19 +1382,6 @@ The actual packets are taken
 	</div>
 </script>
 
-
-
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioEffectFade',{
-	shortName: "fade",
-		inputs:1,
-		outputs:1,
-		category: 'effect-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioEffectFade">
 	<h3>Summary</h3>
 	<p>Gradually increase or decrease audio level.</p>
@@ -1643,9 +1400,11 @@ The actual packets are taken
 	<p class=desc>Begin decreasing the audio level, to reach 0 (no output)
 		after "milliseconds" time.
 	</p>
-	<!--<h3>Examples</h3>
-	<p class=exam>File &gt; Examples &gt; Audio &gt; 
-	</p>-->
+	<!--
+<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt;
+	</p>
+-->
 	<h3>Notes</h3>
 	<p>Cross fading can be built with 2 fade objects fed into a mixer.
 		When one fade object is off (fully faded out) and the other on
@@ -1667,17 +1426,6 @@ The actual packets are taken
 	</div>
 </script>
 
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioEffectChorus',{
-	shortName: "chorus",
-		inputs:1,
-		outputs:1,
-		category: 'effect-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioEffectChorus">
 <h3>Summary</h3>
 	<p>The chorus effect simulates the richness of several nearly-identical
@@ -1727,17 +1475,6 @@ The actual packets are taken
 	</div>
 </script>
 
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioEffectFlange',{
-	shortName: "flange",
-		inputs:1,
-		outputs:1,
-		category: 'effect-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioEffectFlange">
 <h3>Summary</h3>
 	<p>Originally, flanging was produced by playing the same signal on two synchronized
@@ -1798,18 +1535,6 @@ double s_freq = .0625;</p>
 	</div>
 </script>
 
-
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioEffectEnvelope',{
-	shortName: "envelope",
-		inputs:1,
-		outputs:1,
-		category: 'effect-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioEffectEnvelope">
 	<h3>Summary</h3>
 	<div>
@@ -1874,18 +1599,6 @@ double s_freq = .0625;</p>
 	</div>
 </script>
 
-
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioEffectMultiply',{
-	shortName: "multiply",
-		inputs:2,
-		outputs:1,
-		category: 'effect-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioEffectMultiply">
 	<h3>Summary</h3>
 	<div>
@@ -1906,9 +1619,11 @@ double s_freq = .0625;</p>
 		This object simply multiplies the 2 signals to create
 		a continuous output
 	</p>
-	<!--<h3>Examples</h3>
-	<p class=exam>File &gt; Examples &gt; Audio &gt; 
-	</p>-->
+	<!--
+<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt;
+	</p>
+-->
 	<h3>Notes</h3>
 	<p>
     </p>
@@ -1920,18 +1635,6 @@ double s_freq = .0625;</p>
 	</div>
 </script>
 
-
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioEffectDelay',{
-	shortName: "delay",
-		inputs:1,
-		outputs:8,
-		category: 'effect-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioEffectDelay">
 	<h3>Summary</h3>
 	<div>
@@ -1981,17 +1684,6 @@ double s_freq = .0625;</p>
 	</div>
 </script>
 
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioEffectDelayExternal',{
-	shortName: "delayExt",
-		inputs:1,
-		outputs:8,
-		category: 'effect-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioEffectDelayExternal">
 	<h3>Summary</h3>
 	<div>
@@ -2060,8 +1752,10 @@ double s_freq = .0625;</p>
 	<p>
 	<a href="https://www.youtube.com/watch?v=d80d1HWy5_s" target="_blank">Demo Video</a> (YouTube)
 	</p>
-	<!-- <p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Delay
-	</p> -->
+	<!--
+ <p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Delay
+	</p>
+-->
 	<p>
 	<a href="https://forum.pjrc.com/threads/29276-Limits-of-delay-effect-in-audio-library?p=79436&viewfull=1#post79436" target="_blank">Forum Conversaton</a> (with sample code)
 	</p>
@@ -2092,17 +1786,6 @@ double s_freq = .0625;</p>
 	</div>
 </script>
 
-
-<script type="text/javascript">
-    RED.nodes.registerType('AudioEffectBitcrusher',{
-    shortName: "bitcrusher",
-        inputs:1,
-        outputs:1,
-        category: 'effect-function',
-        color:"#E6E0F8",
-        icon: "arrow-in.png"
-    });
-</script>
 <script type="text/x-red" data-help-name="AudioEffectBitcrusher">
     <h3>Summary</h3>
     <p>Reduce the samplerate and/or bitdepth of a source signal, resulting in
@@ -2148,20 +1831,6 @@ double s_freq = .0625;</p>
     </div>
 </script>
 
-
-
-
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioFilterBiquad',{
-	shortName: "biquad",
-		inputs:1,
-		outputs:1,
-		category: 'filter-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioFilterBiquad">
 	<h3>Summary</h3>
 	<div>
@@ -2226,18 +1895,6 @@ double s_freq = .0625;</p>
 	</div>
 </script>
 
-
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioFilterFIR',{
-	shortName: "fir",
-		inputs:1,
-		outputs:1,
-		category: 'filter-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioFilterFIR">
 	<h3>Summary</h3>
 	<div>
@@ -2290,18 +1947,6 @@ double s_freq = .0625;</p>
 	</div>
 </script>
 
-
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioFilterStateVariable',{
-	shortName: "filter",
-		inputs:2,
-		outputs:3,
-		category: 'filter-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioFilterStateVariable">
 	<h3>Summary</h3>
 	<p>A State Variable (Chamberlin) Filter with 12 dB/octave roll-off,
@@ -2335,9 +1980,11 @@ double s_freq = .0625;</p>
 		shift the filter frequency up 2.5 octaves, and a full scale negative
 		signal will shift it down 2.5 octaves.
 	</p>
-	<!--<h3>Examples</h3>
-	<p class=exam>File &gt; Examples &gt; Audio &gt; 
-	</p>-->
+	<!--
+<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt;
+	</p>
+-->
 	<h3>Notes</h3>
 	<p>
 		When controlled by a signal, the equation for the filter
@@ -2359,19 +2006,6 @@ double s_freq = .0625;</p>
 	</div>
 </script>
 
-
-
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioAnalyzePeak',{
-	shortName: "peak",
-		inputs:1,
-		outputs:0,
-		category: 'analyze-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioAnalyzePeak">
 	<h3>Summary</h3>
 	<p>Track the signal peak amplitude.  Very useful for simple
@@ -2404,18 +2038,6 @@ double s_freq = .0625;</p>
 	</div>
 </script>
 
-
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioAnalyzeFFT256',{
-	shortName: "fft256",
-		inputs:1,
-		outputs:0,
-		category: 'analyze-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioAnalyzeFFT256">
 	<h3>Summary</h3>
 	<p>Compute a 256 point Fast Fourier Transform (FFT) frequency analysis,
@@ -2481,18 +2103,6 @@ double s_freq = .0625;</p>
 	</div>
 </script>
 
-
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioAnalyzeFFT1024',{
-	shortName: "fft1024",
-		inputs:1,
-		outputs:0,
-		category: 'analyze-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioAnalyzeFFT1024">
 	<h3>Summary</h3>
 	<p>Compute a 1024 point Fast Fourier Transform (FFT) frequency analysis,
@@ -2562,18 +2172,6 @@ double s_freq = .0625;</p>
 	</div>
 </script>
 
-
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioAnalyzeToneDetect',{
-	shortName: "tone",
-		inputs:1,
-		outputs:0,
-		category: 'analyze-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioAnalyzeToneDetect">
 	<h3>Summary</h3>
 	<p>Detect the level of a single tone</p>
@@ -2628,18 +2226,6 @@ double s_freq = .0625;</p>
 	</div>
 </script>
 
-
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioAnalyzePrint',{
-	shortName: "print",
-		inputs:1,
-		outputs:0,
-		category: 'analyze-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioAnalyzePrint">
 	<h3>Summary</h3>
 	<p>Print raw audio data to the Arduino Serial Monitor.  This
@@ -2665,9 +2251,11 @@ double s_freq = .0625;</p>
 	<p class=func><span class=keyword>length</span>(samples);</p>
 	<p class=desc>blah blah blah blah
 	</p>
-	<!--<h3>Examples</h3>
-	<p class=exam>File &gt; Examples &gt; Audio &gt; 
-	</p>-->
+	<!--
+<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt;
+	</p>
+-->
 	<h3>Notes</h3>
 	<p>This object doesn't work very well and probably should not be used.</p>
 </script>
@@ -2678,18 +2266,6 @@ double s_freq = .0625;</p>
 	</div>
 </script>
 
-
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioControlSGTL5000',{
-	shortName: "sgtl5000",
-		inputs:0,
-		outputs:0,
-		category: 'control-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioControlSGTL5000">
 	<h3>Summary</h3>
 	<p>Control the SGTL5000 chip on the
@@ -3023,18 +2599,6 @@ value  frequency
 	</div>
 </script>
 
-
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioControlWM8731',{
-	shortName: "wm8731",
-		inputs:0,
-		outputs:0,
-		category: 'control-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioControlWM8731">
 	<h3>Summary</h3>
 	<p>Control a WM8731 chip in slave mode, where it receives all clocks from Teensy</p>
@@ -3060,9 +2624,11 @@ value  frequency
 	<p class=func><span class=keyword>inputSelect</span>(input);</p>
 	<p class=desc>not implemented
 	</p>
-	<!--<h3>Examples</h3>
+	<!--
+<h3>Examples</h3>
 	<p class=exam>File &gt; Examples &gt; Audio &gt;
-	</p>-->
+	</p>
+-->
 	<h3>Notes</h3>
 	<p></p>
 </script>
@@ -3073,18 +2639,6 @@ value  frequency
 	</div>
 </script>
 
-
-
-<script type="text/javascript">
-	RED.nodes.registerType('AudioControlWM8731master',{
-	shortName: "wm8731m",
-		inputs:0,
-		outputs:0,
-		category: 'control-function',
-		color:"#E6E0F8",
-		icon: "arrow-in.png"
-	});
-</script>
 <script type="text/x-red" data-help-name="AudioControlWM8731master">
 	<h3>Summary</h3>
 	<p>Control a WM8731 chip in master mode, where it controls all I2S timing.</p>
@@ -3122,10 +2676,6 @@ value  frequency
 		<input type="text" id="node-input-name" placeholder="Name">
 	</div>
 </script>
-
-
-
-
 
 </body>
 </html>

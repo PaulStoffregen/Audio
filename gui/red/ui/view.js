@@ -60,7 +60,7 @@ RED.view = (function() {
 		"yellow": "#F9DF31",
 		"blue":   "#53A3F3",
 		"grey":   "#d3d3d3"
-	}
+	};
 
 	var outer = d3.select("#chart")
 		.append("svg:svg")
@@ -108,7 +108,7 @@ RED.view = (function() {
 				moveTouchCenter = [
 					touch1['pageX']+(b/2),
 					touch1['pageY']+(a/2)
-				]
+				];
 				startTouchDistance = Math.sqrt((a*a)+(b*b));
 			} else {
 				var obj = d3.select(document.body);
@@ -568,6 +568,10 @@ RED.view = (function() {
 				nn.type = selected_tool;
 				nn._def = RED.nodes.getType(nn.type);
 				nn.id = RED.nodes.cppName(nn);
+
+				nn._def.defaults = nn._def.defaults ? nn._def.defaults  : {};
+				nn._def.defaults.name = { value: nn.id };
+
 				nn.outputs = nn._def.outputs;
 				nn.changed = true;
 
@@ -729,8 +733,8 @@ RED.view = (function() {
 					node.x = 25
 				}
 				var rmlinks = RED.nodes.remove(node.id);
-				for (var i=0; i < rmlinks.length; i++) {
-					var link = rmlinks[i];
+				for (var j=0; j < rmlinks.length; j++) {
+					var link = rmlinks[j];
 					//console.log("delete link: " + link.source.id + ":" + link.sourcePort
 					//	+ " -> " + link.target.id + ":" + link.targetPort);
 					if (link.source == node) {
@@ -760,7 +764,7 @@ RED.view = (function() {
 				.on("mouseup", (function(d,n){return function(d){portMouseUp(d,1,n);}})(rect, n))
 				.on("touchend", (function(d,n){return function(d){portMouseUp(d,1,n);}})(rect, n))
 				.on("mouseover",function(d) { var port = d3.select(this); port.classed("port_hovered",(mouse_mode!=RED.state.JOINING || mousedown_port_type != 1 ));})
-				.on("mouseout",function(d) { var port = d3.select(this); port.classed("port_hovered",false);})
+				.on("mouseout",function(d) { var port = d3.select(this); port.classed("port_hovered",false);});
 			RED.nodes.removeLink(selected_link);
 			removedLinks.push(selected_link);
 			setDirty(true);
@@ -1003,7 +1007,7 @@ RED.view = (function() {
 					node.attr("id",d.id);
 					//var l = d._def.label;
 					//l = (typeof l === "function" ? l.call(d) : l)||"";
-					var l = d.id;
+					var l = d.name ? d.name : d.id;
 					d.w = Math.max(node_width,calculateTextWidth(l)+(d._def.inputs>0?7:0) );
 					d.h = Math.max(node_height,(Math.max(d.outputs,d._def.inputs)||0) * 15);
 
@@ -1123,7 +1127,7 @@ RED.view = (function() {
 
 						if ("right" == d._def.align) {
 							icon_group.attr('class','node_icon_group node_icon_group_'+d._def.align);
-							icon_shade_border.attr("d",function(d) { return "M 0 1 l 0 "+(d.h-2)})
+							icon_shade_border.attr("d",function(d) { return "M 0 1 l 0 "+(d.h-2)});
 							//icon.attr('class','node_icon node_icon_'+d._def.align);
 							//icon.attr('class','node_icon_shade node_icon_shade_'+d._def.align);
 							//icon.attr('class','node_icon_shade_border node_icon_shade_border_'+d._def.align);
@@ -1149,7 +1153,7 @@ RED.view = (function() {
 							//    icon_shade.attr("x",function(d){return d.w-30});
 							//    icon_shade_border.attr("d",function(d){return "M "+(d.w-30)+" 1 l 0 "+(d.h-2);});
 							//}
-						}
+						};
 						
 						//icon.style("pointer-events","none");
 						icon_group.style("pointer-events","none");
@@ -1225,7 +1229,7 @@ RED.view = (function() {
 						if (d.resize) {
 							//var l = d._def.label;
 							//l = (typeof l === "function" ? l.call(d) : l)||"";
-							var l = d.id;
+							var l = d.name ? d.name : d.id;
 							d.w = Math.max(node_width,calculateTextWidth(l)+(d._def.inputs>0?7:0) );
 							d.h = Math.max(node_height,(Math.max(d.outputs,d._def.inputs)||0) * 15);
 						}
@@ -1277,8 +1281,9 @@ RED.view = (function() {
 										return d._def.label;
 									}
 								}
-								return ""; */
-								return d.id;
+								return "n.a.";
+								 */
+								return d.name ? d.name : d.id;
 						})
 							.attr('y', function(d){return (d.h/2)-1;})
 							.attr('class',function(d){
@@ -1337,7 +1342,7 @@ RED.view = (function() {
 								}
 							}
 							return ""; */
-							return d.id;
+							return d.name ? d.name : d.id;
 						});
 						if (!showStatus || !d.status) {
 							thisNode.selectAll('.node_status_group').style("display","none");
@@ -1404,7 +1409,7 @@ RED.view = (function() {
 
 		link.exit().remove();
 
-		var links = vis.selectAll(".link_path")
+		var links = vis.selectAll(".link_path");
 		links.attr("d",function(d){
 				var numOutputs = d.source.outputs || 1;
 				var sourcePort = d.sourcePort || 0;
@@ -1438,7 +1443,7 @@ RED.view = (function() {
 					" C "+(d.x1+scale*node_width)+" "+(d.y1+scaleY*node_height)+" "+
 					(d.x2-scale*node_width)+" "+(d.y2-scaleY*node_height)+" "+
 					(d.x2)+" "+d.y2;
-		})
+		});
 
 		link.classed("link_selected", function(d) { return d === selected_link || d.selected; });
 		link.classed("link_unknown",function(d) { return d.target.type == "unknown" || d.source.type == "unknown"});
@@ -1477,16 +1482,25 @@ RED.view = (function() {
 	function importNodes(newNodesStr,touchImport) {
 		
 		var createNewIds = true;
-		
-		// TODO: solve this more elegant as the system expects
+		var useStorage = false;
+
 		if ($("#node-input-arduino").prop('checked') === true) {
-			newNodesStr = RED.nodes.cppToJSON(newNodesStr);
+			nodesJSON = RED.nodes.cppToJSON(newNodesStr);
+			if (nodesJSON.count <= 0 || nodesJSON.skipped > 0) {
+				var note = "No (or not all) nodes imported, because some IDs existed already!";
+				RED.notify("<strong>Note</strong>: " + note, "warning");
+			}
+
+			newNodesStr = nodesJSON.data;
 			createNewIds = false;
+
+			if (useStorage) {
 			RED.storage.clear();
 			localStorage.setItem("audio_library_guitool", newNodesStr);
 			RED.storage.load();
 			redraw();
 			return;
+		}
 		}
 
 		try {
@@ -1560,33 +1574,37 @@ RED.view = (function() {
 	function showExportNodesDialog() {
 		mouse_mode = RED.state.EXPORT;
 		var nns = RED.nodes.createExportableNodeSet(moving_set);
-		$("#dialog-form").html($("script[data-template-name='export-clipboard-dialog']").html());
-		$("#node-input-export").val(JSON.stringify(nns));
-		$("#node-input-export").focus(function() {
+		//$("#dialog-form").html(getForm("dialog-form", "export-clipboard-dialog"));
+		var frm = getForm("dialog-form", "export-clipboard-dialog", function (d, f) {
+			$("#node-input-export").val(JSON.stringify(nns)).focus(function() {
 				var textarea = $(this);
 				textarea.select();
 				textarea.mouseup(function() {
 						textarea.unbind("mouseup");
 						return false;
 				});
-		});
+			}).focus();
 		$( "#dialog" ).dialog("option","title","Export nodes to clipboard").dialog( "open" );
-		$("#node-input-export").focus();
+		});
 	}
 
 	function showExportNodesLibraryDialog() {
 		mouse_mode = RED.state.EXPORT;
 		var nns = RED.nodes.createExportableNodeSet(moving_set);
-		$("#dialog-form").html($("script[data-template-name='export-library-dialog']").html());
+		//$("#dialog-form").html(this.getForm('export-library-dialog'));
+		getForm("dialog-form", "export-library-dialog", function(d, f) {
 		$("#node-input-filename").attr('nodes',JSON.stringify(nns));
 		$( "#dialog" ).dialog("option","title","Export nodes to library").dialog( "open" );
+		});
 	}
 
 	function showImportNodesDialog() {
 		mouse_mode = RED.state.IMPORT;
-		$("#dialog-form").html($("script[data-template-name='import-dialog']").html());
+		//$("#dialog-form").html(this.getForm('import-dialog'));
+		getForm("dialog-form", "import-dialog", function(d, f) {
 		$("#node-input-import").val("");
 		$( "#dialog" ).dialog("option","title","Import nodes").dialog( "open" );
+		});
 	}
 
 	function showRenameWorkspaceDialog(id) {
@@ -1605,6 +1623,20 @@ RED.view = (function() {
 
 		$( "#node-input-workspace-name" ).val(ws.label);
 		$( "#node-dialog-rename-workspace" ).dialog("open");
+	}
+
+	function getForm(formId, key, callback) {
+		var form = $("<h2>No form found.</h2>");
+		var frmPlugin = "resources/form/" + key + ".html";
+		$.get(frmPlugin, function(data) {
+			form = $("#" + formId);
+			$(form).empty();
+			$(form).append(data);
+			if(typeof callback == 'function') {
+				callback.call(this, form);
+			}
+		});
+		return form;
 	}
 
 	$("#node-dialog-rename-workspace form" ).submit(function(e) { e.preventDefault();});
@@ -1726,6 +1758,7 @@ RED.view = (function() {
 			RED.nodes.eachNode(function(n) { n.dirty = true;});
 			//TODO: subscribe/unsubscribe here
 			redraw();
-		}
+		},
+		getForm: getForm
 	};
 })();

@@ -78,14 +78,33 @@ RED.sidebar.info = (function() {
 			}
 		}
 		table += "</tbody></table><br/>";
-		table  += '<div class="node-help">'+($("script[data-help-name|='"+node.type+"']").html()||"")+"</div>";
-		$("#tab-info").html(table);
+		this.setHelpContent(table, node.type);
+	}
+
+	function setHelpContent(prefix, key) {
+		// server test switched off - test purposes only
+		var patt = new RegExp(/^[http|https]/);
+		var server = false && patt.test(location.protocol);
+
+
+		prefix = prefix == "" ? "<h3>" + key + "</h3>" : prefix;
+		if (!server) {
+			data = $("script[data-help-name|='" + key + "']").html();
+			$("#tab-info").html(prefix + '<div class="node-help">' + data + '</div>');
+		} else {
+			$.get( "resources/help/" + key + ".html", function( data ) {
+				$("#tab-info").html(prefix + '<h2>' + key + '</h2><div class="node-help">' + data + '</div>');
+			}).fail(function () {
+				$("#tab-info").html(prefix);
+			});
+		}
 	}
 	
 	return {
 		refresh:refresh,
 		clear: function() {
 			$("#tab-info").html("");
-		}
+		},
+		setHelpContent: setHelpContent
 	}
 })();
