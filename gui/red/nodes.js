@@ -317,17 +317,23 @@ RED.nodes = (function() {
 	 */
 	function cppToJSON(newNodesStr) {
 
-		var nodes = [];
+		var newNodes = [];
 		var skipped = [];
 		var cables = [];
+		var words = [];
 
-		const CODE_START 	= "// GUItool: begin automatically generated code";
-		const CODE_END		= "// GUItool: end automatically generated code";
 		const NODE_COMMENT	= "//";
 		const NODE_AC		= "AudioConnection";
 
 		var parseLine = function(line) {
-			var parts = line.match(/^(\S+)\s(.*)/).slice(1);
+			var parts = line.match(/^(\S+)\s(.*)/);
+			if (parts == null) {
+				return
+			}
+			parts =	parts.slice(1);
+			if (parts == null || parts.length <= 1) {
+				return
+			}
 			var type = $.trim(parts[0]);
 			line = $.trim(parts[1]) + " ";
 
@@ -336,52 +342,50 @@ RED.nodes = (function() {
 			var conn = [];
 
 			parts = line.match(/^([^;]{0,});(.*)/);
-			if (parts) {
+			if (parts && parts.length >= 2) {
 				parts = parts.slice(1);
-				description = $.trim(parts[0]);
-				coords = $.trim(parts[1]);
-				parts = coords.match(/^([^\/]{0,})\/\/xy=(.*)/);
-				if (parts) {
-					parts = parts.slice(1);
-					coords = $.trim(parts[1]).split(",");
+				if (parts && parts.length >= 1) {
+					description = $.trim(parts[0]);
+					coords = $.trim(parts[1]);
+					parts = coords.match(/^([^\/]{0,})\/\/xy=(.*)/);
+					if (parts) {
+						parts = parts.slice(1);
+						coords = $.trim(parts[1]).split(",");
+					}
 				}
 			}
 
-			switch (type) {
-				case NODE_AC:
-					parts = description.match(/^([^\(]*\()([^\)]*)(.*)/);
-					if (parts) {
-						conn = $.trim(parts[2]).split(",");
-						cables.push(conn);
-					}
-					break;
-				case NODE_COMMENT:
-					// do nothing ...
-					break;
-				default:
-					var node = new Object({
-						"id": description,
-						"type": type,
-						"x": parseInt(coords ? coords[0] : 0),
-						"y": parseInt(coords ? coords[1] : 0),
-						"z": 0,
-						"wires": []
-					});
-					// first solution: skip existing id
-					if (!RED.nodes.node(node.id)) {
-					nodes.push(node);
-					} else {
-						skipped.push(node.id);
-					}
-					break;
+			if (type == NODE_AC) {
+				parts = description.match(/^([^\(]*\()([^\)]*)(.*)/);
+				if (parts && parts.length > 1) {
+					conn = $.trim(parts[2]).split(",");
+					cables.push(conn);
+				}
+			} else if (type == NODE_COMMENT) {
+				// do nothing
+			} else {
+				var node = new Object({
+					"id": description,
+					"type": type,
+					"x": parseInt(coords ? coords[0] : 0),
+					"y": parseInt(coords ? coords[1] : 0),
+					"z": 0,
+					"wires": []
+				});
+				// first solution: skip existing id
+				if (RED.nodes.node(node.id) !== null) {
+					skipped.push(node.id);
+				} else {
+					newNodes.push(node);
+				}
 			}
 		};
 
 		var findNode = function(name) {
-			var len = nodes.length;
+			var len = newNodes.length;
 			for (var key = 0; key < len; key++) {
-				if (nodes[key].id == name) {
-					return nodes[key];
+				if (newNodes[key].id == name) {
+					return newNodes[key];
 				}
 			}
 		};
@@ -414,15 +418,16 @@ RED.nodes = (function() {
 
 		var traverseLines = function(raw) {
 			var lines = raw.split("\n");
-			var useLine = 0;
-
 			for (var i = 0; i < lines.length; i++) {
 				var line = lines[i];
-				useLine += (line.indexOf(CODE_START) >= 0) ? (useLine ? 0 : 1) : 0;
-				if (useLine > 0) {
+				var parts = line.match(/^(\S+)\s(.*)/);
+				if (parts == null || parts.length == 1) {
+					continue;
+				}
+				var word = parts[1].trim();
+				if (words.indexOf(word) >= 0) {
 					parseLine(line);
 				}
-				useLine -= (line.indexOf(CODE_END) >= 0) ? (useLine ? 1 : 0) : 0;
 			}
 		};
 
@@ -446,14 +451,21 @@ RED.nodes = (function() {
 			}
 		};
  */
+		function startImport() {
+			words = Array(NODE_AC);
+			$.each(node_defs, function (key, obj) {
+				words.push(key);
+			});
+			traverseLines(newNodesStr);
+			linkCables(cables);
+		}
 
-		traverseLines(newNodesStr);
-		linkCables(cables);
+		startImport();
 
 		return {
-			count: nodes.length,
+			count: newNodes.length,
 			skipped: skipped.length,
-			data: nodes.length > 0 ? JSON.stringify(nodes) : ""
+			data: newNodes.length > 0 ? JSON.stringify(newNodes) : ""
 		};
 	}
 

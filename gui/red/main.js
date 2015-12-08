@@ -182,7 +182,7 @@ var RED = (function() {
 			// if the query string has ?info=className, populate info tab
 			var info = getQueryVariable("info");
 			if (info) {
-			RED.sidebar.info.setHelpContent('', info);
+				RED.sidebar.info.setHelpContent('', info);
 			}
 	}
 
@@ -215,20 +215,39 @@ var RED = (function() {
 
 	$(function() {
 		$(".palette-spinner").show();
-		$.ajaxSetup({beforeSend: function(xhr){
-			if (xhr.overrideMimeType) {
-				xhr.overrideMimeType("application/json");
-			}
-		}});
-		$.getJSON( "resources/nodes_def.json", function( data ) {
+
+		// server test switched off - test purposes only
+		var patt = new RegExp(/^[http|https]/);
+		var server = false && patt.test(location.protocol);
+
+		if (!server) {
+			var data = $.parseJSON($("script[data-container-name|='NodeDefinitions']").html());
 			var nodes = data["nodes"];
-			$.each(nodes, function(key, val) {
+			$.each(nodes, function (key, val) {
 				RED.nodes.registerType(val["type"], val["data"]);
 			});
-		RED.keyboard.add(/* ? */ 191,{shift:true},function(){showHelp();d3.event.preventDefault();});
-		loadNodes();
+			RED.keyboard.add(/* ? */ 191, {shift: true}, function () {
+				showHelp();
+				d3.event.preventDefault();
+			});
+			loadNodes();
 			$(".palette-spinner").hide();
-		})
+		} else {
+			$.ajaxSetup({beforeSend: function(xhr){
+				if (xhr.overrideMimeType) {
+					xhr.overrideMimeType("application/json");
+				}
+			}});
+			$.getJSON( "resources/nodes_def.json", function( data ) {
+				var nodes = data["nodes"];
+				$.each(nodes, function(key, val) {
+					RED.nodes.registerType(val["type"], val["data"]);
+				});
+				RED.keyboard.add(/* ? */ 191,{shift:true},function(){showHelp();d3.event.preventDefault();});
+				loadNodes();
+				$(".palette-spinner").hide();
+			})
+		}
 	});
 
 	return {
