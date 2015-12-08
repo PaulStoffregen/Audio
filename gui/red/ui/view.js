@@ -1626,16 +1626,31 @@ RED.view = (function() {
 	}
 
 	function getForm(formId, key, callback) {
+		// server test switched off - test purposes only
+		var patt = new RegExp(/^[http|https]/);
+		var server = false && patt.test(location.protocol);
 		var form = $("<h2>No form found.</h2>");
-		var frmPlugin = "resources/form/" + key + ".html";
-		$.get(frmPlugin, function(data) {
+
+		if (!server) {
+			data = $("script[data-template-name|='" + key + "']").html();
 			form = $("#" + formId);
 			$(form).empty();
 			$(form).append(data);
 			if(typeof callback == 'function') {
 				callback.call(this, form);
 			}
-		});
+		} else {
+			var frmPlugin = "resources/form/" + key + ".html";
+			$.get(frmPlugin, function(data) {
+				form = $("#" + formId);
+				$(form).empty();
+				$(form).append(data);
+				if(typeof callback == 'function') {
+					callback.call(this, form);
+				}
+			});
+		}
+
 		return form;
 	}
 
