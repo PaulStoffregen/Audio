@@ -453,7 +453,7 @@ RED.nodes = (function() {
 		return {
 			count: nodes.length,
 			skipped: skipped.length,
-			data: count > 0 ? JSON.stringify(nodes) : ""
+			data: nodes.length > 0 ? JSON.stringify(nodes) : ""
 		};
 	}
 
