@@ -30,7 +30,6 @@ RED.view = (function() {
 		moveTouchCenter = [],
 		touchStartTime = 0;
 
-
 	var activeWorkspace = 0;
 	var workspaceScrollPositions = {};
 
@@ -191,38 +190,39 @@ RED.view = (function() {
 		.attr('height', space_height)
 		.attr('fill','#fff');
 
-	//var gridScale = d3.scale.linear().range([0,2000]).domain([0,2000]);
-	//var grid = vis.append('g');
-	//
-	//grid.selectAll("line.horizontal").data(gridScale.ticks(100)).enter()
-	//    .append("line")
-	//        .attr(
-	//        {
-	//            "class":"horizontal",
-	//            "x1" : 0,
-	//            "x2" : 2000,
-	//            "y1" : function(d){ return gridScale(d);},
-	//            "y2" : function(d){ return gridScale(d);},
-	//            "fill" : "none",
-	//            "shape-rendering" : "crispEdges",
-	//            "stroke" : "#eee",
-	//            "stroke-width" : "1px"
-	//        });
-	//grid.selectAll("line.vertical").data(gridScale.ticks(100)).enter()
-	//    .append("line")
-	//        .attr(
-	//        {
-	//            "class":"vertical",
-	//            "y1" : 0,
-	//            "y2" : 2000,
-	//            "x1" : function(d){ return gridScale(d);},
-	//            "x2" : function(d){ return gridScale(d);},
-	//            "fill" : "none",
-	//            "shape-rendering" : "crispEdges",
-	//            "stroke" : "#eee",
-	//            "stroke-width" : "1px"
-	//        });
+	var gridScale = d3.scale.linear().range([0,2000]).domain([0,2000]);
+	/*
+	var grid = vis.append('g');
 
+	grid.selectAll("line.horizontal").data(gridScale.ticks(100)).enter()
+	    .append("line")
+	        .attr(
+	        {
+	            "class":"horizontal",
+	            "x1" : 0,
+	            "x2" : 2000,
+	            "y1" : function(d){ return gridScale(d);},
+	            "y2" : function(d){ return gridScale(d);},
+	            "fill" : "none",
+	            "shape-rendering" : "crispEdges",
+	            "stroke" : "#eee",
+	            "stroke-width" : "1px"
+	        });
+	grid.selectAll("line.vertical").data(gridScale.ticks(100)).enter()
+	     .append("line")
+	        .attr(
+	        {
+	            "class":"vertical",
+	            "y1" : 0,
+	            "y2" : 2000,
+	            "x1" : function(d){ return gridScale(d);},
+	            "x2" : function(d){ return gridScale(d);},
+	            "fill" : "none",
+	            "shape-rendering" : "crispEdges",
+		        "stroke" : "#eee",
+	            "stroke-width" : "1px"
+	        });
+*/
 
 	var drag_line = vis.append("svg:path").attr("class", "drag_line");
 
@@ -787,7 +787,6 @@ RED.view = (function() {
 			RED.notify(moving_set.length+" node"+(moving_set.length>1?"s":"")+" copied");
 		}
 	}
-
 
 	function calculateTextWidth(str) {
 		var sp = document.createElement("span");
@@ -1453,7 +1452,12 @@ RED.view = (function() {
 		}
 	}
 
+	function arrangeAll() {
+		// TODO: arange all nodes optimized without collision
+	}
+
 	RED.keyboard.add(/* z */ 90,{ctrl:true},function(){RED.history.pop();});
+	RED.keyboard.add(/* o */ 79,{ctrl:true},function(){arrangeAll();d3.event.preventDefault();});
 	RED.keyboard.add(/* a */ 65,{ctrl:true},function(){selectAll();d3.event.preventDefault();});
 	RED.keyboard.add(/* = */ 187,{ctrl:true},function(){zoomIn();d3.event.preventDefault();});
 	RED.keyboard.add(/* - */ 189,{ctrl:true},function(){zoomOut();d3.event.preventDefault();});
@@ -1485,7 +1489,7 @@ RED.view = (function() {
 		var useStorage = false;
 
 		if ($("#node-input-arduino").prop('checked') === true) {
-			nodesJSON = RED.nodes.cppToJSON(newNodesStr);
+			var nodesJSON = RED.nodes.cppToJSON(newNodesStr);
 			if (nodesJSON.count <= 0 || nodesJSON.skipped > 0) {
 				var note = "No (or not all) nodes imported, because some IDs existed already!";
 				RED.notify("<strong>Note</strong>: " + note, "warning");
@@ -1495,12 +1499,12 @@ RED.view = (function() {
 			createNewIds = false;
 
 			if (useStorage) {
-			RED.storage.clear();
-			localStorage.setItem("audio_library_guitool", newNodesStr);
-			RED.storage.load();
-			redraw();
-			return;
-		}
+				RED.storage.clear();
+				localStorage.setItem("audio_library_guitool", newNodesStr);
+				RED.storage.load();
+				redraw();
+				return;
+			}
 		}
 
 		try {
