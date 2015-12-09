@@ -22,5 +22,9 @@
 	{
 		"name": "SerialFlash",
 		"frameworks": "arduino"
-	}
+	},
+  "examples": [
+    "examples/*/*.ino",
+    "examples/*/*/*.ino"
+  ]
 }
