@@ -321,11 +321,13 @@ RED.nodes = (function() {
 		var skipped = [];
 		var cables = [];
 		var words = [];
+		var lastY = 0;
 
 		const NODE_COMMENT	= "//";
 		const NODE_AC		= "AudioConnection";
 
 		var parseLine = function(line) {
+
 			var parts = line.match(/^(\S+)\s(.*)/);
 			if (parts == null) {
 				return
@@ -337,7 +339,7 @@ RED.nodes = (function() {
 			var type = $.trim(parts[0]);
 			line = $.trim(parts[1]) + " ";
 
-			var description = "";
+			var name = "";
 			var coords = [0, 0];
 			var conn = [];
 
@@ -345,7 +347,7 @@ RED.nodes = (function() {
 			if (parts && parts.length >= 2) {
 				parts = parts.slice(1);
 				if (parts && parts.length >= 1) {
-					description = $.trim(parts[0]);
+					name = $.trim(parts[0]);
 					coords = $.trim(parts[1]);
 					parts = coords.match(/^([^\/]{0,})\/\/xy=(.*)/);
 					if (parts) {
@@ -356,7 +358,7 @@ RED.nodes = (function() {
 			}
 
 			if (type == NODE_AC) {
-				parts = description.match(/^([^\(]*\()([^\)]*)(.*)/);
+				parts = name.match(/^([^\(]*\()([^\)]*)(.*)/);
 				if (parts && parts.length > 1) {
 					conn = $.trim(parts[2]).split(",");
 					cables.push(conn);
@@ -364,19 +366,30 @@ RED.nodes = (function() {
 			} else if (type == NODE_COMMENT) {
 				// do nothing
 			} else {
-				var node = new Object({
-					"id": description,
-					"type": type,
-					"x": parseInt(coords ? coords[0] : 0),
-					"y": parseInt(coords ? coords[1] : 0),
-					"z": 0,
-					"wires": []
-				});
-				// first solution: skip existing id
-				if (RED.nodes.node(node.id) !== null) {
-					skipped.push(node.id);
+				var names = [];
+				var yPos = [];
+				if (name.indexOf(",") >= 0) {
+					names = name.split(",");
 				} else {
-					newNodes.push(node);
+					names.push(name);
+				}
+				for (var n = 0; n < names.length; n++) {
+					name = names[n].trim();
+					var gap = 10;
+					var def = node_defs[type];
+					var dW = Math.max(RED.view.defaults.width, RED.view.calculateTextWidth(name) + (def.inputs > 0 ? 7 : 0));
+					var dH = Math.max(RED.view.defaults.height,(Math.max(def.outputs, def.inputs)||0) * 15);
+					var newX = parseInt(coords ? coords[0] : 0);
+					var newY = parseInt(coords ? coords[1] : 0);
+					//newY = newY == 0 ? lastY + (dH * n) + gap : newY;
+					//lastY = Math.max(lastY, newY);
+					var node = new Object({"order": n, "id": name, "type": type, "x": newX, "y": newY, "z": 0, "wires": []});
+					// first solution: skip existing id
+					if (RED.nodes.node(node.id) !== null) {
+						skipped.push(node.id);
+					} else {
+						newNodes.push(node);
+					}
 				}
 			}
 		};
@@ -419,14 +432,28 @@ RED.nodes = (function() {
 		var traverseLines = function(raw) {
 			var lines = raw.split("\n");
 			for (var i = 0; i < lines.length; i++) {
-				var line = lines[i];
+				var line = lines[i].trim();
+
+				// we reached the setup or loop part ...
+				var pattSu = new RegExp(/\s*void\s*setup\s*\(\s*\).*/);
+				var pattLo = new RegExp(/\s*void\s*loop\s*\(\s*\).*/);
+				if (pattSu.test(line) || pattLo.test(line)) {
+					break;
+				}
+
+				// we need at least two parts to examine
 				var parts = line.match(/^(\S+)\s(.*)/);
 				if (parts == null || parts.length == 1) {
 					continue;
 				}
-				var word = parts[1].trim();
-				if (words.indexOf(word) >= 0) {
-					parseLine(line);
+
+				// ... and it has to end with an semikolon ...
+				var pattSe = new RegExp(/.*;$/);
+				if (pattSe.test(line)) {
+					var word = parts[1].trim();
+					if (words.indexOf(word) >= 0) {
+						parseLine(line);
+					}
 				}
 			}
 		};

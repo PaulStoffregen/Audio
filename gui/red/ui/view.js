@@ -990,6 +990,7 @@ RED.view = (function() {
 		RED.touch.radialMenu.show(obj,pos,options);
 		resetMouseVars();
 	}
+
 	function redraw() {
 		vis.attr("transform","scale("+scaleFactor+")");
 		outer.attr("width", space_width*scaleFactor).attr("height", space_height*scaleFactor);
@@ -1377,6 +1378,7 @@ RED.view = (function() {
 						d.dirty = false;
 					}
 			});
+
 		}
 
 		var link = vis.selectAll(".link").data(RED.nodes.links.filter(function(d) { return d.source.z == activeWorkspace && d.target.z == activeWorkspace }),function(d) { return d.source.id+":"+d.sourcePort+":"+d.target.id+":"+d.targetPort;});
@@ -1453,7 +1455,7 @@ RED.view = (function() {
 	}
 
 	function arrangeAll() {
-		// TODO: arange all nodes optimized without collision
+		// TODO: arrange imported nodes without coordinates
 	}
 
 	RED.keyboard.add(/* z */ 90,{ctrl:true},function(){RED.history.pop();});
@@ -1778,6 +1780,11 @@ RED.view = (function() {
 			//TODO: subscribe/unsubscribe here
 			redraw();
 		},
-		getForm: getForm
+		getForm: getForm,
+		calculateTextWidth: calculateTextWidth,
+		defaults: {
+			width: node_width,
+			height: node_height
+		}
 	};
 })();
