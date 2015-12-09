@@ -15,7 +15,12 @@
 	},
 	"repository":
 	{
-	    "type": "git",
-	    "url": "https://github.com/PaulStoffregen/Audio"
+		"type": "git",
+		"url": "https://github.com/PaulStoffregen/Audio"
+	},
+	"dependencies":
+	{
+		"name": "SerialFlash",
+		"frameworks": "arduino"
 	}
 }
