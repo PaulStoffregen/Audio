@@ -36,17 +36,6 @@ env:
     - PLATFORMIO_CI_SRC=examples/Tutorial/Part_1_03_Playing_Music
     - PLATFORMIO_CI_SRC=examples/Tutorial/Part_1_04_Blink_While_Playing
     - PLATFORMIO_CI_SRC=examples/Tutorial/Part_1_05_Do_More_While_Playing
-    - PLATFORMIO_CI_SRC=examples/Tutorial/Part_2_01_First_Design_Tool_Use
-    - PLATFORMIO_CI_SRC=examples/Tutorial/Part_2_02_Mixers
-    - PLATFORMIO_CI_SRC=examples/Tutorial/Part_2_03_Samples
-    - PLATFORMIO_CI_SRC=examples/Tutorial/Part_2_04_Microphone_Check
-    - PLATFORMIO_CI_SRC=examples/Tutorial/Part_2_05_Simple_Delay
-    - PLATFORMIO_CI_SRC=examples/Tutorial/Part_2_06_Feedback_Delay
-    - PLATFORMIO_CI_SRC=examples/Tutorial/Part_2_07_Filters
-    - PLATFORMIO_CI_SRC=examples/Tutorial/Part_2_08_Oscillators
-    - PLATFORMIO_CI_SRC=examples/Tutorial/Part_3_01_Peak_Detection
-    - PLATFORMIO_CI_SRC=examples/Tutorial/Part_3_02_Fourier_Transform
-    - PLATFORMIO_CI_SRC=examples/Tutorial/Part_3_03_TFT_Display
 
 install:
     - pip install -U platformio
