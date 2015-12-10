@@ -1492,8 +1492,8 @@ RED.view = (function() {
 
 		if ($("#node-input-arduino").prop('checked') === true) {
 			var nodesJSON = RED.nodes.cppToJSON(newNodesStr);
-			if (nodesJSON.count <= 0 || nodesJSON.skipped > 0) {
-				var note = "No (or not all) nodes imported, because some IDs existed already!";
+			if (nodesJSON.count <= 0) {
+				var note = "No nodes imported!";
 				RED.notify("<strong>Note</strong>: " + note, "warning");
 			}
 
