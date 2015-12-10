@@ -68,6 +68,24 @@ RED.nodes = (function() {
 		return name;
 	}
 
+	function getUniqueName(n) {
+		var newName = n.name;
+		if (typeof newName === "string") {
+			var parts = newName.match(/(\d*)$/);
+			var count = 0;
+			var base = newName;
+			if (parts) {
+				count = isNaN(parseInt(parts[1])) ? 0 : parseInt(parts[1]);
+				base = newName.replace(count, "");
+			}
+			while (RED.nodes.namedNode(newName) !== null) {
+				count += 1;
+				newName = base + count;
+			}
+		}
+		return newName;
+	}
+
 	function getType(type) {
 		return node_defs[type];
 	}
@@ -111,6 +129,17 @@ RED.nodes = (function() {
 		configNodes[c.id] = c;
 	}
 */
+	function checkForIO() {
+		var hasIO = false;
+		RED.nodes.eachNode(function (node) {
+
+			if ((node._def.category === "input-function") ||
+				(node._def.category === "output-function")) {
+				hasIO = true;
+			}
+		});
+		return hasIO;
+	}
 
 	function getNode(id) {
 		if (id in configNodes) {
@@ -120,6 +149,15 @@ RED.nodes = (function() {
 				if (nodes[n].id == id) {
 					return nodes[n];
 				}
+			}
+		}
+		return null;
+	}
+
+	function getNodeByName(name) {
+		for (var n in nodes) {
+			if (nodes[n].name == name) {
+				return nodes[n];
 			}
 		}
 		return null;
@@ -318,10 +356,8 @@ RED.nodes = (function() {
 	function cppToJSON(newNodesStr) {
 
 		var newNodes = [];
-		var skipped = [];
 		var cables = [];
 		var words = [];
-		var lastY = 0;
 
 		const NODE_COMMENT	= "//";
 		const NODE_AC		= "AudioConnection";
@@ -383,13 +419,14 @@ RED.nodes = (function() {
 					var newY = parseInt(coords ? coords[1] : 0);
 					//newY = newY == 0 ? lastY + (dH * n) + gap : newY;
 					//lastY = Math.max(lastY, newY);
-					var node = new Object({"order": n, "id": name, "type": type, "x": newX, "y": newY, "z": 0, "wires": []});
-					// first solution: skip existing id
+					var node = new Object({"order": n, "id": name, "name": name, "type": type, "x": newX, "y": newY, "z": 0, "wires": []});
+					// netter solution: create new id
 					if (RED.nodes.node(node.id) !== null) {
-						skipped.push(node.id);
-					} else {
-						newNodes.push(node);
+						node.z = RED.view.getWorkspace();
+						node.id = getID();
+						node.name = getUniqueName(node);
 					}
+					newNodes.push(node);
 				}
 			}
 		};
@@ -449,7 +486,8 @@ RED.nodes = (function() {
 
 				// ... and it has to end with an semikolon ...
 				var pattSe = new RegExp(/.*;$/);
-				if (pattSe.test(line)) {
+				var pattCoord = new RegExp(/.*\/\/xy=\d+,\d+$/);
+				if (pattSe.test(line) || pattCoord.test(line)) {
 					var word = parts[1].trim();
 					if (words.indexOf(word) >= 0) {
 						parseLine(line);
@@ -491,7 +529,6 @@ RED.nodes = (function() {
 
 		return {
 			count: newNodes.length,
-			skipped: skipped.length,
 			data: newNodes.length > 0 ? JSON.stringify(newNodes) : ""
 		};
 	}
@@ -610,6 +647,8 @@ RED.nodes = (function() {
 							}
 						}
 
+						node.name = getUniqueName(n);
+
 						addNode(node);
 						RED.editor.validateNode(node);
 						node_map[n.id] = node;
@@ -672,6 +711,7 @@ RED.nodes = (function() {
 			}
 		},
 		node: getNode,
+		namedNode: getNodeByName,
 		cppToJSON: cppToJSON,
 		import: importNodes,
 		refreshValidation: refreshValidation,
@@ -680,6 +720,7 @@ RED.nodes = (function() {
 		createCompleteNodeSet: createCompleteNodeSet,
 		id: getID,
 		cppName: createUniqueCppName,
+		hasIO: checkForIO,
 		nodes: nodes, // TODO: exposed for d3 vis
 		links: links  // TODO: exposed for d3 vis
 	};

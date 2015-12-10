@@ -48,7 +48,7 @@ var RED = (function() {
 	function save(force) {
 		RED.storage.update();
 
-		if (1) {
+		if (RED.nodes.hasIO()) {
 			var nns = RED.nodes.createCompleteNodeSet();
 			// sort by horizontal position, plus slight vertical position,
 			// for well defined update order that follows signal flow
@@ -129,6 +129,20 @@ var RED = (function() {
 			$( "#dialog" ).dialog("option","title","Export to Arduino").dialog( "open" );
 			});
 			//RED.view.dirty(false);
+		} else {
+			$( "#node-dialog-error-deploy" ).dialog({
+				title: "Error exporting data to Arduino IDE",
+				modal: true,
+				autoOpen: false,
+				width: 410,
+				height: 245,
+				buttons: [{
+					text: "Ok",
+					click: function() {
+						$( this ).dialog( "close" );
+					}
+				}]
+			}).dialog("open");
 		}
 	}
 

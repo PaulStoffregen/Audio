@@ -154,12 +154,23 @@ span.mainfunction {color: #993300; font-weight: bolder}
 <div id="node-dialog-confirm-deploy" class="hide">
 	<form class="form-horizontal">
 		<div id="node-dialog-confirm-deploy-config" style="text-align: center; padding-top: 30px;">
-		 Some of the nodes are not properly configured. Are you sure you want to deploy?
+			Some of the nodes are not properly configured. Are you sure you want to deploy?
 		</div>
 		<div id="node-dialog-confirm-deploy-unknown" style="text-align: center; padding-top: 10px;">
-		 The workspace contains some unknown node types:
-		 <ul style="width: 300px; margin: auto; text-align: left;" id="node-dialog-confirm-deploy-unknown-list"></ul>
-		 Are you sure you want to deploy?
+			The workspace contains some unknown node types:
+			<ul style="width: 300px; margin: auto; text-align: left;" id="node-dialog-confirm-deploy-unknown-list"></ul>
+			Are you sure you want to deploy?
+		</div>
+	</form>
+</div>
+
+<div id="node-dialog-error-deploy" class="hide">
+	<form class="form-horizontal">
+		<div id="node-dialog-error-deploy-noio" style="text-align: center; padding-top: 10px;">
+			<p>The workspace contains no input/output nodes!</p>
+			<p>You need an input or an output to export the data!</p>
+			<p>Without such a input/output function the exported
+			code will not run properly!</p>
 		</div>
 	</form>
 </div>
