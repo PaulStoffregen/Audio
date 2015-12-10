@@ -43,6 +43,8 @@ install:
     # install dependent libraries
     # http://platformio.org/#!/lib/show/539/SerialFlash
     - platformio lib install 539
+    
+    - export PLATFORMIO_BUILD_FLAGS=-larm_cortexM4l_math
 
     # remove "extras" directory
     - rm -r extras
