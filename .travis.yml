@@ -46,8 +46,9 @@ install:
     
     - export PLATFORMIO_BUILD_FLAGS=-larm_cortexM4l_math
 
-    # remove "extras" directory
+    # remove unused items
     - rm -r extras
+    - rm -r examples/Synthesis/PlaySynthMusic/miditones
 
 script:
     - platformio ci --lib=. --board=teensy31
