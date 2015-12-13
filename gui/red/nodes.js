@@ -90,8 +90,8 @@ RED.nodes = (function() {
 		return node_defs[type];
 	}
 	function selectNode(name) {
-	//	window.history.pushState(null, null, window.location.protocol + "//"
-	//		+ window.location.host + window.location.pathname + '?info=' + name);
+		windowq.history.pushState(null, null, window.location.protocol + "//"
+			+ window.location.host + window.location.pathname + '?info=' + name);
 	}
 	function addNode(n) {
 		if (n._def.category == "config") {
