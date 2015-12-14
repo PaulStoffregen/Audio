@@ -90,8 +90,8 @@ RED.nodes = (function() {
 		return node_defs[type];
 	}
 	function selectNode(name) {
-	//	window.history.pushState(null, null, window.location.protocol + "//"
-	//		+ window.location.host + window.location.pathname + '?info=' + name);
+		window.history.pushState(null, null, window.location.protocol + "//"
+			+ window.location.host + window.location.pathname + '?info=' + name);
 	}
 	function addNode(n) {
 		if (n._def.category == "config") {
@@ -485,7 +485,7 @@ RED.nodes = (function() {
 				}
 
 				// ... and it has to end with an semikolon ...
-				var pattSe = new RegExp(/.*;$/);
+				var pattSe = new RegExp(/.*;.*$/);
 				var pattCoord = new RegExp(/.*\/\/xy=\d+,\d+$/);
 				if (pattSe.test(line) || pattCoord.test(line)) {
 					var word = parts[1].trim();
