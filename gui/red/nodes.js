@@ -485,7 +485,7 @@ RED.nodes = (function() {
 				}
 
 				// ... and it has to end with an semikolon ...
-				var pattSe = new RegExp(/.*;$/);
+				var pattSe = new RegExp(/.*;.*$/);
 				var pattCoord = new RegExp(/.*\/\/xy=\d+,\d+$/);
 				if (pattSe.test(line) || pattCoord.test(line)) {
 					var word = parts[1].trim();
