@@ -34,6 +34,9 @@
 #define STATE_SUSTAIN	5
 #define STATE_RELEASE	6
 
+// The number of bits added when computing increments.
+#define ENVELOPE_ALIASING 8
+
 void AudioEffectEnvelope::noteOn(void)
 {
 	__disable_irq();
@@ -45,7 +48,7 @@ void AudioEffectEnvelope::noteOn(void)
 	} else {
 		state = STATE_ATTACK;
 		count = attack_count;
-		inc = (0x10000 / count) >> 3;
+		inc = ((0x10000 << ENVELOPE_ALIASING) / count) >> 3;
 	}
 	__enable_irq();
 }
@@ -55,8 +58,11 @@ void AudioEffectEnvelope::noteOff(void)
 	__disable_irq();
 	state = STATE_RELEASE;
 	count = release_count;
-	mult = sustain_mult;
-	inc = (-mult / ((int32_t)count << 3));
+        
+        // Resetting the mult variable can cause an undesired jump if it 
+        // happens before the sustain state is reached.
+        // mult = sustain_mult <<ff ENVELOPE_ALIASING;
+	inc = (-mult / ((int32_t)count)) >> 3;
 	__enable_irq();
 }
 
@@ -82,23 +88,23 @@ void AudioEffectEnvelope::update(void)
 				count = hold_count;
 				if (count > 0) {
 					state = STATE_HOLD;
-					mult = 0x10000;
+					mult = 0x10000 << ENVELOPE_ALIASING;
 					inc = 0;
 				} else {
 					count = decay_count;
 					state = STATE_DECAY;
-					inc = ((sustain_mult - 0x10000) / ((int32_t)count << 3));
+					inc = (((sustain_mult - 0x10000) << ENVELOPE_ALIASING) / ((int32_t)count)) >> 3;
 				}
 				continue;
 			} else if (state == STATE_HOLD) {
 				state = STATE_DECAY;
 				count = decay_count;
-				inc = ((sustain_mult - 0x10000) / (int32_t)count) >> 3;
+				inc = (((sustain_mult - 0x10000) << ENVELOPE_ALIASING) / (int32_t)count) >> 3;
 				continue;
 			} else if (state == STATE_DECAY) {
 				state = STATE_SUSTAIN;
 				count = 0xFFFF;
-				mult = sustain_mult;
+				mult = sustain_mult << ENVELOPE_ALIASING;
 				inc = 0;
 			} else if (state == STATE_SUSTAIN) {
 				count = 0xFFFF;
@@ -114,7 +120,7 @@ void AudioEffectEnvelope::update(void)
 			} else if (state == STATE_DELAY) {
 				state = STATE_ATTACK;
 				count = attack_count;
-				inc = (0x10000 / count) >> 3;
+				inc = ((0x10000 << ENVELOPE_ALIASING) / count) >> 3;
 				continue;
 			}
 		}
@@ -125,24 +131,24 @@ void AudioEffectEnvelope::update(void)
 		sample78 = *p++;
 		p -= 4;
 		mult += inc;
-		tmp1 = signed_multiply_32x16b(mult, sample12);
+		tmp1 = signed_multiply_32x16b(mult >> ENVELOPE_ALIASING, sample12);
 		mult += inc;
-		tmp2 = signed_multiply_32x16t(mult, sample12);
+		tmp2 = signed_multiply_32x16t(mult >> ENVELOPE_ALIASING, sample12);
 		sample12 = pack_16b_16b(tmp2, tmp1);
 		mult += inc;
-		tmp1 = signed_multiply_32x16b(mult, sample34);
+		tmp1 = signed_multiply_32x16b(mult >> ENVELOPE_ALIASING, sample34);
 		mult += inc;
-		tmp2 = signed_multiply_32x16t(mult, sample34);
+		tmp2 = signed_multiply_32x16t(mult >> ENVELOPE_ALIASING, sample34);
 		sample34 = pack_16b_16b(tmp2, tmp1);
 		mult += inc;
-		tmp1 = signed_multiply_32x16b(mult, sample56);
+		tmp1 = signed_multiply_32x16b(mult >> ENVELOPE_ALIASING, sample56);
 		mult += inc;
-		tmp2 = signed_multiply_32x16t(mult, sample56);
+		tmp2 = signed_multiply_32x16t(mult >> ENVELOPE_ALIASING, sample56);
 		sample56 = pack_16b_16b(tmp2, tmp1);
 		mult += inc;
-		tmp1 = signed_multiply_32x16b(mult, sample78);
+		tmp1 = signed_multiply_32x16b(mult >> ENVELOPE_ALIASING, sample78);
 		mult += inc;
-		tmp2 = signed_multiply_32x16t(mult, sample78);
+		tmp2 = signed_multiply_32x16t(mult >> ENVELOPE_ALIASING, sample78);
 		sample78 = pack_16b_16b(tmp2, tmp1);
 		*p++ = sample12;
 		*p++ = sample34;
