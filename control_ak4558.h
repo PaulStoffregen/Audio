@@ -25,7 +25,7 @@
 // DIF2-1-0 = 011 ( 16 bit I2S compatible when BICK = 32fs)
 
 #ifndef PIN_PDN
-#define PIN_PDN 1
+#define PIN_PDN 0
 #endif
 // Power-Down & Reset Mode Pin
 // “L”: Power-down and Reset, “H”: Normal operation

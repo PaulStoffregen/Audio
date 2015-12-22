@@ -15,16 +15,16 @@ AudioControlAK4558       ak4558;       //xy=172,178
 
 void setup() {
   // put your setup code here, to run once:
+  AudioMemory(12);
+  while (!Serial);
+  ak4558.enable();
+  AudioNoInterrupts();
   sine1.frequency(440);
   sine2.frequency(220);
   sine1.amplitude(1.0);
   sine2.amplitude(1.0);
-  delay(10000);
-  Serial.begin(9600);
-  Serial.println("test");
-  ak4558.enable();
+  AudioInterrupts();
 }
 
 void loop() {
-  delay(1);
 }

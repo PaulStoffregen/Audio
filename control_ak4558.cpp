@@ -38,11 +38,15 @@ bool AudioControlAK4558::write(unsigned int reg, unsigned int val)
 
 bool AudioControlAK4558::enable(void)
 {
+	Serial.println("Starting setup...");
+	delay(1000);
+	Serial.println("Setup start");
 	// Power Up and Reset
 	// Clock Setup (datasheet page 72)
-	digitalWrite(PIN_PDN, LOW);
+	pinMode(PIN_PDN, OUTPUT);
+	digitalWrite(0, LOW);
 	delay(1);
-	digitalWrite(PIN_PDN, HIGH);
+	digitalWrite(0, HIGH);
 	// After Power Up: PDN pin “L” → “H”
 	// “L” time of 150ns or more is needed to reset the AK4558.
 	delay(20);
@@ -61,10 +65,16 @@ bool AudioControlAK4558::enable(void)
 	
 	registers[AK4558_CTRL_1] &= ~AK4558_DIF2;
 	registers[AK4558_CTRL_1] |= AK4558_DIF1 | AK4558_DIF0;
+	Serial.print("CTRL_1 set to ");
+	Serial.println(registers[AK4558_CTRL_1], BIN);
 	// DIF2-1-0 = 011 ( 16 bit I2S compatible when BICK = 32fs)
 	registers[AK4558_CTRL_2] &= ~AK4558_MCKS1;
+	Serial.print("CTRL_2 set to ");
+	Serial.println(registers[AK4558_CTRL_2], BIN);
 	// MCKS1-0 = 00 (Master Clock Input Frequency Select, set 256fs for Normal Speed Mode -> 11.2896 MHz)
 	registers[AK4558_MODE_CTRL] &= ~AK4558_BCKO0;
+	Serial.print("MODE_CTRL set to ");
+	Serial.println(registers[AK4558_MODE_CTRL], BIN);
 	// BCKO1-0 = 00 (BICK Output Frequency at Master Mode = 32fs = 1.4112 MHz)
 	Wire.beginTransmission(AK4558_I2C_ADDR);
 	Wire.write(AK4558_CTRL_1);
@@ -83,6 +93,8 @@ bool AudioControlAK4558::enable(void)
 	registers[AK4558_PLL_CTRL] |= AK4558_PLL2;
 	registers[AK4558_PLL_CTRL] &= ~AK4558_PLL1;
 	write(AK4558_I2C_ADDR, registers[AK4558_PLL_CTRL]);
+	Serial.print("PLL_CTRL set to ");
+	Serial.println(registers[AK4558_PLL_CTRL], BIN);
 	delay(10);
 	// as per table 16, set PLL_CTRL.PLL3-2-1-0 to 0101 for MICK as PLL Reference, 11.2896 MHz
 	// also, wait 10 ms for PLL lock
@@ -90,6 +102,8 @@ bool AudioControlAK4558::enable(void)
 	// Set the DAC output to power-save mode: LOPS bit “0” → “1”
 	registers[AK4558_MODE_CTRL] |= AK4558_FS1 | AK4558_LOPS;
 	write(AK4558_I2C_ADDR, registers[AK4558_MODE_CTRL]);
+	Serial.print("MODE_CTRL set to ");
+	Serial.println(registers[AK4558_MODE_CTRL], BIN);
 	// Set up the sampling frequency (FS3-0 bits). The ADC must be powered-up in consideration of PLL
 	// lock time. (in this case (ref. table 17): Set clock to mode 5 / 44.100 KHz)
 	// Set up the audio format (Addr=03H). (in this case: TDM1-0 = 00 (Time Division Multiplexing mode OFF) by default)
@@ -99,6 +113,9 @@ bool AudioControlAK4558::enable(void)
 	// ignore this, leaving default values - Set up the digital output volume (Address = 08H, 09H).
 	
 	registers[AK4558_PWR_MNGT] |= AK4558_PMADR | AK4558_PMADL | AK4558_PMDAR | AK4558_PMDAL;
+	write(AK4558_I2C_ADDR, registers[AK4558_PWR_MNGT]);
+	Serial.print("PWR_MNGT set to ");
+	Serial.println(registers[AK4558_PWR_MNGT], BIN);
 	delay(300);
 	// Power up the ADC: PMADL = PMADR bits = “0” → “1”
 	// Initialization cycle of the ADC is 5200/fs @Normal mode. The SDTO pin outputs “L” during initialization.
@@ -107,6 +124,9 @@ bool AudioControlAK4558::enable(void)
 	
 	registers[AK4558_MODE_CTRL] &= ~AK4558_LOPS;
 	write(AK4558_I2C_ADDR, registers[AK4558_MODE_CTRL]);
+	write(AK4558_I2C_ADDR, registers[AK4558_MODE_CTRL]);
+	Serial.print("MODE_CTRL set to ");
+	Serial.println(registers[AK4558_MODE_CTRL], BIN);
 	// Release power-save mode of the DAC output: LOPS bit = “1” → “0”
 	// Set LOPS bit to “0” after the LOUT and ROUT pins output “H”. Sound data will be output from the
 	// LOUT and ROUT pins after this setting.
