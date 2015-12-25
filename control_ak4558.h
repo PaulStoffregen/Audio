@@ -237,7 +237,8 @@ public:
 	bool inputSelect(int n) { return false; }
 protected:
 	unsigned int registers[10];
-	void readInitConfig(void);
+	void initConfig(void);
+	void readConfig(void);
 	bool write(unsigned int reg, unsigned int val);
 };
 
