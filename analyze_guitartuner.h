@@ -57,7 +57,7 @@ public:
      *
      *  @return none
      */
-    void initialize( float threshold );
+    void begin( float threshold );
     
     /**
      *  sets threshold value

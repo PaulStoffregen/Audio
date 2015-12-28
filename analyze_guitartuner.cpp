@@ -202,7 +202,7 @@ uint16_t AudioAnalyzeGuitarTuner::estimate( int64_t *yin, int64_t *rs, uint16_t 
  *  @param threshold Allowed uncertainty
  *  @param cpu_max   How much cpu usage before throttling
  */
-void AudioAnalyzeGuitarTuner::initialize( float threshold ) {
+void AudioAnalyzeGuitarTuner::begin( float threshold ) {
     __disable_irq( );
     process_buffer = false;
     yin_threshold  = threshold;
