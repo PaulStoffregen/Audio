@@ -24,7 +24,7 @@
 #include "utility/dspinst.h"
 #include "arm_math.h"
 
-#define HALF_BLOCKS AUDIO_BLOCKS * 64
+#define HALF_BLOCKS AUDIO_GUITARTUNER_BLOCKS * 64
 
 #define LOOP1(a)  a
 #define LOOP2(a)  a LOOP1(a)
@@ -42,7 +42,7 @@ static void copy_buffer(void *destination, const void *source) {
     for (int i=0; i < AUDIO_BLOCK_SAMPLES; i++) *dst++ = *src++;
 }
 
-void AudioTuner::update( void ) {
+void AudioAnalyzeGuitarTuner::update( void ) {
     
     audio_block_t *block;
     
@@ -63,15 +63,15 @@ void AudioTuner::update( void ) {
         if ( !first_run && process_buffer ) process( );
     }
     
-    if ( state >= AUDIO_BLOCKS ) {
+    if ( state >= AUDIO_GUITARTUNER_BLOCKS ) {
         if ( next_buffer ) {
             if ( !first_run && process_buffer ) process( );
-            for ( int i = 0; i < AUDIO_BLOCKS; i++ ) copy_buffer( AudioBuffer+( i * 0x80 ), blocklist1[i]->data );
-            for ( int i = 0; i < AUDIO_BLOCKS; i++ ) release(blocklist1[i] );
+            for ( int i = 0; i < AUDIO_GUITARTUNER_BLOCKS; i++ ) copy_buffer( AudioBuffer+( i * 0x80 ), blocklist1[i]->data );
+            for ( int i = 0; i < AUDIO_GUITARTUNER_BLOCKS; i++ ) release(blocklist1[i] );
         } else {
             if ( !first_run && process_buffer ) process( );
-            for ( int i = 0; i < AUDIO_BLOCKS; i++ ) copy_buffer( AudioBuffer+( i * 0x80 ), blocklist2[i]->data );
-            for ( int i = 0; i < AUDIO_BLOCKS; i++ ) release( blocklist2[i] );
+            for ( int i = 0; i < AUDIO_GUITARTUNER_BLOCKS; i++ ) copy_buffer( AudioBuffer+( i * 0x80 ), blocklist2[i]->data );
+            for ( int i = 0; i < AUDIO_GUITARTUNER_BLOCKS; i++ ) release( blocklist2[i] );
         }
         process_buffer = true;
         first_run = false;
@@ -80,13 +80,13 @@ void AudioTuner::update( void ) {
     }
 }
 
-FASTRUN void AudioTuner::process( void ) {
+FASTRUN void AudioAnalyzeGuitarTuner::process( void ) {
     //digitalWriteFast(0, HIGH);
     
     const int16_t *p;
     p = AudioBuffer;
     
-    uint16_t cycles = 64;;
+    uint16_t cycles = 64;
     uint16_t tau = tau_global;
     do {
         uint16_t x   = 0;
@@ -164,7 +164,7 @@ FASTRUN void AudioTuner::process( void ) {
  *
  *  @return tau
  */
-uint16_t AudioTuner::estimate( int64_t *yin, int64_t *rs, uint16_t head, uint16_t tau ) {
+uint16_t AudioAnalyzeGuitarTuner::estimate( int64_t *yin, int64_t *rs, uint16_t head, uint16_t tau ) {
     const int64_t *y = ( int64_t * )yin;
     const int64_t *r = ( int64_t * )rs;
     uint16_t _tau, _head;
@@ -202,7 +202,7 @@ uint16_t AudioTuner::estimate( int64_t *yin, int64_t *rs, uint16_t head, uint16_
  *  @param threshold Allowed uncertainty
  *  @param cpu_max   How much cpu usage before throttling
  */
-void AudioTuner::initialize( float threshold ) {
+void AudioAnalyzeGuitarTuner::initialize( float threshold ) {
     __disable_irq( );
     process_buffer = false;
     yin_threshold  = threshold;
@@ -223,7 +223,7 @@ void AudioTuner::initialize( float threshold ) {
  *
  *  @return true if data is ready else false
  */
-bool AudioTuner::available( void ) {
+bool AudioAnalyzeGuitarTuner::available( void ) {
     __disable_irq( );
     bool flag = new_output;
     if ( flag ) new_output = false;
@@ -236,7 +236,7 @@ bool AudioTuner::available( void ) {
  *
  *  @return frequency in hertz
  */
-float AudioTuner::read( void ) {
+float AudioAnalyzeGuitarTuner::read( void ) {
     __disable_irq( );
     float d = data;
     __enable_irq( );
@@ -248,7 +248,7 @@ float AudioTuner::read( void ) {
  *
  *  @return periodicity
  */
-float AudioTuner::probability( void ) {
+float AudioAnalyzeGuitarTuner::probability( void ) {
     __disable_irq( );
     float p = periodicity;
     __enable_irq( );
@@ -260,7 +260,7 @@ float AudioTuner::probability( void ) {
  *
  *  @param thresh    Allowed uncertainty
  */
-void AudioTuner::threshold( float p ) {
+void AudioAnalyzeGuitarTuner::threshold( float p ) {
     __disable_irq( );
     yin_threshold = p;
     __enable_irq( );

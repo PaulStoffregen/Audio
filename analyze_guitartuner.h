@@ -20,32 +20,32 @@
  * THE SOFTWARE.
  */
 
-#ifndef AudioTuner_h_
-#define AudioTuner_h_
+#ifndef AudioAnalyzeGuitarTuner_h_
+#define AudioAnalyzeGuitarTuner_h_
 
 #include "AudioStream.h"
-/****************************************************************
- *              Safe to adjust these values below               *
- *                                                              *
- *  This parameter defines the size of the buffer.              *
- *                                                              *
- *  1.  AUDIO_BLOCKS -  Buffer size is 128 * AUDIO_BLOCKS.      *
- *                      The more AUDIO_BLOCKS the lower the     *
- *                      frequency you can detect. The defualt   *
- *                      (24) is set to measure down to 29.14    *
- *                      Hz or B(flat)0.                         *
- *                                                              *
- ****************************************************************/
-#define AUDIO_BLOCKS  24
-/****************************************************************/
-class AudioTuner : public AudioStream {
+/***********************************************************************
+ *              Safe to adjust these values below                      *
+ *                                                                     *
+ *  This parameter defines the size of the buffer.                     *
+ *                                                                     *
+ *  1.  AUDIO_GUITARTUNER_BLOCKS -  Buffer size is 128 * AUDIO_BLOCKS. *
+ *                      The more AUDIO_GUITARTUNER_BLOCKS the lower    *
+ *                      the frequency you can detect. The default      *
+ *                      (24) is set to measure down to 29.14 Hz        *
+ *                      or B(flat)0.                                   *
+ *                                                                     *
+ ***********************************************************************/
+#define AUDIO_GUITARTUNER_BLOCKS  24
+/***********************************************************************/
+class AudioAnalyzeGuitarTuner : public AudioStream {
 public:
     /**
      *  constructor to setup Audio Library and initialize
      *
      *  @return none
      */
-    AudioTuner( void ) : AudioStream( 1, inputQueueArray ), enabled( false ), new_output(false) {
+    AudioAnalyzeGuitarTuner( void ) : AudioStream( 1, inputQueueArray ), enabled( false ), new_output(false) {
     
     }
     
@@ -120,13 +120,13 @@ private:
     uint64_t running_sum;
     uint16_t tau_global;
     int64_t  rs_buffer[5], yin_buffer[5];
-    int16_t  AudioBuffer[AUDIO_BLOCKS*128] __attribute__ ( ( aligned ( 4 ) ) );
+    int16_t  AudioBuffer[AUDIO_GUITARTUNER_BLOCKS*128] __attribute__ ( ( aligned ( 4 ) ) );
     uint8_t  yin_idx, state;
     float    periodicity, yin_threshold, cpu_usage_max, data;
     bool     enabled, next_buffer, first_run;
     volatile bool new_output, process_buffer;
-    audio_block_t *blocklist1[AUDIO_BLOCKS];
-    audio_block_t *blocklist2[AUDIO_BLOCKS];
+    audio_block_t *blocklist1[AUDIO_GUITARTUNER_BLOCKS];
+    audio_block_t *blocklist2[AUDIO_GUITARTUNER_BLOCKS];
     audio_block_t *inputQueueArray[1];
 };
 #endif
