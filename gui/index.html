@@ -381,6 +381,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioAnalyzeFFT256","data":{"defaults":{"name":{"value":"new"}},"shortName":"fft256","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioAnalyzeFFT1024","data":{"defaults":{"name":{"value":"new"}},"shortName":"fft1024","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioAnalyzeToneDetect","data":{"defaults":{"name":{"value":"new"}},"shortName":"tone","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioAnalyzeGuitarTuner","data":{"defaults":{"name":{"value":"new"}},"shortName":"guitartuner","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioAnalyzePrint","data":{"defaults":{"name":{"value":"new"}},"shortName":"print","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioControlSGTL5000","data":{"defaults":{"name":{"value":"new"}},"shortName":"sgtl5000","inputs":0,"outputs":0,"category":"control-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioControlWM8731","data":{"defaults":{"name":{"value":"new"}},"shortName":"wm8731","inputs":0,"outputs":0,"category":"control-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -2279,6 +2280,58 @@ double s_freq = .0625;</p>
 		is detected, and then false for the remainder of that interval.</p>
 </script>
 <script type="text/x-red" data-template-name="AudioAnalyzeToneDetect">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioAnalyzeGuitarTuner">
+	<h3>Summary</h3>
+	<p>Detect with fairly good accuracy the fundamental frequencies f<sub>o</sub> from
+		electric guitars and basses.</p>
+    <p>Written By Collin Duffy</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Signal to analyze</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>begin</span>(threshold);</p>
+	<p class=desc>Initialize and start detecting frequencies,
+		with an initial threshold (the amount of allowed uncertainty).
+	</p>
+	<p class=func><span class=keyword>available</span>();</p>
+	<p class=desc>Returns true (non-zero) when a valid
+		frequency is detected.
+	</p>
+	<p class=func><span class=keyword>read</span>();</p>
+	<p class=desc>Read the detected frequency.
+	</p>
+	<p class=func><span class=keyword>probability</span>();</p>
+	<p class=desc>Return the level of certainty, betweeo 0 to 1.0.
+	</p>
+	<p class=func><span class=keyword>threshold</span>(level);</p>
+	<p class=desc>Set the detection threshold, the amount of allowed uncertainty.
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; GuitarTuneNotes
+	</p>
+	<h3>Notes</h3>
+	<p>The <a href="http://recherche.ircam.fr/equipes/pcm/cheveign/pss/2002_JASA_YIN.pdf">YIN algorithm</a> (PDF)
+		is used to detect frequencies, with many optimizations for
+		frequencies between 29-400Hz.  This algorithm can be somewhat
+		memory and processor hungry but will allow you to detect with
+		fairly good accuracy the fundamental frequencies from
+		electric guitars and basses.</p>
+	<p>Within the code, AUDIO_GUITARTUNER_BLOCKS
+		may be edited to control low frequency range.  The default
+		(24) allows measurement down to 29.14 Hz, or B(flat)0.</p>
+	<p>This object was contributed by Collin Duffy from his
+		<a href="https://github.com/duff2013/AudioTuner">AudioTuner project</a>.
+		Additional details and documentation may be found there.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioAnalyzeGuitarTuner">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
