@@ -9,6 +9,9 @@
 
 #include "AudioControl.h"
 
+#define AK4558_SERIAL_DEBUG 1
+//if 1, then Serial Monitor will show debug information about configuration of the AK4558
+
 // for Teensy audio lib operation the following settings are needed
 // 1fs = 44.1 KHz
 // sample size = 16 bits
@@ -230,9 +233,13 @@
 class AudioControlAK4558 : public AudioControl
 {
 public:
-	bool enable(void);
-	bool disable(void) { return false; }
-	bool volume(float n) { return false; }
+	bool enable(void);	//enables the CODEC, does not power up ADC nor DAC (use enableIn() and enableOut() for selective power up)
+	bool enableIn(void);
+	bool enableOut(void);
+	bool disable(void) { return (disableIn()&&disableOut()); }
+	bool disableIn(void);
+	bool disableOut(void);
+	bool volume(float n);
 	bool inputLevel(float n) { return false; }
 	bool inputSelect(int n) { return false; }
 protected:
