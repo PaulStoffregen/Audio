@@ -1,3 +1,11 @@
+/* Detect the frequency of music notes, by Colin Duffy
+
+   This example repeatedly plays a guitar note (output to the DAC pin)
+   and prints an analysis of the frequency to the Arduino Serial Monitor
+
+   https://forum.pjrc.com/threads/32252-Different-Range-FFT-Algorithm/page2
+   https://github.com/duff2013/AudioTuner
+*/
 /*
  C     C#    D     Eb    E     F     F#    G     G#    A     Bb    B
  0 16.35 17.32 18.35 19.45 20.60 21.83 23.12 24.50 25.96 27.50 29.14 30.87
@@ -32,13 +40,13 @@
 #include "b3_note.h"
 #include "e4_note.h"
 //---------------------------------------------------------------------------------------
-AudioAnalyzeGuitarTuner   tuner;
+AudioAnalyzeNoteFrequency notefreq;
 AudioOutputAnalog         dac;
 AudioPlayMemory           wav_note;
 AudioMixer4               mixer;
 //---------------------------------------------------------------------------------------
 AudioConnection patchCord0(wav_note, 0, mixer, 0);
-AudioConnection patchCord1(mixer, 0, tuner, 0);
+AudioConnection patchCord1(mixer, 0, notefreq, 0);
 AudioConnection patchCord2(mixer, 0, dac, 0);
 //---------------------------------------------------------------------------------------
 IntervalTimer playNoteTimer;
@@ -61,16 +69,16 @@ void setup() {
      *  Initialize the yin algorithm's absolute
      *  threshold, this is good number.
      */
-    tuner.begin(.15);
+    notefreq.begin(.15);
     pinMode(LED_BUILTIN, OUTPUT);
     playNoteTimer.begin(playNote, 1000);
 }
 
 void loop() {
     // read back fundamental frequency
-    if (tuner.available()) {
-        float note = tuner.read();
-        float prob = tuner.probability();
+    if (notefreq.available()) {
+        float note = notefreq.read();
+        float prob = notefreq.probability();
         Serial.printf("Note: %3.2f | Probability: %.2f\n", note, prob);
     }
 }

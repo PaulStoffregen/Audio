@@ -1,4 +1,4 @@
-/* Audio Library Guitar and Bass Tuner
+/* Audio Library Note Frequency Detection & Guitar/Bass Tuner
  * Copyright (c) 2015, Colin Duffy
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-#include "analyze_guitartuner.h"
+#include "analyze_notefreq.h"
 #include "utility/dspinst.h"
 #include "arm_math.h"
 
@@ -42,7 +42,7 @@ static void copy_buffer(void *destination, const void *source) {
     for (int i=0; i < AUDIO_BLOCK_SAMPLES; i++) *dst++ = *src++;
 }
 
-void AudioAnalyzeGuitarTuner::update( void ) {
+void AudioAnalyzeNoteFrequency::update( void ) {
     
     audio_block_t *block;
     
@@ -80,7 +80,7 @@ void AudioAnalyzeGuitarTuner::update( void ) {
     }
 }
 
-FASTRUN void AudioAnalyzeGuitarTuner::process( void ) {
+FASTRUN void AudioAnalyzeNoteFrequency::process( void ) {
     //digitalWriteFast(0, HIGH);
     
     const int16_t *p;
@@ -164,7 +164,7 @@ FASTRUN void AudioAnalyzeGuitarTuner::process( void ) {
  *
  *  @return tau
  */
-uint16_t AudioAnalyzeGuitarTuner::estimate( int64_t *yin, int64_t *rs, uint16_t head, uint16_t tau ) {
+uint16_t AudioAnalyzeNoteFrequency::estimate( int64_t *yin, int64_t *rs, uint16_t head, uint16_t tau ) {
     const int64_t *y = ( int64_t * )yin;
     const int64_t *r = ( int64_t * )rs;
     uint16_t _tau, _head;
@@ -202,7 +202,7 @@ uint16_t AudioAnalyzeGuitarTuner::estimate( int64_t *yin, int64_t *rs, uint16_t 
  *  @param threshold Allowed uncertainty
  *  @param cpu_max   How much cpu usage before throttling
  */
-void AudioAnalyzeGuitarTuner::begin( float threshold ) {
+void AudioAnalyzeNoteFrequency::begin( float threshold ) {
     __disable_irq( );
     process_buffer = false;
     yin_threshold  = threshold;
@@ -223,7 +223,7 @@ void AudioAnalyzeGuitarTuner::begin( float threshold ) {
  *
  *  @return true if data is ready else false
  */
-bool AudioAnalyzeGuitarTuner::available( void ) {
+bool AudioAnalyzeNoteFrequency::available( void ) {
     __disable_irq( );
     bool flag = new_output;
     if ( flag ) new_output = false;
@@ -236,7 +236,7 @@ bool AudioAnalyzeGuitarTuner::available( void ) {
  *
  *  @return frequency in hertz
  */
-float AudioAnalyzeGuitarTuner::read( void ) {
+float AudioAnalyzeNoteFrequency::read( void ) {
     __disable_irq( );
     float d = data;
     __enable_irq( );
@@ -248,7 +248,7 @@ float AudioAnalyzeGuitarTuner::read( void ) {
  *
  *  @return periodicity
  */
-float AudioAnalyzeGuitarTuner::probability( void ) {
+float AudioAnalyzeNoteFrequency::probability( void ) {
     __disable_irq( );
     float p = periodicity;
     __enable_irq( );
@@ -260,7 +260,7 @@ float AudioAnalyzeGuitarTuner::probability( void ) {
  *
  *  @param thresh    Allowed uncertainty
  */
-void AudioAnalyzeGuitarTuner::threshold( float p ) {
+void AudioAnalyzeNoteFrequency::threshold( float p ) {
     __disable_irq( );
     yin_threshold = p;
     __enable_irq( );
