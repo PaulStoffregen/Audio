@@ -1454,8 +1454,70 @@ RED.view = (function() {
 		}
 	}
 
+	function doSort (arr) {
+		arr.sort(function (a, b) {
+			var nameA = a.name ? a.name : a.id;
+			var nameB = b.name ? b.name : b.id;
+			return nameA.localeCompare(nameB, 'en', {numeric: 'true'});
+		});
+	}
+
+	function setNewCoords (lastX, lastY, arr) {
+		var x = lastX;
+		var y = lastY;
+		for (var i = 0; i < arr.length; i++) {
+			var node = arr[i];
+			var name = node.name ? node.name : node.id;
+			var def = node._def;
+			var dH = Math.max(RED.view.defaults.height, (Math.max(def.outputs, def.inputs) || 0) * 15);
+			x = lastX + Math.max(RED.view.defaults.width, RED.view.calculateTextWidth(name) + (def.inputs > 0 ? 7 : 0));
+			node.x = x;
+			node.y = y + dH/2;
+			y = y + dH + 15;
+			node.dirty = true;
+		}
+		return { x: x, y: y };
+	}
+
 	function arrangeAll() {
-		// TODO: arrange imported nodes without coordinates
+		var ioNoIn = [];
+		var ioInOut = [];
+		var ioMultiple = [];
+		var ioNoOut = [];
+		var ioCtrl = [];
+
+		RED.nodes.eachNode(function (node) {
+
+			if (node._def.inputs == 0 && node._def.outputs == 0) {
+				ioCtrl.push(node);
+			} else if (node._def.inputs == 0) {
+				ioNoIn.push(node);
+			} else if (node._def.outputs == 0) {
+				ioNoOut.push(node);
+			} else if (node._def.inputs == 1 && node._def.outputs == 1) {
+				ioInOut.push(node);
+			} else if (node._def.inputs > 1) {
+				ioMultiple.push(node);
+			}
+		});
+
+		var cols = new Array(ioNoIn, ioInOut, ioMultiple, ioNoOut, ioCtrl);
+		var lowestY = 0;
+
+		for (var i = 0; i < cols.length; i++) {
+			var dX = ((i < cols.length - 1) ?  i : 0) * (RED.view.defaults.width * 2) + (RED.view.defaults.width / 2) + 15;
+			var dY = ((i < cols.length - 1) ?  (RED.view.defaults.height / 4) : lowestY) + 15;
+			var startX = 0;
+			var startY = 0;
+
+			doSort(cols[i]);
+			var last = setNewCoords(startX + dX, startY + dY, cols[i]);
+			lowestY = Math.max(lowestY, last.y);
+			startX = ((i < cols.length - 1) ? last.x : 0) + (RED.view.defaults.width) * 4;
+			startY = lowestY + (RED.view.defaults.height * 1.5);
+		}
+		RED.storage.update();
+		redraw();
 	}
 
 	RED.keyboard.add(/* z */ 90,{ctrl:true},function(){RED.history.pop();});
