@@ -233,20 +233,23 @@
 class AudioControlAK4558 : public AudioControl
 {
 public:
-	bool enable(void);	//enables the CODEC, does not power up ADC nor DAC (use enableIn() and enableOut() for selective power up)
-	bool enableIn(void);
-	bool enableOut(void);
-	bool disable(void) { return (disableIn()&&disableOut()); }
-	bool disableIn(void);
-	bool disableOut(void);
-	bool volume(float n);
-	bool inputLevel(float n) { return false; }
-	bool inputSelect(int n) { return false; }
-protected:
-	unsigned int registers[10];
+	bool enable(void);		//enables the CODEC, does not power up ADC nor DAC (use enableIn() and enableOut() for selective power up)
+	bool enableIn(void);	//powers up ADC
+	bool enableOut(void);	//powers up DAC
+	bool disable(void) { return (disableIn()&&disableOut()); }	//powers down ADC/DAC
+	bool disableIn(void);	//powers down ADC
+	bool disableOut(void);	//powers down DAC
+	bool volume(float n);	//sets LOUT/ROUT volume to n (range 0.0 - 1.0)
+	bool volumeLeft(float n);	//sets LOUT volume to n (range 0.0 - 1.0)
+	bool volumeRight(float n);	//sets ROUT volume to n (range 0.0 - 1.0)
+	bool inputLevel(float n) { return false; }	//not supported by AK4558
+	bool inputSelect(int n); {return false; }	//sets inputs to mono left, mono right, stereo (default stereo), not yet implemented
+private:
+	unit8_t registers[10];
 	void initConfig(void);
 	void readConfig(void);
 	bool write(unsigned int reg, unsigned int val);
+	unit8_t convertVolume(float vol);
 };
 
 #endif

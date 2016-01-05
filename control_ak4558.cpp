@@ -17,7 +17,7 @@ void AudioControlAK4558::initConfig(void)
 	// registers[AK4558_CTRL_1] |= AK4558_DIF1 | AK4558_DIF0;
 	//
 	// after manipulation, we can write the entire register value on the CODEC
-	unsigned int n = 0;
+	unit8_t n = 0;
 	Wire.requestFrom(AK4558_I2C_ADDR,10);
 	while(Wire.available()) {
 #if AK4558_SERIAL_DEBUG > 0
@@ -35,8 +35,8 @@ void AudioControlAK4558::initConfig(void)
 void AudioControlAK4558::readConfig(void)
 {
 	// reads registers values
-	unsigned int n = 0;
-	char c = 0;
+	unit8_t n = 0;
+	unit8_t c = 0;
 	Wire.requestFrom(AK4558_I2C_ADDR, 10);
 	while(Wire.available()) {
 		Serial.print("Register ");
@@ -189,7 +189,6 @@ bool AudioControlAK4558::enable(void)
 #if AK4558_SERIAL_DEBUG > 0
 	Serial.println("AK4558: Enable device - Done");
 #endif
-	write(AK4558_ROUT_VOL,255); //dummy write to last register to reset address counter to 0
 	return true;
 }
 
@@ -249,20 +248,54 @@ bool AudioControlAK4558::disableOut(void)
 	return true;
 }
 
-bool AudioControlAK4558:volume(float n)
+unsigned char AudioControlAK4558::convertVolume(float vol)
+{
+	// Convert float (range 0.0-1.0) to unsigned char (range 0x00-0xFF)
+	uint8_t temp = vol>>22;
+	return temp;
+}
+
+bool AudioControlAK4558::volume(float n)
 {
 	// Set DAC output volume
-	
-	registers[AK4558_LOUT_VOL] = 255;
-	registers[AK4558_ROUT_VOL] = 255;
+	unit8_t vol = convertVolume(n);
+	registers[AK4558_LOUT_VOL] = vol;
+	registers[AK4558_ROUT_VOL] = vol;
 	Wire.beginTransmission(AK4558_I2C_ADDR);
 	Wire.write(AK4558_LOUT_VOL);
 	Wire.write(registers[AK4558_LOUT_VOL]);
 	Wire.write(registers[AK4558_ROUT_VOL]);
-	Wire.endTransmission();
+#if AK4558_SERIAL_DEBUG > 0
+	Serial.print("AK4558: LOUT_VOL set to ");
+	Serial.println(registers[AK4558_LOUT_VOL], BIN);
+	Serial.print("AK4558: ROUT_VOL set to ");
+	Serial.println(registers[AK4558_ROUT_VOL], BIN);
+#endif
+	return (Wire.endTransmission(true)==0);
+}
+
+bool AudioControlAK4558:::volumeLeft(float n)
+{
+	// Set DAC left output volume
+	unit8_t vol = convertVolume(n);
+	registers[AK4558_LOUT_VOL] = vol;
+	bool ret = write(AK4558_LOUT_VOL, registers[AK4558_LOUT_VOL]);
 #if AK4558_SERIAL_DEBUG > 0
 	Serial.print("AK4558: LOUT_VOL set to ");
 	Serial.println(registers[AK4558_LOUT_VOL], BIN);
 #endif
-	return (Wire.endTransmission(true)==0);
+	return ret;
+}
+
+bool AudioControlAK4558::volumeRight(float n)
+{
+	// Set DAC right output volume
+	unit8_t vol = convertVolume(n);
+	registers[AK4558_ROUT_VOL] = vol;
+	write(AK4558_EOUT_VOL, registers[AK4558_ROUT_VOL]);
+#if AK4558_SERIAL_DEBUG > 0
+	Serial.print("AK4558: ROUT_VOL set to ");
+	Serial.println(registers[AK4558_ROUT_VOL], BIN);
+#endif
+	return ret;
 }
