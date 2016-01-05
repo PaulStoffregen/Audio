@@ -108,6 +108,14 @@ void AudioSynthWaveform::update(void)
       }
       break;
 
+    case WAVEFORM_SAWTOOTH_REVERSE:
+      for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
+        *bp++ = ((short)(tone_phase>>15)*tone_amp) >> 15;
+         // phase and incr are both unsigned 32-bit fractions
+         tone_phase -= tone_incr;
+      }
+      break;
+
     case WAVEFORM_TRIANGLE:
       for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
         if(tone_phase & 0x80000000) {
@@ -137,6 +145,15 @@ void AudioSynthWaveform::update(void)
       }
       break;
       
+    case WAVEFORM_SAMPLE_HOLD:
+      for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
+        if(tone_phase < tone_incr) {
+          sample = random(-tone_amp, tone_amp);
+        }
+        *bp++ = sample;
+        tone_phase += tone_incr;
+      }
+      break;
     }
     if (tone_offset) {
 	bp = block->data;

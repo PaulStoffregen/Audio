@@ -98,7 +98,7 @@ void playFile(const char *filename)
 
 
 void loop() {
-  playFile("SDTEST1.WAV");
+  playFile("SDTEST1.WAV");  // filenames are always uppercase 8.3 format
   delay(500);
   playFile("SDTEST2.WAV");
   delay(500);

@@ -45,6 +45,8 @@ extern const int16_t AudioWaveformSine[257];
 #define WAVEFORM_TRIANGLE  3
 #define WAVEFORM_ARBITRARY 4
 #define WAVEFORM_PULSE     5
+#define WAVEFORM_SAWTOOTH_REVERSE 6
+#define WAVEFORM_SAMPLE_HOLD 7
 
 // todo: remove these...
 #define TONE_TYPE_SINE     0
@@ -117,6 +119,8 @@ private:
   short    tone_freq;
   uint32_t tone_phase;
   uint32_t tone_width;
+  // sample for SAMPLE_HOLD
+  short sample;
   // volatile prevents the compiler optimizing out the frequency function
   volatile uint32_t tone_incr;
   short    tone_type;
