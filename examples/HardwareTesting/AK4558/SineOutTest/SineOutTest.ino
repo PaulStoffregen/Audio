@@ -28,6 +28,7 @@ void setup() {
   AudioMemory(12);
   while (!Serial);
   ak4558.enable();
+  ak4558.enableOut();
   AudioNoInterrupts();
   sine1.frequency(440);
   sine2.frequency(440);

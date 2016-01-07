@@ -17,7 +17,7 @@ void AudioControlAK4558::initConfig(void)
 	// registers[AK4558_CTRL_1] |= AK4558_DIF1 | AK4558_DIF0;
 	//
 	// after manipulation, we can write the entire register value on the CODEC
-	unit8_t n = 0;
+	uint8_t n = 0;
 	Wire.requestFrom(AK4558_I2C_ADDR,10);
 	while(Wire.available()) {
 #if AK4558_SERIAL_DEBUG > 0
@@ -35,8 +35,8 @@ void AudioControlAK4558::initConfig(void)
 void AudioControlAK4558::readConfig(void)
 {
 	// reads registers values
-	unit8_t n = 0;
-	unit8_t c = 0;
+	uint8_t n = 0;
+	uint8_t c = 0;
 	Wire.requestFrom(AK4558_I2C_ADDR, 10);
 	while(Wire.available()) {
 		Serial.print("Register ");
@@ -248,17 +248,17 @@ bool AudioControlAK4558::disableOut(void)
 	return true;
 }
 
-unsigned char AudioControlAK4558::convertVolume(float vol)
+uint8_t AudioControlAK4558::convertVolume(float vol)
 {
 	// Convert float (range 0.0-1.0) to unsigned char (range 0x00-0xFF)
-	uint8_t temp = vol>>22;
+	uint8_t temp = ((uint32_t)vol)>>22;
 	return temp;
 }
 
 bool AudioControlAK4558::volume(float n)
 {
 	// Set DAC output volume
-	unit8_t vol = convertVolume(n);
+	uint8_t vol = convertVolume(n);
 	registers[AK4558_LOUT_VOL] = vol;
 	registers[AK4558_ROUT_VOL] = vol;
 	Wire.beginTransmission(AK4558_I2C_ADDR);
@@ -274,10 +274,10 @@ bool AudioControlAK4558::volume(float n)
 	return (Wire.endTransmission(true)==0);
 }
 
-bool AudioControlAK4558:::volumeLeft(float n)
+bool AudioControlAK4558::volumeLeft(float n)
 {
 	// Set DAC left output volume
-	unit8_t vol = convertVolume(n);
+	uint8_t vol = convertVolume(n);
 	registers[AK4558_LOUT_VOL] = vol;
 	bool ret = write(AK4558_LOUT_VOL, registers[AK4558_LOUT_VOL]);
 #if AK4558_SERIAL_DEBUG > 0
@@ -290,9 +290,9 @@ bool AudioControlAK4558:::volumeLeft(float n)
 bool AudioControlAK4558::volumeRight(float n)
 {
 	// Set DAC right output volume
-	unit8_t vol = convertVolume(n);
+	uint8_t vol = convertVolume(n);
 	registers[AK4558_ROUT_VOL] = vol;
-	write(AK4558_EOUT_VOL, registers[AK4558_ROUT_VOL]);
+	bool ret = write(AK4558_ROUT_VOL, registers[AK4558_ROUT_VOL]);
 #if AK4558_SERIAL_DEBUG > 0
 	Serial.print("AK4558: ROUT_VOL set to ");
 	Serial.println(registers[AK4558_ROUT_VOL], BIN);

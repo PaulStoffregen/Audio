@@ -24,6 +24,8 @@ void setup() {
   AudioMemory(12);
   while (!Serial);
   ak4558.enable();
+  ak4558.enableIn();
+  ak4558.enableOut();
 }
 
 void loop() {
