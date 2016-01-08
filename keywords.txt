@@ -9,6 +9,7 @@ AudioOutputPWM	KEYWORD2
 AudioControlSGTL5000	KEYWORD2
 AudioControlWM8731	KEYWORD2
 AudioControlWM8731master	KEYWORD2
+AudioControlAK4558	KEYWORD2
 AudioMemory	KEYWORD2
 
 AudioAnalyzeFFT256	KEYWORD2
@@ -74,8 +75,14 @@ trigger	KEYWORD2
 length	KEYWORD2
 threshold	KEYWORD2
 enable	KEYWORD2
+enableIn	KEYWORD2
+enableOut	KEYWORD2
 disable	KEYWORD2
+disableIn	KEYWORD2
+disableOut	KEYWORD2
 volume	KEYWORD2
+volumeLeft	KEYWORD2
+volumeRight KEYWORD2
 attack	KEYWORD2
 hold	KEYWORD2
 decay	KEYWORD2
