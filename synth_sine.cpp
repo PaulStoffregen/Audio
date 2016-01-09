@@ -50,7 +50,7 @@ void AudioSynthWaveformSine::update(void)
 				val2 = AudioWaveformSine[index+1];
 				scale = (ph >> 8) & 0xFFFF;
 				val2 *= scale;
-				val1 *= 0xFFFF - scale;
+				val1 *= 0x10000 - scale;
 #if defined(KINETISK)
 				block->data[i] = multiply_32x32_rshift32(val1 + val2, magnitude);
 #elif defined(KINETISL)
@@ -103,7 +103,7 @@ void AudioSynthWaveformSineModulated::update(void)
 			val2 = AudioWaveformSine[index+1];
 			scale = (ph >> 8) & 0xFFFF;
 			val2 *= scale;
-			val1 *= 0xFFFF - scale;
+			val1 *= 0x10000 - scale;
 			//block->data[i] = (((val1 + val2) >> 16) * magnitude) >> 16;
 			block->data[i] = multiply_32x32_rshift32(val1 + val2, magnitude);
 			// -32768 = no phase increment
@@ -122,7 +122,7 @@ void AudioSynthWaveformSineModulated::update(void)
 			val2 = AudioWaveformSine[index+1];
 			scale = (ph >> 8) & 0xFFFF;
 			val2 *= scale;
-			val1 *= 0xFFFF - scale;
+			val1 *= 0x10000 - scale;
 			block->data[i] = (val1 + val2) >> 16;
 			ph += inc;
 		}
