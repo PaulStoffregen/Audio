@@ -121,9 +121,9 @@ void AudioSynthWaveformSineHires::update(void)
 				ph += inc;
 			}
 			phase_accumulator = ph;
-			transmit(msw);
+			transmit(msw, 0);
 			release(msw);
-			transmit(lsw);
+			transmit(lsw, 1);
 			release(lsw);
 			return;
 		} else {
