@@ -96,7 +96,17 @@ bool AudioControlWM8731::volumeInteger(unsigned int n)
 	return true;
 }
 
+bool AudioControlWM8731::inputLevel(float n)
+{
+	// range is 0x00 (min) - 0x1F (max)
 
+	int _level = int(n * 31.f); 
+
+	_level = _level > 0x1F ? 0x1F : _level;
+	write(WM8731_REG_LLINEIN, _level);
+	write(WM8731_REG_RLINEIN, _level);
+	return true;
+}
 
 /******************************************************************/
 
