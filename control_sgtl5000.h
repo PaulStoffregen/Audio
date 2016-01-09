@@ -40,18 +40,7 @@ public:
 	bool unmuteHeadphone(void) { return write(0x0024, ana_ctrl & ~(1<<4)); }
 	bool muteLineout(void) { return write(0x0024, ana_ctrl | (1<<8)); }
 	bool unmuteLineout(void) { return write(0x0024, ana_ctrl & ~(1<<8)); }
-	bool inputSelect(int n) {
-		if (n == AUDIO_INPUT_LINEIN) {
-			return write(0x0020, 0x055) // +7.5dB gain (1.3Vp-p full scale)
-			 && write(0x0024, ana_ctrl | (1<<2)); // enable linein
-		} else if (n == AUDIO_INPUT_MIC) {
-			return write(0x002A, 0x0173) // mic preamp gain = +40dB
-			 && write(0x0020, 0x088)     // input gain +12dB (is this enough?)
-			 && write(0x0024, ana_ctrl & ~(1<<2)); // enable mic
-		} else {
-			return false;
-		}
-	}
+	bool inputSelect(int n);
 	bool volume(float left, float right);
 	bool micGain(unsigned int dB);
 	bool lineInLevel(uint8_t n) { return lineInLevel(n, n); }
@@ -93,7 +82,7 @@ protected:
 	unsigned int read(unsigned int reg);
 	bool write(unsigned int reg, unsigned int val);
 	unsigned int modify(unsigned int reg, unsigned int val, unsigned int iMask);
-	unsigned short dap_audio_eq_band(uint8_t bandNum, float n);
+	unsigned short dap_audio_eq_band(uint8_t bandNum, float eq_weighting);
 private:
 	bool semi_automated;
 	void automate(uint8_t dap, uint8_t eq);

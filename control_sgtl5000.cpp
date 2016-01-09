@@ -24,6 +24,12 @@
  * THE SOFTWARE.
  */
 
+/*
+ * PLEASE NOTE:
+ * external documentation available in the INFO section at
+ * https://www.pjrc.com/teensy/gui/?info=AudioControlSGTL5000
+ */
+
 #include "control_sgtl5000.h"
 #include "Wire.h"
 
@@ -498,8 +504,6 @@
 #define SGTL5000_I2C_ADDR  0x0A  // CTRL_ADR0_CS pin low (normal configuration)
 //#define SGTL5000_I2C_ADDR  0x2A // CTRL_ADR0_CS  pin high
 
-
-
 bool AudioControlSGTL5000::enable(void)
 {
 	muted = true;
@@ -522,16 +526,25 @@ bool AudioControlSGTL5000::enable(void)
 	write(CHIP_LINE_OUT_VOL, 0x1D1D); // default approx 1.3 volts peak-to-peak
 	write(CHIP_CLK_CTRL, 0x0004);  // 44.1 kHz, 256*Fs
 	write(CHIP_I2S_CTRL, 0x0130); // SCLK=32*Fs, 16bit, I2S format
-	// default signal routing is ok?
+    // default startup signal routing is ok?
 	write(CHIP_SSS_CTRL, 0x0010); // ADC->I2S, I2S->DAC
 	write(CHIP_ADCDAC_CTRL, 0x0000); // disable dac mute
 	write(CHIP_DAC_VOL, 0x3C3C); // digital gain, 0dB
-	write(CHIP_ANA_HP_CTRL, 0x7F7F); // set volume (lowest level)
+	// set current volume to lowest level
+	write(CHIP_ANA_HP_CTRL, 0x7F7F);
 	write(CHIP_ANA_CTRL, 0x0036);  // enable zero cross detectors
 	//mute = false;
 	semi_automated = true;
 	return true;
 }
+
+/* TODO create custom enable() to set other bit-depths or sample rates
+ * essential for 24bit 48kHz:
+ * write(CHIP_CLK_CTRL, 0x0008);  // 48 kHz, 256*Fs
+ * write(CHIP_I2S_CTRL, 0x0010); // SCLK=64*Fs, 24bit, I2S format, SCLKFREQ = 0
+ * (requires matching I2S settings not supported by the audio library
+ * at the moment)
+ */
 
 unsigned int AudioControlSGTL5000::read(unsigned int reg)
 {
@@ -545,6 +558,7 @@ unsigned int AudioControlSGTL5000::read(unsigned int reg)
 	val |= Wire.read();
 	return val;
 }
+
 
 bool AudioControlSGTL5000::write(unsigned int reg, unsigned int val)
 {
@@ -588,6 +602,23 @@ bool AudioControlSGTL5000::volume(float left, float right)
 {
 	unsigned short m=((0x7F-calcVol(right,0x7F))<<8)|(0x7F-calcVol(left,0x7F));
 	return write(CHIP_ANA_HP_CTRL, m);
+}
+
+// Select which ADC input to use: AUDIO_INPUT_LINEIN or AUDIO_INPUT_MIC
+bool AudioControlSGTL5000::inputSelect(int device)
+{
+	if (device == AUDIO_INPUT_LINEIN) {
+		// enable LineIN and set ADC input range
+		return write(CHIP_ANA_CTRL, ana_ctrl | (1<<2)
+			&& lineInLevel(5));
+	} else if (device == AUDIO_INPUT_MIC) {
+    // TODO use micGain()
+		return write(CHIP_MIC_CTRL, 0x0173) // mic preamp gain = +40dB
+			&& write(CHIP_ANA_ADC_CTRL, 0x088) // input gain +12dB (is this enough?)
+			&& write(CHIP_ANA_CTRL, ana_ctrl & ~(1<<2)); // enable mic
+	} else {
+		return false;
+	}
 }
 
 bool AudioControlSGTL5000::micGain(unsigned int dB)
@@ -694,6 +725,12 @@ unsigned short AudioControlSGTL5000::dacVolume(float left, float right)
 	return modify(CHIP_DAC_VOL,m,65535);
 }
 
+// TODO create function to set MAIN_VOL for DUAL INPUT MIXER
+// write(DAP_MAIN_CHAN, 0x8000) // 100% volume
+
+// TODO create function to set MIX_VOL for DUAL INPUT MIXER
+// write(DAP_MIX_CHAN, 0x8000); // 100% volume
+
 unsigned short AudioControlSGTL5000::adcHighPassFilterEnable(void)
 {
 	return modify(CHIP_ADCDAC_CTRL, 0, 3);
@@ -729,6 +766,9 @@ unsigned short AudioControlSGTL5000::audioProcessorDisable(void)
 	return write(CHIP_SSS_CTRL, 0x0010) && write(DAP_CONTROL, 0);
 }
 
+// TODO function to enable DUAL INPUT MIXER
+// return write(DAP_CONTROL, 0x011) && write(CHIP_SSS_CTRL, 0x0070)
+// additionaly, call volume functions for MAIN_VOL and MIX_VOL
 
 // DAP_PEQ
 unsigned short AudioControlSGTL5000::eqFilterCount(uint8_t n) // valid to n&7, 0 thru 7 filters enabled.
@@ -873,10 +913,13 @@ unsigned char AudioControlSGTL5000::calcVol(float n, unsigned char range)
 	return (unsigned char)n;
 }
 
-// DAP_AUDIO_EQ_BASS_BAND0 & DAP_AUDIO_EQ_BAND1 & DAP_AUDIO_EQ_BAND2 etc etc
-unsigned short AudioControlSGTL5000::dap_audio_eq_band(uint8_t bandNum, float n) // by signed percentage -100/+100; dap_audio_eq(3);
+// DAP_AUDIO_EQ_BASS_BAND0, DAP_AUDIO_EQ_BAND1, [..]
+// 5 bands from 115Hz to 9900Hz
+// each eq_weighting programmable in range -1 to +1 (-11.75dB to +12dB)
+// 0.0 is neutral setting, step resolution 0.25dB
+unsigned short AudioControlSGTL5000::dap_audio_eq_band(uint8_t bandNum, float eq_weighting)
 {
-	n=(n*48)+0.499;
+	float n = (eq_weighting * 48) + 0.499;
 	if(n<-47) n=-47;
 	if(n>48) n=48;
 	n+=47;
