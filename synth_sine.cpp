@@ -68,6 +68,75 @@ void AudioSynthWaveformSine::update(void)
 }
 
 
+
+
+
+#if defined(KINETISK)
+// High accuracy 11th order Taylor Series Approximation
+// input is 0 to 0xFFFFFFFF, representing 0 to 360 degree phase
+// output is 32 bit signed integer, top 25 bits should be very good
+static int32_t taylor(uint32_t ph)
+{
+	int32_t angle, sum, p1, p2, p3, p5, p7, p9, p11;
+
+	if (ph >= 0xC0000000 || ph < 0x40000000) {
+		angle = (int32_t)ph; // valid from -90 to +90 degrees
+	} else {
+		angle = (int32_t)(0x80000000u - ph);
+	}
+	p1 =  multiply_32x32_rshift32_rounded(angle << 1, 1686629713);
+	p2 =  multiply_32x32_rshift32_rounded(p1, p1) << 3;
+	p3 =  multiply_32x32_rshift32_rounded(p2, p1) << 3;
+	sum = multiply_subtract_32x32_rshift32_rounded(p1 << 1, p3, 1431655765);
+	p5 =  multiply_32x32_rshift32_rounded(p3, p2) << 1;
+	sum = multiply_accumulate_32x32_rshift32_rounded(sum, p5, 286331153);
+	p7 =  multiply_32x32_rshift32_rounded(p5, p2);
+	sum = multiply_subtract_32x32_rshift32_rounded(sum, p7, 54539267);
+	p9 =  multiply_32x32_rshift32_rounded(p7, p2);
+	sum = multiply_accumulate_32x32_rshift32_rounded(sum, p9, 6059919);
+	p11 = multiply_32x32_rshift32_rounded(p9, p2);
+	sum = multiply_subtract_32x32_rshift32_rounded(sum, p11, 440721);
+	return sum <<= 1;
+}
+#endif
+
+
+void AudioSynthWaveformSineHires::update(void)
+{
+#if defined(KINETISK)
+	audio_block_t *msw, *lsw;
+	uint32_t i, ph, inc;
+	int32_t val;
+
+	if (magnitude) {
+		msw = allocate();
+		lsw = allocate();
+		if (msw && lsw) {
+			ph = phase_accumulator;
+			inc = phase_increment;
+			for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+				val = taylor(ph);
+				msw->data[i] = val >> 16;
+				lsw->data[i] = val & 0xFFFF;
+				ph += inc;
+			}
+			phase_accumulator = ph;
+			transmit(msw);
+			release(msw);
+			transmit(lsw);
+			release(lsw);
+			return;
+		} else {
+			if (msw) release(msw);
+			if (lsw) release(lsw);
+		}
+	}
+	phase_accumulator += phase_increment * AUDIO_BLOCK_SAMPLES;
+#endif
+}
+
+
+
 #if defined(KINETISK)
 
 void AudioSynthWaveformSineModulated::update(void)

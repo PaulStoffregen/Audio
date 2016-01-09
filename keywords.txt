@@ -40,6 +40,7 @@ AudioRecordQueue	KEYWORD2
 AudioSynthToneSweep	KEYWORD2
 AudioSynthWaveform	KEYWORD2
 AudioSynthWaveformSine	KEYWORD2
+AudioSynthWaveformSineHires	KEYWORD2
 AudioSynthWaveformSineModulated	KEYWORD2
 AudioSynthWaveformDc	KEYWORD2
 AudioSynthNoiseWhite	KEYWORD2
