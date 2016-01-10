@@ -378,6 +378,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioFilterFIR","data":{"defaults":{"name":{"value":"new"}},"shortName":"fir","inputs":1,"outputs":1,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioFilterStateVariable","data":{"defaults":{"name":{"value":"new"}},"shortName":"filter","inputs":2,"outputs":3,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioAnalyzePeak","data":{"defaults":{"name":{"value":"new"}},"shortName":"peak","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioAnalyzeRMS","data":{"defaults":{"name":{"value":"new"}},"shortName":"rms","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioAnalyzeFFT256","data":{"defaults":{"name":{"value":"new"}},"shortName":"fft256","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioAnalyzeFFT1024","data":{"defaults":{"name":{"value":"new"}},"shortName":"fft1024","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioAnalyzeToneDetect","data":{"defaults":{"name":{"value":"new"}},"shortName":"tone","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -2099,6 +2100,36 @@ double s_freq = .0625;</p>
 	</div>
 </script>
 
+<script type="text/x-red" data-help-name="AudioAnalyzeRMS">
+	<h3>Summary</h3>
+	<p>Track the signal RMS amplitude.  Useful for
+		audio level response projects, and general troubleshooting.</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Signal to analyze</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>available</span>();</p>
+	<p class=desc>Returns true if new RMS data is available.
+	</p>
+	<p class=func><span class=keyword>read</span>();</p>
+	<p class=desc>Read the new RMS value.
+		Return is from 0.0 to 1.0.
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; PeakAndRMSMeterStereo</p>
+	</p>
+	<h3>Notes</h3>
+	<p></p>
+</script>
+<script type="text/x-red" data-template-name="AudioAnalyzeRMS">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
 <script type="text/x-red" data-help-name="AudioAnalyzeFFT256">
 	<h3>Summary</h3>
 	<p>Compute a 256 point Fast Fourier Transform (FFT) frequency analysis,
@@ -2795,7 +2826,7 @@ value  frequency
 
 <script type="text/x-red" data-help-name="AudioControlAK4558">
 	<h3>Summary</h3>
-	<p>Control the AK4558 chip on the <a href="https://hackaday.io/project/8567-hifi-audio-codec-module" target="_blank">HiFi Audio CODEC Module</a> 
+	<p>Control the AK4558 chip on the <a href="https://hackaday.io/project/8567-hifi-audio-codec-module" target="_blank">HiFi Audio CODEC Module</a>
 	in slave mode, where the Teensy controls all I2S timing.</p>
 	<h3>Audio Connections</h3>
 	<p>This object has no audio inputs or outputs.  Separate I2S objects

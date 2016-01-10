@@ -64,6 +64,7 @@
 #include "analyze_tonedetect.h"
 #include "analyze_notefreq.h"
 #include "analyze_peak.h"
+#include "analyze_rms.h"
 #include "control_sgtl5000.h"
 #include "control_wm8731.h"
 #include "control_ak4558.h"

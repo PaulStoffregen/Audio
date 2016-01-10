@@ -15,6 +15,7 @@ AudioMemory	KEYWORD2
 AudioAnalyzeFFT256	KEYWORD2
 AudioAnalyzeFFT1024	KEYWORD2
 AudioAnalyzePeak	KEYWORD2
+AudioAnalyzeRMS	KEYWORD2
 AudioAnalyzePrint	KEYWORD2
 AudioAnalyzeToneDetect	KEYWORD2
 AudioAnalyzeNoteFrequency	KEYWORD2
