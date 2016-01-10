@@ -26,27 +26,53 @@
 
 
 #include "analyze_rms.h"
-#include <arm_math.h>
+#include "utility/dspinst.h"
 
 void AudioAnalyzeRMS::update(void)
 {
-	audio_block_t *block;
-	int16_t rmsResult;
-
-	block = receiveReadOnly();
-	if (!block) {
-		return;
-	}
-
-	// not reinventing the wheel:
-	// use DSP packed 32i instructions as found in arm_math.h, with 64b accumulator
-	arm_rms_q15(block->data, AUDIO_BLOCK_SAMPLES, &rmsResult); // seems to use ~2% CPU
-	lastRMS = rmsResult; // prevent threading issues
-	// for optimization, one could re-implement arm_rms_q15 to do the sqrt on read().
-	// This way, the rms in dB could also be implemented faster:
-	// Instead of 20*log10(sqrt(MSerror)), one could do write 10*log10(MSerror)
-
-	new_output = true;
+	audio_block_t *block = receiveReadOnly();
+	if (!block) return;
+#if 1
+	uint32_t *p = (uint32_t *)(block->data);
+	uint32_t *end = p + AUDIO_BLOCK_SAMPLES/2;
+	int64_t sum = accum;
+	do {
+		uint32_t n1 = *p++;
+		uint32_t n2 = *p++;
+		uint32_t n3 = *p++;
+		uint32_t n4 = *p++;
+		sum = multiply_accumulate_16tx16t_add_16bx16b(sum, n1, n1);
+		sum = multiply_accumulate_16tx16t_add_16bx16b(sum, n2, n2);
+		sum = multiply_accumulate_16tx16t_add_16bx16b(sum, n3, n3);
+		sum = multiply_accumulate_16tx16t_add_16bx16b(sum, n4, n4);
+	} while (p < end);
+	accum = sum;
+	count++;
+#else
+	int16_t *p = block->data;
+	int16_t *end = p + AUDIO_BLOCK_SAMPLES;
+	int64_t sum = accum;
+	do {
+		int32_t n = *p++;
+		sum += n * n;
+	} while (p < end);
+	accum = sum;
+	count++;
+#endif
 	release(block);
+}
+
+float AudioAnalyzeRMS::read(void)
+{
+	__disable_irq();
+	int64_t sum = accum;
+	accum = 0;
+	uint32_t num = count;
+	count = 0;
+	__enable_irq();
+	float meansq = sum / (num * AUDIO_BLOCK_SAMPLES);
+	// TODO: shift down to 32 bits and use sqrt_uint32
+	//       but is that really any more efficient?
+	return sqrtf(meansq) / 32767.0;
 }
 

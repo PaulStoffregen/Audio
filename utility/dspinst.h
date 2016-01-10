@@ -274,6 +274,20 @@ static inline int32_t multiply_16tx16b_add_16bx16t(uint32_t a, uint32_t b)
 	return out;
 }
 
+// // computes sum += ((a[15:0] * b[15:0]) + (a[31:16] * b[31:16]))
+static inline int64_t multiply_accumulate_16tx16t_add_16bx16b(int64_t sum, uint32_t a, uint32_t b)
+{
+	asm volatile("smlald %Q0, %R0, %1, %2" : "+r" (sum) : "r" (a), "r" (b));
+	return sum;
+}
+
+// // computes sum += ((a[15:0] * b[31:16]) + (a[31:16] * b[15:0]))
+static inline int64_t multiply_accumulate_16tx16b_add_16bx16t(int64_t sum, uint32_t a, uint32_t b)
+{
+	asm volatile("smlaldx %Q0, %R0, %1, %2" : "+r" (sum) : "r" (a), "r" (b));
+	return sum;
+}
+
 // computes ((a[15:0] * b[15:0])
 static inline int32_t multiply_16bx16b(uint32_t a, uint32_t b) __attribute__((always_inline, unused));
 static inline int32_t multiply_16bx16b(uint32_t a, uint32_t b)
