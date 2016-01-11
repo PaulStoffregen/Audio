@@ -100,6 +100,9 @@ micGain	KEYWORD2
 lineInLevel	KEYWORD2
 lineOutLevel	KEYWORD2
 dacVolume	KEYWORD2
+dacVolumeRamp	KEYWORD2
+dacVolumeRampLinear	KEYWORD2
+dacVolumeRampDisable	KEYWORD2
 adcHighPassFilterEnable	KEYWORD2
 adcHighPassFilterFreeze	KEYWORD2
 adcHighPassFilterDisable	KEYWORD2

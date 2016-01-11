@@ -2551,14 +2551,27 @@ double s_freq = .0625;</p>
 		signal level.  The ranges is 0 to 1.0, with the default (no digital attenuation)
 		at 1.0.
 	</p>
-	<p  class=desc>dacVolume uses zero-crossing detect to avoid clicks, and ramping is handled by
-	the chip so that a new volume may be set directly in a single call.
+	<p  class=desc>dacVolume uses zero-crossing detect to avoid clicks, and graceful
+		ramping is handled by the chip so that a new volume may be set directly in
+		a single call.
 	</p>
 	<p class=func><span class=keyword>dacVolume</span>(left, right);</p>
 	<p class=desc>Adjust the digital output volume separately on left and
 		right channels.
 	</p>
-
+	<p class=func><span class=keyword>dacVolumeRamp</span>();</p>
+	<p class=desc>Enable graceful volume ramping.  The dacVolume adjusts gradually using
+		an exponential curve.  Pops or loud clicks are avoided when making large
+		changes in volume level.
+	</p>
+	<p class=func><span class=keyword>dacVolumeRampLinear</span>();</p>
+	<p class=desc>Enable faster volume ramping.  A slight click may be heard during a
+		large volume change.
+	</p>
+	<p class=func><span class=keyword>dacVolumeRampDisable</span>();</p>
+	<p class=desc>Do not use any gradual ramping.  The zero cross feature still helps
+		for small changes, but large volume changes may produce a pop or click.
+	</p>
 
 	<h3>Audio Processor</h3>
 
@@ -2730,6 +2743,8 @@ value  frequency
 	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; SGTL5000 &gt; balanceHP
 	</p>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; SGTL5000 &gt; CalcBiquadToneControlDAP
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; SGTL5000 &gt; VolumeRamp
 	</p>
 	<h3>Notes</h3>
 	<p>TODO: add example with rock/classical/speech presets, where rock uses bass boost

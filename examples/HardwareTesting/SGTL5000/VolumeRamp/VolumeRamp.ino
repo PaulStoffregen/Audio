@@ -7,6 +7,8 @@
 // time, to prevent a sudden pop or click sound.  You could achieve this by adding
 // code to change the volume setting in very small steps over time, but the
 // SGTL5000 can do it for you automatically.
+//
+// This example was originally contributed by Hedde Bosman
 
 #include <Audio.h>
 #include <Wire.h>
