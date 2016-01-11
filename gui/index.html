@@ -375,6 +375,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioEffectDelay","data":{"defaults":{"name":{"value":"new"}},"shortName":"delay","inputs":1,"outputs":8,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectDelayExternal","data":{"defaults":{"name":{"value":"new"}},"shortName":"delayExt","inputs":1,"outputs":8,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectBitcrusher","data":{"shortName":"bitcrusher","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectMidSide","data":{"shortName":"midside","inputs":2,"outputs":2,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioFilterBiquad","data":{"defaults":{"name":{"value":"new"}},"shortName":"biquad","inputs":1,"outputs":1,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioFilterFIR","data":{"defaults":{"name":{"value":"new"}},"shortName":"fir","inputs":1,"outputs":1,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioFilterStateVariable","data":{"defaults":{"name":{"value":"new"}},"shortName":"filter","inputs":2,"outputs":3,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -1898,7 +1899,7 @@ double s_freq = .0625;</p>
         <tr class=odd><td align=center>In 0</td><td>Signal Input</td></tr>
         <tr class=odd><td align=center>Out 0</td><td>Signal Output</td></tr>
     </table>
-    <h3>Parameters</h3>
+    <h3>Functions</h3>
     <p class=func><span class=keyword>bits</span>(xcrushBits);</p>
     <p class=desc>xcrushBits sets the bitdepth, from 1 to 16. A Value of 16
     does not crush the bitdepth, and is effectively a passthru for this part
@@ -1927,6 +1928,46 @@ double s_freq = .0625;</p>
     </p>
 </script>
 <script type="text/x-red" data-template-name="AudioEffectBitcrusher">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioEffectMidSide">
+	<h3>Summary</h3>
+	<p>Convert stereo signals to/from Mid-Side format.
+		Mid-Side encoding can be used to increase stereo width, make the lower
+		frequencies mono (to please your sub), or as the basis of audio compression.</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>While<br>Encoding</th><th>While<br>Decoding</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Left Input</td><td>Mid Output</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Right Input</td><td>Side Output</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Mid Input</td><td>Left Output</td></tr>
+		<tr class=odd><td align=center>Out 1</td><td>Side Input</td><td>Right Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>encode</span>();</p>
+	<p class=desc>Configure this object to encode from stereo to Mid-Side format.</p>
+	<p class=func><span class=keyword>decode</span>();</p>
+	<p class=desc>Configure this object to decode from Mid-Side format back to stereo signals.</p>
+
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Mid_Side</p>
+	<h3>Notes</h3>
+	<p>Many interesting stereo effects can be achieved by manipulating Mid-Side signals.</p>
+	<p>Normally a pair of these objects are used, one to encode, then additional
+		gain/attenuation or effects applied to the Mid-Side signals, and finally
+		decoding back to stereo signals</p>
+	<p>To prevent saturation, halving is done in the encoding, that is:</p>
+	<p>Mid = (left+right)/2</p>
+	<p>Side = (left-right)/2</p>
+	<p>And to decode:</p>
+	<p>Left = Mid+Side</p>
+	<p>Right = Mid-Side</p>
+</script>
+<script type="text/x-red" data-template-name="AudioEffectMidSide">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
