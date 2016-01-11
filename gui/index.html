@@ -395,7 +395,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 
 <script type="text/x-red" data-help-name="AudioInputI2S">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Receive 16 bit stereo audio from the
 	<a href="http://www.pjrc.com/store/teensy3_audio.html" target="_blank">audio shield</a>
 		or another I2S device, using I2S master mode.</p>
@@ -461,7 +461,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 
 <script type="text/x-red" data-help-name="AudioInputAnalog">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Receive audio using the built-in analog to digital converter.</p>
 	</div>
 	<h3>Audio Connections</h3>
@@ -508,7 +508,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 
 <script type="text/x-red" data-help-name="AudioInputI2Sslave">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Receive 16 bit stereo audio from an I2S device using I2S slave mode.</p>
 	</div>
 	<h3>Audio Connections</h3>
@@ -553,7 +553,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 
 <script type="text/x-red" data-help-name="AudioOutputI2S">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Transmit 16 bit stereo audio to the
 	<a href="http://www.pjrc.com/store/teensy3_audio.html" target="_blank">audio shield</a>
 		or another I2S device, using I2S master mode.</p>
@@ -612,7 +612,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 
 <script type="text/x-red" data-help-name="AudioOutputSPDIF">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Transmit 16 bit stereo audio as Digital S/PDIF.</p>
 	<p align=center><img src="img/spdif_proto.jpg"></p>
 	</div>
@@ -665,7 +665,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 
 <script type="text/x-red" data-help-name="AudioOutputAnalog">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Transmit 12 bit audio using Teensy 3.1's built-in digital to analog converter.</p>
 	</div>
 	<h3>Audio Connections</h3>
@@ -701,7 +701,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 
 <script type="text/x-red" data-help-name="AudioOutputPWM">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Transmit audio using Teensy 3.1's PWM pins.  Two pins are
 		used for coarse and fine pulses, to be combined by scaled
 		resistors.</p>
@@ -751,7 +751,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 
 <script type="text/x-red" data-help-name="AudioOutputI2Sslave">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Transmit 16 bit stereo audio to an I2S device using I2S slave mode.</p>
 	</div>
 	<h3>Audio Connections</h3>
@@ -794,7 +794,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 
 <script type="text/x-red" data-help-name="AudioMixer4">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Combine up to 4 audio signals together, each with adjustable gain.
 		All channels support signal attenuation or amplification.</p>
 	</div>
@@ -843,7 +843,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 
 <script type="text/x-red" data-help-name="AudioPlayMemory">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Play a short sound clip, stored directly in memory.
 		Data files are created with the
 		<a href="https://github.com/PaulStoffregen/Audio/tree/master/examples/SamplePlayer/wav2sketch" target="_blank">wav2sketch program</a>,
@@ -895,7 +895,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 
 <script type="text/x-red" data-help-name="AudioPlaySdWav">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Play a WAV file, stored on a SD card.</p>
 	</div>
 	<h3>Audio Connections</h3>
@@ -958,7 +958,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 
 <script type="text/x-red" data-help-name="AudioPlaySdRaw">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Play a RAW data file, stored on a SD card.  RAW format is simpler
 		than WAV and begins playing immediately, without parsing WAV file
 		header info.</p>
@@ -1013,7 +1013,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 
 <script type="text/x-red" data-help-name="AudioPlaySerialflashRaw">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Play a RAW data file, stored on a Serial Flash chip.  These chips
 		are far more efficient than SD cards, allowing many files to be
 		played simultaneously by copies of this object.
@@ -1075,7 +1075,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 
 <script type="text/x-red" data-help-name="AudioPlayQueue">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Play audio data provided by the Arduino sketch.  This object provides
 		functions to allow the sketch code to push data into the audio system.</p>
 	</div>
@@ -1124,7 +1124,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 
 <script type="text/x-red" data-help-name="AudioRecordQueue">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Record audio data by sending to the Arduino sketch.  This object allows
 		sketch code to receive audio packets.</p>
 	</div>
@@ -1182,7 +1182,7 @@ The actual packets are taken
 
 <script type="text/x-red" data-help-name="AudioSynthWaveformSine">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Create a sine wave signal</p>
 	</div>
 	<h3>Audio Connections</h3>
@@ -1226,7 +1226,7 @@ The actual packets are taken
 
 <script type="text/x-red" data-help-name="AudioSynthWaveformSineHires">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Create a highly precise, low distortion sine wave signal.
 		Mainly useful for codec &amp; analog circuitry testing.</p>
 	</div>
@@ -1267,7 +1267,7 @@ The actual packets are taken
 
 <script type="text/x-red" data-help-name="AudioSynthWaveformSineModulated">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Create a modulated sine wave, using any audio signal to continuously
 		modulate the sine wave frequency.</p>
 	</div>
@@ -1313,7 +1313,7 @@ The actual packets are taken
 
 <script type="text/x-red" data-help-name="AudioSynthWaveform">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Create a waveform: sine, sawtooth, square, triangle, pulse or arbitrary.</p>
 	</div>
 	<h3>Audio Connections</h3>
@@ -1383,7 +1383,7 @@ The actual packets are taken
 
 <script type="text/x-red" data-help-name="AudioSynthToneSweep">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Create a continuously varying (in frequency) sine wave</p>
 	</div>
 	<h3>Audio Connections</h3>
@@ -1414,7 +1414,7 @@ The actual packets are taken
 
 <script type="text/x-red" data-help-name="AudioSynthWaveformDc">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Create constant (DC) signal, useful for control of objects that take
 		a modulation or control input signal.  This constant level can be
 		used to modify other waveforms using mixer or multiplier objects</p>
@@ -1454,7 +1454,7 @@ The actual packets are taken
 
 <script type="text/x-red" data-help-name="AudioSynthNoiseWhite">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Create white noise.
 		</p>
 	<p align=center><img src="img/whitenoise.png"></p>
@@ -1487,7 +1487,7 @@ The actual packets are taken
 
 <script type="text/x-red" data-help-name="AudioSynthNoisePink">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Create pink noise, using Stefan Stenzel's "New Shade Of Pink" algorithm.
 		</p>
 	<!--
@@ -1527,7 +1527,7 @@ The actual packets are taken
 
 <script type="text/x-red" data-help-name="AudioEffectFade">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Gradually increase or decrease audio level.</p>
 	</div>
 	<h3>Audio Connections</h3>
@@ -1573,7 +1573,7 @@ The actual packets are taken
 
 <script type="text/x-red" data-help-name="AudioEffectChorus">
 <h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>The chorus effect simulates the richness of several nearly-identical
 	sound sources (like the way a choir sounds different to a single singer).
 	It does this by sampling from a delay line, so each voice is actually
@@ -1624,7 +1624,7 @@ The actual packets are taken
 
 <script type="text/x-red" data-help-name="AudioEffectFlange">
 <h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Originally, flanging was produced by playing the same signal on two synchronized
 	reel-to-reel tape recorders and making one of the reels slow down and speed up by
 	pressing on the flange of the reel (hence the name). This is a type of
@@ -1686,7 +1686,7 @@ double s_freq = .0625;</p>
 
 <script type="text/x-red" data-help-name="AudioEffectEnvelope">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Modify a signal with a DAHDSR (Delay Attack Hold Decay Sustain
 		Release) envelope.
 	</p>
@@ -1750,7 +1750,7 @@ double s_freq = .0625;</p>
 
 <script type="text/x-red" data-help-name="AudioEffectMultiply">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Multiply two signals together, useful for amplitude modulation
 		or "voltage controlled amplification".
 	</p>
@@ -1786,7 +1786,7 @@ double s_freq = .0625;</p>
 
 <script type="text/x-red" data-help-name="AudioEffectDelay">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Delay a signal.  Up to 8 separate delay taps can be used.</p>
 	<p align=center><img src="img/delay.png"><br><small>1 kHz burst, delayed 5.2 ms.</small></p>
 	</div>
@@ -1835,7 +1835,7 @@ double s_freq = .0625;</p>
 
 <script type="text/x-red" data-help-name="AudioEffectDelayExternal">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Delay a signal, using external memory for longer delay times!  Up to 8 separate delay taps can be used.</p>
 	<p align=center><img src="img/delay.png"><br><small>1 kHz burst, delayed 5.2 ms.</small></p>
 	</div>
@@ -1937,7 +1937,7 @@ double s_freq = .0625;</p>
 
 <script type="text/x-red" data-help-name="AudioEffectBitcrusher">
     <h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
     <p>Reduce the samplerate and/or bitdepth of a source signal, resulting in
 		a distorted sound.</p>
 	</div>
@@ -1984,7 +1984,7 @@ double s_freq = .0625;</p>
 
 <script type="text/x-red" data-help-name="AudioEffectMidSide">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Convert stereo signals to/from Mid-Side format.
 		Mid-Side encoding can be used to increase stereo width, make the lower
 		frequencies mono (to please your sub), or as the basis of audio compression.</p>
@@ -2026,7 +2026,7 @@ double s_freq = .0625;</p>
 
 <script type="text/x-red" data-help-name="AudioFilterBiquad">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Biquadratic cascaded filter, useful for all sorts of filtering.
 		Up to 4 stages may be cascaded.
 	</p>
@@ -2090,7 +2090,7 @@ double s_freq = .0625;</p>
 
 <script type="text/x-red" data-help-name="AudioFilterFIR">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Finite impulse response filter, useful for all sorts of filtering.
 	</p>
 	<p align=center><img src="img/fir_filter.png"></p>
@@ -2142,7 +2142,7 @@ double s_freq = .0625;</p>
 
 <script type="text/x-red" data-help-name="AudioFilterStateVariable">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>A State Variable (Chamberlin) Filter with 12 dB/octave roll-off,
 		adjustable resonance, and optional signal control of corner
 		frequency.</p>
@@ -2203,7 +2203,7 @@ double s_freq = .0625;</p>
 
 <script type="text/x-red" data-help-name="AudioAnalyzePeak">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Track the signal peak amplitude.  Very useful for simple
 		audio level response projects, and general troubleshooting.</p>
 	</div>
@@ -2241,7 +2241,7 @@ double s_freq = .0625;</p>
 
 <script type="text/x-red" data-help-name="AudioAnalyzeRMS">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Track the signal RMS amplitude.  Useful for
 		audio level response projects, and general troubleshooting.</p>
 	</div>
@@ -2273,7 +2273,7 @@ double s_freq = .0625;</p>
 
 <script type="text/x-red" data-help-name="AudioAnalyzeFFT256">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Compute a 256 point Fast Fourier Transform (FFT) frequency analysis,
 		with real value (magnitude) output.  The frequency resolution is
 		172 Hz, useful for simple audio visualization.</p>
@@ -2340,7 +2340,7 @@ double s_freq = .0625;</p>
 
 <script type="text/x-red" data-help-name="AudioAnalyzeFFT1024">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Compute a 1024 point Fast Fourier Transform (FFT) frequency analysis,
 		with real value (magnitude) output.  The frequency resolution is
 		43 Hz, useful detailed for audio visualization.</p>
@@ -2411,7 +2411,7 @@ double s_freq = .0625;</p>
 
 <script type="text/x-red" data-help-name="AudioAnalyzeToneDetect">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Detect the level of a single tone</p>
 	</div>
 	<h3>Audio Connections</h3>
@@ -2467,7 +2467,7 @@ double s_freq = .0625;</p>
 
 <script type="text/x-red" data-help-name="AudioAnalyzeNoteFrequency">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Detect with fairly good accuracy the fundamental frequency f<sub>o</sub>
 		of musical notes, such as electric guitar and bass.</p>
 	</div>
@@ -2524,7 +2524,7 @@ double s_freq = .0625;</p>
 
 <script type="text/x-red" data-help-name="AudioAnalyzePrint">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Print raw audio data to the Arduino Serial Monitor.  This
 		object creates massive output quickly, and should not normally be used.</p>
 	</div>
@@ -2566,7 +2566,7 @@ double s_freq = .0625;</p>
 
 <script type="text/x-red" data-help-name="AudioControlSGTL5000">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Control the SGTL5000 chip on the
 		<a href="http://www.pjrc.com/store/teensy3_audio.html" target="_blank">audio shield</a>.
 		SGTL5000 is always used in slave mode, where Teensy controls
@@ -2916,7 +2916,7 @@ value  frequency
 
 <script type="text/x-red" data-help-name="AudioControlWM8731">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Control a WM8731 chip in slave mode, where it receives all clocks from Teensy</p>
 	</div>
 	<h3>Audio Connections</h3>
@@ -2958,7 +2958,7 @@ value  frequency
 
 <script type="text/x-red" data-help-name="AudioControlWM8731master">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Control a WM8731 chip in master mode, where it controls all I2S timing.</p>
 	</div>
 	<h3>Audio Connections</h3>
@@ -2998,7 +2998,7 @@ value  frequency
 
 <script type="text/x-red" data-help-name="AudioControlAK4558">
 	<h3>Summary</h3>
-	<div class=tooltip>
+	<div class=tooltipinfo>
 	<p>Control the AK4558 chip on the <a href="https://hackaday.io/project/8567-hifi-audio-codec-module" target="_blank">HiFi Audio CODEC Module</a>
 	in slave mode, where the Teensy controls all I2S timing.</p>
 	</div>
