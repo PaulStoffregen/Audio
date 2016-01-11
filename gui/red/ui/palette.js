@@ -125,12 +125,12 @@ RED.palette = (function() {
 
 		if (!server) {
 			data = $("script[data-help-name|='" + key + "']").html();
-			var firstP = $("<div/>").append(data).children("p").first().html();
+			var firstP = $("<div/>").append(data).children("div").first().html();
 			options.content = firstP;
 			$(elem).popover(options);
 		} else {
 			$.get( "resources/help/" + key + ".html", function( data ) {
-				var firstP = $("<div/>").append(data).children("p").first().html();
+				var firstP = $("<div/>").append(data).children("div").first().html();
 				options.content = firstP;
 				$(elem).popover(options);
 			});
