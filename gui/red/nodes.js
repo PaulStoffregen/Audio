@@ -90,10 +90,10 @@ RED.nodes = (function() {
 		return node_defs[type];
 	}
 	function selectNode(name) {
-		// on Chrome this causes "Uncaught SecurityError" when used from file:
-		// but other than errors in the console, doesn't seem to harm anything
-		window.history.pushState(null, null, window.location.protocol + "//"
-			+ window.location.host + window.location.pathname + '?info=' + name);
+		if (!((document.origin == 'null') && (window.chrome))) {
+			window.history.pushState(null, null, window.location.protocol + "//"
+				+ window.location.host + window.location.pathname + '?info=' + name);
+		}
 	}
 	function addNode(n) {
 		if (n._def.category == "config") {
