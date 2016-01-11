@@ -2082,8 +2082,12 @@ double s_freq = .0625;</p>
 	<p class=desc>Returns true each time new peak data is available.
 	</p>
 	<p class=func><span class=keyword>read</span>();</p>
-	<p class=desc>Read the highest peak value since the last read.
+	<p class=desc>Read the highest peak amplitude value since the last read.
 		Return is from 0.0 to 1.0.
+	</p>
+	<p class=func><span class=keyword>readPeakToPeak</span>();</p>
+	<p class=desc>Read the highest peak-to-peak amplitude since the last read.
+		Return is from 0.0 to 2.0.
 	</p>
 	<h3>Examples</h3>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; PeakMeterMono
