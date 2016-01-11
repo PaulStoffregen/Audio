@@ -694,6 +694,24 @@ unsigned short AudioControlSGTL5000::dacVolume(float left, float right)
 	return modify(CHIP_DAC_VOL,m,65535);
 }
 
+bool AudioControlSGTL5000::dacVolumeRamp()
+{
+	return modify(CHIP_ADCDAC_CTRL, 0x300, 0x300);
+}
+
+bool AudioControlSGTL5000::dacVolumeRampLinear()
+{
+	return modify(CHIP_ADCDAC_CTRL, 0x200, 0x300);
+}
+
+bool AudioControlSGTL5000::dacVolumeRampDisable()
+{
+	return modify(CHIP_ADCDAC_CTRL, 0, 0x300);
+}
+
+
+
+
 unsigned short AudioControlSGTL5000::adcHighPassFilterEnable(void)
 {
 	return modify(CHIP_ADCDAC_CTRL, 0, 3);

@@ -60,6 +60,9 @@ public:
 	unsigned short lineOutLevel(uint8_t left, uint8_t right);
 	unsigned short dacVolume(float n);
 	unsigned short dacVolume(float left, float right);
+	bool dacVolumeRamp();
+	bool dacVolumeRampLinear();
+	bool dacVolumeRampDisable();
 	unsigned short adcHighPassFilterEnable(void);
 	unsigned short adcHighPassFilterFreeze(void);
 	unsigned short adcHighPassFilterDisable(void);
