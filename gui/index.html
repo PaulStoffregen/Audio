@@ -360,6 +360,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioPlayQueue","data":{"defaults":{"name":{"value":"new"}},"shortName":"queue","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioRecordQueue","data":{"defaults":{"name":{"value":"new"}},"shortName":"queue","inputs":1,"outputs":0,"category":"record-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveformSine","data":{"defaults":{"name":{"value":"new"}},"shortName":"sine","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioSynthWaveformSineHires","data":{"defaults":{"name":{"value":"new"}},"shortName":"sine_hires","inputs":0,"outputs":2,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveformSineModulated","data":{"defaults":{"name":{"value":"new"}},"shortName":"sine_fm","inputs":1,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveform","data":{"defaults":{"name":{"value":"new"}},"shortName":"waveform","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthToneSweep","data":{"defaults":{"name":{"value":"new"}},"shortName":"tonesweep","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -1184,6 +1185,45 @@ The actual packets are taken
 	</p>
 	<h3>Notes</h3>
 	<p></p>
+</script>
+<script type="text/x-red" data-template-name="AudioSynthWaveformSine">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioSynthWaveformSineHires">
+	<h3>Summary</h3>
+	<p>Create a highly precise, low distortion sine wave signal.
+		Mainly useful for codec &amp; analog circuitry testing.</p>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Sine Wave, upper bits</td></tr>
+		<tr class=odd><td align=center>Out 1</td><td>Sine Wave, lower bits</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>amplitude</span>(level);</p>
+	<p class=desc>Set the amplitude, from 0 to 1.0.
+	</p>
+	<p class=func><span class=keyword>frequency</span>(freq);</p>
+	<p class=desc>Set the frequency, from 0 to 22000.  Very low values may
+		be used to create a LFO (Low Frequency Oscillator) for objects
+		with modulation signal inputs.
+	</p>
+	<p class=func><span class=keyword>phase</span>(angle);</p>
+	<p class=desc>
+		Cause the generated waveform to jump to a specific point within
+		its cycle.  Angle is from 0 to 360 degrees.  When multiple objects
+		are configured,
+		<a href="http://www.pjrc.com/teensy/td_libs_AudioProcessorUsage.html" target="_blank">AudioNoInterrupts()</a>
+		should be used to guarantee all new settings take effect together.
+	</p>
+	<h3>Notes</h3>
+	<p>An 11th order Taylor series approximation is used to generate
+		a very accurate sine wave.  At least the upper 25 bits are believe
+		to be perfect.  This is mainly intended for testing 24 bit codec chips!</p>
 </script>
 <script type="text/x-red" data-template-name="AudioSynthWaveformSine">
 	<div class="form-row">
