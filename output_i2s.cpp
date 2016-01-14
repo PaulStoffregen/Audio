@@ -25,6 +25,7 @@
  */
 
 #include "output_i2s.h"
+#include "memcpy_audio.h"
 
 audio_block_t * AudioOutputI2S::block_left_1st = NULL;
 audio_block_t * AudioOutputI2S::block_right_1st = NULL;
@@ -71,14 +72,67 @@ void AudioOutputI2S::begin(void)
 
 void AudioOutputI2S::isr(void)
 {
+#if defined(KINETISK)
+	int16_t *dest;
+	audio_block_t *blockL, *blockR;
+	uint32_t saddr, offsetL, offsetR;
+
+	saddr = (uint32_t)(dma.TCD->SADDR);
+	dma.clearInterrupt();
+	if (saddr < (uint32_t)i2s_tx_buffer + sizeof(i2s_tx_buffer) / 2) {
+		// DMA is transmitting the first half of the buffer
+		// so we must fill the second half
+		dest = (int16_t *)&i2s_tx_buffer[AUDIO_BLOCK_SAMPLES/2];
+		if (AudioOutputI2S::update_responsibility) AudioStream::update_all();
+	} else {
+		// DMA is transmitting the second half of the buffer
+		// so we must fill the first half
+		dest = (int16_t *)i2s_tx_buffer;
+	}
+
+	blockL = AudioOutputI2S::block_left_1st;
+	blockR = AudioOutputI2S::block_right_1st;
+	offsetL = AudioOutputI2S::block_left_offset;
+	offsetR = AudioOutputI2S::block_right_offset;
+
+	if (blockL && blockR) {
+		memcpy_tointerleaveLR(dest, blockL->data + offsetL, blockR->data + offsetR);
+		offsetL += AUDIO_BLOCK_SAMPLES / 2;
+		offsetR += AUDIO_BLOCK_SAMPLES / 2;
+	} else if (blockL) {
+		memcpy_tointerleaveL(dest, blockL->data + offsetL);
+		offsetL += AUDIO_BLOCK_SAMPLES / 2;
+	} else if (blockR) {
+		memcpy_tointerleaveR(dest, blockR->data + offsetR);
+		offsetR += AUDIO_BLOCK_SAMPLES / 2;
+	} else {
+		memset(dest,0,AUDIO_BLOCK_SAMPLES * 2);
+		return;
+	}
+
+	if (offsetL < AUDIO_BLOCK_SAMPLES) {
+		AudioOutputI2S::block_left_offset = offsetL;
+	} else {
+		AudioOutputI2S::block_left_offset = 0;
+		AudioStream::release(blockL);
+		AudioOutputI2S::block_left_1st = AudioOutputI2S::block_left_2nd;
+		AudioOutputI2S::block_left_2nd = NULL;
+	}
+	if (offsetR < AUDIO_BLOCK_SAMPLES) {
+		AudioOutputI2S::block_right_offset = offsetR;
+	} else {
+		AudioOutputI2S::block_right_offset = 0;
+		AudioStream::release(blockR);
+		AudioOutputI2S::block_right_1st = AudioOutputI2S::block_right_2nd;
+		AudioOutputI2S::block_right_2nd = NULL;
+	}
+#else
 	const int16_t *src, *end;
 	int16_t *dest;
 	audio_block_t *block;
 	uint32_t saddr, offset;
 
-#if defined(KINETISK)
-	saddr = (uint32_t)(dma.TCD->SADDR);
-#endif
+	saddr = (uint32_t)(dma.CFG->SAR);
 	dma.clearInterrupt();
 	if (saddr < (uint32_t)i2s_tx_buffer + sizeof(i2s_tx_buffer) / 2) {
 		// DMA is transmitting the first half of the buffer
@@ -93,7 +147,6 @@ void AudioOutputI2S::isr(void)
 		end = (int16_t *)&i2s_tx_buffer[AUDIO_BLOCK_SAMPLES/2];
 	}
 
-	// TODO: these copy routines could be merged and optimized, maybe in assembly?
 	block = AudioOutputI2S::block_left_1st;
 	if (block) {
 		offset = AudioOutputI2S::block_left_offset;
@@ -141,6 +194,7 @@ void AudioOutputI2S::isr(void)
 			dest += 2;
 		} while (dest < end);
 	}
+#endif
 }
 
 
