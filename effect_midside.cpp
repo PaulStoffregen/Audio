@@ -41,7 +41,7 @@ void AudioEffectMidSide::update(void)
 		if (blockb) release(blockb); // of the blocks is NULL then it's trouble anyway
 		return;
 	}
-
+#if defined(KINETISK)
 	pa = (uint32_t *)(blocka->data);
 	pb = (uint32_t *)(blockb->data);
 	end = pa + AUDIO_BLOCK_SAMPLES/2;
@@ -87,6 +87,7 @@ void AudioEffectMidSide::update(void)
 	}
 	transmit(blocka, 0); // mid (encoding) or  left (decoding)
 	transmit(blockb, 1); // side (encoding) or right (decoding)
+#endif
 	release(blocka);
 	release(blockb);
 }
