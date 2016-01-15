@@ -1,8 +1,6 @@
 Teensy Audio Library
 ====================
 
-[![Build Status](https://travis-ci.org/PaulStoffregen/Audio.svg?branch=master)](https://travis-ci.org/PaulStoffregen/Audio)
-
 16 bit, 44.1 kHz streaming audio library for Teensy 3.x, featuring:
 
 * Polyphonic Playback
