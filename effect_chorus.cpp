@@ -31,11 +31,13 @@
 
 boolean AudioEffectChorus::begin(short *delayline,int d_length,int n_chorus)
 {
+#if 0
 Serial.print("AudioEffectChorus.begin(Chorus delay line length = ");
 Serial.print(d_length);
 Serial.print(", n_chorus = ");
 Serial.print(n_chorus);
 Serial.println(")");
+#endif
 
   l_delayline = NULL;
   delay_length = 0;
