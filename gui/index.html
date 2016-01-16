@@ -348,6 +348,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioInputAnalog","data":{"defaults":{"name":{"value":"new"}},"shortName":"adc","inputs":0,"outputs":1,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputI2Sslave","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2ss","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputI2S","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputI2SQuad","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_quad","inputs":4,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputSPDIF","data":{"defaults":{"name":{"value":"new"}},"shortName":"spdif","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputAnalog","data":{"defaults":{"name":{"value":"new"}},"shortName":"dac","inputs":1,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputPWM","data":{"defaults":{"name":{"value":"new"}},"shortName":"pwm","inputs":1,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -609,6 +610,56 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		<input type="text" id="node-input-name" placeholder="Name">
 	</div>
 </script>
+
+<script type="text/x-red" data-help-name="AudioOutputI2SQuad">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Transmit quad (4) channel 16 bit audio, using I2S master mode.</p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Channel #1</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Channel #2</td></tr>
+		<tr class=odd><td align=center>In 2</td><td>Channel #3</td></tr>
+		<tr class=odd><td align=center>In 3</td><td>Channel #4</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from its 4 input ports to the I2S hardware.</p>
+	<h3>Hardware</h3>
+	<p>TODO: <a href="https://forum.pjrc.com/threads/29373-Bit-bang-multiple-I2S-inputs-simultaneously?p=79606#post79606" target="_blank">details</a> for how to connect 2 Teensy audio shields</p>
+	<p>The I2S signals are used in "master" mode, where Teensy creates
+		all 3 clock signals and controls all data timing.</p>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>9</td><td>BCLK</td><td>Output</td></tr>
+		<tr class=odd><td align=center>11</td><td>MCLK</td><td>Output</td></tr>
+		<tr class=odd><td align=center>22</td><td>TX (ch 1+2)</td><td>Output</td></tr>
+		<tr class=odd><td align=center>15</td><td>TX (ch 3+4)</td><td>Output</td></tr>
+		<tr class=odd><td align=center>23</td><td>LRCLK</td><td>Output</td></tr>
+	</table>
+	<p>Audio from
+		master mode I2S may be used in the same project as ADC, DAC and
+		PWM signals, because all remain in sync to Teensy's timing</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; SGTL5000 &gt; QuadChannelOutput
+	</p>
+	<h3>Notes</h3>
+	<p>Normally, this object is used with two Audio Shields, which
+		are controlled separately by a pair of "sgtl5000" objects.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioOutputI2SQuad">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+
+
+
+
 
 <script type="text/x-red" data-help-name="AudioOutputSPDIF">
 	<h3>Summary</h3>
