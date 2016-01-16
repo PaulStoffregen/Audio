@@ -79,6 +79,7 @@ output	KEYWORD2
 trigger	KEYWORD2
 length	KEYWORD2
 threshold	KEYWORD2
+setAddress	KEYWORD2
 enable	KEYWORD2
 enableIn	KEYWORD2
 enableOut	KEYWORD2
