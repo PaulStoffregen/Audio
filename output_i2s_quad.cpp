@@ -65,13 +65,11 @@ void AudioOutputI2SQuad::begin(void)
 
 	dma.TCD->SADDR = i2s_tx_buffer;
 	dma.TCD->SOFF = 2;
-	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
-	dma.TCD->NBYTES_MLNO = DMA_TCD_NBYTES_DMLOE
-		| DMA_TCD_NBYTES_MLOFFYES_MLOFF(((int)(&I2S0_TDR0) - (int)(&I2S0_TDR1)))
-		| DMA_TCD_NBYTES_MLOFFYES_NBYTES(4);
+	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1) | DMA_TCD_ATTR_DMOD(3);
+	dma.TCD->NBYTES_MLNO = 4;
 	dma.TCD->SLAST = -sizeof(i2s_tx_buffer);
 	dma.TCD->DADDR = &I2S0_TDR0;
-	dma.TCD->DOFF = (uint32_t)(&I2S0_TDR1) - (uint32_t)(&I2S0_TDR0);
+	dma.TCD->DOFF = 4;
 	dma.TCD->CITER_ELINKNO = sizeof(i2s_tx_buffer) / 4;
 	dma.TCD->DLASTSGA = 0;
 	dma.TCD->BITER_ELINKNO = sizeof(i2s_tx_buffer) / 4;
@@ -97,7 +95,7 @@ void AudioOutputI2SQuad::isr(void)
 	if (saddr < (uint32_t)i2s_tx_buffer + sizeof(i2s_tx_buffer) / 2) {
 		// DMA is transmitting the first half of the buffer
 		// so we must fill the second half
-		dest = (int16_t *)&i2s_tx_buffer[AUDIO_BLOCK_SAMPLES/2];
+		dest = (int16_t *)&i2s_tx_buffer[AUDIO_BLOCK_SAMPLES];
 		if (update_responsibility) update_all();
 	} else {
 		dest = (int16_t *)i2s_tx_buffer;
