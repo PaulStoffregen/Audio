@@ -9,10 +9,10 @@
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
  *
- * 1. The above copyright notice and this permission notice shall be 
+ * 1. The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
  *
- * 2. If the Software is incorporated into a build system that allows 
+ * 2. If the Software is incorporated into a build system that allows
  * selection among a list of target devices, then similar target
  * devices manufactured by PJRC.COM must be included in the list of
  * target devices and selectable in the same manner.
@@ -121,7 +121,7 @@
 	pop	{r2-r12}
 	BX lr
 
-/* void memcpy_tointerleaveL(short *dst, short *srcR); */
+/* void memcpy_tointerleaveR(short *dst, short *srcR); */
  .global	memcpy_tointerleaveR
 .thumb_func
 	memcpy_tointerleaveR:
@@ -163,6 +163,44 @@
 	pop	{r2-r12}
 	BX lr
 
+/* void memcpy_tointerleaveQuad(int16_t *dst, const int16_t *src1, const int16_t *src2, const int16_t *src3, const int16_t *src4) */
+ .global	memcpy_tointerleaveQuad
+.thumb_func
+	memcpy_tointerleaveQuad:
+
+	@ r0: dst
+	@ r1: src1
+	@ r2: src2
+	@ r3: src3
+	@ r4: src4
+
+	push	{r4-r11}
+	ldr r4, [sp, #(0+32)] //4th parameter is saved on the stack
+	add r11,r0,#512		// TODO: 512 = AUDIO_BLOCK_SAMPLES*4
+	.align 2
+.loopQuad:
+
+	.irp offset, 1,2
+
+	ldr r5, [r1],4
+	ldr r6, [r3],4
+	pkhbt r7,r5,r6,LSL #16
+	pkhtb r9,r6,r5,ASR #16
+	ldr r5, [r2],4
+	ldr r6, [r4],4
+	pkhbt r8,r5,r6,LSL #16
+	pkhtb r10,r6,r5,ASR #16
+
+	stmia r0!, {r7-r10}
+
+	.endr
+
+	cmp r11, r0
+	bne .loopQuad
+
+	pop	{r4-r11}
+
+	BX lr
 
 .END
 
