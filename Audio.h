@@ -82,6 +82,7 @@
 #include "filter_variable.h"
 #include "input_adc.h"
 #include "input_i2s.h"
+#include "input_i2s_quad.h"
 #include "mixer.h"
 #include "output_dac.h"
 #include "output_i2s.h"
