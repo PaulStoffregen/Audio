@@ -345,6 +345,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 <script  type="text/x-red" data-container-name="NodeDefinitions">
 	{"nodes":[
 		{"type":"AudioInputI2S","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputI2SQuad","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_quad","inputs":0,"outputs":4,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputAnalog","data":{"defaults":{"name":{"value":"new"}},"shortName":"adc","inputs":0,"outputs":1,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputI2Sslave","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2ss","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputI2S","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -454,6 +455,54 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		objects, for simultaneous audio streaming on different hardware.</p>
 </script>
 <script type="text/x-red" data-template-name="AudioInputI2S">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioInputI2SQuad">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Receive 16 bit quad (4) channel audio from two
+	<a href="http://www.pjrc.com/store/teensy3_audio.html" target="_blank">audio shields</a>
+		or another I2S devices, using I2S master mode.</p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Channel #1</td></tr>
+		<tr class=odd><td align=center>Out 1</td><td>Channel #2</td></tr>
+		<tr class=odd><td align=center>Out 2</td><td>Channel #3</td></tr>
+		<tr class=odd><td align=center>Out 3</td><td>Channel #4</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from the I2S hardware to its 4 output ports.</p>
+	<h3>Hardware</h3>
+	<p>TODO: add detailed documentation about connecting 2 audio shields,
+		including the wire needed from pin 30 to the 2nd audio shield</p>
+	<p>The I2S signals are used in "master" mode, where Teensy creates
+		all 3 clock signals and controls all data timing.</p>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>9</td><td>BCLK</td><td>Output</td></tr>
+		<tr class=odd><td align=center>11</td><td>MCLK</td><td>Output</td></tr>
+		<tr class=odd><td align=center>13</td><td>RX</td><td>Input</td></tr>
+		<tr class=odd><td align=center>30</td><td>RX</td><td>Input</td></tr>
+		<tr class=odd><td align=center>23</td><td>LRCLK</td><td>Output</td></tr>
+	</table>
+	<p>Audio from
+		master mode I2S may be used in the same project as ADC, DAC and
+		PWM signals, because all remain in sync to Teensy's timing</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughQuad
+	</p>
+	<h3>Notes</h3>
+	<p>Normally, this object is used with two Audio Shield, which
+		are controlled separately by a pair "sgtl5000" object.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioInputI2SQuad">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -643,6 +692,8 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		master mode I2S may be used in the same project as ADC, DAC and
 		PWM signals, because all remain in sync to Teensy's timing</p>
 	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughQuad
+	</p>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; SGTL5000 &gt; QuadChannelOutput
 	</p>
 	<h3>Notes</h3>
