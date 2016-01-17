@@ -3,6 +3,7 @@ AudioConnection	KEYWORD2
 AudioInputI2S	KEYWORD2
 AudioInputI2Sslave	KEYWORD2
 AudioOutputI2S	KEYWORD2
+AudioOutputI2SQuad	KEYWORD2
 AudioOutputI2Sslave	KEYWORD2
 AudioOutputSPDIF	KEYWORD2
 AudioOutputPWM	KEYWORD2
@@ -78,6 +79,7 @@ output	KEYWORD2
 trigger	KEYWORD2
 length	KEYWORD2
 threshold	KEYWORD2
+setAddress	KEYWORD2
 enable	KEYWORD2
 enableIn	KEYWORD2
 enableOut	KEYWORD2

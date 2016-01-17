@@ -495,10 +495,18 @@
 #define DAP_COEF_WR_A2_MSB		0x0138
 #define DAP_COEF_WR_A2_LSB		0x013A
 
-#define SGTL5000_I2C_ADDR  0x0A  // CTRL_ADR0_CS pin low (normal configuration)
-//#define SGTL5000_I2C_ADDR  0x2A // CTRL_ADR0_CS  pin high
+#define SGTL5000_I2C_ADDR_CS_LOW	0x0A  // CTRL_ADR0_CS pin low (normal configuration)
+#define SGTL5000_I2C_ADDR_CS_HIGH	0x2A // CTRL_ADR0_CS  pin high
 
 
+void AudioControlSGTL5000::setAddress(uint8_t level)
+{
+	if (level == LOW) {
+		i2c_addr = SGTL5000_I2C_ADDR_CS_LOW;
+	} else {
+		i2c_addr = SGTL5000_I2C_ADDR_CS_HIGH;
+	}
+}
 
 bool AudioControlSGTL5000::enable(void)
 {
@@ -536,11 +544,11 @@ bool AudioControlSGTL5000::enable(void)
 unsigned int AudioControlSGTL5000::read(unsigned int reg)
 {
 	unsigned int val;
-	Wire.beginTransmission(SGTL5000_I2C_ADDR);
+	Wire.beginTransmission(i2c_addr);
 	Wire.write(reg >> 8);
 	Wire.write(reg);
 	if (Wire.endTransmission(false) != 0) return 0;
-	if (Wire.requestFrom(SGTL5000_I2C_ADDR, 2) < 2) return 0;
+	if (Wire.requestFrom((int)i2c_addr, 2) < 2) return 0;
 	val = Wire.read() << 8;
 	val |= Wire.read();
 	return val;
@@ -549,7 +557,7 @@ unsigned int AudioControlSGTL5000::read(unsigned int reg)
 bool AudioControlSGTL5000::write(unsigned int reg, unsigned int val)
 {
 	if (reg == CHIP_ANA_CTRL) ana_ctrl = val;
-	Wire.beginTransmission(SGTL5000_I2C_ADDR);
+	Wire.beginTransmission(i2c_addr);
 	Wire.write(reg >> 8);
 	Wire.write(reg);
 	Wire.write(val >> 8);

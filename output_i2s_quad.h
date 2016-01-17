@@ -24,32 +24,36 @@
  * THE SOFTWARE.
  */
 
-#include "analyze_peak.h"
+#ifndef output_i2s_quad_h_
+#define output_i2s_quad_h_
 
-void AudioAnalyzePeak::update(void)
+#include "AudioStream.h"
+#include "DMAChannel.h"
+
+class AudioOutputI2SQuad : public AudioStream
 {
-	audio_block_t *block;
-	const int16_t *p, *end;
-	int32_t min, max;
+public:
+	AudioOutputI2SQuad(void) : AudioStream(4, inputQueueArray) { begin(); }
+	virtual void update(void);
+	void begin(void);
+private:
+	static void config_i2s(void);
+	static audio_block_t *block_ch1_1st;
+	static audio_block_t *block_ch2_1st;
+	static audio_block_t *block_ch3_1st;
+	static audio_block_t *block_ch4_1st;
+	static bool update_responsibility;
+	static DMAChannel dma;
+	static void isr(void);
+	static audio_block_t *block_ch1_2nd;
+	static audio_block_t *block_ch2_2nd;
+	static audio_block_t *block_ch3_2nd;
+	static audio_block_t *block_ch4_2nd;
+	static uint16_t ch1_offset;
+	static uint16_t ch2_offset;
+	static uint16_t ch3_offset;
+	static uint16_t ch4_offset;
+	audio_block_t *inputQueueArray[4];
+};
 
-	block = receiveReadOnly();
-	if (!block) {
-		return;
-	}
-	p = block->data;
-	end = p + AUDIO_BLOCK_SAMPLES;
-	min = min_sample;
-	max = max_sample;
-	do {
-		int16_t d=*p++;
-		// TODO: can we speed this up with SSUB16 and SEL
-		// http://www.m4-unleashed.com/parallel-comparison/
-		if (d<min) min=d;
-		if (d>max) max=d;
-	} while (p < end);
-	min_sample = min;
-	max_sample = max;
-	new_output = true;
-	release(block);
-}
-
+#endif
