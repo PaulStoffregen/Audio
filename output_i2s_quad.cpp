@@ -107,12 +107,16 @@ void AudioOutputI2SQuad::isr(void)
 	src4 = (block_ch4_1st) ? block_ch4_1st->data + ch4_offset : zeros;
 
 	// TODO: fast 4-way interleaved memcpy...
+#if 1
+	memcpy_tointerleaveQuad(dest, src1, src2, src3, src4);
+#else
 	for (int i=0; i < AUDIO_BLOCK_SAMPLES/2; i++) {
 		*dest++ = *src1++;
 		*dest++ = *src3++;
 		*dest++ = *src2++;
 		*dest++ = *src4++;
 	}
+#endif
 
 	if (block_ch1_1st) {
 		if (ch1_offset == 0) {
