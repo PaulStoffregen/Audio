@@ -44,7 +44,7 @@
 	@ r1: srcL
 	@ r2: srcR
 
-	push	{r3-r12,r14}
+	push	{r4-r12,r14}
 	add r14,r0,#256		// TODO: 256 = AUDIO_BLOCK_SAMPLES*2
 	.align 2
 .loopLR:
@@ -75,7 +75,7 @@
 	cmp r14, r0
 	bne .loopLR
 
-	pop	{r3-r12,r14}
+	pop	{r4-r12,r14}
 	BX lr
 
 
@@ -87,7 +87,7 @@
 	@ r0: dst
 	@ r1: srcL
 
-	push	{r2-r12}
+	push	{r4-r12}
 	mov r2, #0
 	add r12,r0,#256		// TODO: 256 = AUDIO_BLOCK_SAMPLES*2
 	.align 2
@@ -118,7 +118,7 @@
 	cmp r12, r0
 	bne .loopL
 
-	pop	{r2-r12}
+	pop	{r4-r12}
 	BX lr
 
 /* void memcpy_tointerleaveL(short *dst, short *srcR); */
@@ -129,7 +129,7 @@
 	@ r0: dst
 	@ r1: srcR
 
-	push	{r2-r12}
+	push	{r4-r12}
 	mov r2, #0
 	add r12,r0,#256		// TODO: 256 = AUDIO_BLOCK_SAMPLES*2
 	.align 2
@@ -160,7 +160,7 @@
 	cmp r12, r0
 	bne .loopR
 
-	pop	{r2-r12}
+	pop	{r4-r12}
 	BX lr
 
 
@@ -177,7 +177,7 @@
 	@ r4: src4
 
 	push	{r4-r11}
-	ldr r4, [sp, #(0+32)] //4th parameter is saved on the stack
+	ldr r4, [sp, #(0+32)] //5th parameter is saved on the stack
 	add r11,r0,#512		// TODO: 512 = AUDIO_BLOCK_SAMPLES*4
 	.align 2
 .loopQuad:
