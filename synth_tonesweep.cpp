@@ -61,12 +61,13 @@ if(0) {
 
   tone_amp = t_amp * 32767.0;
 
-  tone_tmp = tone_hi - tone_lo;
-  tone_sign = 1;
   tone_freq = tone_lo*0x100000000LL;
-  if(tone_tmp < 0) {
+  if (tone_hi >= tone_lo) {
+    tone_tmp = tone_hi - tone_lo;
+    tone_sign = 1;
+  } else {
     tone_sign = -1;
-    tone_tmp = -tone_tmp;
+    tone_tmp = tone_lo - tone_hi;
   }
   tone_tmp = tone_tmp/t_time/44100.;
   tone_incr = (tone_tmp * 0x100000000LL);
