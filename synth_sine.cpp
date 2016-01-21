@@ -88,14 +88,14 @@ static int32_t taylor(uint32_t ph)
 	p2 =  multiply_32x32_rshift32_rounded(p1, p1) << 1;                   // p2:  3.29
 	p3 =  multiply_32x32_rshift32_rounded(p2, p1) << 2;                   // p3:  3.29
 	sum = multiply_subtract_32x32_rshift32_rounded(p1, p3, 1431655765);   // sum: 2.30
-	p5 =  multiply_32x32_rshift32_rounded(p3, p2) << 1;                   // p5:  5.27
-	sum = multiply_accumulate_32x32_rshift32_rounded(sum, p5, 286331153);
-	p7 =  multiply_32x32_rshift32_rounded(p5, p2);                        // p7:  8.24
-	sum = multiply_subtract_32x32_rshift32_rounded(sum, p7, 54539267);
-	p9 =  multiply_32x32_rshift32_rounded(p7, p2);                        // p9: 11.21
-	sum = multiply_accumulate_32x32_rshift32_rounded(sum, p9, 6059919);
-	p11 = multiply_32x32_rshift32_rounded(p9, p2);                       // p11: 14.18
-	sum = multiply_subtract_32x32_rshift32_rounded(sum, p11, 440721);
+	p5 =  multiply_32x32_rshift32_rounded(p3, p2);                        // p5:  6.26
+	sum = multiply_accumulate_32x32_rshift32_rounded(sum, p5, 572662306);
+	p7 =  multiply_32x32_rshift32_rounded(p5, p2);                        // p7:  9.22
+	sum = multiply_subtract_32x32_rshift32_rounded(sum, p7, 109078534);
+	p9 =  multiply_32x32_rshift32_rounded(p7, p2);                        // p9: 12.20
+	sum = multiply_accumulate_32x32_rshift32_rounded(sum, p9, 12119837);
+	p11 = multiply_32x32_rshift32_rounded(p9, p2);                       // p11: 15.17
+	sum = multiply_subtract_32x32_rshift32_rounded(sum, p11, 881443);
 	return sum <<= 1;                                                 // return:  1.31
 }
 #endif
