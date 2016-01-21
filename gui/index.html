@@ -390,6 +390,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioAnalyzePrint","data":{"defaults":{"name":{"value":"new"}},"shortName":"print","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioControlSGTL5000","data":{"defaults":{"name":{"value":"new"}},"shortName":"sgtl5000","inputs":0,"outputs":0,"category":"control-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioControlAK4558","data":{"defaults":{"name":{"value":"new"}},"shortName":"ak4558","inputs":0,"outputs":0,"category":"control-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioControlCS4272","data":{"defaults":{"name":{"value":"new"}},"shortName":"cs4272","inputs":0,"outputs":0,"category":"control-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioControlWM8731","data":{"defaults":{"name":{"value":"new"}},"shortName":"wm8731","inputs":0,"outputs":0,"category":"control-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioControlWM8731master","data":{"defaults":{"name":{"value":"new"}},"shortName":"wm8731m","inputs":0,"outputs":0,"category":"control-function","color":"#E6E0F8","icon":"arrow-in.png"}}
 	]}
@@ -3152,12 +3153,76 @@ value  frequency
 	<p>TODO: Implement ADC and DAC filters control.</p>
 	<p>TODO: Implement DAC level attenuator attack rate modifier.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioControlWM8731master">
+<script type="text/x-red" data-template-name="AudioControlAK4558">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
 	</div>
 </script>
+
+<script type="text/x-red" data-help-name="AudioControlCS4272">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Control the CS4272 chip on the <a href="https://hackaday.io/project/5912-teensy-super-audio-board" target="_blank">Super Audio Board</a>.
+	</p>
+	<p>TODO: does this control object put the CS4272 into I2S master or slave mode</p>
+	</div>
+	<h3>Audio Connections</h3>
+	<p>This object has no audio inputs or outputs.  Separate I2S objects
+		are used to send and receive audio data.
+	</p>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>enable</span>();</p>
+	<p class=desc>Enables the CODEC to work with 44.1 KHz - 16 bit data. This function does not enable the ADC/DAC modules.
+	</p>
+	<p class=func><span class=keyword>volume</span>(vol);</p>
+	<p class=desc>Set the volume level. Range is 0 to 1.0.
+	</p>
+	<p class=func><span class=keyword>volume</span>(left, right);</p>
+	<p class=desc>Set the volume level. Range is 0 to 1.0.
+	</p>
+	<p class=func><span class=keyword>dacVolume</span>(vol);</p>
+	<p class=desc>Set the volume level. Range is 0 to 1.0.  TODO: what's the
+		distinction between volume() and dacVolume()?
+	</p>
+	<p class=func><span class=keyword>dacVolume</span>(left, right);</p>
+	<p class=desc>Set the volume level. Range is 0 to 1.0.
+	</p>
+
+	<p class=func><span class=keyword>muteOutput</span>();</p>
+	<p class=desc>TODO: description
+	</p>
+	<p class=func><span class=keyword>unmuteOutput</span>();</p>
+	<p class=desc>TODO: description
+	</p>
+	<p class=func><span class=keyword>muteInput</span>();</p>
+	<p class=desc>TODO: description
+	</p>
+	<p class=func><span class=keyword>unmuteInput</span>();</p>
+	<p class=desc>TODO: description
+	</p>
+	<p class=func><span class=keyword>enableDither</span>();</p>
+	<p class=desc>TODO: description
+	</p>
+	<p class=func><span class=keyword>disableDither</span>();</p>
+	<p class=desc>TODO: description
+	</p>
+
+	<h3>Hardware</h3>
+	<p>Pin 2 must be connected to the CS4272 reset.  SDA &amp; SCL are used for all control.
+	</p>
+
+	<h3>Notes</h3>
+</script>
+<script type="text/x-red" data-template-name="AudioControlCS4272">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+
+
 
 </body>
 </html>
