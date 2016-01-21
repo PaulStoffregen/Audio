@@ -90,7 +90,7 @@ static int32_t taylor(uint32_t ph)
 	sum = multiply_subtract_32x32_rshift32_rounded(p1, p3, 1431655765);   // sum: 2.30
 	p5 =  multiply_32x32_rshift32_rounded(p3, p2);                        // p5:  6.26
 	sum = multiply_accumulate_32x32_rshift32_rounded(sum, p5, 572662306);
-	p7 =  multiply_32x32_rshift32_rounded(p5, p2);                        // p7:  9.22
+	p7 =  multiply_32x32_rshift32_rounded(p5, p2);                        // p7:  9.23
 	sum = multiply_subtract_32x32_rshift32_rounded(sum, p7, 109078534);
 	p9 =  multiply_32x32_rshift32_rounded(p7, p2);                        // p9: 12.20
 	sum = multiply_accumulate_32x32_rshift32_rounded(sum, p9, 12119837);
