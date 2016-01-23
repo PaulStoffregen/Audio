@@ -48,7 +48,6 @@ install:
 
     # remove unused items
     - rm -r extras
-    - rm -r examples/Synthesis/PlaySynthMusic/miditones
 
 script:
     - platformio ci --lib=. --board=teensy31
