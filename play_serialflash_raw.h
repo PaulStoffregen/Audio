@@ -46,7 +46,7 @@ private:
 	SerialFlashFile rawfile;
 	uint32_t file_size;
 	volatile uint32_t file_offset;
-	volatile bool playing;
+	volatile uint8_t playing;
 };
 
 #endif
