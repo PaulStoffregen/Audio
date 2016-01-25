@@ -5,7 +5,7 @@
 *  Convert a MIDI file into a bytestream of notes
 *
 *
-*   (C) Copyright 2011, Len Shustek
+*   (C) Copyright 2011,2013,2015,2016 Len Shustek
 *
 *   This program is free software: you can redistribute it and/or modify
 *   it under the terms of version 3 of the GNU General Public License as
@@ -46,10 +46,17 @@
 *     -Changed to allow compilation and execution in 64-bit environments
 *      by using C99 standard intN_t and uintN_t types for MIDI structures,
 *      and formatting specifications like "PRId32" instead of "ld".
+* 04 April 2015, L. Shustek, V1.7
+*     -Made friendlier to other compilers: import source of strlcpy and strlcat,
+*      fixed various type mismatches that the LCC compiler didn't fret about.
+*      Generate "const" for data initialization for compatibility with Arduino IDE v1.6.x.
+* 23 January 2016, D. Blackketter, V1.8
+*     -Fix warnings and errors building on Mac OS X via "gcc miditones.c"
+* 25 January 2016, D. Blackketter, Paul Stoffregen, V1.9
+      -Merge in velocity output option from Arduino/Teensy Audio Library
 */
-// Sept 2014 - Add option for velocity output
 
-#define VERSION "1.6"
+#define VERSION "1.9"
 
 
 /*--------------------------------------------------------------------------------
@@ -152,9 +159,10 @@
 *
 *  If the high-order bit of the byte is 1, then it is one of the following commands:
 *
-*    9t nn  Start playing note nn on tone generator t.  Generators are numbered
+*    9t nn [vv] Start playing note nn on tone generator t.  Generators are numbered
 *           starting with 0.  The notes numbers are the MIDI numbers for the chromatic
 *           scale, with decimal 60 being Middle C, and decimal 69 being Middle A (440 Hz).
+*           if the -v option is enabled, a second byte is added to indicate velocity
 *
 *    8t     Stop playing the note on tone generator t.
 *
@@ -269,7 +277,7 @@ track[MAX_TRACKS] = {
 void SayUsage(char *programName){
     static char *usage[] = {
         "Convert MIDI files to an Arduino PLAYTUNE bytestream",
-        "miditones [-p] [-lg] [-lp] [-s1] [-tn] <basefilename>",
+        "miditones [-p] [-lg] [-lp] [-s1] [-tn] [-v] <basefilename>",
         "  -p   parse only, don't generate bytestream",
         "  -lp  log input parsing",
         "  -lg  log output generation",
@@ -279,6 +287,7 @@ void SayUsage(char *programName){
         "  -b   binary file output instead of C source text",
         "  -cn  mask for which tracks to process, e.g. -c3 for only 0 and 1",
         "  -kn  key shift in chromatic notes, positive or negative",
+        "  -v   include velocity data in play note commands",
         "input file:  <basefilename>.mid",
         "output file: <basefilename>.bin or .c",
         "log file:    <basefilename>.log",
@@ -357,55 +366,60 @@ void print_command_line (int argc,char *argv[]) {
 }
 
 
-
 /****************  utility routines  **********************/
 
-size_t strlcat (char *dst, const char *src, size_t siz)
-{
-    char *d = dst;
-    const char *s = src;
-    size_t n = siz;
-    size_t dlen;
-    /* Find the end of dst and adjust bytes left but don't go past end */
-    while (n-- != 0 && *d != '\0')
-        d++;
-    dlen = d - dst;
-    n = siz - dlen;
-    if (n == 0)
-        return (dlen + strlen(s));
-    while (*s != '\0') {
-        if (n != 1) {
-            *d++ = *s;
-            n--;
-        }
-        s++;
-    }
-    *d = '\0';
-    return (dlen + (s - src)); /* count does not include NUL */
+
+/* safe string copy */
+size_t miditones_strlcpy(char *dst, const char *src,	size_t 	siz) {
+	char       *d = dst;
+	const char *s = src;
+	size_t      n = siz;
+	/* Copy as many bytes as will fit */
+	if (n != 0)
+	{
+		while (--n != 0)
+		{
+			if ((*d++ = *s++) == '\0')
+				break;
+		}
+	}
+	/* Not enough room in dst, add NUL and traverse rest of src */
+	if (n == 0)
+	{
+		if (siz != 0)
+			*d = '\0';          /* NUL-terminate dst */
+		while (*s++)
+			;
+	}
+	return (s - src - 1);       /* count does not include NUL */
 }
 
-size_t strlcpy(char *dst, const char *src, size_t siz)
-{
-    char *d = dst;
-    const char *s = src;
-    size_t n = siz;
-    /* Copy as many bytes as will fit */
-    if (n != 0) {
-        while (--n != 0) {
-            if ((*d++ = *s++) == '\0') break;
-        }
-    }
-    /* Not enough room in dst, add NUL and traverse rest of src */
-    if (n == 0) {
-        if (siz != 0)
-            *d = '\0'; /* NUL-terminate dst */
-        while (*s++)
-            ;
-    }
-    return (s - src - 1); /* count does not include NUL */
+/* safe string concatenation */
+
+size_t miditones_strlcat(char *dst, const char *src, size_t siz) {
+	char       *d = dst;
+	const char *s = src;
+	size_t      n = siz;
+	size_t      dlen;
+	/* Find the end of dst and adjust bytes left but don't go past end */
+	while (n-- != 0 && *d != '\0')
+		d++;
+	dlen = d - dst;
+	n = siz - dlen;
+	if (n == 0)
+		return (dlen + strlen(s));
+	while (*s != '\0')
+	{
+		if (n != 1)
+		{
+			*d++ = *s;
+			n--;
+		}
+		s++;
+	}
+	*d = '\0';
+	return (dlen + (s - src));  /* count does not include NUL */
 }
-
-
 
 /* match a constant character sequence */
 
@@ -432,8 +446,8 @@ void midi_error (char *msg, unsigned char *bufptr) {
 
 /* check that we have a specified number of bytes left in the buffer */
 
-void chk_bufdata(unsigned char *ptr, int len) {
-    if (ptr + len - buffer > buflen) midi_error("data missing", ptr);
+void chk_bufdata(unsigned char *ptr, unsigned long int len) {
+    if ((unsigned)(ptr + len - buffer) > buflen) midi_error("data missing", ptr);
 }
 
 
@@ -468,7 +482,7 @@ void process_header (void) {
 
     chk_bufdata(hdrptr, sizeof(struct midi_header));
     hdr = (struct midi_header *) hdrptr;
-    if (!charcmp((char *)(hdr->MThd),"MThd")) midi_error("Missing 'MThd'", hdrptr);
+    if (!charcmp((char*)hdr->MThd,"MThd")) midi_error("Missing 'MThd'", hdrptr);
 
     num_tracks = rev_short(hdr->number_of_tracks);
 
@@ -537,7 +551,7 @@ void find_note (int tracknum) {
     unsigned long int delta_time;
     int event, chan;
     int i;
-    int note, velocity; // , parm;
+    int note, velocity;
     int meta_cmd, meta_length;
     unsigned long int sysex_length;
     struct track_status *t;
@@ -550,7 +564,11 @@ void find_note (int tracknum) {
         delta_time = get_varlen(&t->trkptr);
         if (logparse) {
             fprintf (logfile, "trk %d ", tracknum);
-            fprintf (logfile, delta_time ? "delta time %4ld, " : "                ", delta_time);
+            if (delta_time) {
+              fprintf (logfile, "delta time %4ld, ", delta_time);
+            } else {
+              fprintf (logfile, "                ");
+            }
         }
         t->time += delta_time;
 
@@ -685,13 +703,12 @@ int main(int argc,char *argv[]) {
 #define MAXPATH 120
     char filename[MAXPATH];
 
-    //int i;
     int tracknum;
     int earliest_tracknum;
     unsigned long earliest_time;
     int notes_skipped = 0;
 
-    printf("MIDITONES V%s, (C) 2011 Len Shustek\n", VERSION);
+    printf("MIDITONES V%s, (C) 2011,2015,2016 Len Shustek\n", VERSION);
     printf("See the source code for license information.\n\n");
     if (argc == 1) { /* no arguments */
         SayUsage(argv[0]);
@@ -706,8 +723,8 @@ int main(int argc,char *argv[]) {
     /* Open the log file */
 
     if (logparse || loggen) {
-        strlcpy(filename, filebasename, MAXPATH);
-        strlcat(filename, ".log", MAXPATH);
+        miditones_strlcpy(filename, filebasename, MAXPATH);
+        miditones_strlcat(filename, ".log", MAXPATH);
         logfile = fopen(filename, "w");
         if (!logfile) {
             fprintf(stderr, "Unable to open log file %s", filename);
@@ -717,8 +734,8 @@ int main(int argc,char *argv[]) {
 
     /* Open the input file */
 
-    strlcpy(filename, filebasename, MAXPATH);
-    strlcat(filename, ".mid", MAXPATH);
+    miditones_strlcpy(filename, filebasename, MAXPATH);
+    miditones_strlcat(filename, ".mid", MAXPATH);
     infile = fopen(filename, "rb");
     if (!infile) {
         fprintf(stderr, "Unable to open input file %s", filename);
@@ -744,13 +761,13 @@ int main(int argc,char *argv[]) {
     /* Create the output file */
 
     if (!parseonly) {
-        strlcpy(filename, filebasename, MAXPATH);
+        miditones_strlcpy(filename, filebasename, MAXPATH);
         if (binaryoutput) {
-            strlcat(filename, ".bin", MAXPATH);
+            miditones_strlcat(filename, ".bin", MAXPATH);
             outfile = fopen(filename, "wb");
         }
         else {
-            strlcat(filename, ".c", MAXPATH);
+            miditones_strlcat(filename, ".c", MAXPATH);
             outfile = fopen(filename, "w");
         }
         if (!outfile) {
@@ -759,7 +776,6 @@ int main(int argc,char *argv[]) {
         }
         if (!binaryoutput) {  /* create header of C file that initializes score data */
             time_t rawtime;
-            //struct tm *ptime;
             time (&rawtime);
             fprintf(outfile, "// Playtune bytestream for file \"%s.mid\" ", filebasename);
             fprintf(outfile, "created by MIDITONES V%s on %s", VERSION, asctime(localtime(&rawtime)));
