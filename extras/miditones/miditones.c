@@ -949,7 +949,7 @@ int main(int argc,char *argv[]) {
                         putc (shifted_note, outfile);
                         outfile_bytecount += 2;
                         if (velocityoutput) {
-                          putc (shifted_note, outfile);
+                          putc (trk->velocity, outfile);
                           outfile_bytecount++;
                         }
                     }
