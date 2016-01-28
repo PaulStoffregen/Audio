@@ -102,6 +102,8 @@ void loop() {
     level[13] = fft1024.read(185, 257);
     level[14] = fft1024.read(258, 359);
     level[15] = fft1024.read(360, 511);
+    // See this conversation to change this to more or less than 16 log-scaled bands?
+    // https://forum.pjrc.com/threads/32677-Is-there-a-logarithmic-function-for-FFT-bin-selection-for-any-given-of-bands
 
     // if you have the volume pot soldered to your audio shield
     // uncomment this line to make it adjust the full scale signal
