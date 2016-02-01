@@ -27,7 +27,7 @@
 #include "output_i2s_quad.h"
 #include "memcpy_audio.h"
 
-#if defined(__MK20DX256__)
+#if defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
 
 audio_block_t * AudioOutputI2SQuad::block_ch1_1st = NULL;
 audio_block_t * AudioOutputI2SQuad::block_ch2_1st = NULL;
@@ -262,6 +262,12 @@ void AudioOutputI2SQuad::update(void)
 #elif F_CPU == 168000000
   #define MCLK_MULT 8
   #define MCLK_DIV  119
+#elif F_CPU == 180000000
+  #define MCLK_MULT 16
+  #define MCLK_DIV  255
+#elif F_CPU == 192000000
+  #define MCLK_MULT 1
+  #define MCLK_DIV  17
 #elif F_CPU == 16000000
   #define MCLK_MULT 12
   #define MCLK_DIV  17

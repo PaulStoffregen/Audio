@@ -27,7 +27,7 @@
 #include "output_dac.h"
 #include "utility/pdb.h"
 
-#if defined(__MK20DX256__)
+#if defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
 
 DMAMEM static uint16_t dac_buffer[AUDIO_BLOCK_SAMPLES*2];
 audio_block_t * AudioOutputAnalog::block_left_1st = NULL;
