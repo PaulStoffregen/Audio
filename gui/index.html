@@ -2218,6 +2218,18 @@ double s_freq = .0625;</p>
 	<h3>Examples</h3>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Filter_FIR
 	</p>
+	<h3>Known Issues</h3>
+	<p>Your filter's impulse response array must have an even length.  If you have
+		add odd number of taps, you must add an extra zero to increase the length
+		to an even number.
+	</p>
+	<p>The minimum number of taps is 4.  If you use less, add extra zeros to increase
+		the length to 4.
+	</p>
+	<p>The impulse response must be given in reverse order.  Many filters have
+		symetrical impluse response, making this a non-issue.  If your filter has
+		a non-symetrical response, make sure the data is in reverse time order.
+	</p>
 	<h3>Notes</h3>
 	<p>FIR filters requires more CPU time than Biquad (IIR), but they can
 		implement filters with better phase response.
