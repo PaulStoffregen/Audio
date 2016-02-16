@@ -333,6 +333,23 @@ static inline int32_t substract_32_saturate(uint32_t a, uint32_t b)
 	return out;
 }
 
+//get Q from PSR
+static inline uint32_t get_q_psr(void) __attribute__((always_inline, unused));
+static inline uint32_t get_q_psr(void)
+{
+  uint32_t out;
+  asm volatile("mrs %0, APSR" : "=r" (out));
+  return (out & 0x8000000)>>27;
+}
 
+//clear Q BIT in PSR
+static inline void clr_q_psr(void) __attribute__((always_inline, unused));
+static inline void clr_q_psr(void)
+{
+  uint32_t t;
+  asm volatile("mrs %0,APSR " : "=r" (t));
+  asm volatile("bfc %0, #27, #1" : "=r" (t));
+  asm volatile("msr APSR_nzcvq,%0" : "=r" (t)); 
+}
 
 #endif
