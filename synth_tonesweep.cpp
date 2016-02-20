@@ -52,8 +52,8 @@ if(0) {
   if(t_amp > 1)return false;
   if(t_lo < 1)return false;
   if(t_hi < 1)return false;
-  if(t_hi >= 44100/2)return false;
-  if(t_lo >= 44100/2)return false;
+  if(t_hi >= AUDIO_SAMPLE_RATE_EXACT / 2)return false;
+  if(t_lo >= AUDIO_SAMPLE_RATE_EXACT / 2)return false;
   if(t_time < 0)return false;
   tone_lo = t_lo;
   tone_hi = t_hi;
@@ -69,7 +69,7 @@ if(0) {
     tone_sign = -1;
     tone_tmp = tone_lo - tone_hi;
   }
-  tone_tmp = tone_tmp/t_time/44100.;
+  tone_tmp = tone_tmp / t_time / (float) AUDIO_SAMPLE_RATE_EXACT;
   tone_incr = (tone_tmp * 0x100000000LL);
   sweep_busy = 1;
   return(true);
@@ -98,7 +98,7 @@ void AudioSynthToneSweep::update(void)
     // Generate the sweep
     for(i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
       *bp++ = (short)(( (short)(arm_sin_q31((uint32_t)((tone_phase >> 15)&0x7fffffff))>>16) *tone_amp) >> 16);
-      uint64_t tone_tmp = (0x400000000000LL * (int)((tone_freq >> 32)&0x7fffffff))/44100;
+      uint64_t tone_tmp = (0x400000000000LL * (int)((tone_freq >> 32)&0x7fffffff)) / AUDIO_SAMPLE_RATE_EXACT;
 
       tone_phase +=  tone_tmp;
       if(tone_phase & 0x800000000000LL)tone_phase &= 0x7fffffffffffLL;
