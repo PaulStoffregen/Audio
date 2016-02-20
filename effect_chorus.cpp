@@ -78,7 +78,7 @@ void AudioEffectChorus::update(void)
   // do passthru
   // It stores the unmodified data in the delay line so that
   // it isn't as likely to click
-  if(num_chorus < 1) {
+  if(num_chorus <= 1) {
     // Just passthrough
     block = receiveWritable(0);
     if(block) {
@@ -93,6 +93,7 @@ void AudioEffectChorus::update(void)
       transmit(block,0);
       release(block);
     }
+    return;
   }
 
   //          L E F T  C H A N N E L
