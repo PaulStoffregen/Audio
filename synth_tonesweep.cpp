@@ -119,6 +119,10 @@ void AudioSynthToneSweep::update(void)
         tone_freq -= tone_incr;        
       }
     }
+    while(i < AUDIO_BLOCK_SAMPLES) {
+      *bp++ = 0;
+      i++;
+    }    
     // send the samples to the left channel
     transmit(block,0);
     release(block);
