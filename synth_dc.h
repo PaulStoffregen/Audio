@@ -32,20 +32,18 @@
 // compute (a - b) / c
 // handling 32 bit interger overflow at every step
 // without resorting to slow 64 bit math
-#if 0
+#if 1
 // TODO: write this in assembly....
 static inline int32_t substract_32_then_divide(int32_t a, int32_t b, int32_t c) __attribute__((always_inline, unused));
 static inline int32_t substract_32_then_divide(int32_t a, int32_t b, int32_t c)
 {
-	int32_t diff = substract_32_saturate(a, b);
-	// if only C language provided a way to test Q status bit....
-	if (diff != 0x7FFFFFFF && diff != 0x80000000) {
-		return diff / c;
-	} else {
-		diff = substract_32_saturate(a/2, b/2);
-		if (c == 1 || c == -1) c *= 2; // <-- horrible, incorrect hack
-		return (diff / c) * 2;
-	}
+ 	int r;
+ 	r = substract_32_saturate(a,b);
+ 	if ( !get_q_from_psr() ) return (r/c);
+ 	clr_q_psr();
+ 	if ( c==0 ) r=0;
+ 	if (__builtin_abs(c)<=1) return r;
+ 	return (a/c)-(b/c);
 }
 #else
 // compute (a - b) / c  ... handling 32 bit interger overflow without slow 64 bit math
