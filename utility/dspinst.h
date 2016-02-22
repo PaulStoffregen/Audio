@@ -338,7 +338,7 @@ static inline uint32_t get_q_psr(void) __attribute__((always_inline, unused));
 static inline uint32_t get_q_psr(void)
 {
   uint32_t out;
-  asm volatile("mrs %0, APSR" : "=r" (out));
+  asm ("mrs %0, APSR" : "=r" (out));
   return (out & 0x8000000)>>27;
 }
 
@@ -347,9 +347,8 @@ static inline void clr_q_psr(void) __attribute__((always_inline, unused));
 static inline void clr_q_psr(void)
 {
   uint32_t t;
-  asm volatile("mrs %0,APSR " : "=r" (t));
-  asm volatile("bfc %0, #27, #1" : "=r" (t));
-  asm volatile("msr APSR_nzcvq,%0" : "=r" (t)); 
+  asm ("mov %[t],#0\n"
+       "msr APSR_nzcvq,%0\n" : [t] "=&r" (t)::"cc")); 
 }
 
 #endif
