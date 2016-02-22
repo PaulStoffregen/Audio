@@ -33,7 +33,6 @@
 // handling 32 bit interger overflow at every step
 // without resorting to slow 64 bit math
 #if 1
-// TODO: write this in assembly....
 static inline int32_t substract_32_then_divide(int32_t a, int32_t b, int32_t c) __attribute__((always_inline, unused));
 static inline int32_t substract_32_then_divide(int32_t a, int32_t b, int32_t c)
 {
