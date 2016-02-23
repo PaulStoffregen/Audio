@@ -32,13 +32,13 @@
 // compute (a - b) / c
 // handling 32 bit interger overflow at every step
 // without resorting to slow 64 bit math
-#if 1
+#if defined(KINETISK)
 static inline int32_t substract_32_then_divide(int32_t a, int32_t b, int32_t c) __attribute__((always_inline, unused));
 static inline int32_t substract_32_then_divide(int32_t a, int32_t b, int32_t c)
 {
  	int r;
  	r = substract_32_saturate(a,b);
- 	if ( !get_q_from_psr() ) return (r/c);
+ 	if ( !get_q_psr() ) return (r/c);
  	clr_q_psr();
  	if ( c==0 ) r=0;
  	if (__builtin_abs(c)<=1) return r;
