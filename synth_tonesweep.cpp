@@ -105,7 +105,7 @@ void AudioSynthToneSweep::update(void)
       if(tone_phase & 0x800000000000LL)tone_phase &= 0x7fffffffffffLL;
 
       if(tone_sign > 0) {
-        if((tmp > tone_hi) {
+        if(tmp > tone_hi) {
           sweep_busy = 0;
           break;
         }
