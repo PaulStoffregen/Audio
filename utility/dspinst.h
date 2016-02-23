@@ -348,7 +348,7 @@ static inline void clr_q_psr(void)
 {
   uint32_t t;
   asm ("mov %[t],#0\n"
-       "msr APSR_nzcvq,%0\n" : [t] "=&r" (t)::"cc")); 
+       "msr APSR_nzcvq,%0\n" : [t] "=&r" (t)::"cc"); 
 }
 
 #endif
