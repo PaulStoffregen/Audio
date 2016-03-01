@@ -31,11 +31,19 @@
 
 #define SAMPLES_PER_MSEC (AUDIO_SAMPLE_RATE_EXACT/1000.0)
 
+#define STATE_IDLE	0
+#define STATE_DELAY	1
+#define STATE_ATTACK	2
+#define STATE_HOLD	3
+#define STATE_DECAY	4
+#define STATE_SUSTAIN	5
+#define STATE_RELEASE	6
+
 class AudioEffectEnvelope : public AudioStream
 {
 public:
 	AudioEffectEnvelope() : AudioStream(1, inputQueueArray) {
-		state = 0;
+		state = STATE_IDLE;
 		delay(0.0);  // default values...
 		attack(1.5);
 		hold(0.5);
@@ -43,6 +51,7 @@ public:
 		sustain(0.667);
 		release(30.0);
 	}
+	uint8_t getState() { return state; }
 	void noteOn();
 	void noteOff();
 	void delay(float milliseconds) {
