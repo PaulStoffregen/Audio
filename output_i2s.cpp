@@ -267,6 +267,12 @@ void AudioOutputI2S::update(void)
 #elif F_CPU == 168000000
   #define MCLK_MULT 8
   #define MCLK_DIV  119
+#elif F_CPU == 180000000
+  #define MCLK_MULT 16
+  #define MCLK_DIV  255
+#elif F_CPU == 192000000
+  #define MCLK_MULT 1
+  #define MCLK_DIV  17
 #elif F_CPU == 16000000
   #define MCLK_MULT 12
   #define MCLK_DIV  17
@@ -292,6 +298,7 @@ void AudioOutputI2S::config_i2s(void)
 
 	// enable MCLK output
 	I2S0_MCR = I2S_MCR_MICS(MCLK_SRC) | I2S_MCR_MOE;
+	while (I2S0_MCR & I2S_MCR_DUF) ;
 	I2S0_MDR = I2S_MDR_FRACT((MCLK_MULT-1)) | I2S_MDR_DIVIDE((MCLK_DIV-1));
 
 	// configure transmitter

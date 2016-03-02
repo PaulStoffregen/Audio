@@ -468,6 +468,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>Receive 16 bit quad (4) channel audio from two
 	<a href="http://www.pjrc.com/store/teensy3_audio.html" target="_blank">audio shields</a>
 		or another I2S devices, using I2S master mode.</p>
+	<p align=center><img src="img/audioshield_quad_in.jpg"></p>
 	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -665,6 +666,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
 	<p>Transmit quad (4) channel 16 bit audio, using I2S master mode.</p>
+	<p align=center><img src="img/audioshield_quad_out.jpg"></p>
 	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -1909,7 +1911,7 @@ double s_freq = .0625;</p>
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>delay</span>(channel, milliseconds);</p>
 	<p class=desc>Set output channel (0 to 7) to delay the signals by
-		milliseconds.  The maximum delay is approx 333 ms.  The actual delay
+		milliseconds.  The maximum delay is approx 425 ms.  The actual delay
 		is rounded to the nearest sample.  Each channel can be configured for
 		any delay.  There is no requirement to configure the "taps" in increasing
 		delay order.
@@ -1958,7 +1960,8 @@ double s_freq = .0625;</p>
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>delay</span>(channel, milliseconds);</p>
 	<p class=desc>Set output channel (0 to 7) to delay the signals by
-		milliseconds.  The maximum delay is approx 333 ms.  The actual delay
+		milliseconds.  The maximum delay is approx 1.5 seconds for each 23LC1024 chip.
+		The actual delay
 		is rounded to the nearest sample.  Each channel can be configured for
 		any delay.  There is no requirement to configure the "taps" in increasing
 		delay order.
@@ -2218,6 +2221,18 @@ double s_freq = .0625;</p>
 	<h3>Examples</h3>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Filter_FIR
 	</p>
+	<h3>Known Issues</h3>
+	<p>Your filter's impulse response array must have an even length.  If you have
+		add odd number of taps, you must add an extra zero to increase the length
+		to an even number.
+	</p>
+	<p>The minimum number of taps is 4.  If you use less, add extra zeros to increase
+		the length to 4.
+	</p>
+	<p>The impulse response must be given in reverse order.  Many filters have
+		symetrical impluse response, making this a non-issue.  If your filter has
+		a non-symetrical response, make sure the data is in reverse time order.
+	</p>
 	<h3>Notes</h3>
 	<p>FIR filters requires more CPU time than Biquad (IIR), but they can
 		implement filters with better phase response.
@@ -2226,7 +2241,7 @@ double s_freq = .0625;</p>
 		supported filter length is 200 points.
 	</p>
 	<p>The free
-		<a href="http://t-filter.appspot.com/fir/index.html" target="_blank"> TFilter Design Tool</a>
+		<a href="http://t-filter.engineerjs.com/" target="_blank"> TFilter Design Tool</a>
 		can be used to create the impulse response array.  Be sure to set the sampling
 		frequency to 44117 HZ (it defaults to only 2000 Hz) and the output type to "int" (16 bit).
 	</p>

@@ -36,7 +36,7 @@ uint16_t AudioInputI2SQuad::block_offset = 0;
 bool AudioInputI2SQuad::update_responsibility = false;
 DMAChannel AudioInputI2SQuad::dma(false);
 
-#if defined(__MK20DX256__)
+#if defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
 
 void AudioInputI2SQuad::begin(void)
 {
