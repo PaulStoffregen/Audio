@@ -1053,6 +1053,13 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		Disabling the audio library interrupt for too long may cause audible
 		dropouts or glitches.
 	</p>
+	<p>An experimental SD library optimization exists, which can remove these
+		SD library restrictions.  It also allows reliable playback of more
+		files at the same time.  To enable this special code, find and edit
+		the SD_t3.h file within your Arduino folder.  See the comments within
+		that file for details.
+	</p>
+
 </script>
 <script type="text/x-red" data-template-name="AudioPlaySdWav">
 	<div class="form-row">

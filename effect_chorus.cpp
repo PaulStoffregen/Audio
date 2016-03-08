@@ -78,7 +78,7 @@ void AudioEffectChorus::update(void)
   // do passthru
   // It stores the unmodified data in the delay line so that
   // it isn't as likely to click
-  if(num_chorus < 1) {
+  if(num_chorus <= 1) {
     // Just passthrough
     block = receiveWritable(0);
     if(block) {
@@ -93,6 +93,7 @@ void AudioEffectChorus::update(void)
       transmit(block,0);
       release(block);
     }
+    return;
   }
 
   //          L E F T  C H A N N E L
@@ -100,6 +101,7 @@ void AudioEffectChorus::update(void)
   block = receiveWritable(0);
   if(block) {
     bp = block->data;
+    uint32_t tmp = delay_length/(num_chorus - 1) - 1;
     for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
       l_circ_idx++;
       if(l_circ_idx >= delay_length) {
@@ -110,7 +112,7 @@ void AudioEffectChorus::update(void)
       c_idx = l_circ_idx;
       for(int k = 0; k < num_chorus; k++) {
         sum += l_delayline[c_idx];
-        if(num_chorus > 1)c_idx -= delay_length/(num_chorus - 1) - 1;
+        if(num_chorus > 1)c_idx -= tmp;
         if(c_idx < 0) {
           c_idx += delay_length;
         }

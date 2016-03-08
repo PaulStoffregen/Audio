@@ -157,6 +157,15 @@ static int16_t testmem[8000]; // testing only
 
 #define SPISETTING SPISettings(20000000, MSBFIRST, SPI_MODE0)
 
+// While 20 MHz (Teensy actually uses 16 MHz in most cases) and even 24 MHz
+// have worked well in testing at room temperature with 3.3V power, to fully
+// meet all the worst case timing specs, the SPI clock low time would need
+// to be 40ns (12.5 MHz clock) for the single chip case and 51ns (9.8 MHz
+// clock) for the 6-chip memoryboard with 74LCX126 buffers.
+//
+// Timing analysis and info is here:
+// https://forum.pjrc.com/threads/29276-Limits-of-delay-effect-in-audio-library?p=97506&viewfull=1#post97506
+
 void AudioEffectDelayExternal::read(uint32_t offset, uint32_t count, int16_t *data)
 {
 	uint32_t addr = memory_begin + offset;
