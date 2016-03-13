@@ -262,8 +262,7 @@ unsigned long maximum(unsigned long a, unsigned long b,
 }
 
 
-void reportSpeed(unsigned int numFiles, unsigned long blockCount,
-  unsigned long usecTotal, unsigned long usecMax)
+void reportSpeed(unsigned int numFiles, unsigned long blockCount, unsigned long usecTotal, unsigned long usecMax)
 {
   float bytesPerSecond = (float)(blockCount * 512 * numFiles) / usecTotal;
   Serial.print("  Overall speed = ");
