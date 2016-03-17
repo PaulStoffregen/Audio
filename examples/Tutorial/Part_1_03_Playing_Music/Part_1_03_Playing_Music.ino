@@ -1,4 +1,7 @@
 // Advanced Microcontroller-based Audio Workshop
+//
+// https://github.com/PaulStoffregen/AudioWorkshop2015/raw/master/workshop.pdf
+// https://hackaday.io/project/8292-microcontroller-audio-workshop-had-supercon-2015
 // 
 // Part 1-3: First "Hello World" program, play a music file
 //

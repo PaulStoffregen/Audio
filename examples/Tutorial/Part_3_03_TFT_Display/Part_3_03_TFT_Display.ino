@@ -1,6 +1,9 @@
 // Advanced Microcontroller-based Audio Workshop
+//
+// https://github.com/PaulStoffregen/AudioWorkshop2015/raw/master/workshop.pdf
+// https://hackaday.io/project/8292-microcontroller-audio-workshop-had-supercon-2015
 // 
-// Part 3-3: TFT Display
+// Part 3-3: Add a TFT Display
 
 #include <ILI9341_t3.h>
 #include <font_Arial.h> // from ILI9341_t3
