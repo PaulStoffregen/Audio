@@ -91,8 +91,9 @@ void AudioFilterBiquad::setCoefficients(uint32_t stage, const int *coefficients)
 	*dest++ = *coefficients++;
 	*dest++ = *coefficients++ * -1;
 	*dest++ = *coefficients++ * -1;
-	*dest++ = 0;
-	*dest++ = 0;
+	//*dest++ = 0;
+	//*dest++ = 0;  // clearing filter state causes loud pop
+	dest += 2;
 	*dest   &= 0x80000000;
 	__enable_irq();
 }
