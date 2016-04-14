@@ -27,6 +27,7 @@
 #ifndef analyze_peakdetect_h_
 #define analyze_peakdetect_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 
 class AudioAnalyzePeak : public AudioStream

@@ -27,6 +27,7 @@
 #ifndef analyze_fft256_h_
 #define analyze_fft256_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 #include "arm_math.h"
 

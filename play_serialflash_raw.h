@@ -28,6 +28,7 @@
 #ifndef play_serial_raw_h_
 #define play_serial_raw_h_
 
+#include "Arduino.h"
 #include <AudioStream.h>
 #include <SerialFlash.h>
 

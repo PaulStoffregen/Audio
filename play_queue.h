@@ -27,6 +27,7 @@
 #ifndef play_queue_h_
 #define play_queue_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 
 class AudioPlayQueue : public AudioStream

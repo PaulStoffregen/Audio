@@ -23,6 +23,7 @@
 #ifndef AudioAnalyzeNoteFrequency_h_
 #define AudioAnalyzeNoteFrequency_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 /***********************************************************************
  *              Safe to adjust these values below                      *

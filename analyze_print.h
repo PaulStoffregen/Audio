@@ -27,6 +27,7 @@
 #ifndef analyze_print_h_
 #define analyze_print_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 
 class AudioAnalyzePrint : public AudioStream

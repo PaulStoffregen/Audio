@@ -26,6 +26,7 @@
 
 #ifndef synth_dc_h_
 #define synth_dc_h_
+#include "Arduino.h"
 #include "AudioStream.h"
 #include "utility/dspinst.h"
 

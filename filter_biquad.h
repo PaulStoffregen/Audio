@@ -27,6 +27,7 @@
 #ifndef filter_biquad_h_
 #define filter_biquad_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 
 class AudioFilterBiquad : public AudioStream

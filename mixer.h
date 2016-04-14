@@ -27,6 +27,7 @@
 #ifndef mixer_h_
 #define mixer_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 
 class AudioMixer4 : public AudioStream

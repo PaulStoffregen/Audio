@@ -28,6 +28,7 @@
 #ifndef effect_bitcrusher_h_
 #define effect_bitcrusher_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 
 class AudioEffectBitcrusher : public AudioStream

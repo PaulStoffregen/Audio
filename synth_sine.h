@@ -27,6 +27,7 @@
 #ifndef synth_sine_h_
 #define synth_sine_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 #include "arm_math.h"
 

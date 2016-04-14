@@ -27,6 +27,7 @@
 #ifndef _input_i2s_quad_h_
 #define _input_i2s_quad_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 #include "DMAChannel.h"
 

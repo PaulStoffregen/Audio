@@ -27,6 +27,7 @@
 #ifndef input_adc_h_
 #define input_adc_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 #include "DMAChannel.h"
 

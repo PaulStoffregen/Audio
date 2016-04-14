@@ -23,6 +23,7 @@
 #ifndef effect_flange_h_
 #define effect_flange_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 
 /******************************************************************/

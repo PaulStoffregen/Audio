@@ -26,6 +26,7 @@
 
 #ifndef effect_delay_h_
 #define effect_delay_h_
+#include "Arduino.h"
 #include "AudioStream.h"
 #include "utility/dspinst.h"
 

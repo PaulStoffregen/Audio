@@ -27,6 +27,7 @@
 #ifndef filter_variable_h_
 #define filter_variable_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 
 class AudioFilterStateVariable: public AudioStream

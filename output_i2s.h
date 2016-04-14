@@ -27,6 +27,7 @@
 #ifndef output_i2s_h_
 #define output_i2s_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 #include "DMAChannel.h"
 

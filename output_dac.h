@@ -27,6 +27,7 @@
 #ifndef output_dac_h_
 #define output_dac_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 #include "DMAChannel.h"
 

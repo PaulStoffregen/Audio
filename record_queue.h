@@ -27,6 +27,7 @@
 #ifndef record_queue_h_
 #define record_queue_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 
 class AudioRecordQueue : public AudioStream

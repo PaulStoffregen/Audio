@@ -27,6 +27,7 @@
 #ifndef analyze_fft1024_h_
 #define analyze_fft1024_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 #include "arm_math.h"
 

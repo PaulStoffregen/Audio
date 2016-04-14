@@ -27,6 +27,7 @@
 #ifndef analyze_rms_h_
 #define analyze_rms_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 
 class AudioAnalyzeRMS : public AudioStream
