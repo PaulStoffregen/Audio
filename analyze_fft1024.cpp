@@ -107,8 +107,9 @@ void AudioAnalyzeFFT1024::update(void)
 		arm_cfft_radix4_q15(&fft_inst, buffer);
 		// TODO: support averaging multiple copies
 		for (int i=0; i < 512; i++) {
-			uint32_t tmp = *((uint32_t *)buffer + i); // real & imag
-			uint32_t magsq = multiply_16tx16t_add_16bx16b(tmp, tmp);
+			uint32_t cmplx = *((uint32_t *)buffer + i); // the complex result
+			outputCmplx[i] = cmplx;
+			uint32_t magsq = multiply_16tx16t_add_16bx16b(cmplx, cmplx);
 			output[i] = sqrt_uint32_approx(magsq);
 		}
 		outputflag = true;
@@ -128,4 +129,12 @@ void AudioAnalyzeFFT1024::update(void)
 #endif
 }
 
+float AudioAnalyzeFFT1024::readPhase(unsigned int binNumber)
+{
+	if (binNumber > 511) return 0.0;
+	uint32_t cmplxNumber = outputCmplx[binNumber];
+	int16_t realPart = cmplxNumber & 0x0000ffff;
+	int16_t imaginaryPart = cmplxNumber >> 16;
+	return atan2f((float)realPart * (1.0 / 128.0), (float)imaginaryPart * (1.0 / 128.0));
+}
 
