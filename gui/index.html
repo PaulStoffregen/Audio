@@ -361,6 +361,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioPlaySerialflashRaw","data":{"defaults":{"name":{"value":"new"}},"shortName":"playFlashRaw","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioPlayQueue","data":{"defaults":{"name":{"value":"new"}},"shortName":"queue","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioRecordQueue","data":{"defaults":{"name":{"value":"new"}},"shortName":"queue","inputs":1,"outputs":0,"category":"record-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioSynthSimpleDrum","data":{"defaults":{"name":{"value":"new"}},"shortName":"drum","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveformSine","data":{"defaults":{"name":{"value":"new"}},"shortName":"sine","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveformSineHires","data":{"defaults":{"name":{"value":"new"}},"shortName":"sine_hires","inputs":0,"outputs":2,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveformSineModulated","data":{"defaults":{"name":{"value":"new"}},"shortName":"sine_fm","inputs":1,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -1332,6 +1333,51 @@ The actual packets are taken
 	<p></p>
 </script>
 <script type="text/x-red" data-template-name="AudioSynthWaveformSine">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioSynthSimpleDrum">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Generate a synthesised drum sound.  Also useful for laser pistol and bursting 
+  bubble sound effects.</p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Drum Tone Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+  <p class=func><span class=keyword>noteOn</span>();</p>
+	<p class=desc>Trigger the drum.
+	</p>
+  <p class=func><span class=keyword>frequency</span>(frequency);</p>
+	<p class=desc>Set the base frequency of the drum.
+	</p>
+  <p class=func><span class=keyword>length</span>(milliseconds);</p>
+	<p class=desc>Set the duration of the envelope, in milliseconds.
+	</p>
+  <p class=func><span class=keyword>secondMix</span>(level);</p>
+	<p class=desc>Emulates a two-headed tom, by adding a second sine wave that is
+  harmonized a perfect fifth above 
+  the base frequency.  Using this involves a slight CPU penalty.
+	</p>
+  <p class=func><span class=keyword>pitchMod</span>(depth);</p>
+	<p class=desc>Set the depth of envelope of the pitch, by a maximum of two octaves.
+  Default is 0.5, with no modulation.  Values above 0.5 cause the pitch to sweep 
+  downwards, values lower than 0.5 cause the pitch to sweep upwards.
+	</p>
+  
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Synthesis &gt; SimpleDrumm
+	</p>
+	<h3>Notes</h3>
+	<p></p>
+</script>
+<script type="text/x-red" data-template-name="AudioSynthSimpleDrum">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
