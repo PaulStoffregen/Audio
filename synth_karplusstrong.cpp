@@ -70,7 +70,9 @@ void AudioSynthKarplusStrong::update(void)
 	int16_t *data = block->data;
 	for (int i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
 		int16_t in = buffer[bufferIndex];
-		int16_t out = (in + prior) >> 1;
+		//int16_t out = (in * 32604 + prior * 32604) >> 16;
+		int16_t out = (in * 32686 + prior * 32686) >> 16;
+		//int16_t out = (in * 32768 + prior * 32768) >> 16;
 		*data++ = out;
 		buffer[bufferIndex] = out;
 		prior = in;
