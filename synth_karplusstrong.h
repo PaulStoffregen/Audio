@@ -45,7 +45,7 @@ public:
 		}
 		magnitude = velocity * 65535.0f;
 		int len = (AUDIO_SAMPLE_RATE_EXACT / frequency) + 0.5f;
-		if (len > 400) len = 400;
+		if (len > 536) len = 536;
 		bufferLen = len;
 		bufferIndex = 0;
 		state = 1;
@@ -55,12 +55,12 @@ public:
 	}
 	virtual void update(void);
 private:
-	uint8_t  state;     // 0=steady output, 1=transitioning
+	uint8_t  state;     // 0=steady output, 1=begin on next update, 2=playing
 	uint16_t bufferLen;
 	uint16_t bufferIndex;
 	int32_t  magnitude; // current output
 	static uint32_t seed;  // must start at 1
-	int16_t buffer[400];
+	int16_t buffer[536]; // TODO: dynamically use audio memory blocks
 };
 
 #endif
