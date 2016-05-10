@@ -100,6 +100,10 @@ void loop() {
   delay(hand_delay);
   strum_dn(chord, 0.7);
   delay(hand_delay);
+
+  Serial.print("Max CPU Usage = ");
+  Serial.print(AudioProcessorUsageMax(), 1);
+  Serial.println("%");
 }
 
 void strum_up(const float *chord, float velocity)
