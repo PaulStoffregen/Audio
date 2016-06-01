@@ -44,6 +44,11 @@ var RED = (function() {
 		RED.view.importNodes(data);
 		event.preventDefault();
 	});
+	function make_name(n) {
+		var name = (n.name ? n.name : n.id);
+		name = name.replace(" ", "_").replace("+", "_").replace("-", "_");
+		return name
+	}
 
 	function save(force) {
 		RED.storage.update();
@@ -65,8 +70,7 @@ var RED = (function() {
 				if (node && (node.outputs > 0 || node._def.inputs > 0)) {
 					cpp += n.type + " ";
 					for (var j=n.type.length; j<24; j++) cpp += " ";
-					var name = (n.name ? n.name : n.id);
-					name = name.replace(" ", "_").replace("+", "_").replace("-", "_");
+					var name = make_name(n)
 					cpp += name + "; ";
 					for (var j=n.id.length; j<14; j++) cpp += " ";
 					cpp += "//xy=" + n.x + "," + n.y + "\n";
@@ -88,10 +92,12 @@ var RED = (function() {
 									cpp += "AudioConnection          patchCord" + cordcount + "(";
 									var src = RED.nodes.node(n.id);
 									var dst = RED.nodes.node(parts[0]);
+									var src_name = make_name(src);
+									var dst_name = make_name(dst);
 									if (j == 0 && parts[1] == 0 && src && src.outputs == 1 && dst && dst._def.inputs == 1) {
-										cpp += n.id + ", " + parts[0];
+										cpp += src_name + ", " + parts[0];
 									} else {
-										cpp += n.id + ", " + j + ", " + parts[0] + ", " + parts[1];
+										cpp += src_name + ", " + j + ", " + dst_name + ", " + parts[1];
 									}
 									cpp += ");\n";
 									cordcount++;
