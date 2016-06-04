@@ -347,14 +347,14 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioInputI2S","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputI2SQuad","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_quad","inputs":0,"outputs":4,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputAnalog","data":{"defaults":{"name":{"value":"new"}},"shortName":"adc","inputs":0,"outputs":1,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioInputI2Sslave","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2ss","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputI2Sslave","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2sslave","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputUSB","data":{"defaults":{"name":{"value":"new"}},"shortName":"usb","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputI2S","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputI2SQuad","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_quad","inputs":4,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputSPDIF","data":{"defaults":{"name":{"value":"new"}},"shortName":"spdif","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputAnalog","data":{"defaults":{"name":{"value":"new"}},"shortName":"dac","inputs":1,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputPWM","data":{"defaults":{"name":{"value":"new"}},"shortName":"pwm","inputs":1,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioOutputI2Sslave","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2ss","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputI2Sslave","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2sslave","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputUSB","data":{"defaults":{"name":{"value":"new"}},"shortName":"usb","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioMixer4","data":{"defaults":{"name":{"value":"new"}},"shortName":"mixer","inputs":4,"outputs":1,"category":"mixer-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioPlayMemory","data":{"defaults":{"name":{"value":"new"}},"shortName":"playMem","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -565,7 +565,8 @@ span.mainfunction {color: #993300; font-weight: bolder}
 <script type="text/x-red" data-help-name="AudioInputI2Sslave">
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
-	<p>Receive 16 bit stereo audio from an I2S device using I2S slave mode.</p>
+	<p>Receive 16 bit stereo audio from an I2S device using I2S slave mode
+		(where the ADC or codec chip, not Teensy, controls audio timing).</p>
 	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -807,7 +808,9 @@ span.mainfunction {color: #993300; font-weight: bolder}
 <script type="text/x-red" data-help-name="AudioOutputAnalog">
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
-	<p>Transmit 12 bit audio using Teensy 3.1's built-in digital to analog converter.</p>
+	<p>Transmit 12 bit audio using Teensy's built-in digital to analog converter.</p>
+	<p align=center><img src="img/dac_speaker.jpg"><br>
+	<small><a href="http://www.pjrc.com/store/prop_shield.html" target="_blank_">Prop Shield with 4&ohm; Speaker</a></small></p>
 	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -815,13 +818,18 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		<tr class=odd><td align=center>In 0</td><td>Audio Channel</td></tr>
 	</table>
 	<h3>Functions</h3>
-	<p>This object has no functions to call from the Arduino sketch.  It
-		simply streams data from the ADC to its output port.</p>
+	<p class=func><span class=keyword>analogReference</span>(ref);</p>
+	<p class=desc>Configure output voltage range:<br>
+	<span class=literal>INTERNAL</span> selects 1.2 volt peak-to-peak output.<br>
+	<span class=literal>EXTERNAL</span> selects 3.3 volt peak-to-peak output.
+	</p>
 	<h3>Hardware</h3>
 	<p align=center><img src="img/dacpin.jpg"></p>
-	<p>Signal range is 0 to 1.2V</p>
-	<p>Most applications require at least a 10&micro;F DC-blocking capacitor.</p>
-	<p>TODO: photo of Teensy 3.1 with 10&micro;F capacitor and 3.5mm jack.</p>
+	<p>Signal range default is 0 to 1.2V</p>
+	<p>The output voltage has DC level.  Some applications require a DC-blocking capacitor.  If unsure, a 10&micro;F is usually a safe value to use.  If an aluminum or tantalum capacitor is used, the positive terminal should connect to Teensy's DAC pin.</p>
+	<p>The DAC pin is used with the
+	<a href="http://www.pjrc.com/store/prop_shield.html" target="_blank_">Prop Shield</a>
+	to drive speakers.</p>
 	<h3>Examples</h3>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughMono
 	</p>
@@ -832,6 +840,9 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		not filtered.  This may not
 		be an issue for many uses, but care should be used if amplified and driven
 		to high power tweeters.</p>
+	<p>When using 3.3V output, the power supply is used for the analog reference.  Noise
+		present on the 3.3V power can couple to the DAC output signal.
+	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioOutputAnalog">
 	<div class="form-row">
@@ -870,7 +881,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughMono
 	</p>
 	<h3>Notes</h3>
-	<p>This object only works properly when Tools > CPU_Speed is set to
+	<p>This object only works properly when Tools &gt; CPU_Speed is set to
 		48 or 96 MHz.  Other speeds aren't supported and will likely fail
 		in strange ways.</p>
 	<p>The PWM carrier frequency is 88.2 kHz.  The suggested circuit
@@ -893,7 +904,8 @@ span.mainfunction {color: #993300; font-weight: bolder}
 <script type="text/x-red" data-help-name="AudioOutputI2Sslave">
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
-	<p>Transmit 16 bit stereo audio to an I2S device using I2S slave mode.</p>
+	<p>Transmit 16 bit stereo audio to an I2S device using I2S slave mode
+		(where the DAC or codec chip, not Teensy, controls audio timing).</p>
 	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
