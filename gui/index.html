@@ -348,12 +348,14 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioInputI2SQuad","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_quad","inputs":0,"outputs":4,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputAnalog","data":{"defaults":{"name":{"value":"new"}},"shortName":"adc","inputs":0,"outputs":1,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputI2Sslave","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2ss","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputUSB","data":{"defaults":{"name":{"value":"new"}},"shortName":"usb","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputI2S","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputI2SQuad","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_quad","inputs":4,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputSPDIF","data":{"defaults":{"name":{"value":"new"}},"shortName":"spdif","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputAnalog","data":{"defaults":{"name":{"value":"new"}},"shortName":"dac","inputs":1,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputPWM","data":{"defaults":{"name":{"value":"new"}},"shortName":"pwm","inputs":1,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputI2Sslave","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2ss","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputUSB","data":{"defaults":{"name":{"value":"new"}},"shortName":"usb","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioMixer4","data":{"defaults":{"name":{"value":"new"}},"shortName":"mixer","inputs":4,"outputs":1,"category":"mixer-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioPlayMemory","data":{"defaults":{"name":{"value":"new"}},"shortName":"playMem","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioPlaySdWav","data":{"defaults":{"name":{"value":"new"}},"shortName":"playSdWav","inputs":0,"outputs":2,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -362,6 +364,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioPlayQueue","data":{"defaults":{"name":{"value":"new"}},"shortName":"queue","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioRecordQueue","data":{"defaults":{"name":{"value":"new"}},"shortName":"queue","inputs":1,"outputs":0,"category":"record-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthSimpleDrum","data":{"defaults":{"name":{"value":"new"}},"shortName":"drum","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioSynthKarplusStrong","data":{"defaults":{"name":{"value":"new"}},"shortName":"string","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveformSine","data":{"defaults":{"name":{"value":"new"}},"shortName":"sine","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveformSineHires","data":{"defaults":{"name":{"value":"new"}},"shortName":"sine_hires","inputs":0,"outputs":2,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveformSineModulated","data":{"defaults":{"name":{"value":"new"}},"shortName":"sine_fm","inputs":1,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -604,6 +607,41 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</div>
 </script>
 
+<script type="text/x-red" data-help-name="AudioInputUSB">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Receive stereo audio from a PC or Mac.  Teensy appears as a USB
+		sound device.</p>
+	<p align=center><img src="img/usbtype_audio_in.png"></p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Left Channel</td></tr>
+		<tr class=odd><td align=center>Out 1</td><td>Right Channel</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from the USB to its 2 output ports.</p>
+	<!--
+	<h3>Hardware</h3>
+	-->
+	<!--
+<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; </p>
+	-->
+	<h3>Notes</h3>
+	<p>Arduino's <b>Tools &gt; USB Type</b> menu must be set to <b>Audio</b>.
+		</p>
+	<p align=center><img src="img/usbtype_audio.png"></p>
+</script>
+<script type="text/x-red" data-template-name="AudioInputUSB">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
 <script type="text/x-red" data-help-name="AudioOutputI2S">
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
@@ -712,11 +750,6 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		<input type="text" id="node-input-name" placeholder="Name">
 	</div>
 </script>
-
-
-
-
-
 
 <script type="text/x-red" data-help-name="AudioOutputSPDIF">
 	<h3>Summary</h3>
@@ -894,6 +927,41 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioOutputI2Sslave">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioOutputUSB">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Send stereo audio to a PC or Mac.  Teensy appears as a USB
+		sound device.</p>
+	<p align=center><img src="img/usbtype_audio_out.png"></p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Left Channel</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Right Channel</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams from it's 2 input ports to the USB.</p>
+	<!--
+	<h3>Hardware</h3>
+	-->
+	<!--
+<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; </p>
+	-->
+	<h3>Notes</h3>
+	<p>Arduino's <b>Tools &gt; USB Type</b> menu must be set to <b>Audio</b>.
+		</p>
+	<p align=center><img src="img/usbtype_audio.png"></p>
+</script>
+<script type="text/x-red" data-template-name="AudioInputUSB">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1295,6 +1363,84 @@ The actual packets are taken
 	</div>
 </script>
 
+<script type="text/x-red" data-help-name="AudioSynthSimpleDrum">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Generate a synthesised drum sound.  Also useful for laser pistol and bursting
+		bubble sound effects.</p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Drum Tone Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>noteOn</span>();</p>
+	<p class=desc>Trigger the drum.
+	</p>
+	<p class=func><span class=keyword>frequency</span>(frequency);</p>
+	<p class=desc>Set the base frequency of the drum.
+	</p>
+	<p class=func><span class=keyword>length</span>(milliseconds);</p>
+	<p class=desc>Set the duration of the envelope, in milliseconds.
+	</p>
+	<p class=func><span class=keyword>secondMix</span>(level);</p>
+	<p class=desc>Emulates a two-headed tom, by adding a second sine wave that is
+	harmonized a perfect fifth above
+	the base frequency.  Using this involves a slight CPU penalty.
+	</p>
+	<p class=func><span class=keyword>pitchMod</span>(depth);</p>
+	<p class=desc>Set the depth of envelope of the pitch, by a maximum of two octaves.
+	Default is 0.5, with no modulation.  Values above 0.5 cause the pitch to sweep
+	downwards, values lower than 0.5 cause the pitch to sweep upwards.
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Synthesis &gt; SimpleDrum
+	</p>
+	<h3>Notes</h3>
+	<p></p>
+</script>
+<script type="text/x-red" data-template-name="AudioSynthSimpleDrum">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioSynthKarplusStrong">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Synthesize a plucked string sound, such as a guitar string.
+		</p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Sound Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>noteOn</span>(frequency, velocity);</p>
+	<p class=desc>Begin a new string note.  Velocity can be from 0 to 1.0,
+		indicating how hard the string is plucked.
+	</p>
+	<p class=func><span class=keyword>noteOff</span>(velocity);</p>
+	<p class=desc>Stop the sound output.
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Synthesis &gt; Guitar
+	</p>
+	<p class=exam><a href="https://github.com/PaulStoffregen/TouchGuitar" target="_blank">TouchGuitar</a>
+	</p>
+	<h3>Notes</h3>
+	<p></p>
+</script>
+<script type="text/x-red" data-template-name="AudioSynthSimpleDrum">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
 <script type="text/x-red" data-help-name="AudioSynthWaveformSine">
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
@@ -1333,51 +1479,6 @@ The actual packets are taken
 	<p></p>
 </script>
 <script type="text/x-red" data-template-name="AudioSynthWaveformSine">
-	<div class="form-row">
-		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-		<input type="text" id="node-input-name" placeholder="Name">
-	</div>
-</script>
-
-<script type="text/x-red" data-help-name="AudioSynthSimpleDrum">
-	<h3>Summary</h3>
-	<div class=tooltipinfo>
-	<p>Generate a synthesised drum sound.  Also useful for laser pistol and bursting 
-  bubble sound effects.</p>
-	</div>
-	<h3>Audio Connections</h3>
-	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Port</th><th>Purpose</th></tr>
-		<tr class=odd><td align=center>Out 0</td><td>Drum Tone Output</td></tr>
-	</table>
-	<h3>Functions</h3>
-  <p class=func><span class=keyword>noteOn</span>();</p>
-	<p class=desc>Trigger the drum.
-	</p>
-  <p class=func><span class=keyword>frequency</span>(frequency);</p>
-	<p class=desc>Set the base frequency of the drum.
-	</p>
-  <p class=func><span class=keyword>length</span>(milliseconds);</p>
-	<p class=desc>Set the duration of the envelope, in milliseconds.
-	</p>
-  <p class=func><span class=keyword>secondMix</span>(level);</p>
-	<p class=desc>Emulates a two-headed tom, by adding a second sine wave that is
-  harmonized a perfect fifth above 
-  the base frequency.  Using this involves a slight CPU penalty.
-	</p>
-  <p class=func><span class=keyword>pitchMod</span>(depth);</p>
-	<p class=desc>Set the depth of envelope of the pitch, by a maximum of two octaves.
-  Default is 0.5, with no modulation.  Values above 0.5 cause the pitch to sweep 
-  downwards, values lower than 0.5 cause the pitch to sweep upwards.
-	</p>
-  
-	<h3>Examples</h3>
-	<p class=exam>File &gt; Examples &gt; Synthesis &gt; SimpleDrumm
-	</p>
-	<h3>Notes</h3>
-	<p></p>
-</script>
-<script type="text/x-red" data-template-name="AudioSynthSimpleDrum">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
