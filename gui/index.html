@@ -629,14 +629,16 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<!--
 	<h3>Hardware</h3>
 	-->
-	<!--
-<h3>Examples</h3>
-	<p class=exam>File &gt; Examples &gt; Audio &gt; </p>
-	-->
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughUSB</p>
+	</p>
 	<h3>Notes</h3>
 	<p>Arduino's <b>Tools &gt; USB Type</b> menu must be set to <b>Audio</b>.
 		</p>
 	<p align=center><img src="img/usbtype_audio.png"></p>
+	<p>USB input &amp; output does not cause the Teensy Audio Library to
+		update.  At least one non-USB input or output object must be
+		present for the entire library to update properly.</p>
 </script>
 <script type="text/x-red" data-template-name="AudioInputUSB">
 	<div class="form-row">
@@ -974,16 +976,18 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<!--
 	<h3>Hardware</h3>
 	-->
-	<!--
-<h3>Examples</h3>
-	<p class=exam>File &gt; Examples &gt; Audio &gt; </p>
-	-->
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; WavFilePlayerUSB</p>
+	</p>
 	<h3>Notes</h3>
 	<p>Arduino's <b>Tools &gt; USB Type</b> menu must be set to <b>Audio</b>.
 		</p>
 	<p align=center><img src="img/usbtype_audio.png"></p>
+	<p>USB input &amp; output does not cause the Teensy Audio Library to
+		update.  At least one non-USB input or output object must be
+		present for the entire library to update properly.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioInputUSB">
+<script type="text/x-red" data-template-name="AudioOutputUSB">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
