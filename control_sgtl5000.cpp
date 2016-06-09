@@ -522,7 +522,8 @@ bool AudioControlSGTL5000::enable(void)
 	write(CHIP_ANA_POWER, 0x4060);  // VDDD is externally driven with 1.8V
 	write(CHIP_LINREG_CTRL, 0x006C);  // VDDA & VDDIO both over 3.1V
 	write(CHIP_REF_CTRL, 0x01F2); // VAG=1.575, normal ramp, +12.5% bias current
-	write(CHIP_LINE_OUT_CTRL, 0x0F22); // LO_VAGCNTRL=1.65V, OUT_CURRENT=0.54mA
+	//write(CHIP_LINE_OUT_CTRL, 0x0F22); // LO_VAGCNTRL=1.65V, OUT_CURRENT=0.54mA
+	write(CHIP_LINE_OUT_CTRL, 0x0022); // LO_VAGCNTRL=1.65V, OUT_CURRENT=0.18mA
 	write(CHIP_SHORT_CTRL, 0x4446);  // allow up to 125mA
 	write(CHIP_ANA_CTRL, 0x0137);  // enable zero cross detectors
 	write(CHIP_ANA_POWER, 0x40FF); // power up: lineout, hp, adc, dac
