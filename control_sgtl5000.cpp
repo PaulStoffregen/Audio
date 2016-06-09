@@ -515,7 +515,8 @@ bool AudioControlSGTL5000::enable(void)
 	delay(5);
 	//Serial.print("chip ID = ");
 	//delay(5);
-	//unsigned int n = read(CHIP_ID);
+	unsigned int n = read(CHIP_ID);
+	if (n==0) return false; // chip not found, so avoid timeouts below
 	//Serial.println(n, HEX);
 
 	write(CHIP_ANA_POWER, 0x4060);  // VDDD is externally driven with 1.8V
