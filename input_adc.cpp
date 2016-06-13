@@ -36,7 +36,7 @@ bool AudioInputAnalog::update_responsibility = false;
 DMAChannel AudioInputAnalog::dma(false);
 
 
-void AudioInputAnalog::init(uint8_t pin)
+void AudioInputAnalog::init(uint8_t pin, int analogRef)
 {
 	uint32_t i, sum=0;
 
@@ -44,7 +44,9 @@ void AudioInputAnalog::init(uint8_t pin)
 	// conversion.  This completes the self calibration stuff and
 	// leaves the ADC in a state that's mostly ready to use
 	analogReadRes(16);
-	analogReference(INTERNAL); // range 0 to 1.2 volts
+	// DEFAULT: range 0 to 3.3 volts
+	// INTERNAL: range 0 to 1.2 volts
+	analogReference(analogRef);
 	analogReadAveraging(8);
 	// Actually, do many normal reads, to start with a nice DC level
 	for (i=0; i < 1024; i++) {
