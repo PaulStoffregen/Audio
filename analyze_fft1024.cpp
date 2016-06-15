@@ -103,15 +103,10 @@ void AudioAnalyzeFFT1024::update(void)
 		copy_to_fft_buffer(buffer+0x500, blocklist[5]->data);
 		copy_to_fft_buffer(buffer+0x600, blocklist[6]->data);
 		copy_to_fft_buffer(buffer+0x700, blocklist[7]->data);
-		if (window) apply_window_to_fft_buffer(buffer, window);
-		arm_cfft_radix4_q15(&fft_inst, buffer);
-		// TODO: support averaging multiple copies
-		for (int i=0; i < 512; i++) {
-			uint32_t tmp = *((uint32_t *)buffer + i); // real & imag
-			uint32_t magsq = multiply_16tx16t_add_16bx16b(tmp, tmp);
-			output[i] = sqrt_uint32_approx(magsq);
-		}
 		outputflag = true;
+		if (!onRequestOnly) {
+			calculateFFT();
+		}
 		release(blocklist[0]);
 		release(blocklist[1]);
 		release(blocklist[2]);
@@ -128,4 +123,30 @@ void AudioAnalyzeFFT1024::update(void)
 #endif
 }
 
+bool AudioAnalyzeFFT1024::available()
+{
+	if (outputflag == true) {
+		if (onRequestOnly) {
+			noInterrupts();
+			calculateFFT();
+			interrupts();
+		}
+		outputflag = false;
+		return true;
+	}
+	return false;
+}
 
+void AudioAnalyzeFFT1024::calculateFFT()
+{
+	if (window) apply_window_to_fft_buffer(buffer, window);
+
+	arm_cfft_radix4_q15(&fft_inst, buffer);
+
+	// TODO: support averaging multiple copies
+	for (int i=0; i < 512; i++) {
+		uint32_t tmp = *((uint32_t *)buffer + i); // real & imag
+		uint32_t magsq = multiply_16tx16t_add_16bx16b(tmp, tmp);
+		output[i] = sqrt_uint32_approx(magsq);
+	}
+}
