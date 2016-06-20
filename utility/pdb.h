@@ -35,12 +35,31 @@
 
 #define PDB_CONFIG (PDB_SC_TRGSEL(15) | PDB_SC_PDBEN | PDB_SC_CONT | PDB_SC_PDBIE | PDB_SC_DMAEN)
 
-#if F_BUS == 60000000
+
+#if F_BUS == 120000000
+  #define PDB_PERIOD (2720-1)
+#elif F_BUS == 108000000
+  #define PDB_PERIOD (2448-1)
+#elif F_BUS == 96000000
+  #define PDB_PERIOD (2176-1)
+#elif F_BUS == 90000000
+  #define PDB_PERIOD (2040-1)
+#elif F_BUS == 80000000
+  #define PDB_PERIOD (1813-1)  // small ?? error
+#elif F_BUS == 72000000
+  #define PDB_PERIOD (1632-1)
+#elif F_BUS == 64000000
+  #define PDB_PERIOD (1451-1)  // small ?? error
+#elif F_BUS == 60000000
   #define PDB_PERIOD (1360-1)
 #elif F_BUS == 56000000
   #define PDB_PERIOD (1269-1)  // 0.026% error
+#elif F_BUS == 54000000
+  #define PDB_PERIOD (1224-1)
 #elif F_BUS == 48000000
   #define PDB_PERIOD (1088-1)
+#elif F_BUS == 40000000
+  #define PDB_PERIOD (907-1)  // small ?? error
 #elif F_BUS == 36000000
   #define PDB_PERIOD (816-1)
 #elif F_BUS == 24000000
