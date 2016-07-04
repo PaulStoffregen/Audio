@@ -353,6 +353,8 @@ start:
 		data_length -= size;
 		if (leftover_bytes) {
 			block_left->data[block_offset] = header[0];
+//PAH fix problem with left+right channels being swapped
+			leftover_bytes = 0;
 			goto right16;
 		}
 		while (1) {
