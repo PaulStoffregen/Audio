@@ -5,7 +5,7 @@
 #include <SerialFlash.h>
 
 AudioPlaySdWav           playWav1;
-AudioOutputUSB           audioOutput;
+AudioOutputUSB           audioOutput; // must set Tools > USB Type to Audio
 AudioOutputAnalog        dac;
 AudioConnection          patchCord1(playWav1, 0, audioOutput, 0);
 AudioConnection          patchCord2(playWav1, 1, audioOutput, 1);

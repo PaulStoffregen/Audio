@@ -4,7 +4,7 @@
 #include <SD.h>
 #include <SerialFlash.h>
 
-AudioInputUSB            usb1;           //xy=200,69
+AudioInputUSB            usb1;           //xy=200,69  (must set Tools > USB Type to Audio)
 AudioOutputI2S           i2s1;           //xy=365,94
 AudioConnection          patchCord1(usb1, 0, i2s1, 0);
 AudioConnection          patchCord2(usb1, 1, i2s1, 1);
