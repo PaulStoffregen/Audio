@@ -287,7 +287,7 @@ void AudioOutputI2S::update(void)
   #define MCLK_MULT 12
   #define MCLK_DIV  17
 #else
-  #error "This CPU Clock Speed is not supported by the Audio library";
+  #error "This CPU Clock Speed is not supported by the I2S-Output";
 #endif
 
 #ifndef MCLK_SRC
