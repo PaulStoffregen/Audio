@@ -274,6 +274,7 @@ void AudioOutputI2S::update(void)
 #elif F_CPU == 192000000
   #define MCLK_MULT 1
   #define MCLK_DIV  17
+/*  
 #elif F_CPU == 216000000
   #define MCLK_MULT 8
   #define MCLK_DIV  153
@@ -281,6 +282,7 @@ void AudioOutputI2S::update(void)
 #elif F_CPU == 240000000
   #define MCLK_MULT 4
   #define MCLK_DIV  85
+*/  
 #elif F_CPU == 16000000
   #define MCLK_MULT 12
   #define MCLK_DIV  17
