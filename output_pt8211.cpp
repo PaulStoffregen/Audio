@@ -84,7 +84,6 @@ void AudioOutputPT8211::begin(void)
 
 void AudioOutputPT8211::isr(void)
 {
-	digitalWriteFast(LED_BUILTIN, HIGH);
 	int16_t *dest;
 	audio_block_t *blockL, *blockR;
 	uint32_t saddr, offsetL, offsetR;
@@ -335,7 +334,6 @@ void AudioOutputPT8211::isr(void)
 		AudioOutputPT8211::block_right_1st = AudioOutputPT8211::block_right_2nd;
 		AudioOutputPT8211::block_right_2nd = NULL;
 	}
-	digitalWriteFast(LED_BUILTIN, LOW);
 }
 
 
