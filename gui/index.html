@@ -547,6 +547,10 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		moment, analogRead() can end up waiting forever, which effectively
 		crashes your program.
 	</p>
+	<p>AudioInputAnalog has a
+		<a href="https://github.com/PaulStoffregen/Audio/issues/96">known bug</a>
+		at 72 MHz.  Use 48 or 96 MHz clock speed (Tools &gt; CPU Speed menu).
+	</p>
 	<p>A different pin may be used, but adding it as an parameter
 		to the AudioInputAnalog object definition.
 	</p>
