@@ -542,6 +542,11 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p class=exam>File &gt; Examples &gt; OctoWS2811 &gt; SpectrumAnalyzer
 	</p>
 	<h3>Notes</h3>
+	<p><b>analogRead() must not be used</b>, because AudioInputAnalog is regularly
+		accessing the ADC hardware.  If both access the hardware at the same
+		moment, analogRead() can end up waiting forever, which effectively
+		crashes your program.
+	</p>
 	<p>A different pin may be used, but adding it as an parameter
 		to the AudioInputAnalog object definition.
 	</p>
