@@ -2347,6 +2347,30 @@ double s_freq = .0625;</p>
 	<p class=desc>Configure one stage of the filter (0 to 3) with band reject (notch)
 		response.  Q controls the width of rejected frequencies.
 	</p>
+	<p class=func><span class=keyword>setLowShelf</span>(stage, frequency, gain, slope);</p>
+	<p class=desc>Configure one stage of the filter (0 to 3) with low shelf response.
+		A low shelf filter attenuates or amplifies signals below the specified frequency.
+		Frequency controls the slope midpoint, gain is in dB and can be both
+		positive or negative. The slope parameter controls steepness of gain transition.
+		A slope of 1 yields maximum steepness without overshoot,
+		lower values yield a less steep slope. See the picture below for a visualization
+		of the slope parameter's effect.
+		Be careful with positive gains and slopes higher than 1 as they introduce gain
+		(see warning below).
+	</p>
+	</p>
+	<p class=func><span class=keyword>setHighShelf</span>(stage, frequency, gain, slope);</p>
+	<p class=desc>Configure one stage of the filter (0 to 3) with high shelf response.
+		A high shelf filter attenuates or amplifies signals above the specified frequency.
+		Frequency controls the slope midpoint, gain is in dB and can be both
+		positive or negative. The slope parameter controls steepness of gain transition.
+		A slope of 1 yields maximum steepness without overshoot,
+		lower values yield a less steep slope. See the picture below for a visualization
+		of the slope parameter's effect.
+		Be careful with positive gains and slopes higher than 1 as they introduce gain
+		(see warning below).
+	</p>
+	<p align=center><img src="img/shelf_filter.png"></p>
 	<p class=func><span class=keyword>setCoefficients</span>(stage, array[5]);</p>
 	<p class=desc>Configure one stage of the filter (0 to 3) with an arbitrary
 		filter response.  The array of coefficients is in order: B0, B1, B2, A1, A2.
