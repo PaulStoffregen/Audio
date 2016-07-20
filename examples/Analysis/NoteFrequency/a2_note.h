@@ -1,2 +1,2 @@
 #include "Arduino.h"
-extern const unsigned int a2_note[53971];
+extern const unsigned int a2_note[53801];
