@@ -85,7 +85,7 @@ void AudioAnalyzeNoteFrequency::update( void ) {
  *  page 79. Might have to downsample for low fundmental frequencies because of fft buffer
  *  size limit.
  */
-FASTRUN void AudioAnalyzeNoteFrequency::process( void ) {
+void AudioAnalyzeNoteFrequency::process( void ) {
     
     const int16_t *p;
     p = AudioBuffer;
@@ -99,25 +99,25 @@ FASTRUN void AudioAnalyzeNoteFrequency::process( void ) {
             int16_t current, lag, delta;
             lag = *( ( int16_t * )p + ( x+tau ) );
             current = *( ( int16_t * )p+x );
-            delta1 = ( current-lag );
+            delta = ( current-lag );
             sum += delta * delta;
             x += 4;
             
             lag = *( ( int16_t * )p + ( x+tau ) );
             current = *( ( int16_t * )p+x );
-            delta1 = ( current-lag );
+            delta = ( current-lag );
             sum += delta * delta;
             x += 4;
             
             lag = *( ( int16_t * )p + ( x+tau ) );
             current = *( ( int16_t * )p+x );
-            delta1 = ( current-lag );
+            delta = ( current-lag );
             sum += delta * delta;
             x += 4;
             
             lag = *( ( int16_t * )p + ( x+tau ) );
             current = *( ( int16_t * )p+x );
-            delta1 = ( current-lag );
+            delta = ( current-lag );
             sum += delta * delta;
             x += 4;
 #endif
