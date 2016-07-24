@@ -105,7 +105,7 @@ void AudioAnalyzeFFT256::update(void)
 		count = 1;
 		copy_to_fft_buffer(buffer, prevblocks[2]->data);
 		copy_to_fft_buffer(buffer+128, prevblocks[1]->data);
-		copy_to_fft_buffer(buffer+256, prevblocks[1]->data);
+		copy_to_fft_buffer(buffer+256, prevblocks[0]->data);
 		copy_to_fft_buffer(buffer+384, block->data);
 		if (window) apply_window_to_fft_buffer(buffer, window);
 		arm_cfft_radix4_q15(&fft_inst, buffer);
