@@ -352,6 +352,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioOutputI2S","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputI2SQuad","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_quad","inputs":4,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputSPDIF","data":{"defaults":{"name":{"value":"new"}},"shortName":"spdif","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputPT8211","data":{"defaults":{"name":{"value":"new"}},"shortName":"pt2811","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputAnalog","data":{"defaults":{"name":{"value":"new"}},"shortName":"dac","inputs":1,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputPWM","data":{"defaults":{"name":{"value":"new"}},"shortName":"pwm","inputs":1,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputI2Sslave","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2sslave","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -812,6 +813,50 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioOutputSPDIF">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioOutputPT8211">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Transmit 16 bit stereo audio to a low-cost PT8211 DAC chip.  4X oversampling
+		and filtering are automatically used to improve output quality.</p>
+	<p align=center><img src="img/pt8211.jpg"></p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Left Channel</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Right Channel</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from its 2 input ports to a PT8211 chip.  4X
+		oversampling and filtering is automatically used to improve quality.</p>
+	<h3>Hardware</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>9</td><td>BCK</td><td>Output</td></tr>
+		<tr class=odd><td align=center>22</td><td>DIN</td><td>Output</td></tr>
+		<tr class=odd><td align=center>23</td><td>WS</td><td>Output</td></tr>
+	</table>
+	<p>More information can be found in the PT8211 datasheet.
+		</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PT8211Sine
+	</p>
+	<h3>Credits</h3>
+	<p>Frank Boesing and Benjamin developed this PT8211 object.  Details can be
+		found on this
+		<a href="https://forum.pjrc.com/threads/29284-Dual-channel-16bit-dac-PT8211/page3" target="_blank">forum disussion</a>.
+	<h3>Notes</h3>
+	<p>
+	</p>
+</script>
+<script type="text/x-red" data-template-name="AudioOutputPT8211">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
