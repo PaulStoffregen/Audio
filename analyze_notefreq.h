@@ -120,8 +120,8 @@ private:
      */
     uint64_t running_sum;
     uint16_t tau_global;
-    int64_t  rs_buffer[5], yin_buffer[5];
-    int16_t  AudioBuffer[AUDIO_GUITARTUNER_BLOCKS*128] __attribute__ ( ( aligned ( 4 ) ) );
+    uint64_t  rs_buffer[5], yin_buffer[5];
+    uint16_t  AudioBuffer[AUDIO_GUITARTUNER_BLOCKS*128] __attribute__ ( ( aligned ( 4 ) ) );
     uint8_t  yin_idx, state;
     float    periodicity, yin_threshold, cpu_usage_max, data;
     bool     enabled, next_buffer, first_run;

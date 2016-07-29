@@ -65,10 +65,12 @@ void AudioAnalyzeNoteFrequency::update( void ) {
             if ( !first_run && process_buffer ) process( );
             for ( int i = 0; i < AUDIO_GUITARTUNER_BLOCKS; i++ ) copy_buffer( AudioBuffer+( i * 0x80 ), blocklist1[i]->data );
             for ( int i = 0; i < AUDIO_GUITARTUNER_BLOCKS; i++ ) release(blocklist1[i] );
+            next_buffer = false;
         } else {
             if ( !first_run && process_buffer ) process( );
             for ( int i = 0; i < AUDIO_GUITARTUNER_BLOCKS; i++ ) copy_buffer( AudioBuffer+( i * 0x80 ), blocklist2[i]->data );
             for ( int i = 0; i < AUDIO_GUITARTUNER_BLOCKS; i++ ) release( blocklist2[i] );
+            next_buffer = true;
         }
         process_buffer = true;
         first_run = false;
@@ -83,7 +85,7 @@ void AudioAnalyzeNoteFrequency::update( void ) {
  *  page 79. Might have to downsample for low fundmental frequencies because of fft buffer
  *  size limit.
  */
-FASTRUN void AudioAnalyzeNoteFrequency::process( void ) {
+void AudioAnalyzeNoteFrequency::process( void ) {
     
     const int16_t *p;
     p = AudioBuffer;
@@ -92,27 +94,40 @@ FASTRUN void AudioAnalyzeNoteFrequency::process( void ) {
     uint16_t tau = tau_global;
     do {
         uint16_t x   = 0;
-        int64_t  sum = 0;
+        uint64_t  sum = 0;
         do {
             int16_t current, lag, delta;
             lag = *( ( int16_t * )p + ( x+tau ) );
             current = *( ( int16_t * )p+x );
             delta = ( current-lag );
             sum += delta * delta;
-#if F_CPU == 144000000
-            x += 8;
-#elif F_CPU == 120000000
-            x += 12;
-#elif F_CPU == 96000000
-            x += 16;
-#elif F_CPU < 96000000
-            x += 32;
+            x += 4;
+            
+            lag = *( ( int16_t * )p + ( x+tau ) );
+            current = *( ( int16_t * )p+x );
+            delta = ( current-lag );
+            sum += delta * delta;
+            x += 4;
+            
+            lag = *( ( int16_t * )p + ( x+tau ) );
+            current = *( ( int16_t * )p+x );
+            delta = ( current-lag );
+            sum += delta * delta;
+            x += 4;
+            
+            lag = *( ( int16_t * )p + ( x+tau ) );
+            current = *( ( int16_t * )p+x );
+            delta = ( current-lag );
+            sum += delta * delta;
+            x += 4;
 #endif
         } while ( x <= HALF_BLOCKS );
         
-        running_sum += sum;
+        uint64_t rs = running_sum;
+        rs += sum;
         yin_buffer[yin_idx] = sum*tau;
-        rs_buffer[yin_idx] = running_sum;
+        rs_buffer[yin_idx] = rs;
+        running_sum = rs;
         yin_idx = ( ++yin_idx >= 5 ) ? 0 : yin_idx;
         tau = estimate( yin_buffer, rs_buffer, yin_idx, tau );
         
