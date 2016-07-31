@@ -39,6 +39,11 @@
 #include "g3_note.h"
 #include "b3_note.h"
 #include "e4_note.h"
+#include "AudioSampleBbb_tuba_1.h"
+#include "AudioSampleBbb_tuba_2.h"
+#include "AudioSampleBbb_tuba_3.h"
+#include "AudioSampleBbb_tuba_4.h"
+#include "AudioSampleBbb_tuba_5.h"
 //---------------------------------------------------------------------------------------
 AudioAnalyzeNoteFrequency notefreq;
 AudioOutputAnalog         dac;
@@ -59,6 +64,11 @@ void playNote(void) {
         //wav_note.play(g3_note);
         //wav_note.play(b3_note);
         //wav_note.play(e4_note);
+        //wav_note.play(AudioSampleBbb_tuba_1);
+        //wav_note.play(AudioSampleBbb_tuba_2);
+        //wav_note.play(AudioSampleBbb_tuba_3);
+        //wav_note.play(AudioSampleBbb_tuba_4);
+        //wav_note.play(AudioSampleBbb_tuba_5);
         digitalWriteFast(LED_BUILTIN, !digitalReadFast(LED_BUILTIN));
     }
 }
