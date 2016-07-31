@@ -142,7 +142,7 @@ void AudioAnalyzeNoteFrequency::process( void ) {
             return;
         }
     } while ( --cycles );
-    digitalWriteFast(10, LOW);
+    //digitalWriteFast(10, LOW);
     if ( tau >= HALF_BLOCKS ) {
         process_buffer  = false;
         new_output      = false;
