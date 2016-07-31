@@ -1,9 +1,9 @@
 // Audio data converted from WAV file by wav2sketch
 
-#include "AudioSampleBbb_tuba_1.h"
+#include "tuba_1.h"
 
 // Converted from BBb_Tuba_1.wav, using 44100 Hz, 16 bit PCM encoding
-const unsigned int AudioSampleBbb_tuba_1[31041] = {
+const unsigned int tuba_1[31041] = {
 0x8100F209,0x0718073C,0x06D106FA,0x068706AF,0x0629065A,0x05BB05F4,0x054A0582,0x04CB050B,
 0x043E0485,0x03B403FB,0x03260371,0x028F02DD,0x01F10240,0x015601A5,0x00C3010B,0x002F0074,
 0xFF96FFE2,0xFEFFFF4E,0xFE72FEC0,0xFDE6FE30,0xFD5BFDA0,0xFCD1FD17,0xFC45FC8D,0xFBC3FC08,
