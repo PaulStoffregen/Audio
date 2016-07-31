@@ -47,7 +47,7 @@ public:
      *  @return none
      */
     AudioAnalyzeNoteFrequency( void ) : AudioStream( 1, inputQueueArray ), enabled( false ), new_output(false) {
-    
+        
     }
     
     /**
@@ -94,7 +94,7 @@ public:
      *  @return none
      */
     virtual void update( void );
-
+    
 private:
     /**
      *  check the sampled data for fundamental frequency
@@ -106,7 +106,7 @@ private:
      *
      *  @return tau
      */
-    uint16_t estimate( int64_t *yin, int64_t *rs, uint16_t head, uint16_t tau );
+    uint16_t estimate( uint64_t *yin, uint64_t *rs, uint16_t head, uint16_t tau );
     
     /**
      *  process audio data
@@ -120,7 +120,8 @@ private:
      */
     uint64_t running_sum;
     uint16_t tau_global;
-    int64_t  rs_buffer[5], yin_buffer[5];
+    uint64_t  yin_buffer[5];
+    uint64_t  rs_buffer[5];
     int16_t  AudioBuffer[AUDIO_GUITARTUNER_BLOCKS*128] __attribute__ ( ( aligned ( 4 ) ) );
     uint8_t  yin_idx, state;
     float    periodicity, yin_threshold, cpu_usage_max, data;
