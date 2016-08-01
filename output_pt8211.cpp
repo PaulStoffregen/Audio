@@ -29,12 +29,6 @@
 #include "output_pt8211.h"
 #include "memcpy_audio.h"
 
-	//uncomment to enable oversampling:
-#define OVERSAMPLING
-	//uncomment ONE of these to define interpolation type for oversampling:
-// #define INTERPOLATION_LINEAR
-#define INTERPOLATION_CIC
-
 audio_block_t * AudioOutputPT8211::block_left_1st = NULL;
 audio_block_t * AudioOutputPT8211::block_right_1st = NULL;
 audio_block_t * AudioOutputPT8211::block_left_2nd = NULL;
@@ -80,7 +74,6 @@ void AudioOutputPT8211::begin(void)
 	I2S0_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE | I2S_TCSR_FR;
 	dma.attachInterrupt(isr);
 }
-
 
 void AudioOutputPT8211::isr(void)
 {
@@ -145,46 +138,42 @@ void AudioOutputPT8211::isr(void)
 					static int32_t combROld[2] = {0};
 					
 					combL[0] = valL - oldL;
-					combL[1] = combL[0] - combLOld[0];
-					combL[2] = combL[1] - combLOld[1];
-					// combL[2] now holds input val
-					combLOld[0] = combL[0];
-					combLOld[1] = combL[1];
-					for (int j = 0; j < 4; j++) {
-						int32_t integrateL[3];
-						static int32_t integrateLOld[3] = {0};
-						integrateL[0] = ( (j==0) ? (combL[2]) : (0) ) + integrateLOld[0];
-						integrateL[1] = integrateL[0] + integrateLOld[1];
-						integrateL[2] = integrateL[1] + integrateLOld[2];
-						// integrateL[2] now holds j'th upsampled value
-						*(dest+j*2) = integrateL[2] >> 4;
-						integrateLOld[0] = integrateL[0];
-						integrateLOld[1] = integrateL[1];
-						integrateLOld[2] = integrateL[2];
-					}
 					combR[0] = valR - oldR;
+					combL[1] = combL[0] - combLOld[0];
 					combR[1] = combR[0] - combROld[0];
+					combL[2] = combL[1] - combLOld[1];
 					combR[2] = combR[1] - combROld[1];
+					// combL[2] now holds input val
 					// combR[2] now holds input val
-					combROld[0] = combR[0];
-					combROld[1] = combR[1];
-					
-					for (int j = 0; j < 4; j++) {
-						int32_t integrateR[3];
-						static int32_t integrateROld[3] = {0};
-						integrateR[0] = ( (j==0) ? (combR[2]) : (0) ) + integrateROld[0];
-						integrateR[1] = integrateR[0] + integrateROld[1];
-						integrateR[2] = integrateR[1] + integrateROld[2];
-						// integrateR[2] now holds j'th upsampled value
-						*(dest+j*2+1) = integrateR[2] >> 4;
-						integrateROld[0] = integrateR[0];
-						integrateROld[1] = integrateR[1];
-						integrateROld[2] = integrateR[2];
-					}
-
-					dest+=8;
 					oldL = valL;
 					oldR = valR;
+					combLOld[0] = combL[0];
+					combROld[0] = combR[0];
+					combLOld[1] = combL[1];
+					combROld[1] = combR[1];
+					for (int j = 0; j < 4; j++) {
+						int32_t integrateL[3];
+						int32_t integrateR[3];
+						static int32_t integrateLOld[3] = {0};
+						static int32_t integrateROld[3] = {0};
+						integrateL[0] = ( (j==0) ? (combL[2]) : (0) ) + integrateLOld[0];
+						integrateR[0] = ( (j==0) ? (combR[2]) : (0) ) + integrateROld[0];
+						integrateL[1] = integrateL[0] + integrateLOld[1];
+						integrateR[1] = integrateR[0] + integrateROld[1];
+						integrateL[2] = integrateL[1] + integrateLOld[2];
+						integrateR[2] = integrateR[1] + integrateROld[2];
+						// integrateL[2] now holds j'th upsampled value
+						// integrateR[2] now holds j'th upsampled value
+						*(dest+j*2) = integrateL[2] >> 4;
+						*(dest+j*2+1) = integrateR[2] >> 4;
+						integrateLOld[0] = integrateL[0];
+						integrateROld[0] = integrateR[0];
+						integrateLOld[1] = integrateL[1];
+						integrateROld[1] = integrateR[1];
+						integrateLOld[2] = integrateL[2];
+						integrateROld[2] = integrateR[2];
+					}
+					dest+=8;
 				}
 			#else
 				#error no interpolation method defined for oversampling.
@@ -335,7 +324,6 @@ void AudioOutputPT8211::isr(void)
 		AudioOutputPT8211::block_right_2nd = NULL;
 	}
 }
-
 
 
 

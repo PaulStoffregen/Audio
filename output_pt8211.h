@@ -29,6 +29,12 @@
 #ifndef output_pt8211_h_
 #define output_pt8211_h_
 
+	//uncomment to enable oversampling:
+#define OVERSAMPLING
+	//uncomment ONE of these to define interpolation type for oversampling:
+// #define INTERPOLATION_LINEAR
+#define INTERPOLATION_CIC
+
 #include "Arduino.h"
 #include "AudioStream.h"
 #include "DMAChannel.h"
@@ -47,7 +53,11 @@ protected:
 	static audio_block_t *block_right_1st;
 	static bool update_responsibility;
 	static DMAChannel dma;
-	static void isr(void);
+	static void isr(void)
+	#if defined(OVERSAMPLING)
+		__attribute__((optimize("unroll-loops")))
+	#endif
+	;
 private:
 	static audio_block_t *block_left_2nd;
 	static audio_block_t *block_right_2nd;
