@@ -29,12 +29,6 @@
 #include "output_pt8211.h"
 #include "memcpy_audio.h"
 
-	//uncomment to enable oversampling:
-#define OVERSAMPLING
-	//uncomment ONE of these to define interpolation type for oversampling:
-// #define INTERPOLATION_LINEAR
-#define INTERPOLATION_CIC
-
 audio_block_t * AudioOutputPT8211::block_left_1st = NULL;
 audio_block_t * AudioOutputPT8211::block_right_1st = NULL;
 audio_block_t * AudioOutputPT8211::block_left_2nd = NULL;
@@ -42,7 +36,7 @@ audio_block_t * AudioOutputPT8211::block_right_2nd = NULL;
 uint16_t  AudioOutputPT8211::block_left_offset = 0;
 uint16_t  AudioOutputPT8211::block_right_offset = 0;
 bool AudioOutputPT8211::update_responsibility = false;
-#if defined(OVERSAMPLING)
+#if defined(AUDIO_PT8211_OVERSAMPLING)
 	DMAMEM static uint32_t i2s_tx_buffer[AUDIO_BLOCK_SAMPLES*4];
 #else
 	DMAMEM static uint32_t i2s_tx_buffer[AUDIO_BLOCK_SAMPLES];
@@ -81,7 +75,6 @@ void AudioOutputPT8211::begin(void)
 	dma.attachInterrupt(isr);
 }
 
-
 void AudioOutputPT8211::isr(void)
 {
 	int16_t *dest;
@@ -93,7 +86,7 @@ void AudioOutputPT8211::isr(void)
 	if (saddr < (uint32_t)i2s_tx_buffer + sizeof(i2s_tx_buffer) / 2) {
 		// DMA is transmitting the first half of the buffer
 		// so we must fill the second half
-		#if defined(OVERSAMPLING)
+		#if defined(AUDIO_PT8211_OVERSAMPLING)
 			dest = (int16_t *)&i2s_tx_buffer[(AUDIO_BLOCK_SAMPLES/2)*4];
 		#else
 			dest = (int16_t *)&i2s_tx_buffer[AUDIO_BLOCK_SAMPLES/2];
@@ -110,13 +103,13 @@ void AudioOutputPT8211::isr(void)
 	offsetL = AudioOutputPT8211::block_left_offset;
 	offsetR = AudioOutputPT8211::block_right_offset;
 	
-	#if defined(OVERSAMPLING)
+	#if defined(AUDIO_PT8211_OVERSAMPLING)
 		static int32_t oldL = 0;
 		static int32_t oldR = 0;
 	#endif
 	if (blockL && blockR) {
-		#if defined(OVERSAMPLING)
-			#if defined(INTERPOLATION_LINEAR)
+		#if defined(AUDIO_PT8211_OVERSAMPLING)
+			#if defined(AUDIO_PT8211_INTERPOLATION_LINEAR)
 				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; i++, offsetL++, offsetR++) {
 					int32_t valL = blockL->data[offsetL];
 					int32_t valR = blockR->data[offsetR];
@@ -134,7 +127,7 @@ void AudioOutputPT8211::isr(void)
 					oldL = valL;
 					oldR = valR;
 				}
-			#elif defined(INTERPOLATION_CIC)
+			#elif defined(AUDIO_PT8211_INTERPOLATION_CIC)
 				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; i++, offsetL++, offsetR++) {
 					int32_t valL = blockL->data[offsetL];
 					int32_t valR = blockR->data[offsetR];
@@ -145,59 +138,55 @@ void AudioOutputPT8211::isr(void)
 					static int32_t combROld[2] = {0};
 					
 					combL[0] = valL - oldL;
-					combL[1] = combL[0] - combLOld[0];
-					combL[2] = combL[1] - combLOld[1];
-					// combL[2] now holds input val
-					combLOld[0] = combL[0];
-					combLOld[1] = combL[1];
-					for (int j = 0; j < 4; j++) {
-						int32_t integrateL[3];
-						static int32_t integrateLOld[3] = {0};
-						integrateL[0] = ( (j==0) ? (combL[2]) : (0) ) + integrateLOld[0];
-						integrateL[1] = integrateL[0] + integrateLOld[1];
-						integrateL[2] = integrateL[1] + integrateLOld[2];
-						// integrateL[2] now holds j'th upsampled value
-						*(dest+j*2) = integrateL[2] >> 4;
-						integrateLOld[0] = integrateL[0];
-						integrateLOld[1] = integrateL[1];
-						integrateLOld[2] = integrateL[2];
-					}
 					combR[0] = valR - oldR;
+					combL[1] = combL[0] - combLOld[0];
 					combR[1] = combR[0] - combROld[0];
+					combL[2] = combL[1] - combLOld[1];
 					combR[2] = combR[1] - combROld[1];
+					// combL[2] now holds input val
 					// combR[2] now holds input val
-					combROld[0] = combR[0];
-					combROld[1] = combR[1];
-					
-					for (int j = 0; j < 4; j++) {
-						int32_t integrateR[3];
-						static int32_t integrateROld[3] = {0};
-						integrateR[0] = ( (j==0) ? (combR[2]) : (0) ) + integrateROld[0];
-						integrateR[1] = integrateR[0] + integrateROld[1];
-						integrateR[2] = integrateR[1] + integrateROld[2];
-						// integrateR[2] now holds j'th upsampled value
-						*(dest+j*2+1) = integrateR[2] >> 4;
-						integrateROld[0] = integrateR[0];
-						integrateROld[1] = integrateR[1];
-						integrateROld[2] = integrateR[2];
-					}
-
-					dest+=8;
 					oldL = valL;
 					oldR = valR;
+					combLOld[0] = combL[0];
+					combROld[0] = combR[0];
+					combLOld[1] = combL[1];
+					combROld[1] = combR[1];
+					for (int j = 0; j < 4; j++) {
+						int32_t integrateL[3];
+						int32_t integrateR[3];
+						static int32_t integrateLOld[3] = {0};
+						static int32_t integrateROld[3] = {0};
+						integrateL[0] = ( (j==0) ? (combL[2]) : (0) ) + integrateLOld[0];
+						integrateR[0] = ( (j==0) ? (combR[2]) : (0) ) + integrateROld[0];
+						integrateL[1] = integrateL[0] + integrateLOld[1];
+						integrateR[1] = integrateR[0] + integrateROld[1];
+						integrateL[2] = integrateL[1] + integrateLOld[2];
+						integrateR[2] = integrateR[1] + integrateROld[2];
+						// integrateL[2] now holds j'th upsampled value
+						// integrateR[2] now holds j'th upsampled value
+						*(dest+j*2) = integrateL[2] >> 4;
+						*(dest+j*2+1) = integrateR[2] >> 4;
+						integrateLOld[0] = integrateL[0];
+						integrateROld[0] = integrateR[0];
+						integrateLOld[1] = integrateL[1];
+						integrateROld[1] = integrateR[1];
+						integrateLOld[2] = integrateL[2];
+						integrateROld[2] = integrateR[2];
+					}
+					dest+=8;
 				}
 			#else
 				#error no interpolation method defined for oversampling.
-			#endif //defined(INTERPOLATION_LINEAR)
+			#endif //defined(AUDIO_PT8211_INTERPOLATION_LINEAR)
 		#else
 			memcpy_tointerleaveLR(dest, blockL->data + offsetL, blockR->data + offsetR);
 			offsetL += AUDIO_BLOCK_SAMPLES / 2;
 			offsetR += AUDIO_BLOCK_SAMPLES / 2;
-		#endif //defined(OVERSAMPLING)
+		#endif //defined(AUDIO_PT8211_OVERSAMPLING)
 		
 	} else if (blockL) {
-		#if defined(OVERSAMPLING)
-			#if defined(INTERPOLATION_LINEAR)
+		#if defined(AUDIO_PT8211_OVERSAMPLING)
+			#if defined(AUDIO_PT8211_INTERPOLATION_LINEAR)
 				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; i++, offsetL++) {
 					int32_t val = blockL->data[offsetL];
 					int32_t n = (oldL+val) >> 1;
@@ -212,7 +201,7 @@ void AudioOutputPT8211::isr(void)
 					dest+=8;
 					oldL = val;
 				}
-			#elif defined(INTERPOLATION_CIC)
+			#elif defined(AUDIO_PT8211_INTERPOLATION_CIC)
 				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; i++, offsetL++, offsetR++) {
 					int32_t valL = blockL->data[offsetL];
 
@@ -249,14 +238,14 @@ void AudioOutputPT8211::isr(void)
 				}
 			#else
 				#error no interpolation method defined for oversampling.
-			#endif //defined(INTERPOLATION_LINEAR)
+			#endif //defined(AUDIO_PT8211_INTERPOLATION_LINEAR)
 		#else 
 			memcpy_tointerleaveL(dest, blockL->data + offsetL);
 			offsetL += (AUDIO_BLOCK_SAMPLES / 2);
-		#endif //defined(OVERSAMPLING)
+		#endif //defined(AUDIO_PT8211_OVERSAMPLING)
 	} else if (blockR) {
-		#if defined(OVERSAMPLING)
-			#if defined(INTERPOLATION_LINEAR)
+		#if defined(AUDIO_PT8211_OVERSAMPLING)
+			#if defined(AUDIO_PT8211_INTERPOLATION_LINEAR)
 				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; i++, offsetR++) {
 					int32_t val = blockR->data[offsetR];
 					int32_t n = (oldR+val) >> 1;
@@ -271,7 +260,7 @@ void AudioOutputPT8211::isr(void)
 					dest+=8;
 					oldR = val;
 				}
-			#elif defined(INTERPOLATION_CIC)
+			#elif defined(AUDIO_PT8211_INTERPOLATION_CIC)
 				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; i++, offsetL++, offsetR++) {
 					int32_t valR = blockR->data[offsetR];
 
@@ -308,11 +297,11 @@ void AudioOutputPT8211::isr(void)
 				}
 			#else
 				#error no interpolation method defined for oversampling.
-			#endif //defined(INTERPOLATION_LINEAR)
+			#endif //defined(AUDIO_PT8211_INTERPOLATION_LINEAR)
 		#else
 			memcpy_tointerleaveR(dest, blockR->data + offsetR);
 			offsetR += AUDIO_BLOCK_SAMPLES / 2;
-		#endif //defined(OVERSAMPLING)
+		#endif //defined(AUDIO_PT8211_OVERSAMPLING)
 	} else {
 		memset(dest,0,AUDIO_BLOCK_SAMPLES * 2);
 		return;
@@ -335,7 +324,6 @@ void AudioOutputPT8211::isr(void)
 		AudioOutputPT8211::block_right_2nd = NULL;
 	}
 }
-
 
 
 
@@ -449,7 +437,7 @@ void AudioOutputPT8211::config_i2s(void)
 	// configure transmitter
 	I2S0_TMR = 0;
 	I2S0_TCR1 = I2S_TCR1_TFW(1);  // watermark at half fifo size
-	#if defined(OVERSAMPLING)
+	#if defined(AUDIO_PT8211_OVERSAMPLING)
 		I2S0_TCR2 = I2S_TCR2_SYNC(0) | I2S_TCR2_BCP | I2S_TCR2_MSEL(1) | I2S_TCR2_BCD | I2S_TCR2_DIV(0);
 	#else
 		I2S0_TCR2 = I2S_TCR2_SYNC(0) | I2S_TCR2_BCP | I2S_TCR2_MSEL(1) | I2S_TCR2_BCD | I2S_TCR2_DIV(3);
