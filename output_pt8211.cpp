@@ -36,7 +36,7 @@ audio_block_t * AudioOutputPT8211::block_right_2nd = NULL;
 uint16_t  AudioOutputPT8211::block_left_offset = 0;
 uint16_t  AudioOutputPT8211::block_right_offset = 0;
 bool AudioOutputPT8211::update_responsibility = false;
-#if defined(OVERSAMPLING)
+#if defined(AUDIO_PT8211_OVERSAMPLING)
 	DMAMEM static uint32_t i2s_tx_buffer[AUDIO_BLOCK_SAMPLES*4];
 #else
 	DMAMEM static uint32_t i2s_tx_buffer[AUDIO_BLOCK_SAMPLES];
@@ -86,7 +86,7 @@ void AudioOutputPT8211::isr(void)
 	if (saddr < (uint32_t)i2s_tx_buffer + sizeof(i2s_tx_buffer) / 2) {
 		// DMA is transmitting the first half of the buffer
 		// so we must fill the second half
-		#if defined(OVERSAMPLING)
+		#if defined(AUDIO_PT8211_OVERSAMPLING)
 			dest = (int16_t *)&i2s_tx_buffer[(AUDIO_BLOCK_SAMPLES/2)*4];
 		#else
 			dest = (int16_t *)&i2s_tx_buffer[AUDIO_BLOCK_SAMPLES/2];
@@ -103,13 +103,13 @@ void AudioOutputPT8211::isr(void)
 	offsetL = AudioOutputPT8211::block_left_offset;
 	offsetR = AudioOutputPT8211::block_right_offset;
 	
-	#if defined(OVERSAMPLING)
+	#if defined(AUDIO_PT8211_OVERSAMPLING)
 		static int32_t oldL = 0;
 		static int32_t oldR = 0;
 	#endif
 	if (blockL && blockR) {
-		#if defined(OVERSAMPLING)
-			#if defined(INTERPOLATION_LINEAR)
+		#if defined(AUDIO_PT8211_OVERSAMPLING)
+			#if defined(AUDIO_PT8211_INTERPOLATION_LINEAR)
 				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; i++, offsetL++, offsetR++) {
 					int32_t valL = blockL->data[offsetL];
 					int32_t valR = blockR->data[offsetR];
@@ -127,7 +127,7 @@ void AudioOutputPT8211::isr(void)
 					oldL = valL;
 					oldR = valR;
 				}
-			#elif defined(INTERPOLATION_CIC)
+			#elif defined(AUDIO_PT8211_INTERPOLATION_CIC)
 				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; i++, offsetL++, offsetR++) {
 					int32_t valL = blockL->data[offsetL];
 					int32_t valR = blockR->data[offsetR];
@@ -177,16 +177,16 @@ void AudioOutputPT8211::isr(void)
 				}
 			#else
 				#error no interpolation method defined for oversampling.
-			#endif //defined(INTERPOLATION_LINEAR)
+			#endif //defined(AUDIO_PT8211_INTERPOLATION_LINEAR)
 		#else
 			memcpy_tointerleaveLR(dest, blockL->data + offsetL, blockR->data + offsetR);
 			offsetL += AUDIO_BLOCK_SAMPLES / 2;
 			offsetR += AUDIO_BLOCK_SAMPLES / 2;
-		#endif //defined(OVERSAMPLING)
+		#endif //defined(AUDIO_PT8211_OVERSAMPLING)
 		
 	} else if (blockL) {
-		#if defined(OVERSAMPLING)
-			#if defined(INTERPOLATION_LINEAR)
+		#if defined(AUDIO_PT8211_OVERSAMPLING)
+			#if defined(AUDIO_PT8211_INTERPOLATION_LINEAR)
 				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; i++, offsetL++) {
 					int32_t val = blockL->data[offsetL];
 					int32_t n = (oldL+val) >> 1;
@@ -201,7 +201,7 @@ void AudioOutputPT8211::isr(void)
 					dest+=8;
 					oldL = val;
 				}
-			#elif defined(INTERPOLATION_CIC)
+			#elif defined(AUDIO_PT8211_INTERPOLATION_CIC)
 				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; i++, offsetL++, offsetR++) {
 					int32_t valL = blockL->data[offsetL];
 
@@ -238,14 +238,14 @@ void AudioOutputPT8211::isr(void)
 				}
 			#else
 				#error no interpolation method defined for oversampling.
-			#endif //defined(INTERPOLATION_LINEAR)
+			#endif //defined(AUDIO_PT8211_INTERPOLATION_LINEAR)
 		#else 
 			memcpy_tointerleaveL(dest, blockL->data + offsetL);
 			offsetL += (AUDIO_BLOCK_SAMPLES / 2);
-		#endif //defined(OVERSAMPLING)
+		#endif //defined(AUDIO_PT8211_OVERSAMPLING)
 	} else if (blockR) {
-		#if defined(OVERSAMPLING)
-			#if defined(INTERPOLATION_LINEAR)
+		#if defined(AUDIO_PT8211_OVERSAMPLING)
+			#if defined(AUDIO_PT8211_INTERPOLATION_LINEAR)
 				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; i++, offsetR++) {
 					int32_t val = blockR->data[offsetR];
 					int32_t n = (oldR+val) >> 1;
@@ -260,7 +260,7 @@ void AudioOutputPT8211::isr(void)
 					dest+=8;
 					oldR = val;
 				}
-			#elif defined(INTERPOLATION_CIC)
+			#elif defined(AUDIO_PT8211_INTERPOLATION_CIC)
 				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; i++, offsetL++, offsetR++) {
 					int32_t valR = blockR->data[offsetR];
 
@@ -297,11 +297,11 @@ void AudioOutputPT8211::isr(void)
 				}
 			#else
 				#error no interpolation method defined for oversampling.
-			#endif //defined(INTERPOLATION_LINEAR)
+			#endif //defined(AUDIO_PT8211_INTERPOLATION_LINEAR)
 		#else
 			memcpy_tointerleaveR(dest, blockR->data + offsetR);
 			offsetR += AUDIO_BLOCK_SAMPLES / 2;
-		#endif //defined(OVERSAMPLING)
+		#endif //defined(AUDIO_PT8211_OVERSAMPLING)
 	} else {
 		memset(dest,0,AUDIO_BLOCK_SAMPLES * 2);
 		return;
@@ -437,7 +437,7 @@ void AudioOutputPT8211::config_i2s(void)
 	// configure transmitter
 	I2S0_TMR = 0;
 	I2S0_TCR1 = I2S_TCR1_TFW(1);  // watermark at half fifo size
-	#if defined(OVERSAMPLING)
+	#if defined(AUDIO_PT8211_OVERSAMPLING)
 		I2S0_TCR2 = I2S_TCR2_SYNC(0) | I2S_TCR2_BCP | I2S_TCR2_MSEL(1) | I2S_TCR2_BCD | I2S_TCR2_DIV(0);
 	#else
 		I2S0_TCR2 = I2S_TCR2_SYNC(0) | I2S_TCR2_BCP | I2S_TCR2_MSEL(1) | I2S_TCR2_BCD | I2S_TCR2_DIV(3);
