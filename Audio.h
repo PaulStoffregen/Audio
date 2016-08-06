@@ -104,5 +104,6 @@
 #include "synth_whitenoise.h"
 #include "synth_pinknoise.h"
 #include "synth_karplusstrong.h"
+#include "synth_simple_drum.h"
 
 #endif

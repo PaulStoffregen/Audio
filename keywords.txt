@@ -54,6 +54,7 @@ AudioSynthWaveformDc	KEYWORD2
 AudioSynthNoiseWhite	KEYWORD2
 AudioSynthNoisePink	KEYWORD2
 AudioSynthKarplusStrong	KEYWORD2
+AudioSynthSimpleDrum	KEYWORD2
 isPlaying	KEYWORD2
 positionMillis	KEYWORD2
 lengthMillis	KEYWORD2
@@ -146,6 +147,8 @@ mute_PCM	KEYWORD2
 probability	KEYWORD2
 encode	KEYWORD2
 decode	KEYWORD2
+secondMix	KEYWORD2
+pitchMod	KEYWORD2
 
 AudioMemoryUsage	KEYWORD2
 AudioMemoryUsageMax	KEYWORD2
