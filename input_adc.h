@@ -36,6 +36,7 @@ class AudioInputAnalog : public AudioStream
 public:
         AudioInputAnalog() : AudioStream(0, NULL) { init(A2); }
         AudioInputAnalog(uint8_t pin) : AudioStream(0, NULL) { init(pin); }
+        void setAnalogReference(int ref);
         virtual void update(void);
         friend void dma_ch9_isr(void);
 private:
