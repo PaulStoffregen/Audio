@@ -30,14 +30,5 @@
   "examples": [
     "examples/*/*.ino",
     "examples/*/*/*.ino"
-  ],
-  "build": {
-    "flags": "-I utility",
-    "srcFilter": [
-      "+<utility>",
-      "+<*.c>",
-      "+<*.cpp>",
-      "+<*.h>"
-    ]
-  }
+  ]
 }
