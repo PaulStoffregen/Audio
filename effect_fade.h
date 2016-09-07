@@ -27,6 +27,7 @@
 #ifndef effect_fade_h_
 #define effect_fade_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 
 class AudioEffectFade : public AudioStream

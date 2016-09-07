@@ -270,9 +270,17 @@ void AudioOutputI2S::update(void)
 #elif F_CPU == 180000000
   #define MCLK_MULT 16
   #define MCLK_DIV  255
+  #define MCLK_SRC  0
 #elif F_CPU == 192000000
   #define MCLK_MULT 1
   #define MCLK_DIV  17
+#elif F_CPU == 216000000
+  #define MCLK_MULT 8
+  #define MCLK_DIV  153
+  #define MCLK_SRC  0
+#elif F_CPU == 240000000
+  #define MCLK_MULT 4
+  #define MCLK_DIV  85
 #elif F_CPU == 16000000
   #define MCLK_MULT 12
   #define MCLK_DIV  17
@@ -280,10 +288,12 @@ void AudioOutputI2S::update(void)
   #error "This CPU Clock Speed is not supported by the Audio library";
 #endif
 
+#ifndef MCLK_SRC
 #if F_CPU >= 20000000
   #define MCLK_SRC  3  // the PLL
 #else
   #define MCLK_SRC  0  // system clock
+#endif
 #endif
 
 void AudioOutputI2S::config_i2s(void)

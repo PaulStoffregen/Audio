@@ -347,13 +347,16 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioInputI2S","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputI2SQuad","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_quad","inputs":0,"outputs":4,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputAnalog","data":{"defaults":{"name":{"value":"new"}},"shortName":"adc","inputs":0,"outputs":1,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioInputI2Sslave","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2ss","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputI2Sslave","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2sslave","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputUSB","data":{"defaults":{"name":{"value":"new"}},"shortName":"usb","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputI2S","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputI2SQuad","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_quad","inputs":4,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputSPDIF","data":{"defaults":{"name":{"value":"new"}},"shortName":"spdif","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputPT8211","data":{"defaults":{"name":{"value":"new"}},"shortName":"pt2811","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputAnalog","data":{"defaults":{"name":{"value":"new"}},"shortName":"dac","inputs":1,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputPWM","data":{"defaults":{"name":{"value":"new"}},"shortName":"pwm","inputs":1,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioOutputI2Sslave","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2ss","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputI2Sslave","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2sslave","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputUSB","data":{"defaults":{"name":{"value":"new"}},"shortName":"usb","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioMixer4","data":{"defaults":{"name":{"value":"new"}},"shortName":"mixer","inputs":4,"outputs":1,"category":"mixer-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioPlayMemory","data":{"defaults":{"name":{"value":"new"}},"shortName":"playMem","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioPlaySdWav","data":{"defaults":{"name":{"value":"new"}},"shortName":"playSdWav","inputs":0,"outputs":2,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -361,6 +364,8 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioPlaySerialflashRaw","data":{"defaults":{"name":{"value":"new"}},"shortName":"playFlashRaw","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioPlayQueue","data":{"defaults":{"name":{"value":"new"}},"shortName":"queue","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioRecordQueue","data":{"defaults":{"name":{"value":"new"}},"shortName":"queue","inputs":1,"outputs":0,"category":"record-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioSynthSimpleDrum","data":{"defaults":{"name":{"value":"new"}},"shortName":"drum","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioSynthKarplusStrong","data":{"defaults":{"name":{"value":"new"}},"shortName":"string","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveformSine","data":{"defaults":{"name":{"value":"new"}},"shortName":"sine","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveformSineHires","data":{"defaults":{"name":{"value":"new"}},"shortName":"sine_hires","inputs":0,"outputs":2,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveformSineModulated","data":{"defaults":{"name":{"value":"new"}},"shortName":"sine_fm","inputs":1,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -482,8 +487,8 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>This object has no functions to call from the Arduino sketch.  It
 		simply streams data from the I2S hardware to its 4 output ports.</p>
 	<h3>Hardware</h3>
-	<p>TODO: add detailed documentation about connecting 2 audio shields,
-		including the wire needed from pin 30 to the 2nd audio shield</p>
+	<p>See this Sparkfun blog for <a href="https://www.sparkfun.com/news/2055" target="_blank">how
+		to connect two audio adaptors for 4 channel audio</a>.
 	<p>The I2S signals are used in "master" mode, where Teensy creates
 		all 3 clock signals and controls all data timing.</p>
 	<table class=doc align=center cellpadding=3>
@@ -535,7 +540,18 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</p>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; DialTone_7segment
 	</p>
+	<p class=exam>File &gt; Examples &gt; OctoWS2811 &gt; SpectrumAnalyzer
+	</p>
 	<h3>Notes</h3>
+	<p><b>analogRead() must not be used</b>, because AudioInputAnalog is regularly
+		accessing the ADC hardware.  If both access the hardware at the same
+		moment, analogRead() can end up waiting forever, which effectively
+		crashes your program.
+	</p>
+	<p>AudioInputAnalog has a
+		<a href="https://github.com/PaulStoffregen/Audio/issues/96">known bug</a>
+		at 72 MHz.  Use 48 or 96 MHz clock speed (Tools &gt; CPU Speed menu).
+	</p>
 	<p>A different pin may be used, but adding it as an parameter
 		to the AudioInputAnalog object definition.
 	</p>
@@ -561,7 +577,8 @@ span.mainfunction {color: #993300; font-weight: bolder}
 <script type="text/x-red" data-help-name="AudioInputI2Sslave">
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
-	<p>Receive 16 bit stereo audio from an I2S device using I2S slave mode.</p>
+	<p>Receive 16 bit stereo audio from an I2S device using I2S slave mode
+		(where the ADC or codec chip, not Teensy, controls audio timing).</p>
 	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -597,6 +614,43 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioInputI2Sslave">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioInputUSB">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Receive stereo audio from a PC or Mac.  Teensy appears as a USB
+		sound device.</p>
+	<p align=center><img src="img/usbtype_audio_in.png"></p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Left Channel</td></tr>
+		<tr class=odd><td align=center>Out 1</td><td>Right Channel</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from the USB to its 2 output ports.</p>
+	<!--
+	<h3>Hardware</h3>
+	-->
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughUSB</p>
+	</p>
+	<h3>Notes</h3>
+	<p>Arduino's <b>Tools &gt; USB Type</b> menu must be set to <b>Audio</b>.
+		</p>
+	<p align=center><img src="img/usbtype_audio.png"></p>
+	<p>USB input &amp; output does not cause the Teensy Audio Library to
+		update.  At least one non-USB input or output object must be
+		present for the entire library to update properly.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioInputUSB">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -680,7 +734,9 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>This object has no functions to call from the Arduino sketch.  It
 		simply streams data from its 4 input ports to the I2S hardware.</p>
 	<h3>Hardware</h3>
-	<p>TODO: <a href="https://forum.pjrc.com/threads/29373-Bit-bang-multiple-I2S-inputs-simultaneously?p=79606#post79606" target="_blank">details</a> for how to connect 2 Teensy audio shields</p>
+	<p>See this Sparkfun blog for <a href="https://www.sparkfun.com/news/2055" target="_blank">how
+		to connect two audio adaptors for 4 channel audio</a>.  More
+		<a href="https://forum.pjrc.com/threads/29373-Bit-bang-multiple-I2S-inputs-simultaneously?p=79606#post79606" target="_blank">details</a> are also available.
 	<p>The I2S signals are used in "master" mode, where Teensy creates
 		all 3 clock signals and controls all data timing.</p>
 	<table class=doc align=center cellpadding=3>
@@ -709,11 +765,6 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		<input type="text" id="node-input-name" placeholder="Name">
 	</div>
 </script>
-
-
-
-
-
 
 <script type="text/x-red" data-help-name="AudioOutputSPDIF">
 	<h3>Summary</h3>
@@ -768,10 +819,56 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</div>
 </script>
 
+<script type="text/x-red" data-help-name="AudioOutputPT8211">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Transmit 16 bit stereo audio to a low-cost PT8211 DAC chip.  4X oversampling
+		and filtering are automatically used to improve output quality.</p>
+	<p align=center><img src="img/pt8211.jpg"></p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Left Channel</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Right Channel</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from its 2 input ports to a PT8211 chip.  4X
+		oversampling and filtering is automatically used to improve quality.</p>
+	<h3>Hardware</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>9</td><td>BCK</td><td>Output</td></tr>
+		<tr class=odd><td align=center>22</td><td>DIN</td><td>Output</td></tr>
+		<tr class=odd><td align=center>23</td><td>WS</td><td>Output</td></tr>
+	</table>
+	<p>More information can be found in the PT8211 datasheet.
+		</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PT8211Sine
+	</p>
+	<h3>Credits</h3>
+	<p>Frank Boesing and Benjamin developed this PT8211 object.  Details can be
+		found on this
+		<a href="https://forum.pjrc.com/threads/29284-Dual-channel-16bit-dac-PT8211/page3" target="_blank">forum disussion</a>.
+	<h3>Notes</h3>
+	<p>
+	</p>
+</script>
+<script type="text/x-red" data-template-name="AudioOutputPT8211">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
 <script type="text/x-red" data-help-name="AudioOutputAnalog">
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
-	<p>Transmit 12 bit audio using Teensy 3.1's built-in digital to analog converter.</p>
+	<p>Transmit 12 bit audio using Teensy's built-in digital to analog converter.</p>
+	<p align=center><img src="img/dac_speaker.jpg"><br>
+	<small><a href="http://www.pjrc.com/store/prop_shield.html" target="_blank_">Prop Shield with 4&ohm; Speaker</a></small></p>
 	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -779,23 +876,39 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		<tr class=odd><td align=center>In 0</td><td>Audio Channel</td></tr>
 	</table>
 	<h3>Functions</h3>
-	<p>This object has no functions to call from the Arduino sketch.  It
-		simply streams data from the ADC to its output port.</p>
+	<p class=func><span class=keyword>analogReference</span>(ref);</p>
+	<p class=desc>Configure output voltage range:<br>
+	<span class=literal>INTERNAL</span> selects 1.2 volt peak-to-peak output.<br>
+	<span class=literal>EXTERNAL</span> selects 3.3 volt peak-to-peak output.
+	</p>
 	<h3>Hardware</h3>
 	<p align=center><img src="img/dacpin.jpg"></p>
-	<p>Signal range is 0 to 1.2V</p>
-	<p>Most applications require at least a 10&micro;F DC-blocking capacitor.</p>
-	<p>TODO: photo of Teensy 3.1 with 10&micro;F capacitor and 3.5mm jack.</p>
+	<p>Signal range default is 0 to 1.2V</p>
+	<p>The output voltage has DC level.  Some applications require a DC-blocking capacitor.  If unsure, a 10&micro;F is usually a safe value to use.  If an aluminum or tantalum capacitor is used, the positive terminal should connect to Teensy's DAC pin.</p>
+	<p>The DAC pin is used with the
+	<a href="http://www.pjrc.com/store/prop_shield.html" target="_blank_">Prop Shield</a>
+	to drive speakers.</p>
 	<h3>Examples</h3>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughMono
 	</p>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; SamplePlayer
+	</p>
+	<p class=exam><a href="https://github.com/PaulStoffregen/TouchGuitar" target="_blank">TouchGuitar</a>
+	</p>
+	<p class=exam><a href="https://community.arm.com/groups/embedded/blog/2014/05/23/led-video-panel-at-maker-faire-2014" target="_blank">LED Video Board</a>
+	</p>
+	<p class=exam>File &gt; Examples &gt; OctoWS2811 &gt; VideoSDcard
+	</p>
+	<p class=exam>File &gt; Examples &gt; SerialFlash &gt; MP3Player
 	</p>
 	<h3>Notes</h3>
 	<p>The output rate is 44.1 kHz (no oversampling).  Ultrasonic noise present if
 		not filtered.  This may not
 		be an issue for many uses, but care should be used if amplified and driven
 		to high power tweeters.</p>
+	<p>When using 3.3V output, the power supply is used for the analog reference.  Noise
+		present on the 3.3V power can couple to the DAC output signal.
+	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioOutputAnalog">
 	<div class="form-row">
@@ -834,7 +947,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughMono
 	</p>
 	<h3>Notes</h3>
-	<p>This object only works properly when Tools > CPU_Speed is set to
+	<p>This object only works properly when Tools &gt; CPU_Speed is set to
 		48 or 96 MHz.  Other speeds aren't supported and will likely fail
 		in strange ways.</p>
 	<p>The PWM carrier frequency is 88.2 kHz.  The suggested circuit
@@ -857,7 +970,8 @@ span.mainfunction {color: #993300; font-weight: bolder}
 <script type="text/x-red" data-help-name="AudioOutputI2Sslave">
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
-	<p>Transmit 16 bit stereo audio to an I2S device using I2S slave mode.</p>
+	<p>Transmit 16 bit stereo audio to an I2S device using I2S slave mode
+		(where the DAC or codec chip, not Teensy, controls audio timing).</p>
 	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -891,6 +1005,43 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioOutputI2Sslave">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioOutputUSB">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Send stereo audio to a PC or Mac.  Teensy appears as a USB
+		sound device.</p>
+	<p align=center><img src="img/usbtype_audio_out.png"></p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Left Channel</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Right Channel</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams from it's 2 input ports to the USB.</p>
+	<!--
+	<h3>Hardware</h3>
+	-->
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; WavFilePlayerUSB</p>
+	</p>
+	<h3>Notes</h3>
+	<p>Arduino's <b>Tools &gt; USB Type</b> menu must be set to <b>Audio</b>.
+		</p>
+	<p align=center><img src="img/usbtype_audio.png"></p>
+	<p>USB input &amp; output does not cause the Teensy Audio Library to
+		update.  At least one non-USB input or output object must be
+		present for the entire library to update properly.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioOutputUSB">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -951,7 +1102,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<div class=tooltipinfo>
 	<p>Play a short sound clip, stored directly in memory.
 		Data files are created with the
-		<a href="https://github.com/PaulStoffregen/Audio/tree/master/examples/SamplePlayer/wav2sketch" target="_blank">wav2sketch program</a>,
+		<a href="https://github.com/PaulStoffregen/Audio/tree/master/extras/wav2sketch" target="_blank">wav2sketch program</a>,
 		and copied to the sketch folder to become part of your sketch.</p>
 	</div>
 	<h3>Audio Connections</h3>
@@ -1286,6 +1437,85 @@ The actual packets are taken
 	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioRecordQueue">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioSynthSimpleDrum">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Generate a synthesised drum sound.  Also useful for laser pistol and bursting
+		bubble sound effects.</p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Drum Tone Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>noteOn</span>();</p>
+	<p class=desc>Trigger the drum.
+	</p>
+	<p class=func><span class=keyword>frequency</span>(frequency);</p>
+	<p class=desc>Set the base frequency of the drum.
+	</p>
+	<p class=func><span class=keyword>length</span>(milliseconds);</p>
+	<p class=desc>Set the duration of the envelope, in milliseconds.
+	</p>
+	<p class=func><span class=keyword>secondMix</span>(level);</p>
+	<p class=desc>Emulates a two-headed tom, by adding a second sine wave that is
+	harmonized a perfect fifth above
+	the base frequency.  Using this involves a slight CPU penalty.
+	</p>
+	<p class=func><span class=keyword>pitchMod</span>(depth);</p>
+	<p class=desc>Set the depth of envelope of the pitch, by a maximum of two octaves.
+	Default is 0.5, with no modulation.  Values above 0.5 cause the pitch to sweep
+	downwards, values lower than 0.5 cause the pitch to sweep upwards.
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Synthesis &gt; SimpleDrum
+	</p>
+	<h3>Notes</h3>
+	<p></p>
+</script>
+<script type="text/x-red" data-template-name="AudioSynthSimpleDrum">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioSynthKarplusStrong">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Synthesize a plucked string sound, such as a guitar string.
+		</p>
+	<p align=center><img src="img/touchguitar.jpg"></p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Sound Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>noteOn</span>(frequency, velocity);</p>
+	<p class=desc>Begin a new string note.  Velocity can be from 0 to 1.0,
+		indicating how hard the string is plucked.
+	</p>
+	<p class=func><span class=keyword>noteOff</span>(velocity);</p>
+	<p class=desc>Stop the sound output.
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Synthesis &gt; Guitar
+	</p>
+	<p class=exam><a href="https://github.com/PaulStoffregen/TouchGuitar" target="_blank">TouchGuitar</a>
+	</p>
+	<h3>Notes</h3>
+	<p></p>
+</script>
+<script type="text/x-red" data-template-name="AudioSynthSimpleDrum">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -2171,6 +2401,30 @@ double s_freq = .0625;</p>
 	<p class=desc>Configure one stage of the filter (0 to 3) with band reject (notch)
 		response.  Q controls the width of rejected frequencies.
 	</p>
+	<p class=func><span class=keyword>setLowShelf</span>(stage, frequency, gain, slope);</p>
+	<p class=desc>Configure one stage of the filter (0 to 3) with low shelf response.
+		A low shelf filter attenuates or amplifies signals below the specified frequency.
+		Frequency controls the slope midpoint, gain is in dB and can be both
+		positive or negative. The slope parameter controls steepness of gain transition.
+		A slope of 1 yields maximum steepness without overshoot,
+		lower values yield a less steep slope. See the picture below for a visualization
+		of the slope parameter's effect.
+		Be careful with positive gains and slopes higher than 1 as they introduce gain
+		(see warning below).
+	</p>
+	</p>
+	<p class=func><span class=keyword>setHighShelf</span>(stage, frequency, gain, slope);</p>
+	<p class=desc>Configure one stage of the filter (0 to 3) with high shelf response.
+		A high shelf filter attenuates or amplifies signals above the specified frequency.
+		Frequency controls the slope midpoint, gain is in dB and can be both
+		positive or negative. The slope parameter controls steepness of gain transition.
+		A slope of 1 yields maximum steepness without overshoot,
+		lower values yield a less steep slope. See the picture below for a visualization
+		of the slope parameter's effect.
+		Be careful with positive gains and slopes higher than 1 as they introduce gain
+		(see warning below).
+	</p>
+	<p align=center><img src="img/shelf_filter.png"></p>
 	<p class=func><span class=keyword>setCoefficients</span>(stage, array[5]);</p>
 	<p class=desc>Configure one stage of the filter (0 to 3) with an arbitrary
 		filter response.  The array of coefficients is in order: B0, B1, B2, A1, A2.

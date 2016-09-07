@@ -33,12 +33,17 @@
 #include <SPI.h>
 #include <SD.h>
 //---------------------------------------------------------------------------------------
-#include "e2_note.h"
-#include "a2_note.h"
-#include "d3_note.h"
-#include "g3_note.h"
-#include "b3_note.h"
-#include "e4_note.h"
+#include "guitar_e2_note.h"
+#include "guitar_a2_note.h"
+#include "guitar_d3_note.h"
+#include "guitar_g3_note.h"
+#include "guitar_b3_note.h"
+#include "guitar_e4_note.h"
+#include "tuba_1.h"
+#include "tuba_2.h"
+#include "tuba_3.h"
+#include "tuba_4.h"
+#include "tuba_5.h"
 //---------------------------------------------------------------------------------------
 AudioAnalyzeNoteFrequency notefreq;
 AudioOutputAnalog         dac;
@@ -53,12 +58,18 @@ IntervalTimer playNoteTimer;
 
 void playNote(void) {
     if (!wav_note.isPlaying()) {
-        wav_note.play(e2_note);
-        //wav_note.play(a2_note);
-        //wav_note.play(d3_note);
-        //wav_note.play(g3_note);
-        //wav_note.play(b3_note);
-        //wav_note.play(e4_note);
+        // Uncomment one of these sounds to test notefreq
+        wav_note.play(guitar_e2_note);
+        //wav_note.play(guitar_a2_note);
+        //wav_note.play(guitar_d3_note);
+        //wav_note.play(guitar_g3_note);
+        //wav_note.play(guitar_b3_note);
+        //wav_note.play(guitar_e4_note);
+        //wav_note.play(tuba_1);
+        //wav_note.play(tuba_2);
+        //wav_note.play(tuba_3);
+        //wav_note.play(tuba_4);
+        //wav_note.play(tuba_5);
         digitalWriteFast(LED_BUILTIN, !digitalReadFast(LED_BUILTIN));
     }
 }
@@ -71,6 +82,8 @@ void setup() {
      */
     notefreq.begin(.15);
     pinMode(LED_BUILTIN, OUTPUT);
+    // Audio library isr allways gets priority
+    playNoteTimer.priority(144);
     playNoteTimer.begin(playNote, 1000);
 }
 

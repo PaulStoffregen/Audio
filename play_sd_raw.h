@@ -27,6 +27,7 @@
 #ifndef play_sd_raw_h_
 #define play_sd_raw_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 #include "SD.h"
 

@@ -26,6 +26,7 @@
 
 #ifndef effect_multiply_h_
 #define effect_multiply_h_
+#include "Arduino.h"
 #include "AudioStream.h"
 #include "utility/dspinst.h"
 

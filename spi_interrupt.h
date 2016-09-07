@@ -27,6 +27,7 @@
 #ifndef audio_spi_interrupt_h_
 #define audio_spi_interrupt_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 #include "SPI.h"
 

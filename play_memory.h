@@ -27,6 +27,7 @@
 #ifndef play_memory_h_
 #define play_memory_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 
 class AudioPlayMemory : public AudioStream

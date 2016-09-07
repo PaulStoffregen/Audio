@@ -24,6 +24,7 @@
 #ifndef output_SPDIF_h_
 #define output_SPDIF_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 #include "DMAChannel.h"
 

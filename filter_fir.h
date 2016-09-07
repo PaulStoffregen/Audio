@@ -23,6 +23,7 @@
 #ifndef filter_fir_h_
 #define filter_fir_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 #include "arm_math.h"
 

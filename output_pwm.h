@@ -27,6 +27,7 @@
 #ifndef output_pwm_h_
 #define output_pwm_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 #include "DMAChannel.h"
 

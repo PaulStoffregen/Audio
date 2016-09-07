@@ -27,6 +27,7 @@
 #ifndef input_adc_h_
 #define input_adc_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 #include "DMAChannel.h"
 
@@ -40,7 +41,8 @@ public:
 private:
         static audio_block_t *block_left;
         static uint16_t block_offset;
-	static uint16_t dc_average;
+        static int32_t dc_average_hist[16];
+        static int32_t current_dc_average_index;
         static bool update_responsibility;
 	static DMAChannel dma;
 	static void isr(void);

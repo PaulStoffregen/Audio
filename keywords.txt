@@ -3,11 +3,14 @@ AudioConnection	KEYWORD2
 AudioInputI2S	KEYWORD2
 AudioInputI2SQuad	KEYWORD2
 AudioInputI2Sslave	KEYWORD2
+AudioInputUSB	KEYWORD2
 AudioOutputI2S	KEYWORD2
 AudioOutputI2SQuad	KEYWORD2
 AudioOutputI2Sslave	KEYWORD2
 AudioOutputSPDIF	KEYWORD2
+AudioOutputPT8211	KEYWORD2
 AudioOutputPWM	KEYWORD2
+AudioOutputUSB	KEYWORD2
 AudioControlSGTL5000	KEYWORD2
 AudioControlWM8731	KEYWORD2
 AudioControlWM8731master	KEYWORD2
@@ -50,6 +53,8 @@ AudioSynthWaveformSineModulated	KEYWORD2
 AudioSynthWaveformDc	KEYWORD2
 AudioSynthNoiseWhite	KEYWORD2
 AudioSynthNoisePink	KEYWORD2
+AudioSynthKarplusStrong	KEYWORD2
+AudioSynthSimpleDrum	KEYWORD2
 isPlaying	KEYWORD2
 positionMillis	KEYWORD2
 lengthMillis	KEYWORD2
@@ -142,6 +147,8 @@ mute_PCM	KEYWORD2
 probability	KEYWORD2
 encode	KEYWORD2
 decode	KEYWORD2
+secondMix	KEYWORD2
+pitchMod	KEYWORD2
 
 AudioMemoryUsage	KEYWORD2
 AudioMemoryUsageMax	KEYWORD2

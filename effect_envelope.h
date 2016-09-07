@@ -26,6 +26,7 @@
 
 #ifndef effect_envelope_h_
 #define effect_envelope_h_
+#include "Arduino.h"
 #include "AudioStream.h"
 #include "utility/dspinst.h"
 

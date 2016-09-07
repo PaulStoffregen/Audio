@@ -27,6 +27,7 @@
 #ifndef analyze_tonedetect_h_
 #define analyze_tonedetect_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 
 class AudioAnalyzeToneDetect : public AudioStream

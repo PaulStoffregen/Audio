@@ -23,6 +23,7 @@
 #ifndef effect_chorus_h_
 #define effect_chorus_h_
 
+#include "Arduino.h"
 #include "AudioStream.h"
 
 /******************************************************************/
