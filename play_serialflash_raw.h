@@ -37,6 +37,7 @@ class AudioPlaySerialflashRaw : public AudioStream
 public:
 	AudioPlaySerialflashRaw(void) : AudioStream(0, NULL) { begin(); }
 	void begin(void);
+	bool play(const char *filename, bool half_SR);
 	bool play(const char *filename);
 	void stop(void);
 	bool isPlaying(void) { return playing; }
@@ -44,6 +45,8 @@ public:
 	uint32_t lengthMillis(void);
 	virtual void update(void);
 private:
+	int16_t temp_block[AUDIO_BLOCK_SAMPLES/2];
+	bool read_half_SR;
 	SerialFlashFile rawfile;
 	uint32_t file_size;
 	volatile uint32_t file_offset;
