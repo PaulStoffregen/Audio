@@ -154,7 +154,7 @@ end:	// end of file reached or other reason to stop
 cleanup:
 	if (block_left) {
 		if (block_offset > 0) {
-			for (uint32_t i=block_offset; i < AUDIO_BLOCK_SAMPLES; i++) {
+			for (uint32_t i=block_offset; i < AUDIO_BLOCK_SAMPLES; ++i) {
 				block_left->data[i] = 0;
 			}
 			transmit(block_left, 0);
@@ -167,7 +167,7 @@ cleanup:
 	}
 	if (block_right) {
 		if (block_offset > 0) {
-			for (uint32_t i=block_offset; i < AUDIO_BLOCK_SAMPLES; i++) {
+			for (uint32_t i=block_offset; i < AUDIO_BLOCK_SAMPLES; ++i) {
 				block_right->data[i] = 0;
 			}
 			transmit(block_right, 1);
