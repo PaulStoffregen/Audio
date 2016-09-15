@@ -35,7 +35,7 @@ static void copy_to_fft_buffer(void *destination, const void *source)
 	const uint16_t *src = (const uint16_t *)source;
 	uint32_t *dst = (uint32_t *)destination;
 
-	for (int i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+	for (int i=0; i < AUDIO_BLOCK_SAMPLES; ++i) {
 		*dst++ = *src++;  // real sample plus a zero for imaginary
 	}
 }
@@ -45,7 +45,7 @@ static void apply_window_to_fft_buffer(void *buffer, const void *window)
 	int16_t *buf = (int16_t *)buffer;
 	const int16_t *win = (int16_t *)window;;
 
-	for (int i=0; i < 256; i++) {
+	for (int i=0; i < 256; ++i) {
 		int32_t val = *buf * *win++;
 		//*buf = signed_saturate_rshift(val, 16, 15);
 		*buf = val >> 15;
