@@ -73,13 +73,13 @@ void AudioAnalyzeFFT256::update(void)
 	// G. Heinzel's paper says we're supposed to average the magnitude
 	// squared, then do the square root at the end.
 	if (count == 0) {
-		for (int i=0; i < 128; i++) {
+		for (int i=0; i < 128; ++i) {
 			uint32_t tmp = *((uint32_t *)buffer + i);
 			uint32_t magsq = multiply_16tx16t_add_16bx16b(tmp, tmp);
 			sum[i] = magsq / naverage;
 		}
 	} else {
-		for (int i=0; i < 128; i++) {
+		for (int i=0; i < 128; ++i) {
 			uint32_t tmp = *((uint32_t *)buffer + i);
 			uint32_t magsq = multiply_16tx16t_add_16bx16b(tmp, tmp);
 			sum[i] += magsq / naverage;
@@ -87,7 +87,7 @@ void AudioAnalyzeFFT256::update(void)
 	}
 	if (++count == naverage) {
 		count = 0;
-		for (int i=0; i < 128; i++) {
+		for (int i=0; i < 128; ++i) {
 			output[i] = sqrt_uint32_approx(sum[i]);
 		}
 		outputflag = true;
