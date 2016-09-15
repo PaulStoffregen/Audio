@@ -134,7 +134,7 @@ void AudioSynthSimpleDrum::update(void)
     {
       // If envelope has expired, then stuff zeros into output buffer.
       *p_wave = 0;
-      p_wave++; 
+	  p_wave++;
     }
     else
     {
@@ -153,7 +153,7 @@ void AudioSynthSimpleDrum::update(void)
       mod = signed_multiply_32x16b((env_sqr_current), (wav_pitch_mod>>1)) >> 13;      
       mod2 = signed_multiply_32x16b(wav_increment<<3, mod>>1);
 
-      wav_phasor += (mod2);
+	  wav_phasor += mod2;
       wav_phasor &= 0x7fffffff;
 
       if(do_second)
@@ -197,7 +197,7 @@ void AudioSynthSimpleDrum::update(void)
       }
 
       *p_wave = signed_multiply_32x16b(env_sqr_current, interp ) >> 15 ;
-      p_wave++; 
+	  p_wave++;
     }
   }
 
