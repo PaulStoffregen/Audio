@@ -110,7 +110,7 @@ void AudioOutputPT8211::isr(void)
 	if (blockL && blockR) {
 		#if defined(AUDIO_PT8211_OVERSAMPLING)
 			#if defined(AUDIO_PT8211_INTERPOLATION_LINEAR)
-				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; i++, offsetL++, offsetR++) {
+				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; ++i, ++offsetL, ++offsetR) {
 					int32_t valL = blockL->data[offsetL];
 					int32_t valR = blockR->data[offsetR];
 					int32_t nL = (oldL+valL) >> 1;
@@ -128,7 +128,7 @@ void AudioOutputPT8211::isr(void)
 					oldR = valR;
 				}
 			#elif defined(AUDIO_PT8211_INTERPOLATION_CIC)
-				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; i++, offsetL++, offsetR++) {
+				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; ++i, ++offsetL, ++offsetR) {
 					int32_t valL = blockL->data[offsetL];
 					int32_t valR = blockR->data[offsetR];
 					
@@ -187,7 +187,7 @@ void AudioOutputPT8211::isr(void)
 	} else if (blockL) {
 		#if defined(AUDIO_PT8211_OVERSAMPLING)
 			#if defined(AUDIO_PT8211_INTERPOLATION_LINEAR)
-				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; i++, offsetL++) {
+				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; ++i, ++offsetL) {
 					int32_t val = blockL->data[offsetL];
 					int32_t n = (oldL+val) >> 1;
 					*(dest+0) = (oldL+n) >> 1;
@@ -202,7 +202,7 @@ void AudioOutputPT8211::isr(void)
 					oldL = val;
 				}
 			#elif defined(AUDIO_PT8211_INTERPOLATION_CIC)
-				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; i++, offsetL++, offsetR++) {
+				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; ++i, ++offsetL, offsetR) {
 					int32_t valL = blockL->data[offsetL];
 
 					int32_t combL[3] = {0};
