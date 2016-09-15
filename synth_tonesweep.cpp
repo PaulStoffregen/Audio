@@ -98,7 +98,7 @@ void AudioSynthToneSweep::update(void)
     uint32_t tmp  = tone_freq >> 32; 
     uint64_t tone_tmp = (0x400000000000LL * (int)(tmp&0x7fffffff)) / (int) AUDIO_SAMPLE_RATE_EXACT;
     // Generate the sweep
-    for(i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
+	for(i = 0;i < AUDIO_BLOCK_SAMPLES;++i) {
       *bp++ = (short)(( (short)(arm_sin_q31((uint32_t)((tone_phase >> 15)&0x7fffffff))>>16) *tone_amp) >> 16);
 
       tone_phase +=  tone_tmp;
@@ -121,7 +121,7 @@ void AudioSynthToneSweep::update(void)
     }
     while(i < AUDIO_BLOCK_SAMPLES) {
       *bp++ = 0;
-      i++;
+	  ++i;
     }    
     // send the samples to the left channel
     transmit(block,0);
