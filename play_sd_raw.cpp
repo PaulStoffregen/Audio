@@ -83,7 +83,7 @@ void AudioPlaySdRaw::update(void)
 		// we can read more data from the file...
 		n = rawfile.read(block->data, AUDIO_BLOCK_SAMPLES*2);
 		file_offset += n;
-		for (i=n/2; i < AUDIO_BLOCK_SAMPLES; i++) {
+		for (i=n/2; i < AUDIO_BLOCK_SAMPLES; ++i) {
 			block->data[i] = 0;
 		}
 		transmit(block);
