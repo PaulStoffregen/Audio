@@ -62,36 +62,11 @@ void AudioAnalyzeFFT1024::update(void)
 	if (!block) return;
 
 #if defined(KINETISK)
-	switch (state) {
-	case 0:
-		blocklist[0] = block;
-		state = 1;
-		break;
-	case 1:
-		blocklist[1] = block;
-		state = 2;
-		break;
-	case 2:
-		blocklist[2] = block;
-		state = 3;
-		break;
-	case 3:
-		blocklist[3] = block;
-		state = 4;
-		break;
-	case 4:
-		blocklist[4] = block;
-		state = 5;
-		break;
-	case 5:
-		blocklist[5] = block;
-		state = 6;
-		break;
-	case 6:
-		blocklist[6] = block;
-		state = 7;
-		break;
-	case 7:
+	if (state < 7) {
+		blocklist[state] = block;
+		++state;
+	}
+	else if (state == 7) {
 		blocklist[7] = block;
 		// TODO: perhaps distribute the work over multiple update() ??
 		//       github pull requsts welcome......
@@ -121,7 +96,6 @@ void AudioAnalyzeFFT1024::update(void)
 		blocklist[2] = blocklist[6];
 		blocklist[3] = blocklist[7];
 		state = 4;
-		break;
 	}
 #else
 	release(block);
