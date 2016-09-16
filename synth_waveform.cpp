@@ -109,7 +109,7 @@ void AudioSynthWaveform::update(void)
       break;
 
     case WAVEFORM_SAWTOOTH_REVERSE:
-	  for(int i = 0;i < AUDIO_BLOCK_SAMPLES;++i+) {
+	  for(int i = 0;i < AUDIO_BLOCK_SAMPLES;++i) {
         *bp++ = ((short)(tone_phase>>15)*tone_amp) >> 15;
          // phase and incr are both unsigned 32-bit fractions
          tone_phase -= tone_incr;
