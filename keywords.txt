@@ -40,6 +40,7 @@ AudioFilterStateVariable	KEYWORD2
 AudioInputAnalog	KEYWORD2
 AudioMixer4	KEYWORD2
 AudioOutputAnalog	KEYWORD2
+AudioOutputAnalogStereo	KEYWORD2
 AudioPlayMemory	KEYWORD2
 AudioPlaySdRaw	KEYWORD2
 AudioPlaySdWav	KEYWORD2
