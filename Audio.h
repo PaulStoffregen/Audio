@@ -86,6 +86,7 @@
 #include "input_i2s_quad.h"
 #include "mixer.h"
 #include "output_dac.h"
+#include "output_dacs.h"
 #include "output_i2s.h"
 #include "output_i2s_quad.h"
 #include "output_pwm.h"
