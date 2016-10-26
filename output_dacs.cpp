@@ -92,8 +92,10 @@ void AudioOutputAnalogStereo::analogReference(int ref)
 	// TODO: this should ramp gradually to the new DC level
 	if (ref == INTERNAL) {
 		DAC0_C0 &= ~DAC_C0_DACRFS; // 1.2V
+		DAC1_C0 &= ~DAC_C0_DACRFS;
 	} else {
 		DAC0_C0 |= DAC_C0_DACRFS;  // 3.3V
+		DAC1_C0 |= DAC_C0_DACRFS;
 	}
 }
 
