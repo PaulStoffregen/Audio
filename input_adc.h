@@ -34,8 +34,8 @@
 class AudioInputAnalog : public AudioStream
 {
 public:
-        AudioInputAnalog() : AudioStream(0, NULL) { init(A2); }
-        AudioInputAnalog(uint8_t pin) : AudioStream(0, NULL) { init(pin); }
+        AudioInputAnalog() : AudioStream(0, NULL) { init(A2, INTERNAL); }
+        AudioInputAnalog(uint8_t pin, int analogRef = INTERNAL) : AudioStream(0, NULL) { init(pin, analogRef); }
         virtual void update(void);
         friend void dma_ch9_isr(void);
 private:
@@ -46,7 +46,7 @@ private:
         static bool update_responsibility;
 	static DMAChannel dma;
 	static void isr(void);
-	static void init(uint8_t pin);
+	static void init(uint8_t pin, int analogRef);
 };
 
 #endif

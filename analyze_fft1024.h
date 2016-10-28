@@ -50,16 +50,16 @@ class AudioAnalyzeFFT1024 : public AudioStream
 {
 public:
 	AudioAnalyzeFFT1024() : AudioStream(1, inputQueueArray),
-	  window(AudioWindowHanning1024), state(0), outputflag(false) {
+	  window(AudioWindowHanning1024), state(0), outputflag(false), onRequestOnly(false) {
 		arm_cfft_radix4_init_q15(&fft_inst, 1024, 0, 1);
 	}
-	bool available() {
-		if (outputflag == true) {
-			outputflag = false;
-			return true;
-		}
-		return false;
+
+	bool available();
+
+	void calculateOnRequestOnly(bool flag) {
+		onRequestOnly = flag;
 	}
+
 	float read(unsigned int binNumber) {
 		if (binNumber > 511) return 0.0;
 		return (float)(output[binNumber]) * (1.0 / 16384.0);
@@ -88,6 +88,8 @@ public:
 	uint16_t output[512] __attribute__ ((aligned (4)));
 private:
 	void init(void);
+	void calculateFFT(void);
+
 	const int16_t *window;
 	audio_block_t *blocklist[8];
 	int16_t buffer[2048] __attribute__ ((aligned (4)));
@@ -98,6 +100,7 @@ private:
 	volatile bool outputflag;
 	audio_block_t *inputQueueArray[1];
 	arm_cfft_radix4_instance_q15 fft_inst;
+	bool onRequestOnly;
 };
 
 #endif
