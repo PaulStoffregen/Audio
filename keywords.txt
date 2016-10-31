@@ -38,6 +38,7 @@ AudioFilterBiquad	KEYWORD2
 AudioFilterFIR	KEYWORD2
 AudioFilterStateVariable	KEYWORD2
 AudioInputAnalog	KEYWORD2
+AudioInputAnalogStereo	KEYWORD2
 AudioMixer4	KEYWORD2
 AudioOutputAnalog	KEYWORD2
 AudioOutputAnalogStereo	KEYWORD2
