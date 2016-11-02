@@ -78,6 +78,7 @@
 #include "effect_delay.h"
 #include "effect_delay_ext.h"
 #include "effect_midside.h"
+#include "effect_reverb.h"
 #include "filter_biquad.h"
 #include "filter_fir.h"
 #include "filter_variable.h"
