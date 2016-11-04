@@ -28,6 +28,8 @@
 #include "utility/pdb.h"
 #include "utility/dspinst.h"
 
+#if defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
+
 DMAMEM static uint16_t left_buffer[AUDIO_BLOCK_SAMPLES];
 DMAMEM static uint16_t right_buffer[AUDIO_BLOCK_SAMPLES];
 audio_block_t * AudioInputAnalogStereo::block_left = NULL;
@@ -292,6 +294,7 @@ void AudioInputAnalogStereo::update(void)
 	release(out_right);
 }
 
+
 #if defined(__MK20DX256__)
 static const uint8_t pin2sc1a[] = {
         5, 14, 8+128, 9+128, 13, 12, 6, 7, 15, 4, 0, 19, 3, 19+128, // 0-13 -> A0-A13
@@ -349,3 +352,15 @@ static int analogReadADC1(uint8_t pin)
         }
 }
 
+#else
+
+void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
+{
+}
+
+void AudioInputAnalogStereo::update(void)
+{
+}
+
+
+#endif
