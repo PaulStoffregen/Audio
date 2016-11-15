@@ -64,7 +64,10 @@ bool AudioPlaySdWav::play(const char *filename)
 	__disable_irq();
 	wavfile = SD.open(filename);
 	__enable_irq();
-	if (!wavfile) return false;
+	if (!wavfile) {
+		AudioStopUsingSPI();
+		return false;
+	}
 	buffer_length = 0;
 	buffer_offset = 0;
 	state_play = STATE_STOP;
