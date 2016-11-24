@@ -53,7 +53,7 @@ Dual [Audio Adaptor Boards](http://www.pjrc.com/store/teensy3_audio.html) for qu
 
 [Teensy 3.6](http://www.pjrc.com/store/teensy36.html) or [Teensy 3.5](http://www.pjrc.com/store/teensy35.html) 12 bit DAC Output (Stereo)
 
-![DAC Output](/gui/img/dacpins.jpg)
+![DAC Output](/gui/img/dacpins.png)
 
 [Teensy 3.6](http://www.pjrc.com/store/teensy36.html), [Teensy 3.5](http://www.pjrc.com/store/teensy35.html), [Teensy 3.2](http://www.pjrc.com/store/teensy32.html), [Teensy 3.1](http://www.pjrc.com/store/teensy31.html) or [Teensy 3.0](http://www.pjrc.com/store/teensy3.html) PWM Output (Mono)
 
