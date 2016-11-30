@@ -33,13 +33,16 @@ AudioEffectMultiply	KEYWORD2
 AudioEffectDelay	KEYWORD2
 AudioEffectDelayExternal	KEYWORD2
 AudioEffectBitcrusher	KEYWORD2
+AudioEffectReverb	KEYWORD2
 AudioEffectMidSide	KEYWORD2
 AudioFilterBiquad	KEYWORD2
 AudioFilterFIR	KEYWORD2
 AudioFilterStateVariable	KEYWORD2
 AudioInputAnalog	KEYWORD2
+AudioInputAnalogStereo	KEYWORD2
 AudioMixer4	KEYWORD2
 AudioOutputAnalog	KEYWORD2
+AudioOutputAnalogStereo	KEYWORD2
 AudioPlayMemory	KEYWORD2
 AudioPlaySdRaw	KEYWORD2
 AudioPlaySdWav	KEYWORD2
@@ -77,6 +80,7 @@ muteInput	KEYWORD2
 unmuteInput	KEYWORD2
 enableDither	KEYWORD2
 disableDither	KEYWORD2
+reverbTime	KEYWORD2
 frequency	KEYWORD2
 phase	KEYWORD2
 amplitude	KEYWORD2

@@ -39,7 +39,7 @@ void setup() {
   Serial.println("------------");
 
   // First, detect the card
-  status = card.init(10); // Audio shield has SD card SD on pin 10
+  status = card.init(SPI_FULL_SPEED, 10); // Audio shield has SD card SD on pin 10
   if (status) {
     Serial.println("SD card is connected :-)");
   } else {

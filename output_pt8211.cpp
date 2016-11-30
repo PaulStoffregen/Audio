@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
-//Adapted to PT8211, Frank Bösing.
+//Adapted to PT8211, Frank Bösing, Ben-Rheinland
 
 #include "output_pt8211.h"
 #include "memcpy_audio.h"
@@ -303,7 +303,11 @@ void AudioOutputPT8211::isr(void)
 			offsetR += AUDIO_BLOCK_SAMPLES / 2;
 		#endif //defined(AUDIO_PT8211_OVERSAMPLING)
 	} else {
-		memset(dest,0,AUDIO_BLOCK_SAMPLES * 2);
+		#if defined(AUDIO_PT8211_OVERSAMPLING)
+			memset(dest,0,AUDIO_BLOCK_SAMPLES*8);
+		#else
+			memset(dest,0,AUDIO_BLOCK_SAMPLES*2);	
+		#endif
 		return;
 	}
 
