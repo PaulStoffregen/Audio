@@ -29,6 +29,8 @@
 
 #if defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
 
+#include <AudioStream.h>
+
 .cpu cortex-m4
 .syntax unified
 .thumb
@@ -45,7 +47,7 @@
 	@ r2: srcR
 
 	push	{r4-r11,r14}
-	add r14,r0,#256		// TODO: 256 = AUDIO_BLOCK_SAMPLES*2
+	add r14,r0,#(AUDIO_BLOCK_SAMPLES*2)
 	.align 2
 .loopLR:
 
@@ -89,7 +91,7 @@
 
 	push	{r4-r11}
 	mov r2, #0
-	add r12,r0,#256		// TODO: 256 = AUDIO_BLOCK_SAMPLES*2
+	add r12,r0,#(AUDIO_BLOCK_SAMPLES*2)
 	.align 2
 .loopL:
 
@@ -131,7 +133,7 @@
 
 	push	{r4-r11}
 	mov r2, #0
-	add r12,r0,#256		// TODO: 256 = AUDIO_BLOCK_SAMPLES*2
+	add r12,r0,#(AUDIO_BLOCK_SAMPLES*2)
 	.align 2
 .loopR:
 
@@ -178,7 +180,7 @@
 
 	push	{r4-r11}
 	ldr r4, [sp, #(0+32)] //5th parameter is saved on the stack
-	add r11,r0,#512		// TODO: 512 = AUDIO_BLOCK_SAMPLES*4
+	add r11,r0,#(AUDIO_BLOCK_SAMPLES*4)
 	.align 2
 .loopQuad:
 
