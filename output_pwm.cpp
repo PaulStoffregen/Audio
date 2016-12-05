@@ -56,7 +56,7 @@ void AudioOutputPWM::begin(void)
 	CORE_PIN4_CONFIG = PORT_PCR_MUX(3) | PORT_PCR_DSE | PORT_PCR_SRE;
 	FTM1_C0V = 120; // range 120 to 375
 	FTM1_C1V = 0;   // range 0 to 255
-	for (int i=0; i<256; i+=2) {
+	for (int i=0; i<(AUDIO_BLOCK_SAMPLES*2); i+=2) {
 		pwm_dma_buffer[i] = 120; // zero must not be used
 		pwm_dma_buffer[i+1] = 0;
 	}
