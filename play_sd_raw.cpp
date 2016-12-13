@@ -39,11 +39,21 @@ void AudioPlaySdRaw::begin(void)
 bool AudioPlaySdRaw::play(const char *filename)
 {
 	stop();
+#if defined(HAS_KINETIS_SDHC)
+	if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStartUsingSPI();
+#else
 	AudioStartUsingSPI();
+#endif
+	__disable_irq();
 	rawfile = SD.open(filename);
+	__enable_irq();
 	if (!rawfile) {
 		//Serial.println("unable to open file");
-		AudioStopUsingSPI();
+		#if defined(HAS_KINETIS_SDHC)
+			if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
+		#else
+			AudioStopUsingSPI();
+		#endif
 		return false;
 	}
 	file_size = rawfile.size();
@@ -60,7 +70,11 @@ void AudioPlaySdRaw::stop(void)
 		playing = false;
 		__enable_irq();
 		rawfile.close();
-		AudioStopUsingSPI();
+		#if defined(HAS_KINETIS_SDHC)
+			if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
+		#else
+			AudioStopUsingSPI();
+		#endif
 	} else {
 		__enable_irq();
 	}
@@ -89,7 +103,11 @@ void AudioPlaySdRaw::update(void)
 		transmit(block);
 	} else {
 		rawfile.close();
-		AudioStopUsingSPI();
+		#if defined(HAS_KINETIS_SDHC)
+			if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
+		#else
+			AudioStopUsingSPI();
+		#endif
 		playing = false;
 	}
 	release(block);
@@ -106,5 +124,3 @@ uint32_t AudioPlaySdRaw::lengthMillis(void)
 {
 	return ((uint64_t)file_size * B2M) >> 32;
 }
-
-
