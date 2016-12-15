@@ -28,7 +28,7 @@
 #include "utility/dspinst.h"
 
 extern "C" {
-extern const int16_t fader_table[256];
+extern const int16_t fader_table[257];
 };
 
 void AudioEffectFade::update(void)
