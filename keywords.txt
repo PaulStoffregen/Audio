@@ -8,6 +8,7 @@ AudioOutputI2S	KEYWORD2
 AudioOutputI2SQuad	KEYWORD2
 AudioOutputI2Sslave	KEYWORD2
 AudioOutputSPDIF	KEYWORD2
+AudioOutputPT8211	KEYWORD2
 AudioOutputPWM	KEYWORD2
 AudioOutputUSB	KEYWORD2
 AudioControlSGTL5000	KEYWORD2
@@ -32,13 +33,16 @@ AudioEffectMultiply	KEYWORD2
 AudioEffectDelay	KEYWORD2
 AudioEffectDelayExternal	KEYWORD2
 AudioEffectBitcrusher	KEYWORD2
+AudioEffectReverb	KEYWORD2
 AudioEffectMidSide	KEYWORD2
 AudioFilterBiquad	KEYWORD2
 AudioFilterFIR	KEYWORD2
 AudioFilterStateVariable	KEYWORD2
 AudioInputAnalog	KEYWORD2
+AudioInputAnalogStereo	KEYWORD2
 AudioMixer4	KEYWORD2
 AudioOutputAnalog	KEYWORD2
+AudioOutputAnalogStereo	KEYWORD2
 AudioPlayMemory	KEYWORD2
 AudioPlaySdRaw	KEYWORD2
 AudioPlaySdWav	KEYWORD2
@@ -53,6 +57,7 @@ AudioSynthWaveformDc	KEYWORD2
 AudioSynthNoiseWhite	KEYWORD2
 AudioSynthNoisePink	KEYWORD2
 AudioSynthKarplusStrong	KEYWORD2
+AudioSynthSimpleDrum	KEYWORD2
 isPlaying	KEYWORD2
 positionMillis	KEYWORD2
 lengthMillis	KEYWORD2
@@ -75,6 +80,7 @@ muteInput	KEYWORD2
 unmuteInput	KEYWORD2
 enableDither	KEYWORD2
 disableDither	KEYWORD2
+reverbTime	KEYWORD2
 frequency	KEYWORD2
 phase	KEYWORD2
 amplitude	KEYWORD2
@@ -145,6 +151,8 @@ mute_PCM	KEYWORD2
 probability	KEYWORD2
 encode	KEYWORD2
 decode	KEYWORD2
+secondMix	KEYWORD2
+pitchMod	KEYWORD2
 
 AudioMemoryUsage	KEYWORD2
 AudioMemoryUsageMax	KEYWORD2

@@ -5,8 +5,13 @@
   "keywords": "sound, audio, FFT, filter, effect",
   "description": "Teensy Audio Library",
   "url": "http://www.pjrc.com/teensy/td_libs_Audio.html",
-  "version": "1.03",
-  "exclude": "extras",
+  "version": "1.3",
+  "export": {
+    "exclude": [
+      "gui",
+      "extras"
+    ]
+  },
   "authors":
   {
     "name": "Paul Stoffregen",

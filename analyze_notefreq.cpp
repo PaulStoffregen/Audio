@@ -33,10 +33,11 @@
  *  @param source      source address
  */
 static void copy_buffer(void *destination, const void *source) {
-    const uint16_t *src = (const uint16_t *)source;
-    uint16_t *dst = (uint16_t *)destination;
-    for (int i=0; i < AUDIO_BLOCK_SAMPLES; i++) *dst++ = *src++;
+    const uint16_t *src = ( const uint16_t * )source;
+    uint16_t *dst = (  uint16_t * )destination;
+    for (int i=0; i < AUDIO_BLOCK_SAMPLES; i++)  *dst++ = (*src++);
 }
+
 /**
  *  Virtual function to override from Audio Library
  */
@@ -64,17 +65,21 @@ void AudioAnalyzeNoteFrequency::update( void ) {
         if ( next_buffer ) {
             if ( !first_run && process_buffer ) process( );
             for ( int i = 0; i < AUDIO_GUITARTUNER_BLOCKS; i++ ) copy_buffer( AudioBuffer+( i * 0x80 ), blocklist1[i]->data );
-            for ( int i = 0; i < AUDIO_GUITARTUNER_BLOCKS; i++ ) release(blocklist1[i] );
+            for ( int i = 0; i < AUDIO_GUITARTUNER_BLOCKS; i++ ) release( blocklist1[i] );
+            next_buffer = false;
         } else {
             if ( !first_run && process_buffer ) process( );
             for ( int i = 0; i < AUDIO_GUITARTUNER_BLOCKS; i++ ) copy_buffer( AudioBuffer+( i * 0x80 ), blocklist2[i]->data );
             for ( int i = 0; i < AUDIO_GUITARTUNER_BLOCKS; i++ ) release( blocklist2[i] );
+            next_buffer = true;
         }
         process_buffer = true;
         first_run = false;
         state = 0;
     }
+    
 }
+
 /**
  *  Start the Yin algorithm
  *
@@ -83,7 +88,7 @@ void AudioAnalyzeNoteFrequency::update( void ) {
  *  page 79. Might have to downsample for low fundmental frequencies because of fft buffer
  *  size limit.
  */
-FASTRUN void AudioAnalyzeNoteFrequency::process( void ) {
+void AudioAnalyzeNoteFrequency::process( void ) {
     
     const int16_t *p;
     p = AudioBuffer;
@@ -92,27 +97,39 @@ FASTRUN void AudioAnalyzeNoteFrequency::process( void ) {
     uint16_t tau = tau_global;
     do {
         uint16_t x   = 0;
-        int64_t  sum = 0;
+        uint64_t  sum = 0;
         do {
             int16_t current, lag, delta;
             lag = *( ( int16_t * )p + ( x+tau ) );
             current = *( ( int16_t * )p+x );
             delta = ( current-lag );
             sum += delta * delta;
-#if F_CPU == 144000000
-            x += 8;
-#elif F_CPU == 120000000
-            x += 12;
-#elif F_CPU == 96000000
-            x += 16;
-#elif F_CPU < 96000000
-            x += 32;
-#endif
-        } while ( x <= HALF_BLOCKS );
+            x += 4;
+            
+            lag = *( ( int16_t * )p + ( x+tau ) );
+            current = *( ( int16_t * )p+x );
+            delta = ( current-lag );
+            sum += delta * delta;
+            x += 4;
+            
+            lag = *( ( int16_t * )p + ( x+tau ) );
+            current = *( ( int16_t * )p+x );
+            delta = ( current-lag );
+            sum += delta * delta;
+            x += 4;
+            
+            lag = *( ( int16_t * )p + ( x+tau ) );
+            current = *( ( int16_t * )p+x );
+            delta = ( current-lag );
+            sum += delta * delta;
+            x += 4;
+        } while ( x < HALF_BLOCKS );
         
-        running_sum += sum;
+        uint64_t rs = running_sum;
+        rs += sum;
         yin_buffer[yin_idx] = sum*tau;
-        rs_buffer[yin_idx] = running_sum;
+        rs_buffer[yin_idx] = rs;
+        running_sum = rs;
         yin_idx = ( ++yin_idx >= 5 ) ? 0 : yin_idx;
         tau = estimate( yin_buffer, rs_buffer, yin_idx, tau );
         
@@ -125,7 +142,7 @@ FASTRUN void AudioAnalyzeNoteFrequency::process( void ) {
             return;
         }
     } while ( --cycles );
-    
+    //digitalWriteFast(10, LOW);
     if ( tau >= HALF_BLOCKS ) {
         process_buffer  = false;
         new_output      = false;
@@ -147,9 +164,9 @@ FASTRUN void AudioAnalyzeNoteFrequency::process( void ) {
  *
  *  @return tau
  */
-uint16_t AudioAnalyzeNoteFrequency::estimate( int64_t *yin, int64_t *rs, uint16_t head, uint16_t tau ) {
-    const int64_t *y = ( int64_t * )yin;
-    const int64_t *r = ( int64_t * )rs;
+uint16_t AudioAnalyzeNoteFrequency::estimate( uint64_t *yin, uint64_t *rs, uint16_t head, uint16_t tau ) {
+    const uint64_t *y = ( uint64_t * )yin;
+    const uint64_t *r = ( uint64_t * )rs;
     uint16_t _tau, _head;
     const float thresh = yin_threshold;
     _tau = tau;

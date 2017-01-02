@@ -31,7 +31,8 @@
 DMAMEM static uint16_t analog_rx_buffer[AUDIO_BLOCK_SAMPLES];
 audio_block_t * AudioInputAnalog::block_left = NULL;
 uint16_t AudioInputAnalog::block_offset = 0;
-uint16_t AudioInputAnalog::dc_average = 0;
+int32_t AudioInputAnalog::dc_average_hist[16];
+int32_t AudioInputAnalog::current_dc_average_index = 0;
 bool AudioInputAnalog::update_responsibility = false;
 DMAChannel AudioInputAnalog::dma(false);
 
@@ -45,12 +46,18 @@ void AudioInputAnalog::init(uint8_t pin)
 	// leaves the ADC in a state that's mostly ready to use
 	analogReadRes(16);
 	analogReference(INTERNAL); // range 0 to 1.2 volts
+#if F_BUS == 96000000 || F_BUS == 48000000 || F_BUS == 24000000
 	analogReadAveraging(8);
+#else
+	analogReadAveraging(4);
+#endif
 	// Actually, do many normal reads, to start with a nice DC level
 	for (i=0; i < 1024; i++) {
 		sum += analogRead(pin);
 	}
-	dc_average = sum >> 10;
+	for (i = 0; i < 16; i++) {
+		dc_average_hist[i] = sum >> 10;
+	}
 
 	// set the programmable delay block to trigger the ADC at 44.1 kHz
 #if defined(KINETISK)
@@ -133,7 +140,7 @@ void AudioInputAnalog::isr(void)
 void AudioInputAnalog::update(void)
 {
 	audio_block_t *new_left=NULL, *out_left=NULL;
-	unsigned int dc, offset;
+	uint32_t i, dc, offset;
 	int32_t tmp;
 	int16_t s, *p, *end;
 
@@ -178,18 +185,23 @@ void AudioInputAnalog::update(void)
 	block_offset = 0;
 	__enable_irq();
 
-	// find and subtract DC offset....
-	// TODO: this may not be correct, needs testing with more types of signals
-	dc = dc_average;
+	// Find and subtract DC offset... We use an average of the
+	// last 16 * AUDIO_BLOCK_SAMPLES samples.
+	dc = 0;
+	for (i = 0; i < 16; i++) {
+		dc += dc_average_hist[i];
+	}
+	dc /= 16 * AUDIO_BLOCK_SAMPLES;
+	dc_average_hist[current_dc_average_index] = 0;
 	p = out_left->data;
 	end = p + AUDIO_BLOCK_SAMPLES;
 	do {
+		dc_average_hist[current_dc_average_index] += (uint16_t)(*p);
 		tmp = (uint16_t)(*p) - (int32_t)dc;
 		s = signed_saturate_rshift(tmp, 16, 0);
 		*p++ = s;
-		dc += s / 12000;  // slow response, remove DC component
 	} while (p < end);
-	dc_average = dc;
+	current_dc_average_index = (current_dc_average_index + 1) % 16;
 
 	// then transmit the AC data
 	transmit(out_left);
