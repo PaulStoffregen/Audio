@@ -708,6 +708,10 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>USB input &amp; output does not cause the Teensy Audio Library to
 		update.  At least one non-USB input or output object must be
 		present for the entire library to update properly.</p>
+	<p>A known problem exists with USB audio from Macintosh computers.
+		An imperfect <a href="https://forum.pjrc.com/threads/34855-Distorted-audio-when-using-USB-input-on-Teensy-3-1?p=110392&viewfull=1#post110392">workaround
+		can be enabled by editing usb_audio.cpp</a>.
+		Find and uncomment "#define MACOSX_ADAPTIVE_LIMIT".</p>
 </script>
 <script type="text/x-red" data-template-name="AudioInputUSB">
 	<div class="form-row">
@@ -1146,6 +1150,10 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>USB input &amp; output does not cause the Teensy Audio Library to
 		update.  At least one non-USB input or output object must be
 		present for the entire library to update properly.</p>
+	<p>A known problem exists with USB audio from Macintosh computers.
+		An imperfect <a href="https://forum.pjrc.com/threads/34855-Distorted-audio-when-using-USB-input-on-Teensy-3-1?p=110392&viewfull=1#post110392">workaround
+		can be enabled by editing usb_audio.cpp</a>.
+		Find and uncomment "#define MACOSX_ADAPTIVE_LIMIT".</p>
 </script>
 <script type="text/x-red" data-template-name="AudioOutputUSB">
 	<div class="form-row">
