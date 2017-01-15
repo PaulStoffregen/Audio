@@ -495,12 +495,12 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>The I2S signals are used in "master" mode, where Teensy creates
 		all 3 clock signals and controls all data timing.</p>
 	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Pin</th><th>Signal</th><th>Direction</th></tr>
-		<tr class=odd><td align=center>9</td><td>BCLK</td><td>Output</td></tr>
-		<tr class=odd><td align=center>11</td><td>MCLK</td><td>Output</td></tr>
-		<tr class=odd><td align=center>13</td><td>RX</td><td>Input</td></tr>
-		<tr class=odd><td align=center>30</td><td>RX</td><td>Input</td></tr>
-		<tr class=odd><td align=center>23</td><td>LRCLK</td><td>Output</td></tr>
+		<tr class=top><th>Teensy<br>3.2 Pin</th><th>Teensy<br>3.5/3.6 Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>9</td><td align=center>9</td><td>BCLK</td><td>Output</td></tr>
+		<tr class=odd><td align=center>11</td><td align=center>11</td><td>MCLK</td><td>Output</td></tr>
+		<tr class=odd><td align=center>13</td><td align=center>13</td><td>RX</td><td>Input</td></tr>
+		<tr class=odd><td align=center>30</td><td align=center>38</td><td>RX</td><td>Input</td></tr>
+		<tr class=odd><td align=center>23</td><td align=center>23</td><td>LRCLK</td><td>Output</td></tr>
 	</table>
 	<p>Audio from
 		master mode I2S may be used in the same project as ADC, DAC and
