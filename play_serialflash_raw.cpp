@@ -34,6 +34,14 @@ void AudioPlaySerialflashRaw::begin(void)
 	playing = false;
 	file_offset = 0;
 	file_size = 0;
+	read_half_SR = false;
+}
+
+
+bool AudioPlaySerialflashRaw::play(const char *filename, bool half_SR)
+{
+	read_half_SR = half_SR;
+	return play(filename);
 }
 
 
@@ -68,11 +76,11 @@ void AudioPlaySerialflashRaw::stop(void)
 }
 
 
+
 void AudioPlaySerialflashRaw::update(void)
 {
 	unsigned int i, n;
 	audio_block_t *block;
-
 	// only update if we're playing
 	if (!playing) return;
 
@@ -81,21 +89,35 @@ void AudioPlaySerialflashRaw::update(void)
 	if (block == NULL) return;
 
 	if (rawfile.available()) {
-		// we can read more data from the file...
-		n = rawfile.read(block->data, AUDIO_BLOCK_SAMPLES*2);
-		file_offset += n;
-		for (i=n/2; i < AUDIO_BLOCK_SAMPLES; i++) {
-			block->data[i] = 0;
+ 		// we can read more data from the file...
+		if(read_half_SR) {
+			// read half the samples as normal -- just # of bytes == # of samples
+			n = rawfile.read(temp_block, AUDIO_BLOCK_SAMPLES);
+			file_offset += n;
+			// Double each read sample into the actual trasnmitted block
+			for(i=0;i<AUDIO_BLOCK_SAMPLES;i++) {
+				block->data[i] = temp_block[i/2];
+			}
+			for (i=n; i < AUDIO_BLOCK_SAMPLES; i++) {
+				block->data[i] = 0;
+			}
+			transmit(block);
+		} else {
+			n = rawfile.read(block->data, AUDIO_BLOCK_SAMPLES*2);
+			file_offset += n;
+			for (i=n/2; i < AUDIO_BLOCK_SAMPLES; i++) {
+				block->data[i] = 0;
+			}
+			transmit(block);			
 		}
-		transmit(block);
 	} else {
 		rawfile.close();
 		AudioStopUsingSPI();
 		playing = false;
-		//Serial.println("Finished playing sample");		//TODO
 	}
 	release(block);
 }
+
 
 #define B2M (uint32_t)((double)4294967296000.0 / AUDIO_SAMPLE_RATE_EXACT / 2.0) // 97352592
 
