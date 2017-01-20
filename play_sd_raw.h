@@ -37,18 +37,29 @@ public:
 	AudioPlaySdRaw(void) : AudioStream(0, NULL) { begin(); }
 	void begin(void);
 	bool play(const char *filename);
-	bool play(const char *filename, bool half_SR);
+	bool play(const char *filename, float ratio);
+    bool play(const char *filename, float ratio, uint32_t loopStart, uint32_t loopEnd);
+    int buffered_read(void *buf, uint16_t nbyte);
+	bool setRatio(float ratio);
+	bool loop(bool looping);
 	void stop(void);
 	bool isPlaying(void) { return playing; }
 	uint32_t positionMillis(void);
 	uint32_t lengthMillis(void);
 	virtual void update(void);
+		virtual void update2(void);
+
 private:
-	int16_t temp_block[AUDIO_BLOCK_SAMPLES/2];
-	bool read_half_SR;
+	// TODO temp_block needs to be at most ... X 
+	int16_t temp_block[AUDIO_BLOCK_SAMPLES*5];
+	uint32_t loop_start, loop_end;
+	bool do_loop;
+	float read_ratio;
 	File rawfile;
 	uint32_t file_size;
 	volatile uint32_t file_offset;
+	int buffer_read_offset;
+	uint8_t buffer[512];
 	volatile bool playing;
 };
 
