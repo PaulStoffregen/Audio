@@ -29,9 +29,11 @@
 #ifndef output_pt8211_h_
 #define output_pt8211_h_
 
-	//uncomment to enable oversampling:
+#ifndef AUDIO_PT8211_NO_OVERSAMPLING	
 #define AUDIO_PT8211_OVERSAMPLING
-	//uncomment ONE of these to define interpolation type for oversampling:
+#endif
+
+//uncomment ONE of these to define interpolation type for oversampling:
 // #define AUDIO_PT8211_INTERPOLATION_LINEAR
 #define AUDIO_PT8211_INTERPOLATION_CIC
 
