@@ -60,11 +60,22 @@ void AudioPlaySdWav::begin(void)
 bool AudioPlaySdWav::play(const char *filename)
 {
 	stop();
+#if defined(HAS_KINETIS_SDHC)	
+	if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStartUsingSPI();
+#else 	
 	AudioStartUsingSPI();
+#endif
 	__disable_irq();
 	wavfile = SD.open(filename);
 	__enable_irq();
-	if (!wavfile) return false;
+	if (!wavfile) {
+	#if defined(HAS_KINETIS_SDHC)	
+		if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
+	#else 	
+		AudioStopUsingSPI();
+	#endif			
+		return false;
+	}
 	buffer_length = 0;
 	buffer_offset = 0;
 	state_play = STATE_STOP;
@@ -87,7 +98,11 @@ void AudioPlaySdWav::stop(void)
 		if (b1) release(b1);
 		if (b2) release(b2);
 		wavfile.close();
+	#if defined(HAS_KINETIS_SDHC)	
+		if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
+	#else 	
 		AudioStopUsingSPI();
+	#endif	
 	} else {
 		__enable_irq();
 	}
@@ -148,7 +163,11 @@ void AudioPlaySdWav::update(void)
 	}
 end:	// end of file reached or other reason to stop
 	wavfile.close();
+#if defined(HAS_KINETIS_SDHC)	
+	if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
+#else 	
 	AudioStopUsingSPI();
+#endif	
 	state_play = STATE_STOP;
 	state = STATE_STOP;
 cleanup:

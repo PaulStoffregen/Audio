@@ -29,6 +29,8 @@
 
 #if defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
 
+#include <AudioStream.h>
+
 .cpu cortex-m4
 .syntax unified
 .thumb
@@ -44,16 +46,14 @@
 	@ r1: srcL
 	@ r2: srcR
 
+#if AUDIO_BLOCK_SAMPLES > 8
 	push	{r4-r11,r14}
-	add r14,r0,#256		// TODO: 256 = AUDIO_BLOCK_SAMPLES*2
+	add r14,r0,#(AUDIO_BLOCK_SAMPLES*2)
 	.align 2
 .loopLR:
-
-	.irp offset, 1,2
-
 	//Load 2*4 words
 	ldmia r1!, {r5,r7,r9,r11}  //1+4
-	ldmia r2!, {r6,r8,r10,r12} //1+4
+	ldmia r2!, {r6,r8,r10,r12} //1+4	
 
 	pkhbt r3,r5,r6,LSL #16	//1
 	pkhtb r4,r6,r5,ASR #16	//1
@@ -68,17 +68,30 @@
 	pkhtb r10,r12,r11,ASR #16	//1
 
 	//Write 8 Words
-	stmia r0!, {r3,r4,r5,r6,r7,r8,r9,r10}	//1+8
-
-	.endr //5+5+8+9 = 27 Cycles to interleave 32 bytes.
-
+	stmia r0!, {r3,r4,r5,r6,r7,r8,r9,r10}	//1+8 -> 5+5+8+9 = 27 Cycles to interleave 32 bytes. 
+	
 	cmp r14, r0
 	bne .loopLR
 
-	pop	{r4-r11,r14}
+	pop	{r4-r11,r14}	
+#elif AUDIO_BLOCK_SAMPLES == 8
+	push	{r4-r8,r14}	
+
+	ldmia r1!, {r5,r7}
+	ldmia r2!, {r6,r8}
+
+	pkhbt r3,r5,r6,LSL #16
+	pkhtb r4,r6,r5,ASR #16
+
+	pkhbt r5,r7,r8,LSL #16
+	pkhtb r6,r8,r7,ASR #16
+
+	stmia r0!, {r3,r4,r5,r6}
+	pop	{r4-r8,r14}	
+#endif
 	BX lr
-
-
+	
+	
 /* void memcpy_tointerleaveL(short *dst, short *srcL); */
  .global	memcpy_tointerleaveL
 .thumb_func
@@ -86,14 +99,14 @@
 
 	@ r0: dst
 	@ r1: srcL
-
-	push	{r4-r11}
+	
 	mov r2, #0
-	add r12,r0,#256		// TODO: 256 = AUDIO_BLOCK_SAMPLES*2
+	
+#if AUDIO_BLOCK_SAMPLES > 8
+	push	{r4-r11}
+	add r12,r0,#(AUDIO_BLOCK_SAMPLES*2)
 	.align 2
 .loopL:
-
-	.irp offset, 1,2
 
 	//Load 4 words
 	ldmia r1!, {r5,r7,r9,r11}  //1+4
@@ -113,14 +126,28 @@
 	//Write 8 Words
 	stmia r0!, {r3,r4,r5,r6,r7,r8,r9,r10}	//1+8
 
-	.endr
-
 	cmp r12, r0
 	bne .loopL
 
 	pop	{r4-r11}
+#elif AUDIO_BLOCK_SAMPLES == 8
+	push	{r4-r7}
+	
+	ldmia r1!, {r5,r7}
+
+	pkhbt r3,r5,r2
+	pkhtb r4,r2,r5,ASR #16
+
+	pkhbt r5,r7,r2	//1
+	pkhtb r6,r2,r7,ASR #16
+
+	stmia r0!, {r3,r4,r5,r6}
+	
+	pop	{r4-r7}
+#endif	
 	BX lr
 
+	
 /* void memcpy_tointerleaveL(short *dst, short *srcR); */
  .global	memcpy_tointerleaveR
 .thumb_func
@@ -129,13 +156,12 @@
 	@ r0: dst
 	@ r1: srcR
 
-	push	{r4-r11}
 	mov r2, #0
-	add r12,r0,#256		// TODO: 256 = AUDIO_BLOCK_SAMPLES*2
+#if AUDIO_BLOCK_SAMPLES > 8
+	push	{r4-r11}
+	add r12,r0,#(AUDIO_BLOCK_SAMPLES*2)
 	.align 2
 .loopR:
-
-	.irp offset, 1,2
 
 	//Load 4 words
 	ldmia r1!, {r5,r7,r9,r11}
@@ -155,12 +181,26 @@
 	//Write 8 Words
 	stmia r0!, {r3,r4,r5,r6,r7,r8,r9,r10}
 
-	.endr
-
 	cmp r12, r0
 	bne .loopR
 
 	pop	{r4-r11}
+#elif AUDIO_BLOCK_SAMPLES == 8	
+	push	{r4-r7}
+	
+	ldmia r1!, {r5,r7}
+
+	pkhbt r3,r2,r5,LSL #16
+	pkhtb r4,r5,r2
+
+	pkhbt r5,r2,r7,LSL #16
+	pkhtb r6,r7,r2
+	
+	stmia r0!, {r3,r4,r5,r6}
+
+	pop	{r4-r7}
+
+#endif	
 	BX lr
 
 
@@ -178,11 +218,9 @@
 
 	push	{r4-r11}
 	ldr r4, [sp, #(0+32)] //5th parameter is saved on the stack
-	add r11,r0,#512		// TODO: 512 = AUDIO_BLOCK_SAMPLES*4
+	add r11,r0,#(AUDIO_BLOCK_SAMPLES*4)
 	.align 2
 .loopQuad:
-
-	.irp offset, 1,2
 
 	ldr r5, [r1],4
 	ldr r6, [r3],4
@@ -195,16 +233,11 @@
 
 	stmia r0!, {r7-r10}
 
-	.endr
-
 	cmp r11, r0
 	bne .loopQuad
 
 	pop	{r4-r11}
-
 	BX lr
-
-
 .END
 
 #endif

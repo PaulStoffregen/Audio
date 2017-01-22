@@ -46,7 +46,11 @@ void AudioInputAnalog::init(uint8_t pin)
 	// leaves the ADC in a state that's mostly ready to use
 	analogReadRes(16);
 	analogReference(INTERNAL); // range 0 to 1.2 volts
+#if F_BUS == 96000000 || F_BUS == 48000000 || F_BUS == 24000000
 	analogReadAveraging(8);
+#else
+	analogReadAveraging(4);
+#endif
 	// Actually, do many normal reads, to start with a nice DC level
 	for (i=0; i < 1024; i++) {
 		sum += analogRead(pin);
