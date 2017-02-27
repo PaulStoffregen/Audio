@@ -45,6 +45,21 @@ Bounce button0 = Bounce(0, 15);
 Bounce button1 = Bounce(1, 15);
 Bounce button2 = Bounce(2, 15);
 
+// Use these with the Teensy Audio Shield
+#define SDCARD_CS_PIN    10
+#define SDCARD_MOSI_PIN  7
+#define SDCARD_SCK_PIN   14
+
+// Use these with the Teensy 3.5 & 3.6 SD card
+//#define SDCARD_CS_PIN    BUILTIN_SDCARD
+//#define SDCARD_MOSI_PIN  11  // not actually used
+//#define SDCARD_SCK_PIN   13  // not actually used
+
+// Use these for the SD+Wiz820 or other adaptors
+//#define SDCARD_CS_PIN    4
+//#define SDCARD_MOSI_PIN  11
+//#define SDCARD_SCK_PIN   13
+
 int mode;
 int count=1;
 int a1=0, a2=0, a3=0;
@@ -59,8 +74,8 @@ void setup() {
   pinMode(1, INPUT_PULLUP);
   pinMode(2, INPUT_PULLUP);
   Serial.begin(115200);
-  SPI.setMOSI(7);
-  SPI.setSCK(14);
+  SPI.setMOSI(SDCARD_MOSI_PIN);
+  SPI.setSCK(SDCARD_SCK_PIN);
   sgtl5000_1.enable();
   sgtl5000_1.volume(0.5);
   sgtl5000_1.inputSelect(AUDIO_INPUT_MIC);
@@ -158,7 +173,7 @@ void loop() {
       mixer1.gain(0, 0);
       mixer2.gain(0, 0);
       if (sdcardinit) {
-        if (!(SD.begin(10))) {
+        if (!(SD.begin(SDCARD_CS_PIN))) {
           while (1) {
             Serial.println("Unable to access the SD card");
             if (playsamples) sample1.play(AudioSampleNosdcard);
