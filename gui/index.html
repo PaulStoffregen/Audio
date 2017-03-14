@@ -3216,7 +3216,9 @@ double s_freq = .0625;</p>
 	</p>
 	<p class=func><span class=keyword>adcHighPassFilterDisable</span>();</p>
 	<p class=desc>Completely disable the analog input filter.  DC and sub-audible
-		low frequencies are allowed to enter the digital signal.
+		low frequencies are allowed to enter the digital signal.  This
+		<a href="http://openaudio.blogspot.com/2017/03/teensy-audio-board-self-noise.html">may
+		reduce noise</a> in some cases.
 	</p>
 	<p class=func><span class=keyword>adcHighPassFilterEnable</span>();</p>
 	<p class=desc>Turn the DC-blocking filter back on, if disabled, or
