@@ -47,9 +47,6 @@ void AudioEffectWaveshaper::update(void)
   block = receiveWritable();
   if (!block) return;
 
-  // performance testing...
-  // unsigned long mcs = micros();
-
   uint16_t x, xa;
   int16_t i, ya, yb;
   for (i = 0; i < AUDIO_BLOCK_SAMPLES; i++) {
@@ -61,10 +58,6 @@ void AudioEffectWaveshaper::update(void)
     yb = waveshape[xa + 1];
     block->data[i] = ya + ((yb - ya) * (x - (xa << lerpshift)) >> lerpshift);
   }
-
-  // log performance test without compensating for rollover...
-  // Serial.print("(micros)");
-  // Serial.println(micros() - mcs);
 
   transmit(block);
   release(block);
