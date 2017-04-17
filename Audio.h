@@ -95,6 +95,7 @@
 #include "output_pwm.h"
 #include "output_spdif.h"
 #include "output_pt8211.h"
+#include "output_tdm.h"
 #include "play_memory.h"
 #include "play_queue.h"
 #include "play_sd_raw.h"
