@@ -24,29 +24,25 @@
  * THE SOFTWARE.
  */
 
-#ifndef output_tdm_h_
-#define output_tdm_h_
+#ifndef _input_tdm_h_
+#define _input_tdm_h_
 
 #include "Arduino.h"
 #include "AudioStream.h"
 #include "DMAChannel.h"
 
-class AudioOutputTDM : public AudioStream
+class AudioInputTDM : public AudioStream
 {
 public:
-	AudioOutputTDM(void) : AudioStream(16, inputQueueArray) { begin(); }
+	AudioInputTDM(void) : AudioStream(0, NULL) { begin(); }
 	virtual void update(void);
 	void begin(void);
-	friend class AudioInputTDM;
-protected:
-	static void config_tdm(void);
-	static audio_block_t *block_input[16];
+protected:	
 	static bool update_responsibility;
 	static DMAChannel dma;
 	static void isr(void);
 private:
-	audio_block_t *inputQueueArray[16];
+	static audio_block_t *block_incoming[16];
 };
-
 
 #endif

@@ -70,7 +70,7 @@ void AudioOutputTDM::begin(void)
 }
 
 // TODO: needs optimization...
-static void memcpy_tdm(uint32_t *dest, const uint32_t *src1, const uint32_t *src2)
+static void memcpy_tdm_tx(uint32_t *dest, const uint32_t *src1, const uint32_t *src2)
 {
 	uint32_t i, in1, in2, out1, out2;
 
@@ -106,7 +106,7 @@ void AudioOutputTDM::isr(void)
 	for (i=0; i < 16; i += 2) {
 		src1 = block_input[i] ? (uint32_t *)(block_input[i]->data) : zeros;
 		src2 = block_input[i+1] ? (uint32_t *)(block_input[i+1]->data) : zeros;
-		memcpy_tdm(dest, src1, src2);
+		memcpy_tdm_tx(dest, src1, src2);
 		dest++;
 	}
 	for (i=0; i < 16; i++) {
@@ -204,17 +204,15 @@ void AudioOutputTDM::config_tdm(void)
 		| I2S_TCR4_FSE | I2S_TCR4_FSD;
 	I2S0_TCR5 = I2S_TCR5_WNW(31) | I2S_TCR5_W0W(31) | I2S_TCR5_FBT(31);
 
-#if 0
 	// configure receiver (sync'd to transmitter clocks)
 	I2S0_RMR = 0;
-	I2S0_RCR1 = I2S_RCR1_RFW(1);
+	I2S0_RCR1 = I2S_RCR1_RFW(4);
 	I2S0_RCR2 = I2S_RCR2_SYNC(1) | I2S_TCR2_BCP | I2S_RCR2_MSEL(1)
-		| I2S_RCR2_BCD | I2S_RCR2_DIV(3);
+		| I2S_RCR2_BCD | I2S_RCR2_DIV(0);
 	I2S0_RCR3 = I2S_RCR3_RCE;
-	I2S0_RCR4 = I2S_RCR4_FRSZ(1) | I2S_RCR4_SYWD(15) | I2S_RCR4_MF
-		| I2S_RCR4_FSE | I2S_RCR4_FSP | I2S_RCR4_FSD;
-	I2S0_RCR5 = I2S_RCR5_WNW(15) | I2S_RCR5_W0W(15) | I2S_RCR5_FBT(15);
-#endif
+	I2S0_RCR4 = I2S_RCR4_FRSZ(7) | I2S_RCR4_SYWD(0) | I2S_RCR4_MF
+		| I2S_RCR4_FSE | I2S_RCR4_FSD;
+	I2S0_RCR5 = I2S_RCR5_WNW(31) | I2S_RCR5_W0W(31) | I2S_RCR5_FBT(31);
 
 	// configure pin mux for 3 clock signals
 	CORE_PIN23_CONFIG = PORT_PCR_MUX(6); // pin 23, PTC2, I2S0_TX_FS (LRCLK)

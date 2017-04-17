@@ -87,6 +87,7 @@
 #include "input_adcs.h"
 #include "input_i2s.h"
 #include "input_i2s_quad.h"
+#include "input_tdm.h"
 #include "mixer.h"
 #include "output_dac.h"
 #include "output_dacs.h"
