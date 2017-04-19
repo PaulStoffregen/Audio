@@ -32,8 +32,9 @@ class AudioEffectWaveshaper : public AudioStream
 {
   public:
     AudioEffectWaveshaper(void): AudioStream(1, inputQueueArray) {}
+    ~AudioEffectWaveshaper();
     virtual void update(void);
-    void shape(int16_t* waveshape, int length);
+    void shape(float* waveshape, int length);
   private:
     audio_block_t *inputQueueArray[1];
     int16_t* waveshape;

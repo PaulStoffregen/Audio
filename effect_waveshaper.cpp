@@ -24,13 +24,26 @@
 
 #include "effect_waveshaper.h"
 
-void AudioEffectWaveshaper::shape(int16_t* waveshape, int length)
+AudioEffectWaveshaper::~AudioEffectWaveshaper()
+{
+  if(this->waveshape) {
+    delete [] this->waveshape;
+  }
+}
+
+void AudioEffectWaveshaper::shape(float* waveshape, int length)
 {
   // length must be bigger than 1 and equal to a power of two + 1
   // anything else means we don't continue
   if(!waveshape || length < 2 || length > 32769 || ((length - 1) & (length - 2))) return;
 
-  this->waveshape = waveshape;
+  if(this->waveshape) {
+    delete [] this->waveshape;
+  }
+  this->waveshape = new int16_t[length];
+  for(int i = 0; i < length; i++) {
+    this->waveshape[i] = 32767 * waveshape[i];
+  }
 
   // set lerpshift to the number of bits to shift while interpolating
   // to cover the entire waveshape over a uint16_t input range
