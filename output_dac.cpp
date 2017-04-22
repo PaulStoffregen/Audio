@@ -144,7 +144,7 @@ void AudioOutputAnalog::isr(void)
 		} while (dest < end);
 #else		
 		int i = AUDIO_BLOCK_SAMPLES/8;
-		const uint32_t ofs  = (32768 << 16) | 32768;
+		const uint32_t ofs  = (32767 << 16) | 32767;
 		uint32_t * src32 = (uint32_t *) src;
 		uint32_t * dest32 = (uint32_t *) dest;
 		do {					
