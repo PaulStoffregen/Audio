@@ -353,7 +353,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioOutputI2S","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputI2SQuad","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_quad","inputs":4,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputSPDIF","data":{"defaults":{"name":{"value":"new"}},"shortName":"spdif","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioOutputPT8211","data":{"defaults":{"name":{"value":"new"}},"shortName":"pt2811","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputPT8211","data":{"defaults":{"name":{"value":"new"}},"shortName":"pt8211","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputAnalog","data":{"defaults":{"name":{"value":"new"}},"shortName":"dac","inputs":1,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputAnalogStereo","data":{"defaults":{"name":{"value":"new"}},"shortName":"dacs","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputPWM","data":{"defaults":{"name":{"value":"new"}},"shortName":"pwm","inputs":1,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -495,12 +495,12 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>The I2S signals are used in "master" mode, where Teensy creates
 		all 3 clock signals and controls all data timing.</p>
 	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Pin</th><th>Signal</th><th>Direction</th></tr>
-		<tr class=odd><td align=center>9</td><td>BCLK</td><td>Output</td></tr>
-		<tr class=odd><td align=center>11</td><td>MCLK</td><td>Output</td></tr>
-		<tr class=odd><td align=center>13</td><td>RX</td><td>Input</td></tr>
-		<tr class=odd><td align=center>30</td><td>RX</td><td>Input</td></tr>
-		<tr class=odd><td align=center>23</td><td>LRCLK</td><td>Output</td></tr>
+		<tr class=top><th>Teensy<br>3.2 Pin</th><th>Teensy<br>3.5/3.6 Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>9</td><td align=center>9</td><td>BCLK</td><td>Output</td></tr>
+		<tr class=odd><td align=center>11</td><td align=center>11</td><td>MCLK</td><td>Output</td></tr>
+		<tr class=odd><td align=center>13</td><td align=center>13</td><td>RX</td><td>Input</td></tr>
+		<tr class=odd><td align=center>30</td><td align=center>38</td><td>RX</td><td>Input</td></tr>
+		<tr class=odd><td align=center>23</td><td align=center>23</td><td>LRCLK</td><td>Output</td></tr>
 	</table>
 	<p>Audio from
 		master mode I2S may be used in the same project as ADC, DAC and
@@ -536,6 +536,12 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>Pin A2 is used for audio input.  This circuitry is recommended.</p>
 	<p align=center><img src="img/adccircuit.png"></p>
 	<p>Signal range is 0 to 1.2V</p>
+	<p>With a <a href="https://forum.pjrc.com/threads/40468-Help-with-Basic-Audio-Lib-results?p=126317&viewfull=1#post126317">small modification</a> Adafruit's <a href="https://www.adafruit.com/products/1063">MAX4466 microphone</a> can be used</p>
+	<p align=center><a href="https://forum.pjrc.com/threads/40468-Help-with-Basic-Audio-Lib-results?p=126317&viewfull=1#post126317"><img src="img/adccircuitmic.jpg" border=0></a></p>
+	<p>Control Voltage (CV) from +5V to -5V can be adapted with a
+		<a href="https://www.dorkbotpdx.org/blog/paul/control_voltage_cv_to_analog_input_pin">simple circuit</a>
+		or better <a href="https://forum.pjrc.com/threads/28423?p=71257&viewfull=1#post71257">opamp-based circuity</a>
+		to Teensy's 0-1.2V analog input range.</p>
 	<h3>Examples</h3>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughMono
 	</p>
@@ -591,6 +597,10 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>By default, pins A2 & A3 are used for audio input.  This circuitry is recommended.</p>
 	<p align=center><img src="img/adccircuit2.png"></p>
 	<p>Signal range is 0 to 1.2V</p>
+	<p>Control Voltage (CV) from +5V to -5V can be adapted with a
+		<a href="https://www.dorkbotpdx.org/blog/paul/control_voltage_cv_to_analog_input_pin">simple circuit</a>
+		or better <a href="https://forum.pjrc.com/threads/28423?p=71257&viewfull=1#post71257">opamp-based circuity</a>
+		to Teensy's 0-1.2V analog input range.</p>
 	<h3>Examples</h3>
 	<!--
 	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughMono
@@ -706,6 +716,10 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>USB input &amp; output does not cause the Teensy Audio Library to
 		update.  At least one non-USB input or output object must be
 		present for the entire library to update properly.</p>
+	<p>A known problem exists with USB audio from Macintosh computers.
+		An imperfect <a href="https://forum.pjrc.com/threads/34855-Distorted-audio-when-using-USB-input-on-Teensy-3-1?p=110392&viewfull=1#post110392">workaround
+		can be enabled by editing usb_audio.cpp</a>.
+		Find and uncomment "#define MACOSX_ADAPTIVE_LIMIT".</p>
 </script>
 <script type="text/x-red" data-template-name="AudioInputUSB">
 	<div class="form-row">
@@ -1144,6 +1158,10 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>USB input &amp; output does not cause the Teensy Audio Library to
 		update.  At least one non-USB input or output object must be
 		present for the entire library to update properly.</p>
+	<p>A known problem exists with USB audio from Macintosh computers.
+		An imperfect <a href="https://forum.pjrc.com/threads/34855-Distorted-audio-when-using-USB-input-on-Teensy-3-1?p=110392&viewfull=1#post110392">workaround
+		can be enabled by editing usb_audio.cpp</a>.
+		Find and uncomment "#define MACOSX_ADAPTIVE_LIMIT".</p>
 </script>
 <script type="text/x-red" data-template-name="AudioOutputUSB">
 	<div class="form-row">
@@ -1241,6 +1259,8 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p class=exam>File &gt; Examples &gt; Audio &gt; SamplePlayer
 	</p>
 	<h3>Notes</h3>
+	<p><a href="https://forum.pjrc.com/threads/42401-Instructions-or-tutorials-for-using-wav2sketch?p=135069&viewfull=1#post135069">Step by step instructions for wav2sketch</a>
+		running in Terminal on Macintosh.</p>
 	<p>TODO: supported sample rates: 11.025, 22.05, 44.1</p>
 	<p>TODO: ulaw vs uncompressed encoding</p>
 	<p>Polyphonic playback can be built by creating multiple
@@ -3204,7 +3224,9 @@ double s_freq = .0625;</p>
 	</p>
 	<p class=func><span class=keyword>adcHighPassFilterDisable</span>();</p>
 	<p class=desc>Completely disable the analog input filter.  DC and sub-audible
-		low frequencies are allowed to enter the digital signal.
+		low frequencies are allowed to enter the digital signal.  This
+		<a href="http://openaudio.blogspot.com/2017/03/teensy-audio-board-self-noise.html">may
+		reduce noise</a> in some cases.
 	</p>
 	<p class=func><span class=keyword>adcHighPassFilterEnable</span>();</p>
 	<p class=desc>Turn the DC-blocking filter back on, if disabled, or

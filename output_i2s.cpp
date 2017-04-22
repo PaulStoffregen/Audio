@@ -358,7 +358,7 @@ void AudioOutputI2Sslave::begin(void)
 	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
 	dma.TCD->NBYTES_MLNO = 2;
 	dma.TCD->SLAST = -sizeof(i2s_tx_buffer);
-	dma.TCD->DADDR = &I2S0_TDR0;
+	dma.TCD->DADDR = (void *)((uint32_t)&I2S0_TDR0 + 2);
 	dma.TCD->DOFF = 0;
 	dma.TCD->CITER_ELINKNO = sizeof(i2s_tx_buffer) / 2;
 	dma.TCD->DLASTSGA = 0;
@@ -369,7 +369,8 @@ void AudioOutputI2Sslave::begin(void)
 	update_responsibility = update_setup();
 	dma.enable();
 
-	I2S0_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE | I2S_TCSR_FR;
+	I2S0_TCSR = I2S_TCSR_SR;
+	I2S0_TCSR = I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
 	dma.attachInterrupt(isr);
 }
 
@@ -394,10 +395,10 @@ void AudioOutputI2Sslave::config_i2s(void)
 	I2S0_TCR2 = I2S_TCR2_SYNC(0) | I2S_TCR2_BCP;
 
 	I2S0_TCR3 = I2S_TCR3_TCE;
-	I2S0_TCR4 = I2S_TCR4_FRSZ(1) | I2S_TCR4_SYWD(15) | I2S_TCR4_MF
+	I2S0_TCR4 = I2S_TCR4_FRSZ(1) | I2S_TCR4_SYWD(31) | I2S_TCR4_MF
 		| I2S_TCR4_FSE | I2S_TCR4_FSP;
 
-	I2S0_TCR5 = I2S_TCR5_WNW(15) | I2S_TCR5_W0W(15) | I2S_TCR5_FBT(15);
+	I2S0_TCR5 = I2S_TCR5_WNW(31) | I2S_TCR5_W0W(31) | I2S_TCR5_FBT(31);
 
 	// configure receiver (sync'd to transmitter clocks)
 	I2S0_RMR = 0;
@@ -405,10 +406,10 @@ void AudioOutputI2Sslave::config_i2s(void)
 	I2S0_RCR2 = I2S_RCR2_SYNC(1) | I2S_TCR2_BCP;
 
 	I2S0_RCR3 = I2S_RCR3_RCE;
-	I2S0_RCR4 = I2S_RCR4_FRSZ(1) | I2S_RCR4_SYWD(15) | I2S_RCR4_MF
+	I2S0_RCR4 = I2S_RCR4_FRSZ(1) | I2S_RCR4_SYWD(31) | I2S_RCR4_MF
 		| I2S_RCR4_FSE | I2S_RCR4_FSP | I2S_RCR4_FSD;
 
-	I2S0_RCR5 = I2S_RCR5_WNW(15) | I2S_RCR5_W0W(15) | I2S_RCR5_FBT(15);
+	I2S0_RCR5 = I2S_RCR5_WNW(31) | I2S_RCR5_W0W(31) | I2S_RCR5_FBT(31);
 
 	// configure pin mux for 3 clock signals
 	CORE_PIN23_CONFIG = PORT_PCR_MUX(6); // pin 23, PTC2, I2S0_TX_FS (LRCLK)
