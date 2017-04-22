@@ -26,6 +26,7 @@
 
 #include "output_dac.h"
 #include "utility/pdb.h"
+#include "memcpy_audio.h"
 
 #if defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
 
@@ -137,10 +138,14 @@ void AudioOutputAnalog::isr(void)
 	block = AudioOutputAnalog::block_left_1st;
 	if (block) {
 		src = block->data;
+#if 0		
 		do {
 			// TODO: this should probably dither
 			*dest++ = ((*src++) + 32767) >> 4;
 		} while (dest < end);
+#else
+		memcpy_DAC(dest, src);
+#endif
 		AudioStream::release(block);
 		AudioOutputAnalog::block_left_1st = AudioOutputAnalog::block_left_2nd;
 		AudioOutputAnalog::block_left_2nd = NULL;
