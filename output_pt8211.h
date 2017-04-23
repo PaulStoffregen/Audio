@@ -29,8 +29,6 @@
 #ifndef output_pt8211_h_
 #define output_pt8211_h_
 
-	//uncomment to enable oversampling:
-#define AUDIO_PT8211_OVERSAMPLING
 	//uncomment ONE of these to define interpolation type for oversampling:
 // #define AUDIO_PT8211_INTERPOLATION_LINEAR
 #define AUDIO_PT8211_INTERPOLATION_CIC
@@ -54,7 +52,7 @@ protected:
 	static bool update_responsibility;
 	static DMAChannel dma;
 	static void isr(void)
-	#if defined(AUDIO_PT8211_OVERSAMPLING)
+	#if defined(AUDIO_OVERSAMPLING)
 		__attribute__((optimize("unroll-loops")))
 	#endif
 	;
