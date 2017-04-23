@@ -1,5 +1,5 @@
 /* Teensyduino Audio Memcpy
- * Copyright (c) 2016 Frank Bösing
+ * Copyright (c) 2016, 2017 Frank Bösing
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -238,6 +238,66 @@
 
 	pop	{r4-r11}
 	BX lr
+	
+	
+/* void memcpy_DAC(short *dst, short *src); */
+ .global	memcpy_DAC
+.thumb_func
+	memcpy_DAC:
+
+	@ r0: dst
+	@ r1: src
+	mov   r2, #0x80008000 //0x7fff7fff can not be loaded directly
+	sub   r2,r2, #0x10001	
+#if AUDIO_BLOCK_SAMPLES > 8
+	add   r3,r0,#(AUDIO_BLOCK_SAMPLES*2)
+	push  {r4-r11}
+	.align 2
+.loopDAC:
+ 
+	ldmia r1!, {r4-r11}	
+	add   r4, r4, r2
+	add   r5, r5, r2
+	add   r6, r6, r2
+	add   r7, r7, r2
+	add   r8, r8, r2
+	add   r9, r9, r2
+	add   r10, r10, r2
+	add   r11, r11, r2
+	lsrs  r4, r4, #4
+	lsrs  r5, r5, #4
+	lsrs  r6, r6, #4
+	lsrs  r7, r7, #4
+	lsrs  r8, r8, #4
+	lsrs  r9, r9, #4
+	lsrs  r10, r10, #4
+	lsrs  r11, r11, #4
+	stmia r0!, {r4-r11}
+
+	cmp r3, r0
+	bne .loopDAC
+
+	pop	{r4-r11}
+#elif AUDIO_BLOCK_SAMPLES == 8
+	push  {r4-r6}
+
+	ldmia r1!, {r3-r6}	
+	add   r3, r3, r2
+	add   r4, r4, r2
+	add   r5, r5, r2
+	add   r6, r6, r2
+	lsrs  r3, r3, #4
+	lsrs  r4, r4, #4
+	lsrs  r5, r5, #4
+	lsrs  r6, r6, #4
+	stmia r0!, {r3-r6}
+
+	pop	{r4-r6}
+#endif	
+	BX lr
+	
+	
+	
 .END
 
 #endif

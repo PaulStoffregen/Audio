@@ -26,10 +26,16 @@
 
 #include "output_dac.h"
 #include "utility/pdb.h"
+#include "memcpy_audio.h"
 
 #if defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
 
-DMAMEM static uint16_t dac_buffer[AUDIO_BLOCK_SAMPLES*2];
+
+#if defined(AUDIO_OVERSAMPLING)
+	DMAMEM static uint16_t dac_buffer[AUDIO_BLOCK_SAMPLES*4*2];
+#else
+	DMAMEM static uint16_t dac_buffer[AUDIO_BLOCK_SAMPLES*2];
+#endif
 audio_block_t * AudioOutputAnalog::block_left_1st = NULL;
 audio_block_t * AudioOutputAnalog::block_left_2nd = NULL;
 bool AudioOutputAnalog::update_responsibility = false;
@@ -111,14 +117,10 @@ void AudioOutputAnalog::update(void)
 	}
 }
 
-// TODO: the DAC has much higher bandwidth than the datasheet says
-// can we output a 2X oversampled output, for easier filtering?
-
 void AudioOutputAnalog::isr(void)
 {
-	const int16_t *src, *end;
 	int16_t *dest;
-	audio_block_t *block;
+	audio_block_t *blockL;
 	uint32_t saddr;
 
 	saddr = (uint32_t)(dma.TCD->SADDR);
@@ -126,33 +128,93 @@ void AudioOutputAnalog::isr(void)
 	if (saddr < (uint32_t)dac_buffer + sizeof(dac_buffer) / 2) {
 		// DMA is transmitting the first half of the buffer
 		// so we must fill the second half
-		dest = (int16_t *)&dac_buffer[AUDIO_BLOCK_SAMPLES];
-		end = (int16_t *)&dac_buffer[AUDIO_BLOCK_SAMPLES*2];
+		#if defined(AUDIO_OVERSAMPLING)
+			dest = (int16_t *)&dac_buffer[(AUDIO_BLOCK_SAMPLES)*4];
+		#else
+			dest = (int16_t *)&dac_buffer[AUDIO_BLOCK_SAMPLES];
+		#endif		
 	} else {
 		// DMA is transmitting the second half of the buffer
 		// so we must fill the first half
-		dest = (int16_t *)dac_buffer;
-		end = (int16_t *)&dac_buffer[AUDIO_BLOCK_SAMPLES];
+		dest = (int16_t *)&dac_buffer[0];
 	}
-	block = AudioOutputAnalog::block_left_1st;
-	if (block) {
-		src = block->data;
-		do {
-			// TODO: this should probably dither
-			*dest++ = ((*src++) + 32767) >> 4;
-		} while (dest < end);
-		AudioStream::release(block);
+
+	blockL = AudioOutputAnalog::block_left_1st;
+	
+	#if defined(AUDIO_OVERSAMPLING)
+		static int16_t oldL = 0;
+		static int16_t combLOld[2] = {0,0};
+		int16_t combL[3];		
+		static int16_t integrateLOld[3] = {0,0,0};				
+		int16_t integrateL[3];
+	#endif
+	if (blockL) {
+		#if defined(AUDIO_OVERSAMPLING)
+				for (int i=0; i< AUDIO_BLOCK_SAMPLES; i++) {
+					int16_t valL = (blockL->data[i] + 32767) >> 4;					
+					combL[0] = valL - oldL;
+					combL[1] = combL[0] - combLOld[0];
+					combL[2] = combL[1] - combLOld[1];
+					// combL[2] now holds input val
+					combLOld[0] = combL[0];
+					combLOld[1] = combL[1];
+					
+					integrateL[0] =  combL[2] + integrateLOld[0];
+					integrateL[1] = integrateL[0] + integrateLOld[1];
+					integrateL[2] = integrateL[1] + integrateLOld[2];
+					// integrateL[2] now holds j'th upsampled value
+					*dest++ = integrateL[2] >> 4;
+					integrateLOld[0] = integrateL[0];
+					integrateLOld[1] = integrateL[1];
+					integrateLOld[2] = integrateL[2];					
+
+					integrateL[0] = integrateLOld[0];
+					integrateL[1] = integrateL[0] + integrateLOld[1];
+					integrateL[2] = integrateL[1] + integrateLOld[2];
+					// integrateL[2] now holds j'th upsampled value
+					*dest++ = integrateL[2] >> 4;
+					integrateLOld[0] = integrateL[0];
+					integrateLOld[1] = integrateL[1];
+					integrateLOld[2] = integrateL[2];					
+
+					integrateL[0] = integrateLOld[0];
+					integrateL[1] = integrateL[0] + integrateLOld[1];
+					integrateL[2] = integrateL[1] + integrateLOld[2];
+					// integrateL[2] now holds j'th upsampled value
+					*dest++ = integrateL[2] >> 4;
+					integrateLOld[0] = integrateL[0];
+					integrateLOld[1] = integrateL[1];
+					integrateLOld[2] = integrateL[2];					
+
+					integrateL[0] = integrateLOld[0];
+					integrateL[1] = integrateL[0] + integrateLOld[1];
+					integrateL[2] = integrateL[1] + integrateLOld[2];
+					// integrateL[2] now holds j'th upsampled value
+					*dest++ = integrateL[2] >> 4;
+					integrateLOld[0] = integrateL[0];
+					integrateLOld[1] = integrateL[1];
+					integrateLOld[2] = integrateL[2];					
+					
+					oldL = valL;
+				}
+			
+		#else /*
+			for (int i=0; i< AUDIO_BLOCK_SAMPLES; i++) {
+				*dest++ = (blockL->data[i] + 32767) >> 4;
+			}*/
+			memcpy_DAC(dest, blockL->data);	
+			
+		#endif
+		AudioStream::release(blockL);
 		AudioOutputAnalog::block_left_1st = AudioOutputAnalog::block_left_2nd;
 		AudioOutputAnalog::block_left_2nd = NULL;
-	} else {
-		do {
-			*dest++ = 2047;
-		} while (dest < end);
+	}  else {
+		memset(dest,0,sizeof(dac_buffer) / 2);
 	}
+
 	if (AudioOutputAnalog::update_responsibility) AudioStream::update_all();
+
 }
-
-
 
 #elif defined (__MKL26Z64__)
 
