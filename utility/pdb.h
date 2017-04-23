@@ -30,7 +30,7 @@
 #include "kinetis.h"
 
 //TODO This should go into AudioStream.h !!!
-#define AUDIO_OVERSAMPLING
+#define AUDIO_OVERSAMPLING 1
 
 
 // Multiple input & output objects use the Programmable Delay Block
@@ -39,7 +39,7 @@
 
 #define PDB_CONFIG (PDB_SC_TRGSEL(15) | PDB_SC_PDBEN | PDB_SC_CONT | PDB_SC_PDBIE | PDB_SC_DMAEN)
 
-#if defined(AUDIO_OVERSAMPLING)
+#if AUDIO_OVERSAMPLING
 #define PDB_PERIOD ((int) (F_BUS / (AUDIO_SAMPLE_RATE_EXACT * 4) -0.5f) ) 
 #else
 #define PDB_PERIOD ((int) (F_BUS / AUDIO_SAMPLE_RATE_EXACT -0.5f) ) 
