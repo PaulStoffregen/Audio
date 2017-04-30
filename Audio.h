@@ -111,5 +111,6 @@
 #include "synth_pinknoise.h"
 #include "synth_karplusstrong.h"
 #include "synth_simple_drum.h"
+#include "synth_pwm.h"
 
 #endif

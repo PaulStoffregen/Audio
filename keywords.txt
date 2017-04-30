@@ -57,6 +57,7 @@ AudioSynthWaveformSine	KEYWORD2
 AudioSynthWaveformSineHires	KEYWORD2
 AudioSynthWaveformSineModulated	KEYWORD2
 AudioSynthWaveformDc	KEYWORD2
+AudioSynthWaveformPWM	KEYWORD2
 AudioSynthNoiseWhite	KEYWORD2
 AudioSynthNoisePink	KEYWORD2
 AudioSynthKarplusStrong	KEYWORD2
