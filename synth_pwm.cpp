@@ -48,25 +48,30 @@ void AudioSynthWaveformPWM::update(void)
 		return;
 	}
 	if (modinput) {
+		const uint32_t _duration = duration;
+		uint32_t _elapsed = elapsed;
+		int32_t _magnitude = magnitude;
 		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
-			elapsed += 65536;
+			_elapsed += 65536;
 			int32_t in = modinput->data[i];
-			if (magnitude < 0) in = -in;
-			uint32_t dur = ((uint64_t)(in + 32768) * duration) >> 15;
-			if (elapsed < dur) {
-				out = magnitude;
+			if (_magnitude < 0) in = -in;
+			uint32_t dur = ((uint64_t)(in + 32768) * _duration) >> 15;
+			if (_elapsed < dur) {
+				out = _magnitude;
 			} else {
-				int32_t e = elapsed - dur;
+				int32_t e = _elapsed - dur;
+				signed_saturate_rshift(e, 17, 0);
 				if (e < 0) e = 0;
-				else if (e > 65535) e = 65535;
-				elapsed = e;
+				_elapsed = e;
 				// elapsed must be 0 to 65535
 				// magnitude must be -32767 to +32767
-				out = magnitude - ((magnitude * elapsed * 2) >> 16);
-				magnitude = -magnitude;
+				out = _magnitude - ((_magnitude * _elapsed) >> 15);
+				_magnitude = -_magnitude;
 			}
 			block->data[i] = out;
 		}
+		elapsed = _elapsed;
+		magnitude = _magnitude;
 		release(modinput);
 	} else {
 		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
@@ -77,7 +82,7 @@ void AudioSynthWaveformPWM::update(void)
 				elapsed -= duration;
 				// elapsed must be 0 to 65535
 				// magnitude must be -32767 to +32767
-				out = magnitude - ((magnitude * elapsed * 2) >> 16);
+				out = magnitude - ((magnitude * elapsed) >> 15);
 				magnitude = -magnitude;
 			}
 			block->data[i] = out;
