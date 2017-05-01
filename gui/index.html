@@ -349,6 +349,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioInputAnalog","data":{"defaults":{"name":{"value":"new"}},"shortName":"adc","inputs":0,"outputs":1,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputAnalogStereo","data":{"defaults":{"name":{"value":"new"}},"shortName":"adcs","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputI2Sslave","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2sslave","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputTDM","data":{"defaults":{"name":{"value":"new"}},"shortName":"tdm","inputs":0,"outputs":16,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputUSB","data":{"defaults":{"name":{"value":"new"}},"shortName":"usb","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputI2S","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputI2SQuad","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_quad","inputs":4,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -358,6 +359,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioOutputAnalogStereo","data":{"defaults":{"name":{"value":"new"}},"shortName":"dacs","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputPWM","data":{"defaults":{"name":{"value":"new"}},"shortName":"pwm","inputs":1,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputI2Sslave","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2sslave","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputTDM","data":{"defaults":{"name":{"value":"new"}},"shortName":"tdm","inputs":16,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputUSB","data":{"defaults":{"name":{"value":"new"}},"shortName":"usb","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioMixer4","data":{"defaults":{"name":{"value":"new"}},"shortName":"mixer","inputs":4,"outputs":1,"category":"mixer-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioPlayMemory","data":{"defaults":{"name":{"value":"new"}},"shortName":"playMem","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -372,6 +374,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioSynthWaveformSineHires","data":{"defaults":{"name":{"value":"new"}},"shortName":"sine_hires","inputs":0,"outputs":2,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveformSineModulated","data":{"defaults":{"name":{"value":"new"}},"shortName":"sine_fm","inputs":1,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveform","data":{"defaults":{"name":{"value":"new"}},"shortName":"waveform","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioSynthWaveformPWM","data":{"defaults":{"name":{"value":"new"}},"shortName":"pwm","inputs":1,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthToneSweep","data":{"defaults":{"name":{"value":"new"}},"shortName":"tonesweep","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveformDc","data":{"defaults":{"name":{"value":"new"}},"shortName":"dc","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthNoiseWhite","data":{"defaults":{"name":{"value":"new"}},"shortName":"noise","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -400,7 +403,8 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioControlAK4558","data":{"defaults":{"name":{"value":"new"}},"shortName":"ak4558","inputs":0,"outputs":0,"category":"control-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioControlCS4272","data":{"defaults":{"name":{"value":"new"}},"shortName":"cs4272","inputs":0,"outputs":0,"category":"control-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioControlWM8731","data":{"defaults":{"name":{"value":"new"}},"shortName":"wm8731","inputs":0,"outputs":0,"category":"control-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioControlWM8731master","data":{"defaults":{"name":{"value":"new"}},"shortName":"wm8731m","inputs":0,"outputs":0,"category":"control-function","color":"#E6E0F8","icon":"arrow-in.png"}}
+		{"type":"AudioControlWM8731master","data":{"defaults":{"name":{"value":"new"}},"shortName":"wm8731m","inputs":0,"outputs":0,"category":"control-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioControlCS42448","data":{"defaults":{"name":{"value":"new"}},"shortName":"cs42448","inputs":0,"outputs":0,"category":"control-function","color":"#E6E0F8","icon":"arrow-in.png"}}
 	]}
 </script>
 
@@ -687,6 +691,70 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</div>
 </script>
 
+<script type="text/x-red" data-help-name="AudioInputTDM">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Receive a 256 bit Time Division Multiplexed frame containing
+		many audio channels.</p>
+	<p align=center><img src="img/tdm.jpg"></p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Bits 0 to 15</td></tr>
+		<tr class=odd><td align=center>Out 1</td><td>Bits 16 to 31</td></tr>
+		<tr class=odd><td align=center>Out 2</td><td>Bits 32 to 47</td></tr>
+		<tr class=odd><td align=center>Out 3</td><td>Bits 48 to 63</td></tr>
+		<tr class=odd><td align=center>Out 4</td><td>Bits 64 to 79</td></tr>
+		<tr class=odd><td align=center>Out 5</td><td>Bits 80 to 95</td></tr>
+		<tr class=odd><td align=center>Out 6</td><td>Bits 96 to 111</td></tr>
+		<tr class=odd><td align=center>Out 7</td><td>Bits 112 to 127</td></tr>
+		<tr class=odd><td align=center>Out 8</td><td>Bits 128 to 143</td></tr>
+		<tr class=odd><td align=center>Out 9</td><td>Bits 144 to 159</td></tr>
+		<tr class=odd><td align=center>Out 10</td><td>Bits 160 to 175</td></tr>
+		<tr class=odd><td align=center>Out 11</td><td>Bits 176 to 191</td></tr>
+		<tr class=odd><td align=center>Out 12</td><td>Bits 192 to 207</td></tr>
+		<tr class=odd><td align=center>Out 13</td><td>Bits 208 to 223</td></tr>
+		<tr class=odd><td align=center>Out 14</td><td>Bits 224 to 239</td></tr>
+		<tr class=odd><td align=center>Out 15</td><td>Bits 240 to 255</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from the TDM hardware to its 16 output ports.</p>
+	<h3>Hardware</h3>
+	<p>TDM has been tested with this <a href="https://oshpark.com/shared_projects/2Yj6rFaW">
+		CS42448 Circuit Board</a>.  It may also work with
+		<a href="https://forum.pjrc.com/threads/42894">Invensense ICS-52000 microphones</a>.
+		</p>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>9</td><td>BCLK</td><td>Output, 11.3 MHz</td></tr>
+		<tr class=odd><td align=center>11</td><td>MCLK</td><td>Output, 22.6 MHz</td></tr>
+		<tr class=odd><td align=center>13</td><td>RX</td><td>Input, 11.3 Mbit/sec</td></tr>
+		<tr class=odd><td align=center>23</td><td>FS</td><td>Output</td></tr>
+	</table>
+	<p>Audio from
+		master mode TDM may be used in the same project as ADC, DAC and
+		PWM signals, because all remain in sync to Teensy's timing</p>
+	<!--<h3>Examples</h3>-->
+	<h3>Notes</h3>
+	<p>Only one TDM input and one TDM output object may be used.  The
+		I2S hardware is used by TDM, so TDM objects may not be used
+		together with I2S, SPDIF or PT8211.</p>
+	<p>When used with TDM devices which transmit 32 bit audio, the
+		even numbered channels will contain the useful upper 16
+		bits of audio data.</p>
+	<p>AudioMemory should be at least 16.  Even if most channels are
+		unused, this TDM object will need to allocate 16 blocks of
+		memory.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioInputTDM">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
 <script type="text/x-red" data-help-name="AudioInputUSB">
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
@@ -912,7 +980,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		<tr class=top><th>Pin</th><th>Signal</th><th>Direction</th></tr>
 		<tr class=odd><td align=center>9</td><td>BCK</td><td>Output</td></tr>
 		<tr class=odd><td align=center>22</td><td>DIN</td><td>Output</td></tr>
-		<tr class=odd><td align=center>23</td><td>WS</td><td>Output</td></tr>
+		<tr class=odd><td align=center>23</td><td>FS</td><td>Output</td></tr>
 	</table>
 	<p>More information can be found in the PT8211 datasheet.
 		</p>
@@ -1123,6 +1191,65 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioOutputI2Sslave">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioOutputTDM">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Transmit a 256 bit Time Division Multiplexed frame containing
+		many audio channels.</p>
+	<p align=center><img src="img/tdm.jpg"></p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Bits 0 to 15</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Bits 16 to 31</td></tr>
+		<tr class=odd><td align=center>In 2</td><td>Bits 32 to 47</td></tr>
+		<tr class=odd><td align=center>In 3</td><td>Bits 48 to 63</td></tr>
+		<tr class=odd><td align=center>In 4</td><td>Bits 64 to 79</td></tr>
+		<tr class=odd><td align=center>In 5</td><td>Bits 80 to 95</td></tr>
+		<tr class=odd><td align=center>In 6</td><td>Bits 96 to 111</td></tr>
+		<tr class=odd><td align=center>In 7</td><td>Bits 112 to 127</td></tr>
+		<tr class=odd><td align=center>In 8</td><td>Bits 128 to 143</td></tr>
+		<tr class=odd><td align=center>In 9</td><td>Bits 144 to 159</td></tr>
+		<tr class=odd><td align=center>In 10</td><td>Bits 160 to 175</td></tr>
+		<tr class=odd><td align=center>In 11</td><td>Bits 176 to 191</td></tr>
+		<tr class=odd><td align=center>In 12</td><td>Bits 192 to 207</td></tr>
+		<tr class=odd><td align=center>In 13</td><td>Bits 208 to 223</td></tr>
+		<tr class=odd><td align=center>In 14</td><td>Bits 224 to 239</td></tr>
+		<tr class=odd><td align=center>In 15</td><td>Bits 240 to 255</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from its 16 input ports to the TDM hardware.</p>
+	<h3>Hardware</h3>
+	<p>TDM has been tested with this <a href="https://oshpark.com/shared_projects/2Yj6rFaW">
+		CS42448 Circuit Board</a>.
+		</p>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>9</td><td>BCLK</td><td>Output, 11.3 MHz</td></tr>
+		<tr class=odd><td align=center>11</td><td>MCLK</td><td>Output, 22.6 MHz</td></tr>
+		<tr class=odd><td align=center>22</td><td>TX</td><td>Input, 11.3 Mbit/sec</td></tr>
+		<tr class=odd><td align=center>23</td><td>WS</td><td>Output</td></tr>
+	</table>
+	<p>Audio from
+		master mode TDM may be used in the same project as ADC, DAC and
+		PWM signals, because all remain in sync to Teensy's timing</p>
+	<!--<h3>Examples</h3>-->
+	<h3>Notes</h3>
+	<p>Only one TDM input and one TDM output object may be used.  The
+		I2S hardware is used by TDM, so TDM objects may not be used
+		together with I2S, SPDIF or PT8211.</p>
+	<p>When used with TDM devices which receive 32 bit audio, the
+		even numbered channels are used for the top 16 bits.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioOutputTDM">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1841,6 +1968,47 @@ The actual packets are taken
 	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioSynthWaveform">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioSynthWaveformPWM">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Create a Pulse Width Modulated waveform, with an audio signal
+		controlling the pulse width duty cycle.</p>
+	<p align=center><img src="img/pwm.png"></p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Control Signal Output</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Waveform Output</td></tr>
+	</table>
+	<p>The duty cycle is 50% when the control waveform is zero.
+		As the control input causes a linear changes in PWM duty
+		cycle, from nearly 0 to 100% over -1.0 to +1.0 range.
+		See the notes below for minimum and maximum limitations.
+	</p>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>frequency</span>(freq);</p>
+	<p class=desc>Change the frequency.
+	</p>
+	<p class=func><span class=keyword>amplitude</span>(level);</p>
+	<p class=desc>Change the amplitude.  Set to 0 to turn the signal off.
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>TODO, examples needed
+	</p>
+	<h3>Notes</h3>
+	<p>The maximum duty cycle is 65536 samples high followed by
+		one sample low (99.9985%) and the minimum duty cycle is
+		1 sample high followed by 65536 samples low (0.00153%).
+	</p>
+</script>
+<script type="text/x-red" data-template-name="AudioSynthWaveformPWM">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -3655,6 +3823,48 @@ value  frequency
 	</div>
 </script>
 
+<script type="text/x-red" data-help-name="AudioControlCS42448">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Control the CS42448 chip in TDM mode, for 6 inputs and 8 outputs.
+	</p>
+	<p align=center><img src="img/cs42448.jpg"></p>
+	</div>
+	</div>
+	<h3>Audio Connections</h3>
+	<p>This object has no audio inputs or outputs.  Separate TDM objects
+		are used to send and receive audio data.
+	</p>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>enable</span>();</p>
+	<p class=desc>Enables the CS42448 to work in TDM mode.
+	</p>
+	<p class=func><span class=keyword>volume</span>(level);</p>
+	<p class=desc>Set the volume level for all output channels. Range is 0 to 1.0.
+	</p>
+	<p class=func><span class=keyword>volume</span>(channel, level);</p>
+	<p class=desc>Set the volume level for a single output. Channel is 1 to 8.  Range is 0 to 1.0.
+	</p>
+	<p class=func><span class=keyword>inputLevel</span>(level);</p>
+	<p class=desc>Set the input gain level for all input channels. Range is 0 to 15.85.
+	</p>
+	<p class=func><span class=keyword>inputLevel</span>(channel, level);</p>
+	<p class=desc>Set the input gain level for a single input. Channel is 1 to 6. Range is 0 to 15.85.
+	</p>
+	<h3>Hardware</h3>
+	<p>Tested with this <a href="https://oshpark.com/shared_projects/2Yj6rFaW">
+		CS42448 Circuit Board</a>.
+	</p>
+	<p align=center><img src="img/tdm.jpg"></p>
+	</div>
+	<h3>Notes</h3>
+</script>
+<script type="text/x-red" data-template-name="AudioControlCS42448">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
 
 
 
