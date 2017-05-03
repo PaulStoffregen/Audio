@@ -72,7 +72,7 @@ private:
 	uint16_t milliseconds2count(float milliseconds) {
 		if (milliseconds < 0.0) milliseconds = 0.0;
 		uint32_t c = ((uint32_t)(milliseconds*SAMPLES_PER_MSEC)+7)>>3;
-		if (c > 1103) return 1103; // allow up to 200 ms
+		// if (c > 1103) return 1103; // allow up to 200 ms
 		return c;
 	}
 	audio_block_t *inputQueueArray[1];
