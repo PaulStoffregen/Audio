@@ -1,5 +1,5 @@
 /* Audio Library for Teensy 3.X
- * Copyright (c) 2014, Paul Stoffregen, paul@pjrc.com
+ * Copyright (c) 2017, Paul Stoffregen, paul@pjrc.com
  *
  * Development of this audio library was funded by PJRC.COM, LLC by sales of
  * Teensy and Audio Adaptor boards.  Please support PJRC's efforts to develop
@@ -37,15 +37,15 @@
 void AudioEffectEnvelope::noteOn(void)
 {
 	__disable_irq();
-	mult = 0;
+	mult_hires = 0;
 	count = delay_count;
 	if (count > 0) {
 		state = STATE_DELAY;
-		inc = 0;
+		inc_hires = 0;
 	} else {
 		state = STATE_ATTACK;
 		count = attack_count;
-		inc = (0x10000 / count) >> 3;
+		inc_hires = 0x40000000 / (int32_t)count;
 	}
 	__enable_irq();
 }
@@ -53,10 +53,11 @@ void AudioEffectEnvelope::noteOn(void)
 void AudioEffectEnvelope::noteOff(void)
 {
 	__disable_irq();
-	state = STATE_RELEASE;
-	count = release_count;
-	mult = sustain_mult;
-	inc = (-mult / ((int32_t)count << 3));
+	if (state != STATE_IDLE) {
+		state = STATE_RELEASE;
+		count = release_count;
+		inc_hires = (-mult_hires) / (int32_t)count;
+	}
 	__enable_irq();
 }
 
@@ -82,24 +83,24 @@ void AudioEffectEnvelope::update(void)
 				count = hold_count;
 				if (count > 0) {
 					state = STATE_HOLD;
-					mult = 0x10000;
-					inc = 0;
+					mult_hires = 0x40000000;
+					inc_hires = 0;
 				} else {
-					count = decay_count;
 					state = STATE_DECAY;
-					inc = ((sustain_mult - 0x10000) / ((int32_t)count << 3));
+					count = decay_count;
+					inc_hires = (sustain_mult - 0x40000000) / (int32_t)count;
 				}
 				continue;
 			} else if (state == STATE_HOLD) {
 				state = STATE_DECAY;
 				count = decay_count;
-				inc = ((sustain_mult - 0x10000) / (int32_t)count) >> 3;
+				inc_hires = (sustain_mult - 0x40000000) / (int32_t)count;
 				continue;
 			} else if (state == STATE_DECAY) {
 				state = STATE_SUSTAIN;
 				count = 0xFFFF;
-				mult = sustain_mult;
-				inc = 0;
+				mult_hires = sustain_mult;
+				inc_hires = 0;
 			} else if (state == STATE_SUSTAIN) {
 				count = 0xFFFF;
 			} else if (state == STATE_RELEASE) {
@@ -114,11 +115,14 @@ void AudioEffectEnvelope::update(void)
 			} else if (state == STATE_DELAY) {
 				state = STATE_ATTACK;
 				count = attack_count;
-				inc = (0x10000 / count) >> 3;
+				inc_hires = 0x40000000 / count;
 				continue;
 			}
 		}
-		// process 8 samples, using only mult and inc
+
+		int32_t mult = mult_hires >> 14;
+		int32_t inc = inc_hires >> 17;
+		// process 8 samples, using only mult and inc (16 bit resolution)
 		sample12 = *p++;
 		sample34 = *p++;
 		sample56 = *p++;
@@ -148,6 +152,9 @@ void AudioEffectEnvelope::update(void)
 		*p++ = sample34;
 		*p++ = sample56;
 		*p++ = sample78;
+		// adjust the long-term gain using 30 bit resolution (fix #102)
+		// https://github.com/PaulStoffregen/Audio/issues/102
+		mult_hires += inc_hires;
 		count--;
 	}
 	transmit(block);
