@@ -389,6 +389,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioEffectDelayExternal","data":{"defaults":{"name":{"value":"new"}},"shortName":"delayExt","inputs":1,"outputs":8,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectBitcrusher","data":{"shortName":"bitcrusher","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectMidSide","data":{"shortName":"midside","inputs":2,"outputs":2,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectWaveshaper","data":{"shortName":"waveshape","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioFilterBiquad","data":{"defaults":{"name":{"value":"new"}},"shortName":"biquad","inputs":1,"outputs":1,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioFilterFIR","data":{"defaults":{"name":{"value":"new"}},"shortName":"fir","inputs":1,"outputs":1,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioFilterStateVariable","data":{"defaults":{"name":{"value":"new"}},"shortName":"filter","inputs":2,"outputs":3,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -2686,6 +2687,44 @@ double s_freq = .0625;</p>
 	<p>Right = Mid-Side</p>
 </script>
 <script type="text/x-red" data-template-name="AudioEffectMidSide">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioEffectWaveshaper">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Modify the waveform shape of a signal.</p>
+	<p align=center><img src="img/waveshaper.png"></p>
+	<p>Useful for overdrive, distortion, fuzz,
+		clipping, expo converters, phase inversion, waveform modification &amp; adjustments.
+	</p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Signal</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Original Input Signal</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Shaped Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>shape</span>(array, length);</p>
+	<p class=desc>Configure the waveform shape.  Array is a list of float
+		numbers, given in order.  The first number maps to input -1.0.  The
+		last maps to input +1.0.  The numbers represent the desired output
+		level at each of these input levels.  Length must be 2, 3, 5, 9, 17,
+		33, 65, 129, 257, 513, 1025, 2049, 4097, 8193, 16385, or 32769.
+		</p>
+
+	<h3>Examples</h3>
+	<p class=exam>TODO: example needed</p>
+	<!--<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Mid_Side</p>-->
+	<h3>Notes</h3>
+	<p><a href="https://github.com/dxinteractive/TeensyAudioWaveshaper">More information</a>
+		</p>
+</script>
+<script type="text/x-red" data-template-name="AudioEffectWaveshaper">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
