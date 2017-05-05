@@ -1315,10 +1315,11 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>gain</span>(channel, level);</p>
 	<p class=desc>Adjust the amplification or attenuation.  "channel" must
-		be 0 to 3.  "level" may be any floating point number from 0 to 32767.
+		be 0 to 3.  "level" may be any floating point number from 0 to 32767.0.
 		1.0 passes the signal through directly.  Level of 0 shuts the channel
 		off completely.  Between 0 to 1.0 attenuates the signal, and above
-		1.0 amplifies it.  All 4 channels have separate settings.
+		1.0 amplifies it.  Negative numbers may also be used, to invert the
+		signal.  All 4 channels have separate gain settings.
 	</p>
 	<h3>Examples</h3>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; SamplePlayer
