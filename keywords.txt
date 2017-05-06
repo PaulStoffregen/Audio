@@ -36,6 +36,7 @@ AudioEffectDelayExternal	KEYWORD2
 AudioEffectBitcrusher	KEYWORD2
 AudioEffectReverb	KEYWORD2
 AudioEffectMidSide	KEYWORD2
+AudioEffectWaveshaper	KEYWORD2
 AudioFilterBiquad	KEYWORD2
 AudioFilterFIR	KEYWORD2
 AudioFilterStateVariable	KEYWORD2
@@ -154,6 +155,7 @@ encode	KEYWORD2
 decode	KEYWORD2
 secondMix	KEYWORD2
 pitchMod	KEYWORD2
+shape	KEYWORD2
 
 AudioMemoryUsage	KEYWORD2
 AudioMemoryUsageMax	KEYWORD2
