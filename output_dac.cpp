@@ -137,10 +137,23 @@ void AudioOutputAnalog::isr(void)
 	block = AudioOutputAnalog::block_left_1st;
 	if (block) {
 		src = block->data;
+#if 0		
 		do {
 			// TODO: this should probably dither
 			*dest++ = ((*src++) + 32767) >> 4;
 		} while (dest < end);
+#else		
+		int i = AUDIO_BLOCK_SAMPLES/8;
+		const uint32_t ofs  = (32767 << 16) | 32767;
+		uint32_t * src32 = (uint32_t *) src;
+		uint32_t * dest32 = (uint32_t *) dest;
+		do {					
+			*dest32++ = ((*src32++ + ofs) >> 4) /* & 0x3fff3fff*/; // "&" not needed, DAC is 12 bit
+			*dest32++ = ((*src32++ + ofs) >> 4) /* & 0x3fff3fff*/;
+			*dest32++ = ((*src32++ + ofs) >> 4) /* & 0x3fff3fff*/;
+			*dest32++ = ((*src32++ + ofs) >> 4) /* & 0x3fff3fff*/;			
+		} while (--i);
+#endif				
 		AudioStream::release(block);
 		AudioOutputAnalog::block_left_1st = AudioOutputAnalog::block_left_2nd;
 		AudioOutputAnalog::block_left_2nd = NULL;
