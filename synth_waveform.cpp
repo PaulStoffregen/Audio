@@ -53,7 +53,7 @@ void AudioSynthWaveform::update(void)
     bp = block->data;
     switch(tone_type) {
     case WAVEFORM_SINE:
-      for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
+	  for(int i = 0;i < AUDIO_BLOCK_SAMPLES;++i) {
       	// Calculate interpolated sin
 		index = tone_phase >> 23;
 		val1 = AudioWaveformSine[index];
@@ -77,7 +77,7 @@ void AudioSynthWaveform::update(void)
 		return;
       }
       // len = 256
-      for (int i = 0; i < AUDIO_BLOCK_SAMPLES;i++) {
+	  for (int i = 0; i < AUDIO_BLOCK_SAMPLES;++i) {
 		index = tone_phase >> 23;
 		val1 = *(arbdata + index);
 		val2 = *(arbdata + ((index + 1) & 255));
@@ -92,7 +92,7 @@ void AudioSynthWaveform::update(void)
       break;
       
     case WAVEFORM_SQUARE:
-      for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
+	  for(int i = 0;i < AUDIO_BLOCK_SAMPLES;++i) {
         if(tone_phase & 0x40000000)*bp++ = -tone_amp;
         else *bp++ = tone_amp;
         // phase and incr are both unsigned 32-bit fractions
@@ -101,7 +101,7 @@ void AudioSynthWaveform::update(void)
       break;
       
     case WAVEFORM_SAWTOOTH:
-      for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
+	  for(int i = 0;i < AUDIO_BLOCK_SAMPLES;++i) {
         *bp++ = ((short)(tone_phase>>15)*tone_amp) >> 15;
         // phase and incr are both unsigned 32-bit fractions
         tone_phase += tone_incr;    
@@ -109,7 +109,7 @@ void AudioSynthWaveform::update(void)
       break;
 
     case WAVEFORM_SAWTOOTH_REVERSE:
-      for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
+	  for(int i = 0;i < AUDIO_BLOCK_SAMPLES;++i+) {
         *bp++ = ((short)(tone_phase>>15)*tone_amp) >> 15;
          // phase and incr are both unsigned 32-bit fractions
          tone_phase -= tone_incr;
@@ -117,7 +117,7 @@ void AudioSynthWaveform::update(void)
       break;
 
     case WAVEFORM_TRIANGLE:
-      for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
+	  for(int i = 0;i < AUDIO_BLOCK_SAMPLES;++i) {
         if(tone_phase & 0x80000000) {
           // negative half-cycle
           tmp_amp = -tone_amp;
@@ -138,7 +138,7 @@ void AudioSynthWaveform::update(void)
       break;
       
     case WAVEFORM_PULSE:
-      for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
+	  for(int i = 0;i < AUDIO_BLOCK_SAMPLES;++i) {
         if(tone_phase < tone_width)*bp++ = -tone_amp;
         else *bp++ = tone_amp;
         tone_phase += tone_incr;
@@ -146,7 +146,7 @@ void AudioSynthWaveform::update(void)
       break;
       
     case WAVEFORM_SAMPLE_HOLD:
-      for(int i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
+	  for(int i = 0;i < AUDIO_BLOCK_SAMPLES;++i) {
         if(tone_phase < tone_incr) {
           sample = random(-tone_amp, tone_amp);
         }

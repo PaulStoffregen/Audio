@@ -35,7 +35,7 @@ static void copy_to_fft_buffer(void *destination, const void *source)
 	const uint16_t *src = (const uint16_t *)source;
 	uint32_t *dst = (uint32_t *)destination;
 
-	for (int i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+	for (int i=0; i < AUDIO_BLOCK_SAMPLES; ++i) {
 		*dst++ = *src++;  // real sample plus a zero for imaginary
 	}
 }
@@ -45,7 +45,7 @@ static void apply_window_to_fft_buffer(void *buffer, const void *window)
 	int16_t *buf = (int16_t *)buffer;
 	const int16_t *win = (int16_t *)window;;
 
-	for (int i=0; i < 256; i++) {
+	for (int i=0; i < 256; ++i) {
 		int32_t val = *buf * *win++;
 		//*buf = signed_saturate_rshift(val, 16, 15);
 		*buf = val >> 15;
@@ -73,13 +73,13 @@ void AudioAnalyzeFFT256::update(void)
 	// G. Heinzel's paper says we're supposed to average the magnitude
 	// squared, then do the square root at the end.
 	if (count == 0) {
-		for (int i=0; i < 128; i++) {
+		for (int i=0; i < 128; ++i) {
 			uint32_t tmp = *((uint32_t *)buffer + i);
 			uint32_t magsq = multiply_16tx16t_add_16bx16b(tmp, tmp);
 			sum[i] = magsq / naverage;
 		}
 	} else {
-		for (int i=0; i < 128; i++) {
+		for (int i=0; i < 128; ++i) {
 			uint32_t tmp = *((uint32_t *)buffer + i);
 			uint32_t magsq = multiply_16tx16t_add_16bx16b(tmp, tmp);
 			sum[i] += magsq / naverage;
@@ -87,7 +87,7 @@ void AudioAnalyzeFFT256::update(void)
 	}
 	if (++count == naverage) {
 		count = 0;
-		for (int i=0; i < 128; i++) {
+		for (int i=0; i < 128; ++i) {
 			output[i] = sqrt_uint32_approx(sum[i]);
 		}
 		outputflag = true;

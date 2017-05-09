@@ -109,7 +109,7 @@ void AudioMixer4::update(void)
 	audio_block_t *in, *out=NULL;
 	unsigned int channel;
 
-	for (channel=0; channel < 4; channel++) {
+	for (channel=0; channel < 4; ++channel) {
 		if (!out) {
 			out = receiveWritable(channel);
 			if (out) {
