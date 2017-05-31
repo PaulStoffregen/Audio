@@ -127,6 +127,10 @@ public:
 		state = 1;
 		__enable_irq();
 	}
+	float read(void) {
+		int32_t m = magnitude;
+		return (float)m * (1.0 / 2147418112.0);
+	}
 	virtual void update(void);
 private:
 	uint8_t  state;     // 0=steady output, 1=transitioning
