@@ -100,10 +100,14 @@ private:
 		maxblocks = max;
 	}
 	uint8_t activemask;   // which output channels are active
-	uint8_t headindex;    // head index (incoming) data in quueu
-	uint8_t tailindex;    // tail index (outgoing) data from queue
-	uint8_t maxblocks;    // number of blocks needed in queue
+	uint16_t headindex;    // head index (incoming) data in quueu
+	uint16_t tailindex;    // tail index (outgoing) data from queue
+	uint16_t maxblocks;    // number of blocks needed in queue
+#if DELAY_QUEUE_SIZE * AUDIO_BLOCK_SAMPLES < 65535
 	uint16_t position[8]; // # of sample delay for each channel
+#else
+	uint32_t position[8]; // # of sample delay for each channel
+#endif
 	audio_block_t *queue[DELAY_QUEUE_SIZE];
 	audio_block_t *inputQueueArray[1];
 };
