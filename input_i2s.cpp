@@ -47,7 +47,7 @@ void AudioInputI2S::begin(void)
 
 	CORE_PIN13_CONFIG = PORT_PCR_MUX(4); // pin 13, PTC5, I2S0_RXD0
 #if defined(KINETISK)
-	dma.TCD->SADDR = &I2S0_RDR0;
+	dma.TCD->SADDR = (void *)((uint32_t)&I2S0_RDR0 + 2);
 	dma.TCD->SOFF = 0;
 	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
 	dma.TCD->NBYTES_MLNO = 2;
