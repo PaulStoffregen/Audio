@@ -116,6 +116,7 @@ hold	KEYWORD2
 decay	KEYWORD2
 sustain	KEYWORD2
 release	KEYWORD2
+releaseNoteOn	KEYWORD2
 inputLevel	KEYWORD2
 inputSelect	KEYWORD2
 muteHeadphone	KEYWORD2

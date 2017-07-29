@@ -2383,13 +2383,13 @@ double s_freq = .0625;</p>
 		default is zero, for no delay.
 	</p>
 	<p class=func><span class=keyword>attack</span>(milliseconds);</p>
-	<p class=desc>Set the attack time.  The default is 1.5 milliseconds.
+	<p class=desc>Set the attack time.  The default is 10.5 milliseconds.
 	</p>
 	<p class=func><span class=keyword>hold</span>(milliseconds);</p>
-	<p class=desc>Set the hold time.  The default is 0.5 milliseconds.
+	<p class=desc>Set the hold time.  The default is 2.5 milliseconds.
 	</p>
 	<p class=func><span class=keyword>decay</span>(milliseconds);</p>
-	<p class=desc>Set the decay time.  The default is 15 milliseconds.
+	<p class=desc>Set the decay time.  The default is 35 milliseconds.
 	</p>
 	<p class=func><span class=keyword>sustain</span>(level);</p>
 	<p class=desc>Set the sustain level.  The range is 0 to 1.0.  The
@@ -2397,7 +2397,15 @@ double s_freq = .0625;</p>
 		until noteOff() is called.
 	</p>
 	<p class=func><span class=keyword>release</span>(milliseconds);</p>
-	<p class=desc>Set the release time.  The default is 30 millisecond.
+	<p class=desc>Set the release time.  The default is 300 millisecond.
+	</p>
+	<p class=func><span class=keyword>releaseNoteOn</span>(milliseconds);</p>
+	<p class=desc>Set a quick release time to be used when a new note is
+		started while the envelop is in any state passing the signal.
+		This will add latency before your new attack phase begins, so
+		short times are recommended.  Zero may be used to completely
+		disable this feature (never extra latency).  Longer times help
+		reduce clicks or pops.  The default is 5 millisecond.
 	</p>
 	<h3>Examples</h3>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; PlaySynthMusic

@@ -37,12 +37,13 @@ class AudioEffectEnvelope : public AudioStream
 public:
 	AudioEffectEnvelope() : AudioStream(1, inputQueueArray) {
 		state = 0;
-		delay(0.0);  // default values...
-		attack(1.5);
-		hold(0.5);
-		decay(15.0);
-		sustain(0.667);
-		release(30.0);
+		delay(0.0f);  // default values...
+		attack(10.5f);
+		hold(2.5f);
+		decay(35.0f);
+		sustain(0.5f);
+		release(300.0f);
+		releaseNoteOn(5.0f);
 	}
 	void noteOn();
 	void noteOff();
@@ -69,6 +70,10 @@ public:
 		release_count = milliseconds2count(milliseconds);
 		if (release_count == 0) release_count = 1;
 	}
+	void releaseNoteOn(float milliseconds) {
+		release_forced_count = milliseconds2count(milliseconds);
+		if (release_count == 0) release_count = 1;
+	}
 	using AudioStream::release;
 	virtual void update(void);
 private:
@@ -80,7 +85,7 @@ private:
 	}
 	audio_block_t *inputQueueArray[1];
 	// state
-	uint8_t  state;      // idle, delay, attack, hold, decay, sustain, release
+	uint8_t  state;      // idle, delay, attack, hold, decay, sustain, release, forced
 	uint16_t count;      // how much time remains in this state, in 8 sample units
 	int32_t  mult_hires; // attenuation, 0=off, 0x40000000=unity gain
 	int32_t  inc_hires;  // amount to change mult_hires every 8 samples
@@ -92,6 +97,7 @@ private:
 	uint16_t decay_count;
 	int32_t  sustain_mult;
 	uint16_t release_count;
+	uint16_t release_forced_count;
 
 };
 

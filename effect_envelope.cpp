@@ -33,19 +33,26 @@
 #define STATE_DECAY	4
 #define STATE_SUSTAIN	5
 #define STATE_RELEASE	6
+#define STATE_FORCED	7
 
 void AudioEffectEnvelope::noteOn(void)
 {
 	__disable_irq();
-	mult_hires = 0;
-	count = delay_count;
-	if (count > 0) {
-		state = STATE_DELAY;
-		inc_hires = 0;
-	} else {
-		state = STATE_ATTACK;
-		count = attack_count;
-		inc_hires = 0x40000000 / (int32_t)count;
+	if (state == STATE_IDLE || state == STATE_DELAY || release_forced_count == 0) {
+		mult_hires = 0;
+		count = delay_count;
+		if (count > 0) {
+			state = STATE_DELAY;
+			inc_hires = 0;
+		} else {
+			state = STATE_ATTACK;
+			count = attack_count;
+			inc_hires = 0x40000000 / (int32_t)count;
+		}
+	} else if (state != STATE_FORCED) {
+		state = STATE_FORCED;
+		count = release_forced_count;
+		inc_hires = (-mult_hires) / (int32_t)count;
 	}
 	__enable_irq();
 }
@@ -53,7 +60,7 @@ void AudioEffectEnvelope::noteOn(void)
 void AudioEffectEnvelope::noteOff(void)
 {
 	__disable_irq();
-	if (state != STATE_IDLE) {
+	if (state != STATE_IDLE && state != STATE_FORCED) {
 		state = STATE_RELEASE;
 		count = release_count;
 		inc_hires = (-mult_hires) / (int32_t)count;
@@ -112,6 +119,17 @@ void AudioEffectEnvelope::update(void)
 					*p++ = 0;
 				}
 				break;
+			} else if (state == STATE_FORCED) {
+				mult_hires = 0;
+				count = delay_count;
+				if (count > 0) {
+					state = STATE_DELAY;
+					inc_hires = 0;
+				} else {
+					state = STATE_ATTACK;
+					count = attack_count;
+					inc_hires = 0x40000000 / (int32_t)count;
+				}
 			} else if (state == STATE_DELAY) {
 				state = STATE_ATTACK;
 				count = attack_count;
