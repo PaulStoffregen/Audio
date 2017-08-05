@@ -30,6 +30,7 @@
 
 
 // 140312 - PAH - slightly faster copy
+static void copy_to_fft_buffer(void *destination, const void *source)  __attribute__ ((unused));
 static void copy_to_fft_buffer(void *destination, const void *source)
 {
 	const uint16_t *src = (const uint16_t *)source;
@@ -40,6 +41,7 @@ static void copy_to_fft_buffer(void *destination, const void *source)
 	}
 }
 
+static void apply_window_to_fft_buffer(void *buffer, const void *window)  __attribute__ ((unused));
 static void apply_window_to_fft_buffer(void *buffer, const void *window)
 {
 	int16_t *buf = (int16_t *)buffer;
@@ -123,6 +125,8 @@ void AudioAnalyzeFFT256::update(void)
 	prevblocks[2] = prevblocks[1];
 	prevblocks[1] = prevblocks[0];
 	prevblocks[0] = block;
+#else
+	return;	
 #endif
 }
 
