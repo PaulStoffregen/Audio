@@ -46,15 +46,16 @@ private:
         static audio_block_t *block_right;
         static uint16_t offset_left;
         static uint16_t offset_right;
-        static int32_t left_dc_average_hist[16];
-        static int32_t right_dc_average_hist[16];
-        static int32_t current_dc_average_index;
+        static int32_t hpf_y1[2];
+        static int32_t hpf_x1[2];
+        static int32_t a;
+
         static bool update_responsibility;
-	static DMAChannel dma0;
-	static DMAChannel dma1;
-	static void isr0(void);
-	static void isr1(void);
-	static void init(uint8_t pin0, uint8_t pin1);
+    	static DMAChannel dma0;
+    	static DMAChannel dma1;
+    	static void isr0(void);
+    	static void isr1(void);
+    	static void init(uint8_t pin0, uint8_t pin1);
 };
 
 #endif
