@@ -30,6 +30,8 @@
 
 #if defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
 
+#define COEF_HPF_DCBLOCK    1048300  // DC Removal filter coefficient in S12.19
+
 DMAMEM static uint16_t left_buffer[AUDIO_BLOCK_SAMPLES];
 DMAMEM static uint16_t right_buffer[AUDIO_BLOCK_SAMPLES];
 audio_block_t * AudioInputAnalogStereo::block_left = NULL;
@@ -38,7 +40,6 @@ uint16_t AudioInputAnalogStereo::offset_left = 0;
 uint16_t AudioInputAnalogStereo::offset_right = 0;
 int32_t AudioInputAnalogStereo::hpf_y1[2] = { 0, 0 };
 int32_t AudioInputAnalogStereo::hpf_x1[2] = { 0, 0 };
-int32_t AudioInputAnalogStereo::a = 1048300;
 bool AudioInputAnalogStereo::update_responsibility = false;
 DMAChannel AudioInputAnalogStereo::dma0(false);
 DMAChannel AudioInputAnalogStereo::dma1(false);
@@ -276,7 +277,7 @@ void AudioInputAnalogStereo::update(void)
         int32_t acc = tmp;
         acc += hpf_y1[0];
         acc -= hpf_x1[0];
-        hpf_y1[0] = FRACMUL_SHL(acc, a, 11);
+        hpf_y1[0] = FRACMUL_SHL(acc, COEF_HPF_DCBLOCK, 11);
         hpf_x1[0] = tmp;
         s = signed_saturate_rshift(hpf_y1[0], 16, 4);
         *p++ = s;
@@ -291,7 +292,7 @@ void AudioInputAnalogStereo::update(void)
         int32_t acc = tmp;
         acc += hpf_y1[1];
         acc -= hpf_x1[1];
-        hpf_y1[1]= FRACMUL_SHL(acc, a, 11);
+        hpf_y1[1]= FRACMUL_SHL(acc, COEF_HPF_DCBLOCK, 11);
         hpf_x1[1] = tmp;
         s = signed_saturate_rshift(hpf_y1[1], 16, 4);
         *p++ = s;

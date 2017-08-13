@@ -28,12 +28,13 @@
 #include "utility/pdb.h"
 #include "utility/dspinst.h"
 
+#define COEF_HPF_DCBLOCK    1048300  // DC Removal filter coefficient in S12.19
+
 DMAMEM static uint16_t analog_rx_buffer[AUDIO_BLOCK_SAMPLES];
 audio_block_t * AudioInputAnalog::block_left = NULL;
 uint16_t AudioInputAnalog::block_offset = 0;
 int32_t AudioInputAnalog::hpf_y1 = 0;
 int32_t AudioInputAnalog::hpf_x1 = 0;
-int32_t AudioInputAnalog::a = 1048300;
 
 bool AudioInputAnalog::update_responsibility = false;
 DMAChannel AudioInputAnalog::dma(false);
@@ -41,7 +42,6 @@ DMAChannel AudioInputAnalog::dma(false);
 void AudioInputAnalog::init(uint8_t pin)
 {
     int32_t tmp;
-    a = 1048300;  // DC Removal filter coefficient in S12.19
 
 	// Configure the ADC and run at least one software-triggered
 	// conversion.  This completes the self calibration stuff and
@@ -203,7 +203,7 @@ void AudioInputAnalog::update(void)
         int32_t acc = tmp;
         acc += hpf_y1;
         acc -= hpf_x1;
-        hpf_y1 = FRACMUL_SHL(acc, a, 11);
+        hpf_y1 = FRACMUL_SHL(acc, COEF_HPF_DCBLOCK, 11);
         hpf_x1 = tmp;
 		s = signed_saturate_rshift(hpf_y1, 16, 4);
 		*p++ = s;

@@ -43,12 +43,11 @@ private:
         static uint16_t block_offset;
         static int32_t hpf_y1;
         static int32_t hpf_x1;
-        static int32_t a;
 
         static bool update_responsibility;
-    	static DMAChannel dma;
-    	static void isr(void);
-    	static void init(uint8_t pin);
+        static DMAChannel dma;
+        static void isr(void);
+        static void init(uint8_t pin);
 
 };
 
