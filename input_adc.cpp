@@ -28,7 +28,7 @@
 #include "utility/pdb.h"
 #include "utility/dspinst.h"
 
-#define COEF_HPF_DCBLOCK    1048300  // DC Removal filter coefficient in S12.19
+#define COEF_HPF_DCBLOCK    (1048300<<4)  // DC Removal filter coefficient in S7.24
 
 DMAMEM static uint16_t analog_rx_buffer[AUDIO_BLOCK_SAMPLES];
 audio_block_t * AudioInputAnalog::block_left = NULL;
@@ -57,7 +57,7 @@ void AudioInputAnalog::init(uint8_t pin)
     // Probably not useful to spin cycles here stabilizing
     // since DC blocking is similar to te external analog filters
     tmp = (uint16_t) analogRead(pin);
-    tmp = ( ((int32_t) tmp) << 4);
+    tmp = ( ((int32_t) tmp) << 8);
     hpf_x1 = tmp;   // With constant DC level x1 would be x0
     hpf_y1 = 0;     // Output will settle here when stable
 
@@ -199,13 +199,12 @@ void AudioInputAnalog::update(void)
 	end = p + AUDIO_BLOCK_SAMPLES;
 	do {
 		tmp = (uint16_t)(*p);
-        tmp = ( ((int32_t) tmp) << 4);
-        int32_t acc = tmp;
-        acc += hpf_y1;
-        acc -= hpf_x1;
-        hpf_y1 = FRACMUL_SHL(acc, COEF_HPF_DCBLOCK, 11);
+        tmp = ( ((int32_t) tmp) << 8);
+        int32_t acc = hpf_y1 - hpf_x1;
+        acc += tmp;
+        hpf_y1 = FRACMUL_SHL(acc, COEF_HPF_DCBLOCK, 7);
         hpf_x1 = tmp;
-		s = signed_saturate_rshift(hpf_y1, 16, 4);
+		s = signed_saturate_rshift(hpf_y1, 16, 8);
 		*p++ = s;
 	} while (p < end);
 

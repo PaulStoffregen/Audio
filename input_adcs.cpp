@@ -30,7 +30,7 @@
 
 #if defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
 
-#define COEF_HPF_DCBLOCK    1048300  // DC Removal filter coefficient in S12.19
+#define COEF_HPF_DCBLOCK    (1048300<<4)  // DC Removal filter coefficient in S7.24
 
 DMAMEM static uint16_t left_buffer[AUDIO_BLOCK_SAMPLES];
 DMAMEM static uint16_t right_buffer[AUDIO_BLOCK_SAMPLES];
@@ -70,12 +70,12 @@ void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
     // Probably not useful to spin cycles here stabilizing
     // since DC blocking is similar to te external analog filters
     tmp = (uint16_t) analogRead(pin0);
-    tmp = ( ((int32_t) tmp) << 4);
+    tmp = ( ((int32_t) tmp) << 8);
     hpf_x1[0] = tmp;   // With constant DC level x1 would be x0
     hpf_y1[0] = 0;     // Output will settle here when stable
 
     tmp = (uint16_t) analogReadADC1(pin1);
-    tmp = ( ((int32_t) tmp) << 4);
+    tmp = ( ((int32_t) tmp) << 8);
     hpf_x1[1] = tmp;   // With constant DC level x1 would be x0
     hpf_y1[1] = 0;     // Output will settle here when stable
 
@@ -273,13 +273,12 @@ void AudioInputAnalogStereo::update(void)
     end = p + AUDIO_BLOCK_SAMPLES;
     do {
         tmp = (uint16_t)(*p);
-        tmp = ( ((int32_t) tmp) << 4);
-        int32_t acc = tmp;
-        acc += hpf_y1[0];
-        acc -= hpf_x1[0];
-        hpf_y1[0] = FRACMUL_SHL(acc, COEF_HPF_DCBLOCK, 11);
+        tmp = ( ((int32_t) tmp) << 8);
+        int32_t acc = hpf_y1[0] - hpf_x1[0];
+        acc += tmp;
+        hpf_y1[0] = FRACMUL_SHL(acc, COEF_HPF_DCBLOCK, 7);
         hpf_x1[0] = tmp;
-        s = signed_saturate_rshift(hpf_y1[0], 16, 4);
+        s = signed_saturate_rshift(hpf_y1[0], 16, 8);
         *p++ = s;
     } while (p < end);
 
@@ -288,13 +287,12 @@ void AudioInputAnalogStereo::update(void)
     end = p + AUDIO_BLOCK_SAMPLES;
     do {
         tmp = (uint16_t)(*p);
-        tmp = ( ((int32_t) tmp) << 4);
-        int32_t acc = tmp;
-        acc += hpf_y1[1];
-        acc -= hpf_x1[1];
-        hpf_y1[1]= FRACMUL_SHL(acc, COEF_HPF_DCBLOCK, 11);
+        tmp = ( ((int32_t) tmp) << 8);
+        int32_t acc = hpf_y1[1] - hpf_x1[1];
+        acc += tmp;
+        hpf_y1[1]= FRACMUL_SHL(acc, COEF_HPF_DCBLOCK, 7);
         hpf_x1[1] = tmp;
-        s = signed_saturate_rshift(hpf_y1[1], 16, 4);
+        s = signed_saturate_rshift(hpf_y1[1], 16, 8);
         *p++ = s;
     } while (p < end);
 
