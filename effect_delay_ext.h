@@ -31,9 +31,10 @@
 #include "spi_interrupt.h"
 
 enum AudioEffectDelayMemoryType_t {
-	AUDIO_MEMORY_23LC1024 = 0,
-	AUDIO_MEMORY_MEMORYBOARD = 1,
-	AUDIO_MEMORY_UNDEFINED = 2
+	AUDIO_MEMORY_23LC1024 = 0,	// 128k x 8 S-RAM
+	AUDIO_MEMORY_MEMORYBOARD = 1,	
+	AUDIO_MEMORY_CY15B104 = 2,	// 512k x 8 F-RAM	
+	AUDIO_MEMORY_UNDEFINED = 3
 };
 
 class AudioEffectDelayExternal : public AudioStream
