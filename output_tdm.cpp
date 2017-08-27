@@ -26,6 +26,7 @@
 
 #include "output_tdm.h"
 #include "memcpy_audio.h"
+#include "utility/dspinst.h"
 #if defined(KINETISK)
 
 audio_block_t * AudioOutputTDM::block_input[16] = {
@@ -70,6 +71,7 @@ void AudioOutputTDM::begin(void)
 }
 
 // TODO: needs optimization...
+#if 0
 static void memcpy_tdm_tx(uint32_t *dest, const uint32_t *src1, const uint32_t *src2)
 {
 	uint32_t i, in1, in2, out1, out2;
@@ -84,6 +86,21 @@ static void memcpy_tdm_tx(uint32_t *dest, const uint32_t *src1, const uint32_t *
 		dest += 16;
 	}
 }
+#else
+static inline void memcpy_tdm_tx(uint32_t *dest, const uint32_t *src1, const uint32_t *src2)
+{
+	uint32_t i, in1, in2;
+
+	for (i=0; i < AUDIO_BLOCK_SAMPLES/2; i++) {
+		in1 = *src1++;
+		in2 = *src2++;
+		*dest = pack_16b_16b(in1, in2);	
+		*(dest + 8) = pack_16t_16t(in1, in2);
+		dest += 16;
+	}
+
+}
+#endif
 
 void AudioOutputTDM::isr(void)
 {
