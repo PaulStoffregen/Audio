@@ -2618,6 +2618,10 @@ double s_freq = .0625;</p>
 
 	<p class=desc><span class=keyword>AudioEffectDelayExternal</span>  delayExt1(<span class=literal>AUDIO_MEMORY_23LC1024</span>, 700);<br><span class=keyword>AudioEffectDelayExternal</span>  delayExt2(<span class=literal>AUDIO_MEMORY_23LC1024</span>, 700);
 	</p>
+	<p>When using CY15B104, you
+		<a href="https://forum.pjrc.com/threads/45872-Memory-Chip-for-Audio-Adaptor-Board?p=151839&viewfull=1#post151839">may need to add a capacitor between 3.3V & GND</a>
+		to make the chip work.
+	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioEffectDelayExternal">
 	<div class="form-row">
