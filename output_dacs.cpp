@@ -189,8 +189,8 @@ void AudioOutputAnalogStereo::isr(void)
 	}
 	if (block_right != &block_silent) {
 		release(block_right);
-		block_left_1st = block_left_2nd;
-		block_left_2nd = NULL;
+		block_right_1st = block_right_2nd;
+		block_right_2nd = NULL;
 	}
 
 	if (update_responsibility) update_all();
