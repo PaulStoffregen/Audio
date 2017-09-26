@@ -46,7 +46,11 @@ void AudioOutputI2S::begin(void)
 
 	// TODO: should we set & clear the I2S_TCSR_SR bit here?
 	config_i2s();
+#ifdef I2S_ALT_CHANNEL
 	CORE_PIN22_CONFIG = PORT_PCR_MUX(6); // pin 22, PTC1, I2S0_TXD0
+#else
+	CORE_PIN22_CONFIG = PORT_PCR_MUX(6); // pin 22, PTC1, I2S0_TXD0
+#endif
 
 #if defined(KINETISK)
 	dma.TCD->SADDR = i2s_tx_buffer;
@@ -333,9 +337,15 @@ void AudioOutputI2S::config_i2s(void)
 	I2S0_RCR5 = I2S_RCR5_WNW(31) | I2S_RCR5_W0W(31) | I2S_RCR5_FBT(31);
 
 	// configure pin mux for 3 clock signals
+#ifdef I2S_ALT_CHANNEL
+        CORE_PIN4_CONFIG = PORT_PCR_MUX(6); // pin 4, PTA13, I2S0_TX_FS (LRCLK)
+        CORE_PIN9_CONFIG  = PORT_PCR_MUX(6); // pin  9, PTC3, I2S0_TX_BCLK
+        CORE_PIN28_CONFIG = PORT_PCR_MUX(4); // pin 28, PTC8, I2S0_MCLK
+#else
 	CORE_PIN23_CONFIG = PORT_PCR_MUX(6); // pin 23, PTC2, I2S0_TX_FS (LRCLK)
 	CORE_PIN9_CONFIG  = PORT_PCR_MUX(6); // pin  9, PTC3, I2S0_TX_BCLK
 	CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK
+#endif
 }
 
 
