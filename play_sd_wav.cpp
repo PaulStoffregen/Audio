@@ -538,21 +538,29 @@ bool AudioPlaySdWav::parse_format(void)
 
 bool AudioPlaySdWav::isPlaying(void)
 {
-	return (state < 8);
+	uint8_t s = *(volatile uint8_t *)&state;
+	return (s < 8);
 }
 
 uint32_t AudioPlaySdWav::positionMillis(void)
 {
-	if (state >= 8) return 0;
-	uint32_t offset = total_length - data_length;
-	return ((uint64_t)offset * bytes2millis) >> 32;
+	uint8_t s = *(volatile uint8_t *)&state;
+	if (s >= 8) return 0;
+	uint32_t tlength = *(volatile uint32_t *)&total_length;
+	uint32_t dlength = *(volatile uint32_t *)&data_length;
+	uint32_t offset = tlength - dlength;
+	uint32_t b2m = *(volatile uint32_t *)&bytes2millis;
+	return ((uint64_t)offset * b2m) >> 32;
 }
 
 
 uint32_t AudioPlaySdWav::lengthMillis(void)
 {
-	if (state >= 8) return 0;
-	return ((uint64_t)total_length * bytes2millis) >> 32;
+	uint8_t s = *(volatile uint8_t *)&state;
+	if (s >= 8) return 0;
+	uint32_t tlength = *(volatile uint32_t *)&total_length;
+	uint32_t b2m = *(volatile uint32_t *)&bytes2millis;
+	return ((uint64_t)tlength * b2m) >> 32;
 }
 
 

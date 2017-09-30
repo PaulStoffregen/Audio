@@ -69,6 +69,7 @@
 #include "control_wm8731.h"
 #include "control_ak4558.h"
 #include "control_cs4272.h"
+#include "control_cs42448.h"
 #include "effect_bitcrusher.h"
 #include "effect_chorus.h"
 #include "effect_fade.h"
@@ -79,6 +80,7 @@
 #include "effect_delay_ext.h"
 #include "effect_midside.h"
 #include "effect_reverb.h"
+#include "effect_waveshaper.h"
 #include "filter_biquad.h"
 #include "filter_fir.h"
 #include "filter_variable.h"
@@ -86,6 +88,7 @@
 #include "input_adcs.h"
 #include "input_i2s.h"
 #include "input_i2s_quad.h"
+#include "input_tdm.h"
 #include "mixer.h"
 #include "output_dac.h"
 #include "output_dacs.h"
@@ -94,6 +97,7 @@
 #include "output_pwm.h"
 #include "output_spdif.h"
 #include "output_pt8211.h"
+#include "output_tdm.h"
 #include "play_memory.h"
 #include "play_queue.h"
 #include "play_sd_raw.h"
@@ -108,5 +112,6 @@
 #include "synth_pinknoise.h"
 #include "synth_karplusstrong.h"
 #include "synth_simple_drum.h"
+#include "synth_pwm.h"
 
 #endif

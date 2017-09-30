@@ -1,5 +1,5 @@
 /* Audio Library for Teensy 3.X
- * Copyright (c) 2014, Paul Stoffregen, paul@pjrc.com
+ * Copyright (c) 2017, Paul Stoffregen, paul@pjrc.com
  *
  * Development of this audio library was funded by PJRC.COM, LLC by sales of
  * Teensy and Audio Adaptor boards.  Please support PJRC's efforts to develop
@@ -24,31 +24,29 @@
  * THE SOFTWARE.
  */
 
-#ifndef input_adc_h_
-#define input_adc_h_
+#ifndef output_tdm_h_
+#define output_tdm_h_
 
 #include "Arduino.h"
 #include "AudioStream.h"
 #include "DMAChannel.h"
 
-class AudioInputAnalog : public AudioStream
+class AudioOutputTDM : public AudioStream
 {
 public:
-        AudioInputAnalog() : AudioStream(0, NULL) { init(A2); }
-        AudioInputAnalog(uint8_t pin) : AudioStream(0, NULL) { init(pin); }
-        virtual void update(void);
-        friend void dma_ch9_isr(void);
+	AudioOutputTDM(void) : AudioStream(16, inputQueueArray) { begin(); }
+	virtual void update(void);
+	void begin(void);
+	friend class AudioInputTDM;
+protected:
+	static void config_tdm(void);
+	static audio_block_t *block_input[16];
+	static bool update_responsibility;
+	static DMAChannel dma;
+	static void isr(void);
 private:
-        static audio_block_t *block_left;
-        static uint16_t block_offset;
-        static int32_t hpf_y1;
-        static int32_t hpf_x1;
-
-        static bool update_responsibility;
-        static DMAChannel dma;
-        static void isr(void);
-        static void init(uint8_t pin);
-
+	audio_block_t *inputQueueArray[16];
 };
+
 
 #endif

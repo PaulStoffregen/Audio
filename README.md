@@ -25,7 +25,7 @@ Audio System Design Tool
 
 Use this graphical tool to design your audio project.  Easily browse the library's many features, connect objects, export to Arduino code, and quickly access details for the functions each object provides for you to control it from your Arduino sketch!
 
-http://www.pjrc.com/teensy/gui/
+http://www.pjrc.com/teensy/gui/index.html
 
 
 Supported Hardware

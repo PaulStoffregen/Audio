@@ -15,6 +15,21 @@
 #include <SD.h>
 #include <SPI.h>
 
+// Use these with the Teensy Audio Shield
+#define SDCARD_CS_PIN    10
+#define SDCARD_MOSI_PIN  7
+#define SDCARD_SCK_PIN   14
+
+// Use these with the Teensy 3.5 & 3.6 SD card
+//#define SDCARD_CS_PIN    BUILTIN_SDCARD
+//#define SDCARD_MOSI_PIN  11  // not actually used
+//#define SDCARD_SCK_PIN   13  // not actually used
+
+// Use these for the SD+Wiz820 or other adaptors
+//#define SDCARD_CS_PIN    4
+//#define SDCARD_MOSI_PIN  11
+//#define SDCARD_SCK_PIN   13
+
 void setup() {
   Sd2Card card;
   SdVolume volume;
@@ -30,16 +45,16 @@ void setup() {
   while (!Serial) ;
   delay(50);
 
-  // Configure SPI for the audio shield pins
-  SPI.setMOSI(7);  // Audio shield has MOSI on pin 7
-  SPI.setSCK(14);  // Audio shield has SCK on pin 14
+  // Configure SPI
+  SPI.setMOSI(SDCARD_MOSI_PIN);
+  SPI.setSCK(SDCARD_SCK_PIN);
 
   Serial.begin(9600);
   Serial.println("SD Card Test");
   Serial.println("------------");
 
   // First, detect the card
-  status = card.init(SPI_FULL_SPEED, 10); // Audio shield has SD card SD on pin 10
+  status = card.init(SPI_FULL_SPEED, SDCARD_CS_PIN);
   if (status) {
     Serial.println("SD card is connected :-)");
   } else {
@@ -70,7 +85,7 @@ void setup() {
   Serial.println(" Mbytes.");
 
   // Now open the SD card normally
-  status = SD.begin(10); // Audio shield has SD card CS on pin 10
+  status = SD.begin(SDCARD_CS_PIN);
   if (status) {
     Serial.println("SD library is able to access the filesystem");
   } else {

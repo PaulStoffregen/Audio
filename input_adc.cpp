@@ -28,18 +28,20 @@
 #include "utility/pdb.h"
 #include "utility/dspinst.h"
 
+#define COEF_HPF_DCBLOCK    (1048300<<10)  // DC Removal filter coefficient in S1.30
+
 DMAMEM static uint16_t analog_rx_buffer[AUDIO_BLOCK_SAMPLES];
 audio_block_t * AudioInputAnalog::block_left = NULL;
 uint16_t AudioInputAnalog::block_offset = 0;
-int32_t AudioInputAnalog::dc_average_hist[16];
-int32_t AudioInputAnalog::current_dc_average_index = 0;
+int32_t AudioInputAnalog::hpf_y1 = 0;
+int32_t AudioInputAnalog::hpf_x1 = 0;
+
 bool AudioInputAnalog::update_responsibility = false;
 DMAChannel AudioInputAnalog::dma(false);
 
-
 void AudioInputAnalog::init(uint8_t pin)
 {
-	uint32_t i, sum=0;
+    int32_t tmp;
 
 	// Configure the ADC and run at least one software-triggered
 	// conversion.  This completes the self calibration stuff and
@@ -51,13 +53,13 @@ void AudioInputAnalog::init(uint8_t pin)
 #else
 	analogReadAveraging(4);
 #endif
-	// Actually, do many normal reads, to start with a nice DC level
-	for (i=0; i < 1024; i++) {
-		sum += analogRead(pin);
-	}
-	for (i = 0; i < 16; i++) {
-		dc_average_hist[i] = sum >> 10;
-	}
+	// Note for review:
+    // Probably not useful to spin cycles here stabilizing
+    // since DC blocking is similar to te external analog filters
+    tmp = (uint16_t) analogRead(pin);
+    tmp = ( ((int32_t) tmp) << 14);
+    hpf_x1 = tmp;   // With constant DC level x1 would be x0
+    hpf_y1 = 0;     // Output will settle here when stable
 
 	// set the programmable delay block to trigger the ADC at 44.1 kHz
 #if defined(KINETISK)
@@ -135,12 +137,10 @@ void AudioInputAnalog::isr(void)
 	}
 }
 
-
-
 void AudioInputAnalog::update(void)
 {
 	audio_block_t *new_left=NULL, *out_left=NULL;
-	uint32_t i, dc, offset;
+	uint32_t offset;
 	int32_t tmp;
 	int16_t s, *p, *end;
 
@@ -185,28 +185,28 @@ void AudioInputAnalog::update(void)
 	block_offset = 0;
 	__enable_irq();
 
-	// Find and subtract DC offset... We use an average of the
-	// last 16 * AUDIO_BLOCK_SAMPLES samples.
-	dc = 0;
-	for (i = 0; i < 16; i++) {
-		dc += dc_average_hist[i];
-	}
-	dc /= 16 * AUDIO_BLOCK_SAMPLES;
-	dc_average_hist[current_dc_average_index] = 0;
+    //
+	// DC Offset Removal Filter
+    // 1-pole digital high-pass filter implementation
+    //   y = a*(x[n] - x[n-1] + y[n-1])
+    // The coefficient "a" is as follows:
+    //  a = UNITY*e^(-2*pi*fc/fs)
+    //  fc = 2 @ fs = 44100
+    //
 	p = out_left->data;
 	end = p + AUDIO_BLOCK_SAMPLES;
 	do {
-		dc_average_hist[current_dc_average_index] += (uint16_t)(*p);
-		tmp = (uint16_t)(*p) - (int32_t)dc;
-		s = signed_saturate_rshift(tmp, 16, 0);
+		tmp = (uint16_t)(*p);
+        tmp = ( ((int32_t) tmp) << 14);
+        int32_t acc = hpf_y1 - hpf_x1;
+        acc += tmp;
+        hpf_y1 = FRACMUL_SHL(acc, COEF_HPF_DCBLOCK, 1);
+        hpf_x1 = tmp;
+		s = signed_saturate_rshift(hpf_y1, 16, 14);
 		*p++ = s;
 	} while (p < end);
-	current_dc_average_index = (current_dc_average_index + 1) % 16;
 
 	// then transmit the AC data
 	transmit(out_left);
 	release(out_left);
 }
-
-
-

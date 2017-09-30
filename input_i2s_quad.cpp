@@ -46,7 +46,11 @@ void AudioInputI2SQuad::begin(void)
 	AudioOutputI2SQuad::config_i2s();
 
 	CORE_PIN13_CONFIG = PORT_PCR_MUX(4); // pin 13, PTC5, I2S0_RXD0
+#if defined(__MK20DX256__)
 	CORE_PIN30_CONFIG = PORT_PCR_MUX(4); // pin 30, PTC11, I2S0_RXD1
+#elif defined(__MK64FX512__) || defined(__MK66FX1M0__)
+	CORE_PIN38_CONFIG = PORT_PCR_MUX(4); // pin 38, PTC11, I2S0_RXD1
+#endif
 
 #if defined(KINETISK)
 	dma.TCD->SADDR = &I2S0_RDR0;

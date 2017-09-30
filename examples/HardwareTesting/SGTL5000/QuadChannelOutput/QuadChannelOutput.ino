@@ -24,10 +24,20 @@ AudioConnection          patchCord4(playSdWav2, 1, audioOutput, 3);
 AudioControlSGTL5000     sgtl5000_1;
 AudioControlSGTL5000     sgtl5000_2;
 
-// Use these with the audio adaptor board
+// Use these with the Teensy Audio Shield
 #define SDCARD_CS_PIN    10
 #define SDCARD_MOSI_PIN  7
 #define SDCARD_SCK_PIN   14
+
+// Use these with the Teensy 3.5 & 3.6 SD card
+//#define SDCARD_CS_PIN    BUILTIN_SDCARD
+//#define SDCARD_MOSI_PIN  11  // not actually used
+//#define SDCARD_SCK_PIN   13  // not actually used
+
+// Use these for the SD+Wiz820 or other adaptors
+//#define SDCARD_CS_PIN    4
+//#define SDCARD_MOSI_PIN  11
+//#define SDCARD_SCK_PIN   13
 
 void setup() {
   Serial.begin(9600);

@@ -11,10 +11,20 @@ AudioConnection          patchCord1(playWav1, 0, audioOutput, 0);
 AudioConnection          patchCord2(playWav1, 1, audioOutput, 1);
 AudioConnection          patchCord3(playWav1, 0, dac, 0);
 
-// Use these with the audio adaptor board
+// Use these with the Teensy Audio Shield
 #define SDCARD_CS_PIN    10
 #define SDCARD_MOSI_PIN  7
 #define SDCARD_SCK_PIN   14
+
+// Use these with the Teensy 3.5 & 3.6 SD card
+//#define SDCARD_CS_PIN    BUILTIN_SDCARD
+//#define SDCARD_MOSI_PIN  11  // not actually used
+//#define SDCARD_SCK_PIN   13  // not actually used
+
+// Use these for the SD+Wiz820 or other adaptors
+//#define SDCARD_CS_PIN    4
+//#define SDCARD_MOSI_PIN  11
+//#define SDCARD_SCK_PIN   13
 
 void setup() {
   Serial.begin(9600);
@@ -54,3 +64,10 @@ void loop() {
   playFile("SDTEST4.WAV");
   delay(1500);
 }
+
+// A known problem occurs on Macintosh computers, where the Mac's driver
+// does not seem to be able to adapt and transmit horribly distorted
+// audio to Teensy after a matter of minutes.  An imperfect workaround
+// can be enabled by editing usb_audio.cpp.  Find and uncomment
+// "#define MACOSX_ADAPTIVE_LIMIT".  More detailed info is available here:
+// https://forum.pjrc.com/threads/34855-Distorted-audio-when-using-USB-input-on-Teensy-3-1?p=110392&viewfull=1#post110392

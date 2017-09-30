@@ -1,5 +1,5 @@
 /* Audio Library for Teensy 3.X
- * Copyright (c) 2014, Paul Stoffregen, paul@pjrc.com
+ * Copyright (c) 2017, Paul Stoffregen, paul@pjrc.com
  *
  * Development of this audio library was funded by PJRC.COM, LLC by sales of
  * Teensy and Audio Adaptor boards.  Please support PJRC's efforts to develop
@@ -24,31 +24,35 @@
  * THE SOFTWARE.
  */
 
-#ifndef input_adc_h_
-#define input_adc_h_
+#ifndef synth_pwm_h_
+#define synth_pwm_h_
 
 #include "Arduino.h"
 #include "AudioStream.h"
-#include "DMAChannel.h"
+#include "arm_math.h"
 
-class AudioInputAnalog : public AudioStream
+class AudioSynthWaveformPWM : public AudioStream
 {
 public:
-        AudioInputAnalog() : AudioStream(0, NULL) { init(A2); }
-        AudioInputAnalog(uint8_t pin) : AudioStream(0, NULL) { init(pin); }
-        virtual void update(void);
-        friend void dma_ch9_isr(void);
+	AudioSynthWaveformPWM() : AudioStream(1, inputQueueArray), magnitude(0), elapsed(0) {}
+	void frequency(float freq) {
+		if (freq < 1.0) freq = 1.0;
+		else if (freq > AUDIO_SAMPLE_RATE_EXACT/4) freq = AUDIO_SAMPLE_RATE_EXACT/4;
+		//phase_increment = freq * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT);
+		duration = (AUDIO_SAMPLE_RATE_EXACT * 65536.0 + freq) / (freq * 2.0);
+	}
+	void amplitude(float n) {
+		if (n < 0) n = 0;
+		else if (n > 1.0) n = 1.0;
+		magnitude = n * 32767.0;
+	}
+	virtual void update(void);
 private:
-        static audio_block_t *block_left;
-        static uint16_t block_offset;
-        static int32_t hpf_y1;
-        static int32_t hpf_x1;
-
-        static bool update_responsibility;
-        static DMAChannel dma;
-        static void isr(void);
-        static void init(uint8_t pin);
-
+	uint32_t duration; // samples per half cycle (when 50% duty) * 65536
+	audio_block_t *inputQueueArray[1];
+	int32_t magnitude;
+	uint32_t elapsed;
 };
+
 
 #endif

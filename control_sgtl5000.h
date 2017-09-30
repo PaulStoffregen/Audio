@@ -100,8 +100,8 @@ protected:
 	bool write(unsigned int reg, unsigned int val);
 	unsigned int modify(unsigned int reg, unsigned int val, unsigned int iMask);
 	unsigned short dap_audio_eq_band(uint8_t bandNum, float n);
-private:
 	bool semi_automated;
+private:
 	void automate(uint8_t dap, uint8_t eq);
 	void automate(uint8_t dap, uint8_t eq, uint8_t filterCount);
 };
