@@ -110,7 +110,7 @@ private:
 	uint8_t naverage;
 #endif
 	uint8_t count;
-	bool outputflag;
+	volatile bool outputflag;
 	audio_block_t *inputQueueArray[1];
 	arm_cfft_radix4_instance_q15 fft_inst;
 };
