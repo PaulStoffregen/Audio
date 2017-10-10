@@ -124,7 +124,7 @@ void AudioOutputPWM::isr(void)
 
 	if (block) {
 		src = &block->data[offset];
-		for (int i=0; i < AUDIO_BLOCK_SAMPLES/4; i++) {
+		for (int i=0; i < AUDIO_BLOCK_SAMPLES/4; ++i) {
 			uint16_t sample = *src++ + 0x8000;
 			uint32_t msb = ((sample >> 8) & 255) + 120;
 			uint32_t lsb = sample & 255;

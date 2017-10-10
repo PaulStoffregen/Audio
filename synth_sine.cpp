@@ -114,7 +114,7 @@ void AudioSynthWaveformSineHires::update(void)
 		if (msw && lsw) {
 			ph = phase_accumulator;
 			inc = phase_increment;
-			for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+			for (i=0; i < AUDIO_BLOCK_SAMPLES; ++i) {
 				val = taylor(ph);
 				msw->data[i] = val >> 16;
 				lsw->data[i] = val & 0xFFFF;
@@ -154,7 +154,7 @@ void AudioSynthWaveformSineModulated::update(void)
 		// unable to allocate memory, so we'll send nothing
 		if (modinput) {
 			// but if we got modulation data, update the phase
-			for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+			for (i=0; i < AUDIO_BLOCK_SAMPLES; ++i) {
 				mod = modinput->data[i];
 				ph += inc + (multiply_32x32_rshift32(inc, mod << 16) << 1);
 			}
@@ -185,7 +185,7 @@ void AudioSynthWaveformSineModulated::update(void)
 	} else {
 		ph = phase_accumulator;
 		inc = phase_increment;
-		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+		for (i=0; i < AUDIO_BLOCK_SAMPLES; ++i) {
 			index = ph >> 24;
 			val1 = AudioWaveformSine[index];
 			val2 = AudioWaveformSine[index+1];

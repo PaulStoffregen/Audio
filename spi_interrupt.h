@@ -40,7 +40,7 @@ extern unsigned short AudioUsingSPICount;
 
 static inline void AudioStartUsingSPI(void) {
 	SPI.usingInterrupt(IRQ_SOFTWARE);
-	AudioUsingSPICount++;
+	++AudioUsingSPICount;
 }
 
 static inline void AudioStopUsingSPI(void) {

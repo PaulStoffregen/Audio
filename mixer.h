@@ -35,7 +35,7 @@ class AudioMixer4 : public AudioStream
 #if defined(KINETISK)
 public:
         AudioMixer4(void) : AudioStream(4, inputQueueArray) {
-		for (int i=0; i<4; i++) multiplier[i] = 65536;
+		for (int i=0; i<4; ++i) multiplier[i] = 65536;
 	}
         virtual void update(void);
 	void gain(unsigned int channel, float gain) {
@@ -51,7 +51,7 @@ private:
 #elif defined(KINETISL)
 public:
         AudioMixer4(void) : AudioStream(4, inputQueueArray) {
-		for (int i=0; i<4; i++) multiplier[i] = 256;
+		for (int i=0; i<4; ++i) multiplier[i] = 256;
 	}
         virtual void update(void);
 	void gain(unsigned int channel, float gain) {
