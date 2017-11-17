@@ -51,6 +51,7 @@ AudioPlayMemory	KEYWORD2
 AudioPlaySdRaw	KEYWORD2
 AudioPlaySdWav	KEYWORD2
 AudioPlayQueue	KEYWORD2
+AudioPlaySerialflashRaw	KEYWORD2
 AudioRecordQueue	KEYWORD2
 AudioSynthToneSweep	KEYWORD2
 AudioSynthWaveform	KEYWORD2
