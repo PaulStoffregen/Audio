@@ -8,6 +8,10 @@
 #include "control_ak4558.h"
 #include "Wire.h"
 
+#if defined(ARDUINO_ARCH_SAMD)
+#include <Arduino.h>
+#endif
+
 void AudioControlAK4558::initConfig(void)
 {
 	// puts all default registers values inside an array

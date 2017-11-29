@@ -27,6 +27,8 @@
 #ifndef Audio_h_
 #define Audio_h_
 
+#if 0
+
 #if TEENSYDUINO < 120
 #error "Teensyduino version 1.20 or later is required to compile the Audio library."
 #endif
@@ -40,6 +42,8 @@
 #error "https://github.com/PaulStoffregen/cores/blob/master/teensy3/DMAChannel.h"
 #error "https://github.com/PaulStoffregen/cores/blob/master/teensy3/DMAChannel.cpp"
 #endif
+
+#endif //0
 
 // When changing multiple audio object settings that must update at
 // the same time, these functions allow the audio library interrupt
@@ -84,25 +88,37 @@
 #include "filter_biquad.h"
 #include "filter_fir.h"
 #include "filter_variable.h"
+
+#if 0
 #include "input_adc.h"
 #include "input_adcs.h"
 #include "input_i2s.h"
 #include "input_i2s_quad.h"
 #include "input_tdm.h"
+#endif //0
+
 #include "mixer.h"
-#include "output_dac.h"
 #include "output_dacs.h"
+
+#if 0
+#include "output_dac.h"
 #include "output_i2s.h"
 #include "output_i2s_quad.h"
 #include "output_pwm.h"
 #include "output_spdif.h"
 #include "output_pt8211.h"
 #include "output_tdm.h"
+#endif //0
+
 #include "play_memory.h"
 #include "play_queue.h"
 #include "play_sd_raw.h"
 #include "play_sd_wav.h"
+
+#if 0
 #include "play_serialflash_raw.h"
+#endif //0
+
 #include "record_queue.h"
 #include "synth_tonesweep.h"
 #include "synth_sine.h"

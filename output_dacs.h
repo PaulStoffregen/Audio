@@ -29,6 +29,35 @@
 
 #include "Arduino.h"
 #include "AudioStream.h"
+
+#if defined(ARDUINO_ARCH_SAMD)
+
+#include "Adafruit_ZeroDMA.h"
+
+class AudioOutputAnalogStereo : public AudioStream
+{
+	public:
+	AudioOutputAnalogStereo(void) : AudioStream(2, inputQueueArray) { begin(); }
+	virtual void update(void);
+	void begin(void);
+	void analogReference(int ref);
+	private:
+	static audio_block_t *block_left_1st;
+	static audio_block_t *block_left_2nd;
+	static audio_block_t *block_right_1st;
+	static audio_block_t *block_right_2nd;
+	static audio_block_t block_silent;
+	static bool update_responsibility;
+	audio_block_t *inputQueueArray[2];
+	static Adafruit_ZeroDMA dma0;
+	static Adafruit_ZeroDMA dma1;
+	static DmacDescriptor *desc0;
+	static DmacDescriptor *desc1;
+	static void isr(Adafruit_ZeroDMA *dma);
+};
+
+#else //teensy
+
 #include "DMAChannel.h"
 
 class AudioOutputAnalogStereo : public AudioStream
@@ -49,5 +78,7 @@ private:
 	static DMAChannel dma;
 	static void isr(void);
 };
+
+#endif
 
 #endif

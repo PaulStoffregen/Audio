@@ -27,6 +27,10 @@
 #include "control_sgtl5000.h"
 #include "Wire.h"
 
+#if defined(ARDUINO_ARCH_SAMD)
+#include <Arduino.h>
+#endif
+
 #define CHIP_ID				0x0000
 // 15:8 PARTID		0xA0 - 8 bit identifier for SGTL5000
 // 7:0  REVID		0x00 - revision number for SGTL5000.

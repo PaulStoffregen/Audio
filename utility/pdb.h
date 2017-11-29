@@ -27,6 +27,8 @@
 #ifndef pdb_h_
 #define pdb_h_
 
+#if !defined(ARDUINO_ARCH_SAMD)
+
 #include "kinetis.h"
 
 // Multiple input & output objects use the Programmable Delay Block
@@ -69,5 +71,11 @@
 #else
   #error "Unsupported F_BUS speed"
 #endif
+
+#else
+
+#define AUDIO_TC_FREQ 44100
+
+#endif //ARDUINO_ARCH_SAMD
 
 #endif

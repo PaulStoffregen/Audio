@@ -26,6 +26,11 @@
 
 #include "effect_delay_ext.h"
 
+#if defined(ARDUINO_ARCH_SAMD)
+#include <Arduino.h>
+#define digitalWriteFast digitalWrite
+#endif
+
 //#define INTERNAL_TEST
 
 // While 20 MHz (Teensy actually uses 16 MHz in most cases) and even 24 MHz
@@ -123,9 +128,11 @@ void AudioEffectDelayExternal::initialize(AudioEffectDelayMemoryType_t type, uin
 	head_offset = 0;
 	memory_type = type;
 
+#if !defined(ARDUINO_ARCH_SAMD)
 	SPI.setMOSI(SPIRAM_MOSI_PIN);
 	SPI.setMISO(SPIRAM_MISO_PIN);
 	SPI.setSCK(SPIRAM_SCK_PIN);
+#endif
 
 	SPI.begin();	
 	

@@ -27,6 +27,10 @@
 #include "control_wm8731.h"
 #include "Wire.h"
 
+#if defined(ARDUINO_ARCH_SAMD)
+#include <Arduino.h>
+#endif
+
 #define WM8731_I2C_ADDR 0x1A
 //#define WM8731_I2C_ADDR 0x1B
 

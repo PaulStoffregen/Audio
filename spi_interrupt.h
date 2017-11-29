@@ -51,7 +51,11 @@ static inline void AudioStopUsingSPI(void) {
 #else
 
 static inline void AudioStartUsingSPI(void) {
+#if defined(ARDUINO_ARCH_SAMD)
+	//TODO: this
+#else
 	SPI.usingInterrupt(IRQ_SOFTWARE);
+#endif
 }
 
 static inline void AudioStopUsingSPI(void) {

@@ -30,6 +30,11 @@
 #include "control_cs4272.h"
 #include "Wire.h"
 
+#if defined(ARDUINO_ARCH_SAMD)
+#include <Arduino.h>
+#define digitalWriteFast digitalWrite
+#endif
+
 #define CS4272_ADDR 0x10 // TODO: need to double check
 
 // Section 8.1 Mode Control
