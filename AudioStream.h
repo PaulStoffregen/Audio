@@ -49,7 +49,8 @@
 
 #define WAIT_TC8_REGS_SYNC(x) while(x->COUNT8.SYNCBUSY.bit.ENABLE);
 
-#define DMAMEM //TODO: REMOVE!!
+//TODO: remove
+#define DMAMEM
 
 #else
 #include "kinetis.h"

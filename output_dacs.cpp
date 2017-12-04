@@ -43,7 +43,7 @@ Adafruit_ZeroDMA AudioOutputAnalogStereo::dma0;
 Adafruit_ZeroDMA AudioOutputAnalogStereo::dma1;
 DmacDescriptor *AudioOutputAnalogStereo::desc0;
 DmacDescriptor *AudioOutputAnalogStereo::desc1;
-ZeroDMAstatus    stat;
+static ZeroDMAstatus    stat;
 
 void dummyCallback(Adafruit_ZeroDMA *dma)
 {
@@ -205,22 +205,18 @@ void AudioOutputAnalogStereo::isr(Adafruit_ZeroDMA *dma)
 	
 	//PORT[PORTA].Group->OUTTGL.reg |= (1UL << 21);	
 	saddr = desc0->SRCADDR.reg;
-	
-#if 0
-	saddr = (uint32_t)(dma.TCD->SADDR);
-	dma.clearInterrupt();
-#endif
+	saddr -= (AUDIO_BLOCK_SAMPLES) * 2 * (1<<1);
 
-	if (saddr != (uint32_t)dac_buffer) {
+	if (saddr == (uint32_t)dac_buffer) {
 		//DMA has finished the first half
-		desc0->SRCADDR.reg = (uint32_t)(dac_buffer + AUDIO_BLOCK_SAMPLES);
-		desc1->SRCADDR.reg = ((uint32_t)(dac_buffer + AUDIO_BLOCK_SAMPLES)) + 2;
+		dma0.changeDescriptor(desc0, dac_buffer + AUDIO_BLOCK_SAMPLES);
+		dma1.changeDescriptor(desc1, ((uint16_t *)(dac_buffer + AUDIO_BLOCK_SAMPLES)) + 1);
 		dest = dac_buffer;
 		end = dac_buffer + AUDIO_BLOCK_SAMPLES;
 	} else {
 		//DMA has finished the second half
-		desc0->SRCADDR.reg = (uint32_t)dac_buffer;
-		desc1->SRCADDR.reg = ((uint32_t)dac_buffer) + 2;
+		dma0.changeDescriptor(desc0, dac_buffer);
+		dma1.changeDescriptor(desc1, ((uint16_t *)dac_buffer) + 1 );
 		dest = dac_buffer + AUDIO_BLOCK_SAMPLES;
 		end = dac_buffer + AUDIO_BLOCK_SAMPLES*2;
 	}
