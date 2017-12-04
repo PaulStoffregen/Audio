@@ -73,7 +73,25 @@ void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
 	hpf_y1[1] = 0;     // Output will settle here when stable
 #endif
 	
-	//Enable ADCs in freerunning mode
+	ADC0->CTRLA.bit.PRESCALER = ADC_CTRLA_PRESCALER_DIV4_Val;
+	ADC0->CTRLB.bit.RESSEL = ADC_CTRLB_RESSEL_16BIT_Val;
+	
+	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_CTRLB );  //wait for sync
+	
+	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_CTRLB );  //wait for sync
+	
+	ADC0->SAMPCTRL.reg = 0x1F;                        // Set max Sampling Time Length
+	
+	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_SAMPCTRL );  //wait for sync
+	
+	ADC0->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_8 |    
+						ADC_AVGCTRL_ADJRES(0x0ul);   // Adjusting result by 0
+						
+	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_AVGCTRL );  //wait for sync
+	
+	while(ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_REFCTRL);
+	ADC0->REFCTRL.bit.REFSEL = ADC_REFCTRL_REFSEL_AREFA_Val;
+	
 	ADC0->CTRLB.bit.FREERUN = 0x01; 
 	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_ENABLE ); //wait for sync
 	ADC0->CTRLA.bit.ENABLE = 0x01;             // Enable ADC
@@ -84,12 +102,12 @@ void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
 	//TODO: this will be a different pin on feather M4
 	pinPeripheral(2, PIO_ANALOG);
 	
-	ADC1->CTRLA.bit.PRESCALER = ADC_CTRLA_PRESCALER_DIV64_Val;
+	ADC1->CTRLA.bit.PRESCALER = ADC_CTRLA_PRESCALER_DIV4_Val;
 	ADC1->CTRLB.bit.RESSEL = ADC_CTRLB_RESSEL_16BIT_Val;
 	
 	while( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_CTRLB );  //wait for sync
 	
-	ADC1->SAMPCTRL.reg = 0x2f;                        // Set max Sampling Time Length
+	ADC1->SAMPCTRL.reg = 0x1F;                        // Set max Sampling Time Length
 	
 	while( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_SAMPCTRL );  //wait for sync
 	
@@ -102,13 +120,13 @@ void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
 	
 	//TODO: decide on oversampling ctrl
 	// Averaging (see datasheet table in AVGCTRL register description)
-	ADC1->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_2 |    
+	ADC1->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_8 |    
 						ADC_AVGCTRL_ADJRES(0x0ul);   // Adjusting result by 0
 						
 	while( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_AVGCTRL );  //wait for sync
 	
 	while(ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_REFCTRL);
-	ADC1->REFCTRL.bit.REFSEL = ADC_REFCTRL_REFSEL_INTVCC1_Val;
+	ADC1->REFCTRL.bit.REFSEL = ADC_REFCTRL_REFSEL_AREFA_Val;
 	
 	
 	ADC1->CTRLB.bit.FREERUN = 0x01; 
