@@ -27,7 +27,7 @@
 #include "filter_biquad.h"
 #include "utility/dspinst.h"
 
-#if defined(KINETISK)
+#if defined(KINETISK) || defined(__SAMD51__)
 
 void AudioFilterBiquad::update(void)
 {
