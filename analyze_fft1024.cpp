@@ -61,7 +61,7 @@ void AudioAnalyzeFFT1024::update(void)
 	block = receiveReadOnly();
 	if (!block) return;
 
-#if defined(KINETISK)
+#if defined(KINETISK) || defined(__SAMD51__)
 	switch (state) {
 	case 0:
 		blocklist[0] = block;

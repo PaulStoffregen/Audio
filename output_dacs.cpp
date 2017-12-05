@@ -129,25 +129,6 @@ void AudioOutputAnalogStereo::begin(void)
 	dma0.setCallback(dummyCallback);
 	dma0.startJob();
 	dma1.startJob();
-	
-#if 0	
-	//lets see if we can use ZeroDMA for this
-	dma.TCD->SADDR = dac_buffer; //source address
-	dma.TCD->SOFF = 4; //signed source address offset
-	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(DMA_TCD_ATTR_SIZE_32BIT) |DMA_TCD_ATTR_DSIZE(DMA_TCD_ATTR_SIZE_16BIT); //32 bit source, 16 bit dest
-	dma.TCD->NBYTES_MLNO = DMA_TCD_NBYTES_MLOFFYES_NBYTES(4) | DMA_TCD_NBYTES_DMLOE | DMA_TCD_NBYTES_MLOFFYES_MLOFF((&DAC0_DAT0L - &DAC1_DAT0L) * 2); //TCD Minor Byte Count (Minor Loop Disabled)
-	dma.TCD->SLAST = -sizeof(dac_buffer); //last source address alignment
-	dma.TCD->DADDR = &DAC0_DAT0L; //destination address
-	dma.TCD->DOFF = &DAC1_DAT0L - &DAC0_DAT0L; //signed destination address offset
-	dma.TCD->CITER_ELINKNO = sizeof(dac_buffer) / 4; 
-	dma.TCD->DLASTSGA = (&DAC0_DAT0L - &DAC1_DAT0L) * 2; //Last Destination Address Adjustment/Scatter Gather Address
-	dma.TCD->BITER_ELINKNO = sizeof(dac_buffer) / 4; // TCD Beginning Minor Loop Link, Major Loop Count, Channel Linking Disabled
-	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR; //control status
-	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_PDB); //trigger on PDB
-	update_responsibility = update_setup();
-	dma.enable();
-	dma.attachInterrupt(isr);
-#endif
 }
 
 void AudioOutputAnalogStereo::analogReference(int ref)

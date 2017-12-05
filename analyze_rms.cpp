@@ -32,7 +32,7 @@ void AudioAnalyzeRMS::update(void)
 {
 	audio_block_t *block = receiveReadOnly();
 	if (!block) return;
-#if defined(KINETISK)
+#if defined(KINETISK) || defined(__SAMD51__)
 	uint32_t *p = (uint32_t *)(block->data);
 	uint32_t *end = p + AUDIO_BLOCK_SAMPLES/2;
 	int64_t sum = accum;
