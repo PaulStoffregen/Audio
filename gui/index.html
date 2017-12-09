@@ -360,6 +360,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioOutputPWM","data":{"defaults":{"name":{"value":"new"}},"shortName":"pwm","inputs":1,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputI2Sslave","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2sslave","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputTDM","data":{"defaults":{"name":{"value":"new"}},"shortName":"tdm","inputs":16,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputADAT","data":{"defaults":{"name":{"value":"new"}},"shortName":"adat","inputs":8,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputUSB","data":{"defaults":{"name":{"value":"new"}},"shortName":"usb","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioMixer4","data":{"defaults":{"name":{"value":"new"}},"shortName":"mixer","inputs":4,"outputs":1,"category":"mixer-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioPlayMemory","data":{"defaults":{"name":{"value":"new"}},"shortName":"playMem","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -1251,6 +1252,52 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		even numbered channels are used for the top 16 bits.</p>
 </script>
 <script type="text/x-red" data-template-name="AudioOutputTDM">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioOutputADAT">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Transmit ADAT TOSLINK Optical Output</p>
+	<p align=center><img src="img/adat.jpg"></p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Channel 1</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Channel 2</td></tr>
+		<tr class=odd><td align=center>In 2</td><td>Channel 3</td></tr>
+		<tr class=odd><td align=center>In 3</td><td>Channel 4</td></tr>
+		<tr class=odd><td align=center>In 4</td><td>Channel 5</td></tr>
+		<tr class=odd><td align=center>In 5</td><td>Channel 6</td></tr>
+		<tr class=odd><td align=center>In 6</td><td>Channel 7</td></tr>
+		<tr class=odd><td align=center>In 7</td><td>Channel 8</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from its 8 input ports to the TOSLINK output.</p>
+	<h3>Hardware</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>22</td><td>TX</td><td>TOSLINK Signal</td></tr>
+	</table>
+	<p>For optical TOSLINK output, this
+		<a href="https://www.oshpark.com/shared_projects/KcDBKHta" target="_blank">OSH Park board</a>
+		can be used with the inexpensive Everlight PLT133/T6A connector, available
+		at Digikey, 1080-1434-ND.
+		</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; ADAT_DrumSamplePlayer
+	</p>
+	<h3>Notes</h3>
+	<p>ADAT output was contributed by Ernstjan Freriks.  See <a href="https://forum.pjrc.com/threads/28639-S-pdif?p=159530&viewfull=1#post159530">this forum thread</a> for details.</p>
+	<p>A <a href="https://www.youtube.com/watch?v=e5ov3q02zxo">Youtube video</a>
+		also demonstrates how it works.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioOutputADAT">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
