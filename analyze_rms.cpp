@@ -31,7 +31,10 @@
 void AudioAnalyzeRMS::update(void)
 {
 	audio_block_t *block = receiveReadOnly();
-	if (!block) return;
+	if (!block) {
+		count++;
+		return;
+	}
 #if defined(KINETISK)
 	uint32_t *p = (uint32_t *)(block->data);
 	uint32_t *end = p + AUDIO_BLOCK_SAMPLES/2;
