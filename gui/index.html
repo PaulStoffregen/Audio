@@ -2077,7 +2077,7 @@ The actual packets are taken
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>play</span>(level, lowFreq, highFreq, time);</p>
 	<p class=desc>Start generating frequency sweep output.  The time is specified
-		in milliseconds.  Level is 0 to 1.0.
+		in seconds.  Level is 0 to 1.0.
 	</p>
 	<p class=func><span class=keyword>isPlaying</span>();</p>
 	<p class=desc>Returns true (non-zero) while the output is active.
@@ -2086,7 +2086,8 @@ The actual packets are taken
 	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; ToneSweep
 	</p>
 	<h3>Notes</h3>
-	<p>Uses excessive CPU time</p>
+	<p>Uses excessive CPU time.</p>
+	<p>The frequency actually changes in discrete steps every 128 samples (2.9 ms).</p>
 </script>
 <script type="text/x-red" data-template-name="AudioSynthToneSweep">
 	<div class="form-row">
