@@ -192,7 +192,7 @@ void AudioSynthWaveformSineModulated::update(void)
 			scale = (ph >> 8) & 0xFFFF;
 			val2 *= scale;
 			val1 *= 0x10000 - scale;
-			block->data[i] = (val1 + val2) >> 16;
+			block->data[i] = multiply_32x32_rshift32(val1 + val2, magnitude);
 			ph += inc;
 		}
 	}
