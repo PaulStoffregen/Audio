@@ -47,7 +47,7 @@
 #define AUDIO_Handler TC2_Handler
 #define AUDIO_GCLK_ID TC2_GCLK_ID
 
-#define WAIT_TC8_REGS_SYNC(x) while(x->COUNT8.SYNCBUSY.bit.ENABLE);
+#define WAIT_TC8_REGS_SYNC(x) while(x->COUNT8.SYNCBUSY.bit.ENABLE || x->COUNT8.SYNCBUSY.bit.SWRST);
 
 //TODO: remove
 #define DMAMEM

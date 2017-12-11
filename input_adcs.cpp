@@ -44,8 +44,8 @@ uint16_t AudioInputAnalogStereo::offset_right = 0;
 int32_t AudioInputAnalogStereo::hpf_y1[2] = { 0, 0 };
 int32_t AudioInputAnalogStereo::hpf_x1[2] = { 0, 0 };
 bool AudioInputAnalogStereo::update_responsibility = false;
-Adafruit_ZeroDMA AudioInputAnalogStereo::dma0;
-Adafruit_ZeroDMA AudioInputAnalogStereo::dma1;
+Adafruit_ZeroDMA *AudioInputAnalogStereo::dma0;
+Adafruit_ZeroDMA *AudioInputAnalogStereo::dma1;
 DmacDescriptor *AudioInputAnalogStereo::desc0;
 DmacDescriptor *AudioInputAnalogStereo::desc1;
 static ZeroDMAstatus    stat;
@@ -54,8 +54,11 @@ void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
 {
 	uint32_t tmp;
 	
-	stat = dma0.allocate();
-	stat = dma1.allocate();
+	dma0 = new Adafruit_ZeroDMA;
+	dma1 = new Adafruit_ZeroDMA;
+
+	stat = dma0->allocate();
+	stat = dma1->allocate();
 
 	// Note for review:
 	// Probably not useful to spin cycles here stabilizing
@@ -154,12 +157,12 @@ void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
 	AUDIO_TC->COUNT8.CTRLA.reg |= TC_CTRLA_ENABLE;
 	WAIT_TC8_REGS_SYNC(AUDIO_TC)
 	
-	dma0.setTrigger(TC2_DMAC_ID_OVF);
-	dma1.setTrigger(TC2_DMAC_ID_OVF);
-	dma0.setAction(DMA_TRIGGER_ACTON_BEAT);
-	dma1.setAction(DMA_TRIGGER_ACTON_BEAT);
+	dma0->setTrigger(TC2_DMAC_ID_OVF);
+	dma1->setTrigger(TC2_DMAC_ID_OVF);
+	dma0->setAction(DMA_TRIGGER_ACTON_BEAT);
+	dma1->setAction(DMA_TRIGGER_ACTON_BEAT);
 	
-	desc0 = dma0.addDescriptor(
+	desc0 = dma0->addDescriptor(
 	(void *)(&ADC0->RESULT.reg),		// move data from here
 	left_buffer,			// to here
 	AUDIO_BLOCK_SAMPLES / 2,               // this many...
@@ -167,7 +170,7 @@ void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
 	false,                             // increment source addr?
 	true);
 	
-	desc1 = dma1.addDescriptor(
+	desc1 = dma1->addDescriptor(
 	(void *)(&ADC1->RESULT.reg),		// move data from here
 	right_buffer,			// to here
 	AUDIO_BLOCK_SAMPLES / 2,               // this many...
@@ -176,10 +179,10 @@ void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
 	true);
 	
 	update_responsibility = update_setup();
-	dma0.setCallback(AudioInputAnalogStereo::isr0);
-	dma1.setCallback(AudioInputAnalogStereo::isr1);
-	dma0.startJob();
-	dma1.startJob();
+	dma0->setCallback(AudioInputAnalogStereo::isr0);
+	dma1->setCallback(AudioInputAnalogStereo::isr1);
+	dma0->startJob();
+	dma1->startJob();
 }
 
 
@@ -206,7 +209,7 @@ void AudioInputAnalogStereo::isr0(Adafruit_ZeroDMA *dma)
 		end = (uint16_t *)&left_buffer[AUDIO_BLOCK_SAMPLES/2];
 		//if (update_responsibility) AudioStream::update_all();
 	}
-	dma0.startJob();
+	dma0->startJob();
 	if (block_left != NULL) {
 		offset = offset_left;
 		if (offset > AUDIO_BLOCK_SAMPLES/2) offset = AUDIO_BLOCK_SAMPLES/2;
@@ -242,7 +245,7 @@ void AudioInputAnalogStereo::isr1(Adafruit_ZeroDMA *dma)
 		src = (uint16_t *)&right_buffer[0];
 		end = (uint16_t *)&right_buffer[AUDIO_BLOCK_SAMPLES/2];
 	}
-	dma1.startJob();
+	dma1->startJob();
 	
 	if (block_right != NULL) {
 		offset = offset_right;

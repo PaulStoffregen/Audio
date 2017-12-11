@@ -39,8 +39,8 @@ audio_block_t * AudioOutputAnalogStereo::block_right_1st = NULL;
 audio_block_t * AudioOutputAnalogStereo::block_right_2nd = NULL;
 audio_block_t AudioOutputAnalogStereo::block_silent;
 bool AudioOutputAnalogStereo::update_responsibility = false;
-Adafruit_ZeroDMA AudioOutputAnalogStereo::dma0;
-Adafruit_ZeroDMA AudioOutputAnalogStereo::dma1;
+Adafruit_ZeroDMA *AudioOutputAnalogStereo::dma0;
+Adafruit_ZeroDMA *AudioOutputAnalogStereo::dma1;
 DmacDescriptor *AudioOutputAnalogStereo::desc0;
 DmacDescriptor *AudioOutputAnalogStereo::desc1;
 static ZeroDMAstatus    stat;
@@ -52,8 +52,11 @@ void dummyCallback(Adafruit_ZeroDMA *dma)
 
 void AudioOutputAnalogStereo::begin(void)
 {
-	stat = dma0.allocate();
-	stat = dma1.allocate();
+	dma0 = new Adafruit_ZeroDMA();
+	dma1 = new Adafruit_ZeroDMA();
+
+	stat = dma0->allocate();
+	stat = dma1->allocate();
 	
 	pinPeripheral(PIN_DAC0, PIO_ANALOG);
 	pinPeripheral(PIN_DAC1, PIO_ANALOG);
@@ -99,12 +102,12 @@ void AudioOutputAnalogStereo::begin(void)
 	AUDIO_TC->COUNT8.CTRLA.reg |= TC_CTRLA_ENABLE;
 	WAIT_TC8_REGS_SYNC(AUDIO_TC)
 	
-	dma0.setTrigger(TC2_DMAC_ID_OVF);
-	dma1.setTrigger(TC2_DMAC_ID_OVF);
-	dma0.setAction(DMA_TRIGGER_ACTON_BEAT);
-	dma1.setAction(DMA_TRIGGER_ACTON_BEAT);
+	dma0->setTrigger(TC2_DMAC_ID_OVF);
+	dma1->setTrigger(TC2_DMAC_ID_OVF);
+	dma0->setAction(DMA_TRIGGER_ACTON_BEAT);
+	dma1->setAction(DMA_TRIGGER_ACTON_BEAT);
 	
-	desc0 = dma0.addDescriptor(
+	desc0 = dma0->addDescriptor(
 	  dac_buffer,						// move data from here
 	  (void *)(&DAC->DATA[0]),			// to here
 	  AUDIO_BLOCK_SAMPLES,               // this many...
@@ -114,7 +117,7 @@ void AudioOutputAnalogStereo::begin(void)
 	  DMA_ADDRESS_INCREMENT_STEP_SIZE_2,
 	  DMA_STEPSEL_SRC);
 	  
-	desc1 = dma1.addDescriptor(
+	desc1 = dma1->addDescriptor(
 		((uint16_t *)dac_buffer) + 1,		// move data from here
 		(void *)(&DAC->DATA[1]),			// to here
 		AUDIO_BLOCK_SAMPLES,               // this many...
@@ -125,10 +128,10 @@ void AudioOutputAnalogStereo::begin(void)
 		DMA_STEPSEL_SRC);						 // increment dest addr?
 		
 	update_responsibility = update_setup();
-	dma1.setCallback(AudioOutputAnalogStereo::isr);
-	dma0.setCallback(dummyCallback);
-	dma0.startJob();
-	dma1.startJob();
+	dma1->setCallback(AudioOutputAnalogStereo::isr);
+	dma0->setCallback(dummyCallback);
+	dma0->startJob();
+	dma1->startJob();
 }
 
 void AudioOutputAnalogStereo::analogReference(int ref)
@@ -190,19 +193,19 @@ void AudioOutputAnalogStereo::isr(Adafruit_ZeroDMA *dma)
 
 	if (saddr == (uint32_t)dac_buffer) {
 		//DMA has finished the first half
-		dma0.changeDescriptor(desc0, dac_buffer + AUDIO_BLOCK_SAMPLES);
-		dma1.changeDescriptor(desc1, ((uint16_t *)(dac_buffer + AUDIO_BLOCK_SAMPLES)) + 1);
+		dma0->changeDescriptor(desc0, dac_buffer + AUDIO_BLOCK_SAMPLES);
+		dma1->changeDescriptor(desc1, ((uint16_t *)(dac_buffer + AUDIO_BLOCK_SAMPLES)) + 1);
 		dest = dac_buffer;
 		end = dac_buffer + AUDIO_BLOCK_SAMPLES;
 	} else {
 		//DMA has finished the second half
-		dma0.changeDescriptor(desc0, dac_buffer);
-		dma1.changeDescriptor(desc1, ((uint16_t *)dac_buffer) + 1 );
+		dma0->changeDescriptor(desc0, dac_buffer);
+		dma1->changeDescriptor(desc1, ((uint16_t *)dac_buffer) + 1 );
 		dest = dac_buffer + AUDIO_BLOCK_SAMPLES;
 		end = dac_buffer + AUDIO_BLOCK_SAMPLES*2;
 	}
-	dma0.startJob();
-	dma1.startJob();
+	dma0->startJob();
+	dma1->startJob();
 	block_left = block_left_1st;
 	if (!block_left) block_left = &block_silent;
 	block_right = block_right_1st;

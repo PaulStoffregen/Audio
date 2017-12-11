@@ -29,7 +29,7 @@
 
 #if defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__) || defined(__SAMD51__)
 
-#include <AudioStream.h>
+#include "AudioStream.h"
 
 .cpu cortex-m4
 .syntax unified
