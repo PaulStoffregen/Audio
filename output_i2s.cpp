@@ -400,7 +400,7 @@ void AudioOutputI2S::update(void)
 void AudioOutputI2S::config_i2s(void)
 {
 #if defined(__SAMD51__)
-	i2s->begin(I2S_24_BIT, 44100);
+	i2s->begin(I2S_16_BIT, 44100);
 	i2s->enableMCLK();
 	i2s->enableTx();
 #else

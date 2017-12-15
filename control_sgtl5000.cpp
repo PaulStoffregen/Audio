@@ -519,27 +519,27 @@ bool AudioControlSGTL5000::enable(void)
 	delay(5);
 	//Serial.print("chip ID = ");
 	//delay(5);
-	//unsigned int n = read(CHIP_ID);
+	//unsigned int n = this->read(CHIP_ID);
 	//Serial.println(n, HEX);
 
-	write(CHIP_ANA_POWER, 0x4060);  // VDDD is externally driven with 1.8V
-	write(CHIP_LINREG_CTRL, 0x006C);  // VDDA & VDDIO both over 3.1V
-	write(CHIP_REF_CTRL, 0x01F2); // VAG=1.575, normal ramp, +12.5% bias current
-	write(CHIP_LINE_OUT_CTRL, 0x0F22); // LO_VAGCNTRL=1.65V, OUT_CURRENT=0.54mA
-	write(CHIP_SHORT_CTRL, 0x4446);  // allow up to 125mA
-	write(CHIP_ANA_CTRL, 0x0137);  // enable zero cross detectors
-	write(CHIP_ANA_POWER, 0x40FF); // power up: lineout, hp, adc, dac
-	write(CHIP_DIG_POWER, 0x0073); // power up all digital stuff
+	this->write(CHIP_ANA_POWER, 0x4060);  // VDDD is externally driven with 1.8V
+	this->write(CHIP_LINREG_CTRL, 0x006C);  // VDDA & VDDIO both over 3.1V
+	this->write(CHIP_REF_CTRL, 0x01F2); // VAG=1.575, normal ramp, +12.5% bias current
+	this->write(CHIP_LINE_OUT_CTRL, 0x0F22); // LO_VAGCNTRL=1.65V, OUT_CURRENT=0.54mA
+	this->write(CHIP_SHORT_CTRL, 0x4446);  // allow up to 125mA
+	this->write(CHIP_ANA_CTRL, 0x0137);  // enable zero cross detectors
+	this->write(CHIP_ANA_POWER, 0x40FF); // power up: lineout, hp, adc, dac
+	this->write(CHIP_DIG_POWER, 0x0073); // power up all digital stuff
 	delay(400);
-	write(CHIP_LINE_OUT_VOL, 0x1D1D); // default approx 1.3 volts peak-to-peak
-	write(CHIP_CLK_CTRL, 0x0004);  // 44.1 kHz, 256*Fs
-	write(CHIP_I2S_CTRL, 0x0130); // SCLK=32*Fs, 16bit, I2S format
+	this->write(CHIP_LINE_OUT_VOL, 0x1D1D); // default approx 1.3 volts peak-to-peak
+	this->write(CHIP_CLK_CTRL, 0x0004);  // 44.1 kHz, 256*Fs
+	this->write(CHIP_I2S_CTRL, 0x0130); // SCLK=32*Fs, 16bit, I2S format
 	// default signal routing is ok?
-	write(CHIP_SSS_CTRL, 0x0010); // ADC->I2S, I2S->DAC
-	write(CHIP_ADCDAC_CTRL, 0x0000); // disable dac mute
-	write(CHIP_DAC_VOL, 0x3C3C); // digital gain, 0dB
-	write(CHIP_ANA_HP_CTRL, 0x7F7F); // set volume (lowest level)
-	write(CHIP_ANA_CTRL, 0x0036);  // enable zero cross detectors
+	this->write(CHIP_SSS_CTRL, 0x0010); // ADC->I2S, I2S->DAC
+	this->write(CHIP_ADCDAC_CTRL, 0x0000); // disable dac mute
+	this->write(CHIP_DAC_VOL, 0x3C3C); // digital gain, 0dB
+	this->write(CHIP_ANA_HP_CTRL, 0x7F7F); // set volume (lowest level)
+	this->write(CHIP_ANA_CTRL, 0x0036);  // enable zero cross detectors
 	//mute = false;
 	semi_automated = true;
 	return true;
@@ -572,8 +572,8 @@ bool AudioControlSGTL5000::write(unsigned int reg, unsigned int val)
 
 unsigned int AudioControlSGTL5000::modify(unsigned int reg, unsigned int val, unsigned int iMask)
 {
-	unsigned int val1 = (read(reg)&(~iMask))|val;
-	if(!write(reg,val1)) return 0;
+	unsigned int val1 = (this->read(reg)&(~iMask))|val;
+	if(!this->write(reg,val1)) return 0;
 	return val1;
 }
 
@@ -581,7 +581,7 @@ bool AudioControlSGTL5000::volumeInteger(unsigned int n)
 {
 	if (n == 0) {
 		muted = true;
-		write(CHIP_ANA_HP_CTRL, 0x7F7F);
+		this->write(CHIP_ANA_HP_CTRL, 0x7F7F);
 		return muteHeadphone();
 	} else if (n > 0x80) {
 		n = 0;
@@ -593,13 +593,13 @@ bool AudioControlSGTL5000::volumeInteger(unsigned int n)
 		unmuteHeadphone();
 	}
 	n = n | (n << 8);
-	return write(CHIP_ANA_HP_CTRL, n);  // set volume
+	return this->write(CHIP_ANA_HP_CTRL, n);  // set volume
 }
 
 bool AudioControlSGTL5000::volume(float left, float right)
 {
 	unsigned short m=((0x7F-calcVol(right,0x7F))<<8)|(0x7F-calcVol(left,0x7F));
-	return write(CHIP_ANA_HP_CTRL, m);
+	return this->write(CHIP_ANA_HP_CTRL, m);
 }
 
 bool AudioControlSGTL5000::micGain(unsigned int dB)
@@ -621,8 +621,8 @@ bool AudioControlSGTL5000::micGain(unsigned int dB)
 	input_gain = (dB * 2) / 3;
 	if (input_gain > 15) input_gain = 15;
 
-	return write(CHIP_MIC_CTRL, 0x0170 | preamp_gain)
-	    && write(CHIP_ANA_ADC_CTRL, (input_gain << 4) | input_gain);
+	return this->write(CHIP_MIC_CTRL, 0x0170 | preamp_gain)
+	    && this->write(CHIP_ANA_ADC_CTRL, (input_gain << 4) | input_gain);
 }
 
 // CHIP_ANA_ADC_CTRL
@@ -647,7 +647,7 @@ bool AudioControlSGTL5000::lineInLevel(uint8_t left, uint8_t right)
 {
 	if (left > 15) left = 15;
 	if (right > 15) right = 15;
-	return write(CHIP_ANA_ADC_CTRL, (left << 4) | right);
+	return this->write(CHIP_ANA_ADC_CTRL, (left << 4) | right);
 }
 
 // CHIP_LINE_OUT_VOL
@@ -690,7 +690,7 @@ unsigned short AudioControlSGTL5000::lineOutLevel(uint8_t left, uint8_t right)
 
 unsigned short AudioControlSGTL5000::dacVolume(float n) // set both directly
 {
-	if ((read(CHIP_ADCDAC_CTRL)&(3<<2)) != ((n>0 ? 0:3)<<2)) {
+	if ((this->read(CHIP_ADCDAC_CTRL)&(3<<2)) != ((n>0 ? 0:3)<<2)) {
 		modify(CHIP_ADCDAC_CTRL,(n>0 ? 0:3)<<2,3<<2);
 	}
 	unsigned char m=calcVol(n,0xC0);
@@ -699,7 +699,7 @@ unsigned short AudioControlSGTL5000::dacVolume(float n) // set both directly
 unsigned short AudioControlSGTL5000::dacVolume(float left, float right)
 {
 	unsigned short adcdac=((right>0 ? 0:2)|(left>0 ? 0:1))<<2;
-	if ((read(CHIP_ADCDAC_CTRL)&(3<<2)) != adcdac) {
+	if ((this->read(CHIP_ADCDAC_CTRL)&(3<<2)) != adcdac) {
 		modify(CHIP_ADCDAC_CTRL,adcdac,1<<2);
 	}
 	unsigned short m=(0xFC-calcVol(right,0xC0))<<8|(0xFC-calcVol(left,0xC0));
@@ -745,18 +745,18 @@ unsigned short AudioControlSGTL5000::adcHighPassFilterDisable(void)
 unsigned short AudioControlSGTL5000::audioPreProcessorEnable(void)
 {
 	// audio processor used to pre-process analog input before Teensy
-	return write(DAP_CONTROL, 1) && write(CHIP_SSS_CTRL, 0x0013);
+	return this->write(DAP_CONTROL, 1) && this->write(CHIP_SSS_CTRL, 0x0013);
 }
 
 unsigned short AudioControlSGTL5000::audioPostProcessorEnable(void)
 {
 	// audio processor used to post-process Teensy output before headphones/lineout
-	return write(DAP_CONTROL, 1) && write(CHIP_SSS_CTRL, 0x0070);
+	return this->write(DAP_CONTROL, 1) && this->write(CHIP_SSS_CTRL, 0x0070);
 }
 
 unsigned short AudioControlSGTL5000::audioProcessorDisable(void)
 {
-	return write(CHIP_SSS_CTRL, 0x0010) && write(DAP_CONTROL, 0);
+	return this->write(CHIP_SSS_CTRL, 0x0010) && this->write(DAP_CONTROL, 0);
 }
 
 
@@ -799,17 +799,17 @@ void AudioControlSGTL5000::eqFilter(uint8_t filterNum, int *filterParameters)
 	// TODO: add the part that selects 7 PEQ filters.
 	if(semi_automated) automate(1,1,filterNum+1);
 	modify(DAP_FILTER_COEF_ACCESS,(uint16_t)filterNum,15); 
-	write(DAP_COEF_WR_B0_MSB,(*filterParameters>>4)&65535);
-	write(DAP_COEF_WR_B0_LSB,(*filterParameters++)&15);
-	write(DAP_COEF_WR_B1_MSB,(*filterParameters>>4)&65535);
-	write(DAP_COEF_WR_B1_LSB,(*filterParameters++)&15);
-	write(DAP_COEF_WR_B2_MSB,(*filterParameters>>4)&65535);
-	write(DAP_COEF_WR_B2_LSB,(*filterParameters++)&15);
-	write(DAP_COEF_WR_A1_MSB,(*filterParameters>>4)&65535);
-	write(DAP_COEF_WR_A1_LSB,(*filterParameters++)&15);
-	write(DAP_COEF_WR_A2_MSB,(*filterParameters>>4)&65535);
-	write(DAP_COEF_WR_A2_LSB,(*filterParameters++)&15);
-	write(DAP_FILTER_COEF_ACCESS,(uint16_t)0x100|filterNum);
+	this->write(DAP_COEF_WR_B0_MSB,(*filterParameters>>4)&65535);
+	this->write(DAP_COEF_WR_B0_LSB,(*filterParameters++)&15);
+	this->write(DAP_COEF_WR_B1_MSB,(*filterParameters>>4)&65535);
+	this->write(DAP_COEF_WR_B1_LSB,(*filterParameters++)&15);
+	this->write(DAP_COEF_WR_B2_MSB,(*filterParameters>>4)&65535);
+	this->write(DAP_COEF_WR_B2_LSB,(*filterParameters++)&15);
+	this->write(DAP_COEF_WR_A1_MSB,(*filterParameters>>4)&65535);
+	this->write(DAP_COEF_WR_A1_LSB,(*filterParameters++)&15);
+	this->write(DAP_COEF_WR_A2_MSB,(*filterParameters>>4)&65535);
+	this->write(DAP_COEF_WR_A2_LSB,(*filterParameters++)&15);
+	this->write(DAP_FILTER_COEF_ACCESS,(uint16_t)0x100|filterNum);
 }
 
 /* Valid values for dap_avc parameters
@@ -847,9 +847,9 @@ unsigned short AudioControlSGTL5000::autoVolumeControl(uint8_t maxGain, uint8_t 
 	uint8_t thresh=(pow(10,threshold/20)*0.636)*pow(2,15);
 	uint8_t att=(1-pow(10,-(attack/(20*44100))))*pow(2,19);
 	uint8_t dec=(1-pow(10,-(decay/(20*44100))))*pow(2,23);
-	write(DAP_AVC_THRESHOLD,thresh);
-	write(DAP_AVC_ATTACK,att);
-	write(DAP_AVC_DECAY,dec);
+	this->write(DAP_AVC_THRESHOLD,thresh);
+	this->write(DAP_AVC_ATTACK,att);
+	this->write(DAP_AVC_DECAY,dec);
 	return 	modify(DAP_AVC_CTRL,maxGain<<12|lbiResponse<<8|hardLimit<<5,3<<12|3<<8|1<<5);
 }
 unsigned short AudioControlSGTL5000::autoVolumeEnable(void)
@@ -916,13 +916,13 @@ unsigned short AudioControlSGTL5000::dap_audio_eq_band(uint8_t bandNum, float n)
 void AudioControlSGTL5000::automate(uint8_t dap, uint8_t eq)
 {
 	//if((dap!=0)&&(!(read(DAP_CONTROL)&1))) audioProcessorEnable();
-	if((read(DAP_AUDIO_EQ)&3) != eq) eqSelect(eq);
+	if((this->read(DAP_AUDIO_EQ)&3) != eq) eqSelect(eq);
 }
 
 void AudioControlSGTL5000::automate(uint8_t dap, uint8_t eq, uint8_t filterCount)
 {
 	automate(dap,eq);
-	if (filterCount > (read(DAP_PEQ)&7)) eqFilterCount(filterCount);
+	if (filterCount > (this->read(DAP_PEQ)&7)) eqFilterCount(filterCount);
 }
 
 
