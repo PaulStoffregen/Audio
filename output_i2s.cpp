@@ -400,9 +400,14 @@ void AudioOutputI2S::update(void)
 void AudioOutputI2S::config_i2s(void)
 {
 #if defined(__SAMD51__)
-	i2s->begin(I2S_16_BIT, 44100);
+
+//check that i2s has not already been configured
+	//if(!I2S->CTRLA.bit.ENABLE)
+		i2s->begin(I2S_16_BIT, 44100);
+
 	i2s->enableMCLK();
 	i2s->enableTx();
+	i2s->enableRx();
 #else
 	SIM_SCGC6 |= SIM_SCGC6_I2S;
 	SIM_SCGC7 |= SIM_SCGC7_DMA;

@@ -89,10 +89,10 @@
 #include "filter_fir.h"
 #include "filter_variable.h"
 #include "input_adcs.h"
+#include "input_i2s.h"
 
 #if 0
 #include "input_adc.h"
-#include "input_i2s.h"
 #include "input_i2s_quad.h"
 #include "input_tdm.h"
 #endif //0
