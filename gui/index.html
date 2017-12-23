@@ -2537,7 +2537,7 @@ double s_freq = .0625;</p>
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>delay</span>(channel, milliseconds);</p>
 	<p class=desc>Set output channel (0 to 7) to delay the signals by
-		milliseconds.  The maximum delay is approx 425 ms.  The actual delay
+		milliseconds.  See the table below for the maximum delay.  The actual delay
 		is rounded to the nearest sample.  Each channel can be configured for
 		any delay.  There is no requirement to configure the "taps" in increasing
 		delay order.
@@ -2553,9 +2553,19 @@ double s_freq = .0625;</p>
 	<h3>Notes</h3>
 	<p>Memory for the delayed signal is take from the memory pool allocated by
 		<a href="http://www.pjrc.com/teensy/td_libs_AudioConnection.html" target="_blank">AudioMemory()</a>.
-		Each block allows about 3 milliseconds of delay, so AudioMemory
+		Each block allows about 2.9 milliseconds of delay, so AudioMemory
 		should be increased to allow for the longest delay tap.
 	</p>
+	<p>Each board has a maximum possible delay.
+	</p>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Board</th><th>Maximum</th></tr>
+		<tr class=odd><td>Teensy 3.0</td><td align=center>139.26 ms</td></tr>
+		<tr class=odd><td>Teensy 3.1</td><td align=center>449.39 ms</td></tr>
+		<tr class=odd><td>Teensy 3.2</td><td align=center>449.39 ms</td></tr>
+		<tr class=odd><td>Teensy 3.5</td><td align=center>1671.19 ms</td></tr>
+		<tr class=odd><td>Teensy 3.6</td><td align=center>2413.94 ms</td></tr>
+	</table>
 </script>
 <script type="text/x-red" data-template-name="AudioEffectDelay">
 	<div class="form-row">
