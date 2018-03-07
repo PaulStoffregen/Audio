@@ -2435,20 +2435,25 @@ double s_freq = .0625;</p>
 	</p>
 	<p class=func><span class=keyword>attack</span>(milliseconds);</p>
 	<p class=desc>Set the attack time.  The default is 10.5 milliseconds.
+		The maximum is 11880 milliseconds.
 	</p>
 	<p class=func><span class=keyword>hold</span>(milliseconds);</p>
 	<p class=desc>Set the hold time.  The default is 2.5 milliseconds.
+		The maximum is 11880 milliseconds.
 	</p>
 	<p class=func><span class=keyword>decay</span>(milliseconds);</p>
 	<p class=desc>Set the decay time.  The default is 35 milliseconds.
+		The maximum is 11880 milliseconds.
 	</p>
 	<p class=func><span class=keyword>sustain</span>(level);</p>
 	<p class=desc>Set the sustain level.  The range is 0 to 1.0.  The
 		gain will be maintained at this level after the decay phase,
-		until noteOff() is called.
+		until noteOff() is called.  The sustain phase may last any
+		length of time, controlled by when release() is called.
 	</p>
 	<p class=func><span class=keyword>release</span>(milliseconds);</p>
 	<p class=desc>Set the release time.  The default is 300 millisecond.
+		The maximum is 11880 milliseconds.
 	</p>
 	<p class=func><span class=keyword>releaseNoteOn</span>(milliseconds);</p>
 	<p class=desc>Set a quick release time to be used when a new note is
@@ -2468,9 +2473,6 @@ double s_freq = .0625;</p>
 	<h3>Notes</h3>
 	<p>To achieve the more common ADSR shape, simply
         set delay and hold to zero.</p>
-	<p>The recommended range for each of the 5 timing inputs is 0 to 50
-		milliseconds.  Up to 200 ms can be used, with somewhat reduced
-		accuracy</p>
 </script>
 <script type="text/x-red" data-template-name="AudioEffectEnvelope">
 	<div class="form-row">
