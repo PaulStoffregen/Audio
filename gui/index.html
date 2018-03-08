@@ -771,8 +771,12 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		<tr class=odd><td align=center>Out 1</td><td>Right Channel</td></tr>
 	</table>
 	<h3>Functions</h3>
-	<p>This object has no functions to call from the Arduino sketch.  It
-		simply streams data from the USB to its 2 output ports.</p>
+	<p class=func><span class=keyword>volume</span>();</p>
+	<p class=desc>Returns the volume setting requested by the USB host.
+		Range is 0 to 1.0.  To make the PC's volume control work, this
+		setting should be read periodically and used to control the
+		system processing the signal.
+	</p>
 	<!--
 	<h3>Hardware</h3>
 	-->
@@ -786,10 +790,6 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>USB input &amp; output does not cause the Teensy Audio Library to
 		update.  At least one non-USB input or output object must be
 		present for the entire library to update properly.</p>
-	<p>A known problem exists with USB audio from Macintosh computers.
-		An imperfect <a href="https://forum.pjrc.com/threads/34855-Distorted-audio-when-using-USB-input-on-Teensy-3-1?p=110392&viewfull=1#post110392">workaround
-		can be enabled by editing usb_audio.cpp</a>.
-		Find and uncomment "#define MACOSX_ADAPTIVE_LIMIT".</p>
 </script>
 <script type="text/x-red" data-template-name="AudioInputUSB">
 	<div class="form-row">
