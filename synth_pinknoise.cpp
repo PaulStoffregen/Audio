@@ -35,6 +35,7 @@
 // Use for any purpose. If used in a commercial product, you should give me one.  
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+#include <Arduino.h>
 #include "synth_pinknoise.h"
 
 int16_t AudioSynthNoisePink::instance_cnt = 0;

@@ -41,12 +41,14 @@ public:
 private:
         static audio_block_t *block_left;
         static uint16_t block_offset;
-        static int32_t dc_average_hist[16];
-        static int32_t current_dc_average_index;
+        static int32_t hpf_y1;
+        static int32_t hpf_x1;
+
         static bool update_responsibility;
-	static DMAChannel dma;
-	static void isr(void);
-	static void init(uint8_t pin);
+        static DMAChannel dma;
+        static void isr(void);
+        static void init(uint8_t pin);
+
 };
 
 #endif

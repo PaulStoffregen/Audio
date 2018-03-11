@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "control_wm8731.h"
 #include "Wire.h"
 

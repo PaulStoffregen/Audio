@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "spi_interrupt.h"
 
 #ifdef SPI_HAS_NOTUSINGINTERRUPT

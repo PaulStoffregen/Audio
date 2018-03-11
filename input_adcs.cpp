@@ -24,11 +24,14 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "input_adcs.h"
 #include "utility/pdb.h"
 #include "utility/dspinst.h"
 
 #if defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
+
+#define COEF_HPF_DCBLOCK    (1048300<<10)  // DC Removal filter coefficient in S1.30
 
 DMAMEM static uint16_t left_buffer[AUDIO_BLOCK_SAMPLES];
 DMAMEM static uint16_t right_buffer[AUDIO_BLOCK_SAMPLES];
@@ -36,9 +39,8 @@ audio_block_t * AudioInputAnalogStereo::block_left = NULL;
 audio_block_t * AudioInputAnalogStereo::block_right = NULL;
 uint16_t AudioInputAnalogStereo::offset_left = 0;
 uint16_t AudioInputAnalogStereo::offset_right = 0;
-int32_t AudioInputAnalogStereo::left_dc_average_hist[16];
-int32_t AudioInputAnalogStereo::right_dc_average_hist[16];
-int32_t AudioInputAnalogStereo::current_dc_average_index = 0;
+int32_t AudioInputAnalogStereo::hpf_y1[2] = { 0, 0 };
+int32_t AudioInputAnalogStereo::hpf_x1[2] = { 0, 0 };
 bool AudioInputAnalogStereo::update_responsibility = false;
 DMAChannel AudioInputAnalogStereo::dma0(false);
 DMAChannel AudioInputAnalogStereo::dma1(false);
@@ -47,7 +49,7 @@ static int analogReadADC1(uint8_t pin);
 
 void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
 {
-	uint32_t i, sum0=0, sum1=0;
+	uint32_t tmp;
 
 	//pinMode(32, OUTPUT);
 	//pinMode(33, OUTPUT);
@@ -64,15 +66,20 @@ void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
 	analogReadAveraging(4);
 	ADC1_SC3 = ADC_SC3_AVGE + ADC_SC3_AVGS(0);
 #endif
-	// Actually, do many normal reads, to start with a nice DC level
-	for (i=0; i < 1024; i++) {
-		sum0 += analogRead(pin0);
-		sum1 += analogReadADC1(pin1);
-	}
-	for (i = 0; i < 16; i++) {
-		left_dc_average_hist[i] = sum0 >> 10;
-		right_dc_average_hist[i] = sum1 >> 10;
-	}
+
+    // Note for review:
+    // Probably not useful to spin cycles here stabilizing
+    // since DC blocking is similar to te external analog filters
+    tmp = (uint16_t) analogRead(pin0);
+    tmp = ( ((int32_t) tmp) << 14);
+    hpf_x1[0] = tmp;   // With constant DC level x1 would be x0
+    hpf_y1[0] = 0;     // Output will settle here when stable
+
+    tmp = (uint16_t) analogReadADC1(pin1);
+    tmp = ( ((int32_t) tmp) << 14);
+    hpf_x1[1] = tmp;   // With constant DC level x1 would be x0
+    hpf_y1[1] = 0;     // Output will settle here when stable
+
 
 	// set the programmable delay block to trigger the ADC at 44.1 kHz
 	//if (!(SIM_SCGC6 & SIM_SCGC6_PDB)
@@ -203,13 +210,10 @@ void AudioInputAnalogStereo::isr1(void)
 }
 
 
-
-
 void AudioInputAnalogStereo::update(void)
 {
 	audio_block_t *new_left=NULL, *out_left=NULL;
 	audio_block_t *new_right=NULL, *out_right=NULL;
-	uint32_t i, dc;
 	int32_t tmp;
 	int16_t s, *p, *end;
 
@@ -254,38 +258,42 @@ void AudioInputAnalogStereo::update(void)
 	offset_right = 0;
 	__enable_irq();
 
-	// Find and subtract DC offset... We use an average of the
-	// last 16 * AUDIO_BLOCK_SAMPLES samples.
-	dc = 0;
-	for (i = 0; i < 16; i++) {
-		dc += left_dc_average_hist[i];
-	}
-	dc /= 16 * AUDIO_BLOCK_SAMPLES;
-	left_dc_average_hist[current_dc_average_index] = 0;
-	p = out_left->data;
-	end = p + AUDIO_BLOCK_SAMPLES;
-	do {
-		left_dc_average_hist[current_dc_average_index] += (uint16_t)(*p);
-		tmp = (uint16_t)(*p) - (int32_t)dc;
-		s = signed_saturate_rshift(tmp, 16, 0);
-		*p++ = s;
-	} while (p < end);
+    //
+	// DC Offset Removal Filter
+    // 1-pole digital high-pass filter implementation
+    //   y = a*(x[n] - x[n-1] + y[n-1])
+    // The coefficient "a" is as follows:
+    //  a = UNITY*e^(-2*pi*fc/fs)
+    //  fc = 2 @ fs = 44100
+    //
 
-	dc = 0;
-	for (i = 0; i < 16; i++) {
-		dc += right_dc_average_hist[i];
-	}
-	dc /= 16 * AUDIO_BLOCK_SAMPLES;
-	right_dc_average_hist[current_dc_average_index] = 0;
-	p = out_right->data;
-	end = p + AUDIO_BLOCK_SAMPLES;
-	do {
-		right_dc_average_hist[current_dc_average_index] += (uint16_t)(*p);
-		tmp = (uint16_t)(*p) - (int32_t)dc;
-		s = signed_saturate_rshift(tmp, 16, 0);
-		*p++ = s;
-	} while (p < end);
-	current_dc_average_index = (current_dc_average_index + 1) % 16;
+    // DC removal, LEFT
+    p = out_left->data;
+    end = p + AUDIO_BLOCK_SAMPLES;
+    do {
+        tmp = (uint16_t)(*p);
+        tmp = ( ((int32_t) tmp) << 14);
+        int32_t acc = hpf_y1[0] - hpf_x1[0];
+        acc += tmp;
+        hpf_y1[0] = FRACMUL_SHL(acc, COEF_HPF_DCBLOCK, 1);
+        hpf_x1[0] = tmp;
+        s = signed_saturate_rshift(hpf_y1[0], 16, 14);
+        *p++ = s;
+    } while (p < end);
+
+    // DC removal, RIGHT
+    p = out_right->data;
+    end = p + AUDIO_BLOCK_SAMPLES;
+    do {
+        tmp = (uint16_t)(*p);
+        tmp = ( ((int32_t) tmp) << 14);
+        int32_t acc = hpf_y1[1] - hpf_x1[1];
+        acc += tmp;
+        hpf_y1[1]= FRACMUL_SHL(acc, COEF_HPF_DCBLOCK, 1);
+        hpf_x1[1] = tmp;
+        s = signed_saturate_rshift(hpf_y1[1], 16, 14);
+        *p++ = s;
+    } while (p < end);
 
 	// then transmit the AC data
 	transmit(out_left, 0);

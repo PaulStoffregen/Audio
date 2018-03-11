@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "output_dacs.h"
 #include "utility/pdb.h"
 
@@ -48,7 +49,7 @@ void AudioOutputAnalogStereo::begin(void)
 	memset(&block_silent, 0, sizeof(block_silent));
 
 	// slowly ramp up to DC voltage, approx 1/4 second
-	for (int16_t i=0; i<2048; i+=8) {
+	for (int16_t i=0; i<=2048; i+=8) {
 		*(int16_t *)&(DAC0_DAT0L) = i;
 		*(int16_t *)&(DAC1_DAT0L) = i;
 		delay(1);
@@ -174,10 +175,10 @@ void AudioOutputAnalogStereo::isr(void)
 		// TODO: can this be optimized?
 		uint32_t left = *src_left++;
 		uint32_t right = *src_right++;
-		uint32_t out1 = ((left & 0xFFFF) + 32767) >> 4;
-		out1 |= (((right & 0xFFFF) + 32767) >> 4) << 16;
-		uint32_t out2 = ((left >> 16) + 32767) >> 4;
-		out2 |= (((right >> 16) + 32767) >> 4) << 16;
+		uint32_t out1 = ((left & 0xFFFF) + 32768) >> 4;
+		out1 |= (((right & 0xFFFF) + 32768) >> 4) << 16;
+		uint32_t out2 = ((left >> 16) + 32768) >> 4;
+		out2 |= (((right >> 16) + 32768) >> 4) << 16;
 		*dest++ = out1;
 		*dest++ = out2;
 	} while (dest < end);
@@ -189,8 +190,8 @@ void AudioOutputAnalogStereo::isr(void)
 	}
 	if (block_right != &block_silent) {
 		release(block_right);
-		block_left_1st = block_left_2nd;
-		block_left_2nd = NULL;
+		block_right_1st = block_right_2nd;
+		block_right_2nd = NULL;
 	}
 
 	if (update_responsibility) update_all();

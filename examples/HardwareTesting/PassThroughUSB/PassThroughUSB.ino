@@ -17,13 +17,25 @@ void setup() {
 }
 
 void loop() {
-  // TODO: make PC's volume setting control the SGTL5000 volume...
+  // read the PC's volume setting
+  float vol = usb1.volume();
+
+  // scale to a nice range (not too loud)
+  // and adjust the audio shield output volume
+  if (vol > 0) {
+    // scale 0 = 1.0 range to:
+    //  0.3 = almost silent
+    //  0.8 = really loud
+    vol = 0.3 + vol * 0.5;
+  }
+
+  // use the scaled volume setting.  Delete this for fixed volume.
+  sgtl5000_1.volume(vol);
+
+  delay(100);
 }
 
-// A known problem occurs on Macintosh computers, where the Mac's driver
-// does not seem to be able to adapt and transmit horribly distorted
-// audio to Teensy after a matter of minutes.  An imperfect workaround
-// can be enabled by editing usb_audio.cpp.  Find and uncomment
-// "#define MACOSX_ADAPTIVE_LIMIT".  More detailed info is available here:
+// Teensyduino 1.35 & earlier had a problem with USB audio on Macintosh
+// computers.  For more info and a workaround:
 // https://forum.pjrc.com/threads/34855-Distorted-audio-when-using-USB-input-on-Teensy-3-1?p=110392&viewfull=1#post110392
 

@@ -20,6 +20,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "filter_fir.h"
 
 

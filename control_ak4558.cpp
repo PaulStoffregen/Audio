@@ -5,6 +5,7 @@
  *
  */
  
+#include <Arduino.h>
 #include "control_ak4558.h"
 #include "Wire.h"
 

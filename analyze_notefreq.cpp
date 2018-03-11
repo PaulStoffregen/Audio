@@ -20,6 +20,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "analyze_notefreq.h"
 #include "utility/dspinst.h"
 #include "arm_math.h"

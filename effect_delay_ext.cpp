@@ -24,9 +24,20 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "effect_delay_ext.h"
 
 //#define INTERNAL_TEST
+
+// While 20 MHz (Teensy actually uses 16 MHz in most cases) and even 24 MHz
+// have worked well in testing at room temperature with 3.3V power, to fully
+// meet all the worst case timing specs, the SPI clock low time would need
+// to be 40ns (12.5 MHz clock) for the single chip case and 51ns (9.8 MHz
+// clock) for the 6-chip memoryboard with 74LCX126 buffers.
+//
+// Timing analysis and info is here:
+// https://forum.pjrc.com/threads/29276-Limits-of-delay-effect-in-audio-library?p=97506&viewfull=1#post97506
+#define SPISETTING SPISettings(20000000, MSBFIRST, SPI_MODE0)
 
 // Use these with the audio adaptor board  (should be adjustable by the user...)
 #define SPIRAM_MOSI_PIN  7
@@ -112,6 +123,13 @@ void AudioEffectDelayExternal::initialize(AudioEffectDelayMemoryType_t type, uin
 	activemask = 0;
 	head_offset = 0;
 	memory_type = type;
+
+	SPI.setMOSI(SPIRAM_MOSI_PIN);
+	SPI.setMISO(SPIRAM_MISO_PIN);
+	SPI.setSCK(SPIRAM_SCK_PIN);
+
+	SPI.begin();	
+	
 	if (type == AUDIO_MEMORY_23LC1024) {
 #ifdef INTERNAL_TEST
 		memsize = 8000;
@@ -127,7 +145,16 @@ void AudioEffectDelayExternal::initialize(AudioEffectDelayMemoryType_t type, uin
 		pinMode(MEMBOARD_CS2_PIN, OUTPUT);
 		digitalWriteFast(MEMBOARD_CS0_PIN, LOW);
 		digitalWriteFast(MEMBOARD_CS1_PIN, LOW);
-		digitalWriteFast(MEMBOARD_CS2_PIN, LOW);
+		digitalWriteFast(MEMBOARD_CS2_PIN, LOW);		
+	} else if (type == AUDIO_MEMORY_CY15B104) {
+#ifdef INTERNAL_TEST
+		memsize = 8000;
+#else		
+		memsize = 262144;
+#endif	
+		pinMode(SPIRAM_CS_PIN, OUTPUT);
+		digitalWriteFast(SPIRAM_CS_PIN, HIGH);
+			
 	} else {
 		return;
 	}
@@ -141,11 +168,6 @@ void AudioEffectDelayExternal::initialize(AudioEffectDelayMemoryType_t type, uin
 	allocated[type] += samples;
 	memory_length = samples;
 
-	SPI.setMOSI(SPIRAM_MOSI_PIN);
-	SPI.setMISO(SPIRAM_MISO_PIN);
-	SPI.setSCK(SPIRAM_SCK_PIN);
-
-	SPI.begin();
 	zero(0, memory_length);
 }
 
@@ -154,18 +176,6 @@ void AudioEffectDelayExternal::initialize(AudioEffectDelayMemoryType_t type, uin
 static int16_t testmem[8000]; // testing only
 #endif
 
-
-#define SPISETTING SPISettings(20000000, MSBFIRST, SPI_MODE0)
-
-// While 20 MHz (Teensy actually uses 16 MHz in most cases) and even 24 MHz
-// have worked well in testing at room temperature with 3.3V power, to fully
-// meet all the worst case timing specs, the SPI clock low time would need
-// to be 40ns (12.5 MHz clock) for the single chip case and 51ns (9.8 MHz
-// clock) for the 6-chip memoryboard with 74LCX126 buffers.
-//
-// Timing analysis and info is here:
-// https://forum.pjrc.com/threads/29276-Limits-of-delay-effect-in-audio-library?p=97506&viewfull=1#post97506
-
 void AudioEffectDelayExternal::read(uint32_t offset, uint32_t count, int16_t *data)
 {
 	uint32_t addr = memory_begin + offset;
@@ -173,7 +183,8 @@ void AudioEffectDelayExternal::read(uint32_t offset, uint32_t count, int16_t *da
 #ifdef INTERNAL_TEST
 	while (count) { *data++ = testmem[addr++]; count--; } // testing only
 #else
-	if (memory_type == AUDIO_MEMORY_23LC1024) {
+	if (memory_type == AUDIO_MEMORY_23LC1024 || 
+		memory_type == AUDIO_MEMORY_CY15B104) {
 		addr *= 2;
 		SPI.beginTransaction(SPISETTING);
 		digitalWriteFast(SPIRAM_CS_PIN, LOW);
@@ -232,7 +243,26 @@ void AudioEffectDelayExternal::write(uint32_t offset, uint32_t count, const int1
 		}
 		digitalWriteFast(SPIRAM_CS_PIN, HIGH);
 		SPI.endTransaction();
-	} else if (memory_type == AUDIO_MEMORY_MEMORYBOARD) {
+	} else if (memory_type == AUDIO_MEMORY_CY15B104) {
+		addr *= 2;
+
+		SPI.beginTransaction(SPISETTING);
+		digitalWriteFast(SPIRAM_CS_PIN, LOW);
+		SPI.transfer(0x06); //write-enable before every write
+		digitalWriteFast(SPIRAM_CS_PIN, HIGH);
+		asm volatile ("NOP\n NOP\n NOP\n NOP\n NOP\n NOP\n");
+		digitalWriteFast(SPIRAM_CS_PIN, LOW);
+		SPI.transfer16((0x02 << 8) | (addr >> 16));
+		SPI.transfer16(addr & 0xFFFF);
+		while (count) {
+			int16_t w = 0;
+			if (data) w = *data++;
+			SPI.transfer16(w);
+			count--;
+		}
+		digitalWriteFast(SPIRAM_CS_PIN, HIGH);
+		SPI.endTransaction();	
+	} else if (memory_type == AUDIO_MEMORY_MEMORYBOARD) {		
 		SPI.beginTransaction(SPISETTING);
 		while (count) {
 			uint32_t chip = (addr >> 16) + 1;
@@ -259,6 +289,3 @@ void AudioEffectDelayExternal::write(uint32_t offset, uint32_t count, const int1
 	}
 #endif
 }
-
-
-

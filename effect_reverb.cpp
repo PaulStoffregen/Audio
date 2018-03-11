@@ -22,6 +22,7 @@
 
 // https://github.com/joaoRossiFilho/teensy_reverb
 
+#include <Arduino.h>
 #include "effect_reverb.h"
 #include "utility/dspinst.h"
 #include "math_helper.h"
