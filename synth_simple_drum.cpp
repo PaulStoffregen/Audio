@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "synth_simple_drum.h"
 
 extern "C" {

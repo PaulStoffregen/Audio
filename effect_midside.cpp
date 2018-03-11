@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "effect_midside.h"
 
 void AudioEffectMidSide::update(void)

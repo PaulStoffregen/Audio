@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "output_i2s.h"
 #include "memcpy_audio.h"
 

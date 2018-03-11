@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "input_i2s_quad.h"
 #include "output_i2s_quad.h"
 

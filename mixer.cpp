@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "mixer.h"
 #include "utility/dspinst.h"
 

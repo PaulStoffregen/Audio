@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "effect_multiply.h"
 
 void AudioEffectMultiply::update(void)

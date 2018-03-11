@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "effect_waveshaper.h"
 
 AudioEffectWaveshaper::~AudioEffectWaveshaper()

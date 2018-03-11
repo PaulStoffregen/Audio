@@ -21,6 +21,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "output_adat.h"
 
 #if defined(KINETISK)

@@ -20,6 +20,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "effect_flange.h"
 #include "arm_math.h"
 

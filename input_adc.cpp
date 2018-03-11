@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "input_adc.h"
 #include "utility/pdb.h"
 #include "utility/dspinst.h"

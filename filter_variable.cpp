@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "filter_variable.h"
 #include "utility/dspinst.h"
 

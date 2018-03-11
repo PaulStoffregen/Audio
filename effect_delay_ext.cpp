@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "effect_delay_ext.h"
 
 //#define INTERNAL_TEST

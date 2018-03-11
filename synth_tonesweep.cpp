@@ -20,6 +20,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "synth_tonesweep.h"
 #include "arm_math.h"
 

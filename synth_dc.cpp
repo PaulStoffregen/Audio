@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "synth_dc.h"
 
 void AudioSynthWaveformDc::update(void)

@@ -26,6 +26,7 @@
 
 //Adapted to PT8211, Frank Bösing, Ben-Rheinland
 
+#include <Arduino.h>
 #include "output_pt8211.h"
 #include "memcpy_audio.h"
 
