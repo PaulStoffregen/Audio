@@ -180,3 +180,17 @@ void AudioEffectEnvelope::update(void)
 	release(block);
 }
 
+bool AudioEffectEnvelope::isActive()
+{
+	uint8_t current_state = *(volatile uint8_t *)&state;
+	if (current_state == STATE_IDLE) return false;
+	return true;
+}
+
+bool AudioEffectEnvelope::isSustain()
+{
+	uint8_t current_state = *(volatile uint8_t *)&state;
+	if (current_state == STATE_SUSTAIN) return true;
+	return false;
+}
+
