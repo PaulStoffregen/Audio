@@ -80,6 +80,7 @@
 #include "effect_delay_ext.h"
 #include "effect_midside.h"
 #include "effect_reverb.h"
+#include "effect_freeverb.h"
 #include "effect_waveshaper.h"
 #include "filter_biquad.h"
 #include "filter_fir.h"

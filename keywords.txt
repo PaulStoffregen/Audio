@@ -38,6 +38,7 @@ AudioEffectDelay	KEYWORD2
 AudioEffectDelayExternal	KEYWORD2
 AudioEffectBitcrusher	KEYWORD2
 AudioEffectReverb	KEYWORD2
+AudioEffectFreeverb	KEYWORD2
 AudioEffectMidSide	KEYWORD2
 AudioEffectWaveshaper	KEYWORD2
 AudioFilterBiquad	KEYWORD2
