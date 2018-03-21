@@ -89,6 +89,8 @@ unmuteInput	KEYWORD2
 enableDither	KEYWORD2
 disableDither	KEYWORD2
 reverbTime	KEYWORD2
+roomsize	KEYWORD2
+damping	KEYWORD2
 frequency	KEYWORD2
 phase	KEYWORD2
 amplitude	KEYWORD2
