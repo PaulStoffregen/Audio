@@ -384,6 +384,8 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioEffectChorus","data":{"defaults":{"name":{"value":"new"}},"shortName":"chorus","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectFlange","data":{"defaults":{"name":{"value":"new"}},"shortName":"flange","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectReverb","data":{"defaults":{"name":{"value":"new"}},"shortName":"reverb","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectFreeverb","data":{"defaults":{"name":{"value":"new"}},"shortName":"freeverb","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectFreeverbStereo","data":{"defaults":{"name":{"value":"new"}},"shortName":"freeverbs","inputs":1,"outputs":2,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectEnvelope","data":{"defaults":{"name":{"value":"new"}},"shortName":"envelope","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectMultiply","data":{"defaults":{"name":{"value":"new"}},"shortName":"multiply","inputs":2,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectDelay","data":{"defaults":{"name":{"value":"new"}},"shortName":"delay","inputs":1,"outputs":8,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -2406,6 +2408,92 @@ double s_freq = .0625;</p>
 		<input type="text" id="node-input-name" placeholder="Name">
 	</div>
 </script>
+
+<script type="text/x-red" data-help-name="AudioEffectFreeverb">
+<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>High quality Reverb effect, based on Freeverb by Jezar at Dreampoint.
+	</p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class="top"><th>Port</th><th>Purpose</th></tr>
+		<tr class="odd"><td align="center">In 0</td><td>Input</td></tr>
+		<tr class="odd"><td align="center">Out 0</td><td>Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>roomsize</span>(amount);</p>
+	<p class=desc>Sets the amount of reverberant echo or apparent room
+		size, from 0 (smallest) to 1.0 (largest);
+	</p>
+	<p class=func><span class=keyword>damping</span>(amount);</p>
+	<p class=desc>Sets the damping factor, from 0 to 1.0.  More damping
+		causes higher frequency echo to decay, creating a softer sound,
+		similar to a large room filled with people or materials which
+		absorb some sound as it travels between reflecting surfaces.
+		Lower damping simulates a harsher reverberant field.
+	</p>
+
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Freeverb
+		</p>
+	<h3>Notes</h3>
+	<p>Freeverb mono consumes about 21% of the CPU time on Teensy 3.2 and
+		requires about 22K of RAM.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioEffectFreeverb">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioEffectFreeverbStereo">
+<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>High quality stereo Reverb effect, based on Freeverb by Jezar at Dreampoint.
+	</p>
+	<p>Teensy 3.5 or 3.6 required to run stereo version.</p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class="top"><th>Port</th><th>Purpose</th></tr>
+		<tr class="odd"><td align="center">In 0</td><td>Input</td></tr>
+		<tr class="odd"><td align="center">Out 0</td><td>Left Output</td></tr>
+		<tr class="odd"><td align="center">Out 1</td><td>Right Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>roomsize</span>(amount);</p>
+	<p class=desc>Sets the amount of reverberant echo or apparent room
+		size, from 0 (smallest) to 1.0 (largest);
+	</p>
+	<p class=func><span class=keyword>damping</span>(amount);</p>
+	<p class=desc>Sets the damping factor, from 0 to 1.0.  More damping
+		causes higher frequency echo to decay, creating a softer sound,
+		similar to a large room filled with people or materials which
+		absorb some sound as it travels between reflecting surfaces.
+		Lower damping simulates a harsher reverberant field.
+	</p>
+
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Freeverb_Stereo
+		</p>
+	<h3>Notes</h3>
+	<p>Freeverb mono consumes about 18% of the CPU time on Teensy 3.6 and
+		requires about 45K of RAM.</p>
+	<p>Teensy 3.2 does not have enough RAM to
+		run this effect while playing WAV file and implementing USB Serial.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioEffectFreeverbStereo">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+
+
+
 
 <script type="text/x-red" data-help-name="AudioEffectEnvelope">
 	<h3>Summary</h3>
