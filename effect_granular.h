@@ -27,11 +27,11 @@ class AudioEffectGranular : public AudioStream
 {
 public:
 	AudioEffectGranular(void): AudioStream(1,inputQueueArray) { }
-	void begin(int16_t *sample_bank_def,int16_t max_len_def);
+	void begin(int16_t *sample_bank_def, int16_t max_len_def);
 	void length(int16_t max_len_def);
 	void rate(int16_t playpack_rate_def);
-	void freeze(int16_t activate,int16_t playpack_rate_def,int16_t grain_length_def);
-	void shift(int16_t activate,int16_t playpack_rate_def,int16_t grain_length_def);
+	void freeze(int16_t activate, int16_t playpack_rate_def, int16_t grain_length_def);
+	void shift(int16_t activate, int16_t playpack_rate_def, int16_t grain_length_def);
 	virtual void update(void);
 private:
 	audio_block_t *inputQueueArray[1];
@@ -41,25 +41,16 @@ private:
 	int16_t read_head;
 	int16_t grain_mode;
 	int16_t freeze_len;
-	int16_t allow_len_change;
-	int16_t playback_rate;
-	int16_t capture_trigger;
-	int16_t capture_index;
-	int16_t current_mode;
 	int16_t playpack_rate;
 	int32_t accumulator;
-	int32_t play_index;
-	int32_t increment;
-	int16_t sample_loaded;
 	int16_t prev_input;
-	int16_t zero_cross_up;
-	int16_t zero_cross_down;
-	int16_t sample_trigger;
-	int16_t write_en;
 	int16_t glitch_cross_len;
-	int16_t load_req;
 	int16_t glitch_len;
 	int16_t glitch_min_len;
-	int16_t sample_req;
+	bool allow_len_change;
+	bool sample_loaded;
+	bool write_en;
+	bool zero_cross_down; // redundant?
+	bool sample_req;
 };
 

@@ -26,7 +26,7 @@
 
 void AudioEffectGranular::begin(int16_t *sample_bank_def, int16_t max_len_def)
 {
-	sample_req=1;
+	sample_req = true;
 	length(max_len_def - 1);
 	sample_bank = sample_bank_def;
 }
@@ -35,10 +35,10 @@ void AudioEffectGranular::length(int16_t max_len_def)
 {
 	if (max_len_def < 100) {
 		max_sample_len = 100;
-		glitch_len = max_sample_len/3;
+		glitch_len = max_sample_len / 3;
 	} else {
 		max_sample_len = (max_len_def - 1);
-		glitch_len = max_sample_len/3;
+		glitch_len = max_sample_len / 3;
 	}
 }
 
@@ -55,10 +55,10 @@ void AudioEffectGranular::freeze(int16_t activate, int16_t playpack_rate_def, in
 	if (freeze_length_def < 50) {
 		freeze_len = 50;
 	}
-	if (freeze_length_def>=max_sample_len) {
+	if (freeze_length_def >= max_sample_len) {
 		freeze_len = max_sample_len;
 	}
-	if (freeze_length_def>=50 && freeze_length_def<max_sample_len) {
+	if (freeze_length_def >= 50 && freeze_length_def < max_sample_len) {
 		freeze_len = freeze_length_def;
 	}
 }
@@ -72,7 +72,7 @@ void AudioEffectGranular::shift(int16_t activate, int16_t playpack_rate_def, int
 		grain_mode = 3;
 	}
 	rate(playpack_rate_def);
-	if (allow_len_change == 1 ) {
+	if (allow_len_change) {
 		//  Serial.println("aL");
 		length(grain_length_def);
 	}
@@ -123,7 +123,7 @@ void AudioEffectGranular::update(void)
 
 
 	if (grain_mode == 1) {
-		//when activated the last 
+		//when activated the last
 		for (int j = 0; j < AUDIO_BLOCK_SAMPLES; j++) {
 			if (playpack_rate >= 0) {
 				accumulator += playpack_rate;
@@ -137,55 +137,57 @@ void AudioEffectGranular::update(void)
 		}
 	}
 
-	if (grain_mode == 2) { 
+	if (grain_mode == 2) {
 		//GLITCH SHIFT
-		//basic granular synth thingy 
+		//basic granular synth thingy
 		// the shorter the sample the max_sample_len the more tonal it is.
 		// Longer it has more definition.  It's a bit roboty either way which
 		// is obv great and good enough for noise music.
 
 		for (int k = 0; k < AUDIO_BLOCK_SAMPLES; k++) {
 			int16_t current_input = block->data[k];
-			//we only want to start recodeing when the audio is crossing zero to minimize pops
-			if ((current_input<0 && prev_input>0)) {
-				zero_cross_down=1;
+			// only start recording when the audio is crossing zero to minimize pops
+
+			// TODO: simplify this logic... and check sample_req first for efficiency
+			if (current_input < 0 && prev_input >= 0) {
+				zero_cross_down = true;
 			} else {
-				zero_cross_down=0;
+				zero_cross_down = false;
 			}
 
-			prev_input=current_input;
+			prev_input = current_input;
 
-			if (zero_cross_down == 1 && sample_req == 1) {
-				write_en=1;
+			if (zero_cross_down && sample_req) {
+				write_en = true;
 			}
-			if (write_en==1) {
-				sample_req=0;
-				allow_len_change=1; //reduces noise by not allowing the length to
-						// change after the sample has been recored.
-						// kind of not too much though 
+			if (write_en) {
+				sample_req = false;
+				allow_len_change = true; // Reduces noise by not allowing the
+						// length to change after the sample has been
+						// recored.  Kind of not too much though
 				if (write_head >= glitch_len) {
-					glitch_cross_len=glitch_len;
+					glitch_cross_len = glitch_len;
 					write_head = 0;
-					sample_loaded = 1;
-					write_en=0;
-					allow_len_change=0; 
+					sample_loaded = true;
+					write_en = false;
+					allow_len_change = false;
 				}
 				sample_bank[write_head] = block->data[k];
 				write_head++;
 			}
 
-			if (sample_loaded == 1) {
-				//move it to the middle third of the bank. 
+			if (sample_loaded) {
+				//move it to the middle third of the bank.
 				//3 "seperate" banks are used
-				float fade_len=20.00;
-				int16_t m2=fade_len;
+				float fade_len = 20.00;
+				int16_t m2 = fade_len;
 
 				for (int m = 0; m < 2; m++) {
 					// I'm off by one somewhere? why is there a tick at the
 					// beginning of this only when it's combined with the
 					// fade out???? ooor am i osbserving that incorrectly
 					// either wait it works enough
-					sample_bank[m + glitch_len] = 0;    
+					sample_bank[m + glitch_len] = 0;
 				}
 
 				for (int m = 2; m < glitch_len-m2; m++) {
@@ -194,28 +196,28 @@ void AudioEffectGranular::update(void)
 
 				for (int m = glitch_len-m2; m < glitch_len; m++) {
 					// fade out the end. You can just make fadet=0
-					// but it's a little too daleky 
-					float fadet=sample_bank[m]*(m2/fade_len);
+					// but it's a little too daleky
+					float fadet = sample_bank[m] * (m2 / fade_len);
 					sample_bank[m + glitch_len] = (int16_t)fadet;
 					m2--;
 				}
-				sample_loaded = 0;
-				sample_req=1;
+				sample_loaded = false;
+				sample_req = true;
 			}
 
 			accumulator += playpack_rate;
 			read_head = (accumulator >> 9);
-  
+
 			if (read_head >= glitch_len) {
-				read_head -= (glitch_len);
-				accumulator=0;
+				read_head -= glitch_len;
+				accumulator = 0;
 
 				for (int m = 0; m < glitch_len; m++) {
 					sample_bank[m + (glitch_len*2)] = sample_bank[m+glitch_len];
 					//  sample_bank[m + (glitch_len*2)] = (m%20)*1000;
 				}
 			}
-			block->data[k] = sample_bank[read_head+(glitch_len*2)];
+			block->data[k] = sample_bank[read_head + (glitch_len*2)];
 		}
 	}
 	transmit(block);

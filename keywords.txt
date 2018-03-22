@@ -42,6 +42,7 @@ AudioEffectFreeverb	KEYWORD2
 AudioEffectFreeverbStereo	KEYWORD2
 AudioEffectMidSide	KEYWORD2
 AudioEffectWaveshaper	KEYWORD2
+AudioEffectGranular	KEYWORD2
 AudioFilterBiquad	KEYWORD2
 AudioFilterFIR	KEYWORD2
 AudioFilterStateVariable	KEYWORD2
