@@ -26,64 +26,69 @@
 
 void AudioEffectGranular::begin(int16_t *sample_bank_def, int16_t max_len_def)
 {
-	sample_req = true;
-	length(max_len_def - 1);
+	max_sample_len = max_len_def;
+	grain_mode = 0;
+	read_head = 0;
+	write_head = 0;
+	prev_input = 0;
+	playpack_rate = 512;
+	accumulator = 0;
+	allow_len_change = true;
+	sample_loaded = false;
 	sample_bank = sample_bank_def;
 }
 
-void AudioEffectGranular::length(int16_t max_len_def)
-{
-	if (max_len_def < 100) {
-		max_sample_len = 100;
-		glitch_len = max_sample_len / 3;
-	} else {
-		max_sample_len = (max_len_def - 1);
-		glitch_len = max_sample_len / 3;
-	}
-}
-
-
 void AudioEffectGranular::freeze(int16_t activate, int16_t playpack_rate_def, int16_t freeze_length_def)
 {
-	if (activate==1) {
-		grain_mode = 1;
-	}
-	if (activate==0) {
+	if (activate == 0) {
 		grain_mode = 0;
+		allow_len_change = true;
+		return;
 	}
+	__disable_irq();
+	grain_mode = 1;
 	rate(playpack_rate_def);
-	if (freeze_length_def < 50) {
-		freeze_len = 50;
-	}
-	if (freeze_length_def >= max_sample_len) {
+	if (max_sample_len <= 1500) {
 		freeze_len = max_sample_len;
+	} else {
+		freeze_len = ((max_sample_len - 1500) * freeze_length_def / 1023) + 1500;
 	}
-	if (freeze_length_def >= 50 && freeze_length_def < max_sample_len) {
-		freeze_len = freeze_length_def;
-	}
+	sample_loaded = false;
+	write_en = false;
+	sample_req = true;
+	__enable_irq();
+	Serial.print("in = ");
+	Serial.print(freeze_length_def);
+	Serial.print(", freeze len = ");
+	Serial.println(freeze_len);
 }
 
 void AudioEffectGranular::shift(int16_t activate, int16_t playpack_rate_def, int16_t grain_length_def)
 {
-	if (activate == 1) {
-		grain_mode = 2;
-	}
 	if (activate == 0) {
-		grain_mode = 3;
+		grain_mode = 0;
+		allow_len_change = true;
+		return;
 	}
+	__disable_irq();
+	grain_mode = 2;
 	rate(playpack_rate_def);
 	if (allow_len_change) {
-		//  Serial.println("aL");
-		length(grain_length_def);
+		if (grain_length_def < 100) grain_length_def = 100;
+		int maximum = (max_sample_len - 1) / 3;
+		if (grain_length_def > maximum) grain_length_def = maximum;
+		glitch_len = grain_length_def;
 	}
+	sample_loaded = false;
+	write_en = false;
+	sample_req = true;
+	__enable_irq();
 }
-
 
 void AudioEffectGranular::rate(int16_t playpack_rate_def)
 {
 	playpack_rate = playpack_rate_def;
 }
-
 
 void AudioEffectGranular::update(void)
 {
@@ -98,50 +103,51 @@ void AudioEffectGranular::update(void)
 	block = receiveWritable(0);
 	if (!block) return;
 
-	if (grain_mode == 3) {
-		//through
-		/*
-		for (int i = 0; i < AUDIO_BLOCK_SAMPLES; i++) {
-			write_head++;
-			if (write_head >= max_sample_len) {
-				write_head = 0;
-			}
-			sample_bank[write_head] = block->data[i];
-		}
-		*/
-	}
-
 	if (grain_mode == 0) {
-		//capture audio but dosen't output
-		//this needs to be happening at all times if you want to
-		// use grain_mode = 1, the simple "freeze" sampler.
-		for (int i = 0; i < AUDIO_BLOCK_SAMPLES; i++) {
-			write_head++;
-
-			if (write_head >= max_sample_len) {
-				write_head = 0;
-			}
-			sample_bank[write_head] = block->data[i];
-		}
+		// passthrough, no granular effect
+		prev_input = block->data[AUDIO_BLOCK_SAMPLES-1];
 	}
-
-
-	if (grain_mode == 1) {
+	else if (grain_mode == 1) {
 		//when activated the last
 		for (int j = 0; j < AUDIO_BLOCK_SAMPLES; j++) {
-			if (playpack_rate >= 0) {
-				accumulator += playpack_rate;
-				read_head = accumulator >> 9;
+			if (sample_req) {
+				// only begin capture on zero cross
+				int16_t current_input = block->data[j];
+				if ((current_input < 0 && prev_input >= 0) ||
+				  (current_input >= 0 && prev_input < 0)) {
+					write_en = true;
+					write_head = 0;
+					read_head = 0;
+					sample_req = false;
+					Serial.println("begin freeze capture");
+				} else {
+					prev_input = current_input;
+				}
 			}
-			if (read_head >= freeze_len) {
-				accumulator = 0;
-				read_head -= max_sample_len;
+			if (write_en) {
+				sample_bank[write_head++] = block->data[j];
+				if (write_head >= freeze_len) {
+					sample_loaded = true;
+				}
+				if (write_head >= max_sample_len) {
+					write_en = false;
+					Serial.println("end freeze capture");
+				}
 			}
-			block->data[j] = sample_bank[read_head];
+			if (sample_loaded) {
+				if (playpack_rate >= 0) {
+					accumulator += playpack_rate;
+					read_head = accumulator >> 9;
+				}
+				if (read_head >= freeze_len) {
+					accumulator = 0;
+					read_head = 0;
+				}
+				block->data[j] = sample_bank[read_head];
+			}
 		}
 	}
-
-	if (grain_mode == 2) {
+	else if (grain_mode == 2) {
 		//GLITCH SHIFT
 		//basic granular synth thingy
 		// the shorter the sample the max_sample_len the more tonal it is.
@@ -149,15 +155,16 @@ void AudioEffectGranular::update(void)
 		// is obv great and good enough for noise music.
 
 		for (int k = 0; k < AUDIO_BLOCK_SAMPLES; k++) {
-			int16_t current_input = block->data[k];
 			// only start recording when the audio is crossing zero to minimize pops
 			if (sample_req) {
+				int16_t current_input = block->data[k];
 				if ((current_input < 0 && prev_input >= 0) ||
 				  (current_input >= 0 && prev_input < 0)) {
 					write_en = true;
+				} else {
+					prev_input = current_input;
 				}
 			}
-			prev_input = current_input;
 
 			if (write_en) {
 				sample_req = false;
@@ -165,7 +172,6 @@ void AudioEffectGranular::update(void)
 						// length to change after the sample has been
 						// recored.  Kind of not too much though
 				if (write_head >= glitch_len) {
-					glitch_cross_len = glitch_len;
 					write_head = 0;
 					sample_loaded = true;
 					write_en = false;
@@ -201,6 +207,7 @@ void AudioEffectGranular::update(void)
 					m2--;
 				}
 				sample_loaded = false;
+				prev_input = block->data[k];
 				sample_req = true;
 			}
 

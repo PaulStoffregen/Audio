@@ -28,7 +28,6 @@ class AudioEffectGranular : public AudioStream
 public:
 	AudioEffectGranular(void): AudioStream(1,inputQueueArray) { }
 	void begin(int16_t *sample_bank_def, int16_t max_len_def);
-	void length(int16_t max_len_def);
 	void rate(int16_t playpack_rate_def);
 	void freeze(int16_t activate, int16_t playpack_rate_def, int16_t grain_length_def);
 	void shift(int16_t activate, int16_t playpack_rate_def, int16_t grain_length_def);
@@ -44,9 +43,7 @@ private:
 	int16_t playpack_rate;
 	int32_t accumulator;
 	int16_t prev_input;
-	int16_t glitch_cross_len;
 	int16_t glitch_len;
-	int16_t glitch_min_len;
 	bool allow_len_change;
 	bool sample_loaded;
 	bool write_en;

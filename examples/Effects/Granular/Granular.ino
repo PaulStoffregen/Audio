@@ -20,7 +20,7 @@ Bounce button0 = Bounce(0, 15);
 Bounce button1 = Bounce(1, 15);
 Bounce button2 = Bounce(2, 15);
 
-#define GRANULAR_MEMORY_SIZE 6000
+#define GRANULAR_MEMORY_SIZE 12800  // enough for 29 ms at 44.1 kHz
 int16_t granularMemory[GRANULAR_MEMORY_SIZE];
 
 // Use these with the Teensy Audio Shield
