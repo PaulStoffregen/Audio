@@ -93,6 +93,9 @@ disableDither	KEYWORD2
 reverbTime	KEYWORD2
 roomsize	KEYWORD2
 damping	KEYWORD2
+setSpeed	KEYWORD2
+beginFreeze	KEYWORD2
+beginPitchShift	KEYWORD2
 frequency	KEYWORD2
 phase	KEYWORD2
 amplitude	KEYWORD2

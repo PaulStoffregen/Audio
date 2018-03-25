@@ -1,3 +1,15 @@
+// Granular Effect Example - Pitch shift or freeze sound
+//
+// This example is meant to be used with 3 buttons (pin 0,
+// 1, 2) and 2 knobs (pins 16/A2, 17/A3), which are present
+// on the audio tutorial kit.
+//   https://www.pjrc.com/store/audio_tutorial_kit.html
+//
+// Data files to put on your SD card can be downloaded here:
+//   http://www.pjrc.com/teensy/td_libs_AudioDataFiles.html
+//
+// This example code is in the public domain.
+
 #include <Audio.h>
 #include <Wire.h>
 #include <SPI.h>
@@ -91,22 +103,33 @@ void loop() {
   float knobA2 = (float)analogRead(A2) / 1023.0;
   float knobA3 = (float)analogRead(A3) / 1023.0;
 
+  // Button 0 starts Freeze effect
   if (button0.fallingEdge()) {
-    // Button 0 starts Freeze effect
-    granular1.beginFreeze(knobA3 * 290.0);
+    float msec = 100.0 + (knobA3 * 190.0);
+    granular1.beginFreeze(msec);
+    Serial.print("Begin granular freeze using ");
+    Serial.print(msec);
+    Serial.println(" grains");
   }
   if (button0.risingEdge()) {
     granular1.stop();
   }
 
+  // Button 1 starts Pitch Shift effect
   if (button1.fallingEdge()) {
-    // Button 1 starts Pitch Shift effect
-    granular1.beginPitchShift(knobA3 * 100.0);
+    float msec = 25.0 + (knobA3 * 75.0);
+    granular1.beginPitchShift(msec);
+    Serial.print("Begin granular pitch phift using ");
+    Serial.print(msec);
+    Serial.println(" grains");
   }
   if (button1.risingEdge()) {
     granular1.stop();
   }
 
-  // continuously adjust pitch bend
-  granular1.rate(knobA2 * 1023.0);
+  // Continuously adjust the speed, based on the A3 pot
+  float ratio;
+  ratio = powf(2.0, knobA2 * 2.0 - 1.0); // 0.5 to 2.0
+  //ratio = powf(2.0, knobA2 * 6.0 - 3.0); // 0.125 to 8.0 -- uncomment for far too much range!
+  granular1.setSpeed(ratio);
 }

@@ -31,7 +31,7 @@ void AudioEffectGranular::begin(int16_t *sample_bank_def, int16_t max_len_def)
 	read_head = 0;
 	write_head = 0;
 	prev_input = 0;
-	playpack_rate = 512;
+	playpack_rate = 65536;
 	accumulator = 0;
 	allow_len_change = true;
 	sample_loaded = false;
@@ -51,10 +51,6 @@ void AudioEffectGranular::beginFreeze_int(int grain_samples)
 	write_en = false;
 	sample_req = true;
 	__enable_irq();
-	Serial.print("in = ");
-	Serial.print(grain_samples);
-	Serial.print(", freeze len = ");
-	Serial.println(freeze_len);
 }
 
 void AudioEffectGranular::beginPitchShift_int(int grain_samples)
@@ -79,11 +75,6 @@ void AudioEffectGranular::stop()
 	allow_len_change = true;
 }
 
-void AudioEffectGranular::rate(int16_t playpack_rate_def)
-{
-	playpack_rate = playpack_rate_def;
-}
-
 void AudioEffectGranular::update(void)
 {
 	audio_block_t *block;
@@ -102,7 +93,7 @@ void AudioEffectGranular::update(void)
 		prev_input = block->data[AUDIO_BLOCK_SAMPLES-1];
 	}
 	else if (grain_mode == 1) {
-		//when activated the last
+		// Freeze - sample 1 grain, then repeatedly play it back
 		for (int j = 0; j < AUDIO_BLOCK_SAMPLES; j++) {
 			if (sample_req) {
 				// only begin capture on zero cross
@@ -113,7 +104,6 @@ void AudioEffectGranular::update(void)
 					write_head = 0;
 					read_head = 0;
 					sample_req = false;
-					Serial.println("begin freeze capture");
 				} else {
 					prev_input = current_input;
 				}
@@ -125,13 +115,12 @@ void AudioEffectGranular::update(void)
 				}
 				if (write_head >= max_sample_len) {
 					write_en = false;
-					Serial.println("end freeze capture");
 				}
 			}
 			if (sample_loaded) {
 				if (playpack_rate >= 0) {
 					accumulator += playpack_rate;
-					read_head = accumulator >> 9;
+					read_head = accumulator >> 16;
 				}
 				if (read_head >= freeze_len) {
 					accumulator = 0;
@@ -206,7 +195,7 @@ void AudioEffectGranular::update(void)
 			}
 
 			accumulator += playpack_rate;
-			read_head = (accumulator >> 9);
+			read_head = (accumulator >> 16);
 
 			if (read_head >= glitch_len) {
 				read_head -= glitch_len;
