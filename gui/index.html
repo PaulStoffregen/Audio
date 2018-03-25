@@ -2927,23 +2927,31 @@ double s_freq = .0625;</p>
 	</table>
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>begin</span>(array, length);</p>
-	<p class=desc>TODO: documentation here
+	<p class=desc>Initialize the granular processing with an array of 16 bit
+		integers used to store the sound grains.  Until memory is allocated
+		with this function, no audio appears at the output.
 		</p>
-	<p class=func><span class=keyword>shift</span>(param1, param2, param3);</p>
-	<p class=desc>TODO: documentation here
+	<p class=func><span class=keyword>setSpeed</span>(ratio);</p>
+	<p class=desc>Configure the relative speed grains will be played.  1.0
+		plays the grains without any change.  Less than 1.0 slows the sound,
+		and greater than 1.0 speeds up.  The allowed range is 0.125 to 8.0,
+		for &plusmn;3 octaves shift.
 		</p>
-	<p class=func><span class=keyword>freeze</span>(param1, param2, param3);</p>
-	<p class=desc>TODO: documentation here
+	<p class=func><span class=keyword>beginFreeze</span>(grainLength);</p>
+	<p class=desc>Freeze the sound by sampling one grain, then repeated playing
+		it.  The grainLength is specified in milliseconds, up to the size allowed
+		by the array from begin().
 		</p>
-	<p class=func><span class=keyword>length</span>(param1);</p>
-	<p class=desc>TODO: documentation here
+	<p class=func><span class=keyword>beginPitchShift</span>(grainLength);</p>
+	<p class=desc>Pitch shift by continuously sampling grains and playing them
+		at altered speed.  The grainLength is specified in milliseconds, up to
+		one third of the memory from begin();
 		</p>
-	<p class=func><span class=keyword>rate</span>(param1);</p>
-	<p class=desc>TODO: documentation here
+	<p class=func><span class=keyword>end</span>();</p>
+	<p class=desc>Stop granual processing.  The input signal is passed to the
+		output without any changes.
 		</p>
-
 	<h3>Examples</h3>
-	<p class=exam>TODO: example needed</p>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Granular</p>
 	<!--<h3>Notes</h3>
 	<p> </p>-->
