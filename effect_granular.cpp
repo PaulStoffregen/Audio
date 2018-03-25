@@ -89,7 +89,11 @@ void AudioEffectGranular::update(void)
 {
 	audio_block_t *block;
 
-	if (sample_bank == NULL) return;
+	if (sample_bank == NULL) {
+		block = receiveReadOnly(0);
+		if (block) release(block);
+		return;
+	}
 
 	block = receiveWritable(0);
 	if (!block) return;

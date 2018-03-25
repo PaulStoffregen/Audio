@@ -393,6 +393,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioEffectBitcrusher","data":{"shortName":"bitcrusher","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectMidSide","data":{"shortName":"midside","inputs":2,"outputs":2,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectWaveshaper","data":{"shortName":"waveshape","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectGranular","data":{"shortName":"granular","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioFilterBiquad","data":{"defaults":{"name":{"value":"new"}},"shortName":"biquad","inputs":1,"outputs":1,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioFilterFIR","data":{"defaults":{"name":{"value":"new"}},"shortName":"fir","inputs":1,"outputs":1,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioFilterStateVariable","data":{"defaults":{"name":{"value":"new"}},"shortName":"filter","inputs":2,"outputs":3,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -2491,10 +2492,6 @@ double s_freq = .0625;</p>
 	</div>
 </script>
 
-
-
-
-
 <script type="text/x-red" data-help-name="AudioEffectEnvelope">
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
@@ -2910,6 +2907,48 @@ double s_freq = .0625;</p>
 		</p>
 </script>
 <script type="text/x-red" data-template-name="AudioEffectWaveshaper">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioEffectGranular">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Classic granular effect that uses a variable speed buffer to shift the pitch
+		and freeze incoming audio.</p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Signal</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Input Signal</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Granular Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>begin</span>(array, length);</p>
+	<p class=desc>TODO: documentation here
+		</p>
+	<p class=func><span class=keyword>shift</span>(param1, param2, param3);</p>
+	<p class=desc>TODO: documentation here
+		</p>
+	<p class=func><span class=keyword>freeze</span>(param1, param2, param3);</p>
+	<p class=desc>TODO: documentation here
+		</p>
+	<p class=func><span class=keyword>length</span>(param1);</p>
+	<p class=desc>TODO: documentation here
+		</p>
+	<p class=func><span class=keyword>rate</span>(param1);</p>
+	<p class=desc>TODO: documentation here
+		</p>
+
+	<h3>Examples</h3>
+	<p class=exam>TODO: example needed</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Granular</p>
+	<!--<h3>Notes</h3>
+	<p> </p>-->
+</script>
+<script type="text/x-red" data-template-name="AudioEffectGranular">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
