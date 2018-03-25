@@ -151,19 +151,14 @@ void AudioEffectGranular::update(void)
 		for (int k = 0; k < AUDIO_BLOCK_SAMPLES; k++) {
 			int16_t current_input = block->data[k];
 			// only start recording when the audio is crossing zero to minimize pops
-
-			// TODO: simplify this logic... and check sample_req first for efficiency
-			if (current_input < 0 && prev_input >= 0) {
-				zero_cross_down = true;
-			} else {
-				zero_cross_down = false;
+			if (sample_req) {
+				if ((current_input < 0 && prev_input >= 0) ||
+				  (current_input >= 0 && prev_input < 0)) {
+					write_en = true;
+				}
 			}
-
 			prev_input = current_input;
 
-			if (zero_cross_down && sample_req) {
-				write_en = true;
-			}
 			if (write_en) {
 				sample_req = false;
 				allow_len_change = true; // Reduces noise by not allowing the

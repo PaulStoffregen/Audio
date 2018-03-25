@@ -50,7 +50,6 @@ private:
 	bool allow_len_change;
 	bool sample_loaded;
 	bool write_en;
-	bool zero_cross_down; // redundant?
 	bool sample_req;
 };
 
