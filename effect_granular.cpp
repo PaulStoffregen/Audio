@@ -38,51 +38,45 @@ void AudioEffectGranular::begin(int16_t *sample_bank_def, int16_t max_len_def)
 	sample_bank = sample_bank_def;
 }
 
-void AudioEffectGranular::freeze(int16_t activate, int16_t playpack_rate_def, int16_t freeze_length_def)
+void AudioEffectGranular::beginFreeze_int(int grain_samples)
 {
-	if (activate == 0) {
-		grain_mode = 0;
-		allow_len_change = true;
-		return;
-	}
 	__disable_irq();
 	grain_mode = 1;
-	rate(playpack_rate_def);
-	if (max_sample_len <= 1500) {
-		freeze_len = max_sample_len;
+	if (grain_samples < max_sample_len) {
+		freeze_len = grain_samples;
 	} else {
-		freeze_len = ((max_sample_len - 1500) * freeze_length_def / 1023) + 1500;
+		freeze_len = grain_samples;
 	}
 	sample_loaded = false;
 	write_en = false;
 	sample_req = true;
 	__enable_irq();
 	Serial.print("in = ");
-	Serial.print(freeze_length_def);
+	Serial.print(grain_samples);
 	Serial.print(", freeze len = ");
 	Serial.println(freeze_len);
 }
 
-void AudioEffectGranular::shift(int16_t activate, int16_t playpack_rate_def, int16_t grain_length_def)
+void AudioEffectGranular::beginPitchShift_int(int grain_samples)
 {
-	if (activate == 0) {
-		grain_mode = 0;
-		allow_len_change = true;
-		return;
-	}
 	__disable_irq();
 	grain_mode = 2;
-	rate(playpack_rate_def);
 	if (allow_len_change) {
-		if (grain_length_def < 100) grain_length_def = 100;
+		if (grain_samples < 100) grain_samples = 100;
 		int maximum = (max_sample_len - 1) / 3;
-		if (grain_length_def > maximum) grain_length_def = maximum;
-		glitch_len = grain_length_def;
+		if (grain_samples > maximum) grain_samples = maximum;
+		glitch_len = grain_samples;
 	}
 	sample_loaded = false;
 	write_en = false;
 	sample_req = true;
 	__enable_irq();
+}
+
+void AudioEffectGranular::stop()
+{
+	grain_mode = 0;
+	allow_len_change = true;
 }
 
 void AudioEffectGranular::rate(int16_t playpack_rate_def)

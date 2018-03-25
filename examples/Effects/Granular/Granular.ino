@@ -20,7 +20,7 @@ Bounce button0 = Bounce(0, 15);
 Bounce button1 = Bounce(1, 15);
 Bounce button2 = Bounce(2, 15);
 
-#define GRANULAR_MEMORY_SIZE 12800  // enough for 29 ms at 44.1 kHz
+#define GRANULAR_MEMORY_SIZE 12800  // enough for 290 ms at 44.1 kHz
 int16_t granularMemory[GRANULAR_MEMORY_SIZE];
 
 // Use these with the Teensy Audio Shield
@@ -87,22 +87,26 @@ void loop() {
   button0.update();
   button1.update();
   button2.update();
-  // read knobs
-  int knobA2 = analogRead(A2);
-  int knobA3 = analogRead(A3);
+  // read knobs, scale to 0-1.0 numbers
+  float knobA2 = (float)analogRead(A2) / 1023.0;
+  float knobA3 = (float)analogRead(A3) / 1023.0;
 
   if (button0.fallingEdge()) {
-    granular1.freeze(1, knobA2, knobA3);
+    // Button 0 starts Freeze effect
+    granular1.beginFreeze(knobA3 * 290.0);
   }
   if (button0.risingEdge()) {
-    granular1.freeze(0, knobA2, knobA3);
+    granular1.stop();
   }
 
   if (button1.fallingEdge()) {
-    granular1.shift(1, knobA2, knobA3);
+    // Button 1 starts Pitch Shift effect
+    granular1.beginPitchShift(knobA3 * 100.0);
   }
   if (button1.risingEdge()) {
-    granular1.shift(0, knobA2, knobA3);
+    granular1.stop();
   }
 
+  // continuously adjust pitch bend
+  granular1.rate(knobA2 * 1023.0);
 }
