@@ -83,6 +83,7 @@
 #include "effect_freeverb.h"
 #include "effect_waveshaper.h"
 #include "effect_granular.h"
+#include "effect_combine.h"
 #include "filter_biquad.h"
 #include "filter_fir.h"
 #include "filter_variable.h"
