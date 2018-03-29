@@ -50,18 +50,21 @@ extern const int16_t AudioWaveformSine[257];
 class AudioSynthWaveform : public AudioStream
 {
 public:
-	AudioSynthWaveform(void) : AudioStream(0,NULL), tone_amp(0), tone_freq(0),
-		tone_phase(0), tone_width(0.25), tone_incr(0), tone_type(0),
-		tone_offset(0), arbdata(NULL) {
+	AudioSynthWaveform(void) : AudioStream(0,NULL),
+		phase_accumulator(0), phase_increment(0), phase_offset(0),
+		magnitude(0), pulse_width(0x40000000),
+		arbdata(NULL), sample(0), tone_type(WAVEFORM_SINE),
+		tone_offset(0) {
 	}
 
-	void frequency(float t_freq) {
-		if (t_freq < 0.0) {
-			t_freq = 0.0;
-		} else if (t_freq > AUDIO_SAMPLE_RATE_EXACT / 2) {
-			t_freq = AUDIO_SAMPLE_RATE_EXACT / 2;
+	void frequency(float freq) {
+		if (freq < 0.0) {
+			freq = 0.0;
+		} else if (freq > AUDIO_SAMPLE_RATE_EXACT / 2) {
+			freq = AUDIO_SAMPLE_RATE_EXACT / 2;
 		}
-		tone_incr = (t_freq * (0x80000000LL/AUDIO_SAMPLE_RATE_EXACT)) + 0.5;
+		phase_increment = freq * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT);
+		//tone_incr = (t_freq * (0x80000000LL/AUDIO_SAMPLE_RATE_EXACT)) + 0.5;
 	}
 	void phase(float angle) {
 		if (angle < 0.0) {
@@ -70,7 +73,7 @@ public:
 			angle = angle - 360.0;
 			if (angle >= 360.0) return;
 		}
-		tone_phase = angle * (2147483648.0 / 360.0);
+		phase_offset = angle * (4294967296.0 / 360.0);
 	}
 	void amplitude(float n) {	// 0 to 1.0
 		if (n < 0) {
@@ -78,13 +81,7 @@ public:
 		} else if (n > 1.0) {
 			n = 1.0;
 		}
-		if ((tone_amp == 0) && n) {
-			// reset the phase when the amplitude was zero
-			// and has now been increased.
-			tone_phase = 0;
-		}
-		// set new magnitude
-		tone_amp = n * 32767.0;
+		magnitude = n * 65536.0;
 	}
 	void offset(float n) {
 		if (n < -1.0) {
@@ -100,17 +97,17 @@ public:
 		} else if (n > 1.0) {
 			n = 1.0;
 		}
-		tone_width = n * 0x7fffffffLL;
-		// pulse width is stored as the equivalent phase
+		pulse_width = n * 4294967296.0;
 	}
 	void begin(short t_type) {
-		tone_phase = 0;
+		phase_offset = 0;
 		tone_type = t_type;
 	}
 	void begin(float t_amp, float t_freq, short t_type) {
 		amplitude(t_amp);
 		frequency(t_freq);
-		begin(t_type);
+		phase_offset = 0;
+		tone_type = t_type;
 	}
 	void arbitraryWaveform(const int16_t *data, float maxFreq) {
 		arbdata = data;
@@ -118,17 +115,15 @@ public:
 	virtual void update(void);
 
 private:
-	short    tone_amp;
-	short    tone_freq;
-	uint32_t tone_phase;
-	uint32_t tone_width;
-	// sample for SAMPLE_HOLD
-	short sample;
-	// volatile prevents the compiler optimizing out the frequency function
-	volatile uint32_t tone_incr;
+	uint32_t phase_accumulator;
+	uint32_t phase_increment;
+	uint32_t phase_offset;
+	int32_t  magnitude;
+	uint32_t pulse_width;
+	const int16_t *arbdata;
+	int16_t  sample; // for WAVEFORM_SAMPLE_HOLD
 	short    tone_type;
 	int16_t  tone_offset;
-	const int16_t *arbdata;
 };
 
 

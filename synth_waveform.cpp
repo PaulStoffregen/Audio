@@ -40,127 +40,122 @@
 void AudioSynthWaveform::update(void)
 {
 	audio_block_t *block;
-	short *bp, *end;
-	int32_t val1, val2, val3;
-	uint32_t index, scale;
-	uint32_t mag;
-	short tmp_amp;
+	int16_t *bp, *end;
+	int32_t val1, val2;
+	int16_t magnitude15;
+	uint32_t i, ph, index, index2, scale;
+	const uint32_t inc = phase_increment;
 
-	if (tone_amp == 0) return;
+	ph = phase_accumulator + phase_offset;
+	if (magnitude == 0) {
+		phase_accumulator += inc * AUDIO_BLOCK_SAMPLES;
+		return;
+	}
 	block = allocate();
 	if (!block) {
+		phase_accumulator += inc * AUDIO_BLOCK_SAMPLES;
 		return;
 	}
 	bp = block->data;
+
 	switch(tone_type) {
 	case WAVEFORM_SINE:
-		for(int i = 0; i < AUDIO_BLOCK_SAMPLES; i++) {
-			// Calculate interpolated sin
-			index = tone_phase >> 23;
+		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+			index = ph >> 24;
 			val1 = AudioWaveformSine[index];
 			val2 = AudioWaveformSine[index+1];
-			scale = (tone_phase >> 7) & 0xFFFF;
+			scale = (ph >> 8) & 0xFFFF;
 			val2 *= scale;
-			val1 *= 0xFFFF - scale;
-			val3 = (val1 + val2) >> 16;
-			*bp++ = (short)((val3 * tone_amp) >> 15);
-
-			// phase and incr are both unsigned 32-bit fractions
-			tone_phase += tone_incr;
-			// If tone_phase has overflowed, truncate the top bit
-			if (tone_phase & 0x80000000) tone_phase &= 0x7fffffff;
+			val1 *= 0x10000 - scale;
+			*bp++ = multiply_32x32_rshift32(val1 + val2, magnitude);
+			ph += inc;
 		}
 		break;
 
 	case WAVEFORM_ARBITRARY:
 		if (!arbdata) {
 			release(block);
+			phase_accumulator += inc * AUDIO_BLOCK_SAMPLES;
 			return;
 		}
 		// len = 256
-		for (int i = 0; i < AUDIO_BLOCK_SAMPLES; i++) {
-			index = tone_phase >> 23;
+		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+			index = ph >> 24;
+			index2 = index + 1;
+			if (index2 >= 256) index2 = 0;
 			val1 = *(arbdata + index);
-			val2 = *(arbdata + ((index + 1) & 255));
-			scale = (tone_phase >> 7) & 0xFFFF;
+			val2 = *(arbdata + index2);
+			scale = (ph >> 8) & 0xFFFF;
 			val2 *= scale;
-			val1 *= 0xFFFF - scale;
-			val3 = (val1 + val2) >> 16;
-			*bp++ = (short)((val3 * tone_amp) >> 15);
-			tone_phase += tone_incr;
-			tone_phase &= 0x7fffffff;
+			val1 *= 0x10000 - scale;
+			*bp++ = multiply_32x32_rshift32(val1 + val2, magnitude);
+			ph += inc;
 		}
 		break;
 
 	case WAVEFORM_SQUARE:
-		for(int i = 0; i < AUDIO_BLOCK_SAMPLES; i++) {
-			if (tone_phase & 0x40000000) {
-				*bp++ = -tone_amp;
+		magnitude15 = signed_saturate_rshift(magnitude, 16, 1);
+		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+			if (ph & 0x80000000) {
+				*bp++ = -magnitude15;
 			} else {
-				*bp++ = tone_amp;
+				*bp++ = magnitude15;
 			}
-			// phase and incr are both unsigned 32-bit fractions
-			tone_phase += tone_incr;
+			ph += inc;
 		}
 		break;
 
 	case WAVEFORM_SAWTOOTH:
-		for(int i = 0; i < AUDIO_BLOCK_SAMPLES; i++) {
-			*bp++ = ((short)(tone_phase>>15) * tone_amp) >> 15;
-			// phase and incr are both unsigned 32-bit fractions
-			tone_phase += tone_incr;
+		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+			*bp++ = signed_multiply_32x16t(magnitude, ph);
+			ph += inc;
 		}
 		break;
 
 	case WAVEFORM_SAWTOOTH_REVERSE:
-		for(int i = 0; i < AUDIO_BLOCK_SAMPLES; i++) {
-			*bp++ = ((short)(tone_phase>>15) * tone_amp) >> 15;
-			// phase and incr are both unsigned 32-bit fractions
-			tone_phase -= tone_incr;
+		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+			*bp++ = signed_multiply_32x16t(0xFFFFFFFFu - magnitude, ph);
+			ph += inc;
 		}
 		break;
 
 	case WAVEFORM_TRIANGLE:
-		for(int i = 0; i < AUDIO_BLOCK_SAMPLES; i++) {
-			if (tone_phase & 0x80000000) {
-				// negative half-cycle
-				tmp_amp = -tone_amp;
+		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+			uint32_t phtop = ph >> 30;
+			if (phtop == 1 || phtop == 2) {
+				*bp++ = ((0x10000 - (ph >> 15)) * magnitude) >> 16;
 			} else {
-				// positive half-cycle
-				tmp_amp = tone_amp;
+				*bp++ = ((ph >> 15) * magnitude) >> 16;
 			}
-			mag = tone_phase << 2;
-			// Determine which quadrant
-			if (tone_phase & 0x40000000) {
-				// negate the magnitude
-				mag = ~mag + 1;
-			}
-			*bp++ = ((short)(mag>>17) * tmp_amp) >> 15;
-			tone_phase += tone_incr * 2;
+			ph += inc;
 		}
 		break;
 
 	case WAVEFORM_PULSE:
-		for(int i = 0; i < AUDIO_BLOCK_SAMPLES; i++) {
-			if (tone_phase < tone_width) {
-				*bp++ = -tone_amp;
+		magnitude15 = signed_saturate_rshift(magnitude, 16, 1);
+		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+			if (ph < pulse_width) {
+				*bp++ = magnitude15;
 			} else {
-				*bp++ = tone_amp;
+				*bp++ = -magnitude15;
 			}
-			tone_phase += tone_incr;
+			ph += inc;
 		}
 		break;
 
 	case WAVEFORM_SAMPLE_HOLD:
-		for(int i = 0; i < AUDIO_BLOCK_SAMPLES; i++) {
-			if (tone_phase < tone_incr) {
-				sample = random(-tone_amp, tone_amp);
-			}
+		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
 			*bp++ = sample;
-			tone_phase += tone_incr;
+			uint32_t newph = ph + inc;
+			if (newph < ph) {
+				sample = random(magnitude) - (magnitude >> 1);
+			}
+			ph = newph;
 		}
 		break;
 	}
+	phase_accumulator = ph - phase_offset;
+
 	if (tone_offset) {
 		bp = block->data;
 		end = bp + AUDIO_BLOCK_SAMPLES;
