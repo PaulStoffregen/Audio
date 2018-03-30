@@ -30,13 +30,6 @@
 #include "utility/dspinst.h"
 
 
-/******************************************************************/
-// PAH 140415 - change sin to use Paul's interpolation which is much
-//				faster than arm's sin function
-// PAH 140316 - fix calculation of sample (amplitude error)
-// PAH 140314 - change t_hi from int to float
-
-
 void AudioSynthWaveform::update(void)
 {
 	audio_block_t *block;
@@ -123,7 +116,7 @@ void AudioSynthWaveform::update(void)
 		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
 			uint32_t phtop = ph >> 30;
 			if (phtop == 1 || phtop == 2) {
-				*bp++ = ((0x10000 - (ph >> 15)) * magnitude) >> 16;
+				*bp++ = ((0xFFFF - (ph >> 15)) * magnitude) >> 16;
 			} else {
 				*bp++ = ((ph >> 15) * magnitude) >> 16;
 			}
