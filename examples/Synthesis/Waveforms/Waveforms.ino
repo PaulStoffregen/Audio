@@ -109,6 +109,10 @@ void loop() {
         Serial.println("Triangle");
         break;
       case WAVEFORM_TRIANGLE:
+        current_waveform = WAVEFORM_TRIANGLE_VARIABLE;
+        Serial.println("Variable Triangle");
+        break;
+      case WAVEFORM_TRIANGLE_VARIABLE:
         current_waveform = WAVEFORM_ARBITRARY;
         Serial.println("Arbitary Waveform");
         break;

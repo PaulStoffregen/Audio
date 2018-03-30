@@ -124,6 +124,26 @@ void AudioSynthWaveform::update(void)
 		}
 		break;
 
+	case WAVEFORM_TRIANGLE_VARIABLE:
+		do {
+		uint32_t rise = 0xFFFFFFFF / (pulse_width >> 16);
+		uint32_t fall = 0xFFFFFFFF / (0xFFFF - (pulse_width >> 16));
+		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+			if (ph < pulse_width/2) {
+				uint32_t n = (ph >> 16) * rise;
+				*bp++ = ((n >> 16) * magnitude) >> 16;
+			} else if (ph < 0xFFFFFFFF - pulse_width/2) {
+				uint32_t n = 0x7FFFFFFF - (((ph - pulse_width/2) >> 16) * fall);
+				*bp++ = ((n >> 16) * magnitude) >> 16;
+			} else {
+				uint32_t n = ((ph + pulse_width/2) >> 16) * rise + 0x80000000;
+				*bp++ = ((n >> 16) * magnitude) >> 16;
+			}
+			ph += inc;
+		}
+		} while (0);
+		break;
+
 	case WAVEFORM_PULSE:
 		magnitude15 = signed_saturate_rshift(magnitude, 16, 1);
 		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
