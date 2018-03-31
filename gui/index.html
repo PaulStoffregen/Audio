@@ -375,7 +375,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioSynthWaveformSineHires","data":{"defaults":{"name":{"value":"new"}},"shortName":"sine_hires","inputs":0,"outputs":2,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveformSineModulated","data":{"defaults":{"name":{"value":"new"}},"shortName":"sine_fm","inputs":1,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveform","data":{"defaults":{"name":{"value":"new"}},"shortName":"waveform","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioSynthWaveformModulated","data":{"defaults":{"name":{"value":"new"}},"shortName":"waveform","inputs":2,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioSynthWaveformModulated","data":{"defaults":{"name":{"value":"new"}},"shortName":"waveformMod","inputs":2,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveformPWM","data":{"defaults":{"name":{"value":"new"}},"shortName":"pwm","inputs":1,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthToneSweep","data":{"defaults":{"name":{"value":"new"}},"shortName":"tonesweep","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveformDc","data":{"defaults":{"name":{"value":"new"}},"shortName":"dc","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -1982,6 +1982,10 @@ The actual packets are taken
 	<p class=func><span class=keyword>amplitude</span>(level);</p>
 	<p class=desc>Change the amplitude.  Set to 0 to turn the signal off.
 	</p>
+	<p class=func><span class=keyword>offset</span>(level);</p>
+	<p class=desc>Add a DC offset, from -1.0 to +1.0.  Useful for generating
+		waveforms to use as control or modulation signals.
+	</p>
 	<p class=func><span class=keyword>phase</span>(angle);</p>
 	<p class=desc>
 		Cause the generated waveform to jump to a specific point within
@@ -2002,6 +2006,8 @@ The actual packets are taken
 		do this automatically.
 	</p>
 	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; Waveforms
+	</p>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; PlaySynthMusic
 	</p>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; pulseWidth
@@ -2024,6 +2030,92 @@ The actual packets are taken
 	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioSynthWaveform">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioSynthWaveformModulated">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Create a waveform <b>with modulation</b>: sine, sawtooth, square, triangle, pulse, random S&H or arbitrary.</p>
+	<p align=center><img src="img/waveformsmod.png"></p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Frequency or Phase</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Shape (Pulse &amp; Var Triangle)</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Waveform Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>begin</span>(waveform);</p>
+	<p class=desc>Configure the waveform type to create.
+	</p>
+	<p class=func><span class=keyword>begin</span>(level, frequency, waveform);</p>
+	<p class=desc>Output a waveform, and set the amplitude and base frequency.
+	</p>
+	<p class=func><span class=keyword>frequency</span>(freq);</p>
+	<p class=desc>Change the base (unmodulated) frequency.
+	</p>
+	<p class=func><span class=keyword>amplitude</span>(level);</p>
+	<p class=desc>Change the amplitude.  Set to 0 to turn the signal off.
+	</p>
+	<p class=func><span class=keyword>offset</span>(level);</p>
+	<p class=desc>Add a DC offset, from -1.0 to +1.0.  Useful for generating
+		waveforms to use as control or modulation signals.
+	</p>
+	<p class=func><span class=keyword>frequencyModulation</span>(octaves);</p>
+	<p class=desc>
+		Configure for frequency modulation mode (the default) where the
+		input signal will adjust the frequency by a specific number of
+		octaves (the default is 8 octaves).  If the -1.0 to +1.0 signal
+		represents a &plusmn;10 volt range and you wish to have control
+		at 1 volt/octave, then configure for 10 octaves range.  The
+		maximum modulation sensitivity is 12 octaves.
+	</p>
+	<p class=func><span class=keyword>phaseModulation</span>(degrees);</p>
+	<p class=desc>
+		Configure for phase modulation mode where the input signal will
+		adjust the waveform phase angle a specific number of degrees.
+		180.0 allows a full scale &plusmn;1.0 signal to span 1 full
+		cycle of the waveform.  Maximum modulation sensitivity is 9000
+		degrees (&plusmn;25 cycles).
+	</p>
+	<p class=func><span class=keyword>arbitraryWaveform</span>(array, maxFreq);</p>
+	<p class=desc>
+		Configure the waveform to be used with WAVEFORM_ARBITRARY.  Array
+		must be an array of 256 samples.  Currently, the data is used
+		without any filtering, which can cause aliasing with frequencies
+		above 172 Hz.  For higher frequency output, you must bandwidth
+		limit your waveform data.  Someday, "maxFreq" will be used to
+		do this automatically.
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; WaveformsModulated
+	</p>
+	<h3>Notes</h3>
+	<p>Supported Waveforms:<br>
+		<ul>
+		<li><span class=literal>WAVEFORM_SINE</span></li>
+		<li><span class=literal>WAVEFORM_SAWTOOTH</span></li>
+		<li><span class=literal>WAVEFORM_SAWTOOTH_REVERSE</span></li>
+		<li><span class=literal>WAVEFORM_SQUARE</span></li>
+		<li><span class=literal>WAVEFORM_TRIANGLE</span></li>
+		<li><span class=literal>WAVEFORM_TRIANGLE_VARIABLE</span></li>
+		<li><span class=literal>WAVEFORM_ARBITRARY</span></li>
+		<li><span class=literal>WAVEFORM_PULSE</span></li>
+		<li><span class=literal>WAVEFORM_SAMPLE_HOLD</span></li>
+		</ul>
+	</p>
+	<p>The Sample &amp; Hold waveform does not support phase modulation.
+		Attempting to modulate its phase may give random or
+		inconsistent results.  Use only frequency modulation
+		to vary the Sample &amp; Hold waveform speed
+	</p>
+</script>
+<script type="text/x-red" data-template-name="AudioSynthWaveformModulated">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
