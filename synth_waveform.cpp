@@ -30,6 +30,10 @@
 #include "utility/dspinst.h"
 
 
+// uncomment for more accurate but more computationally expensive frequency modulation
+//#define IMPROVE_EXPONENTIAL_ACCURACY
+
+
 void AudioSynthWaveform::update(void)
 {
 	audio_block_t *block;
@@ -213,6 +217,7 @@ void AudioSynthWaveformModulated::update(void)
 			n = multiply_accumulate_32x32_rshift32_rounded(n, sq, 1934101615);
 			n = n + (multiply_32x32_rshift32_rounded(sq,
 				multiply_32x32_rshift32_rounded(x, 1358044250)) << 1);
+			n = n << 1;
 			#else
 			// exp2 algorithm by Laurent de Soras
 			// http://www.musicdsp.org/showone.php?id=106
@@ -222,8 +227,13 @@ void AudioSynthWaveformModulated::update(void)
 			n = n + 715827882;
 			#endif
 			uint32_t scale = n >> (14 - ipart);
-			uint32_t phinc = ((uint64_t)inc * scale) >> 16; // TODO: saturate 31 bits??
-			ph += phinc;
+			uint64_t phstep = (uint64_t)inc * scale;
+			uint32_t phstep_msw = phstep >> 32;
+			if (phstep_msw < 0x7FFE) {
+				ph += phstep >> 16;
+			} else {
+				ph += 0x7FFE0000;
+			}
 			phasedata[i] = ph;
 		}
 		release(moddata);

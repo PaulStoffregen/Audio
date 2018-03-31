@@ -64,6 +64,7 @@ public:
 			freq = AUDIO_SAMPLE_RATE_EXACT / 2;
 		}
 		phase_increment = freq * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT);
+		if (phase_increment > 0x7FFE0000u) phase_increment = 0x7FFE0000;
 	}
 	void phase(float angle) {
 		if (angle < 0.0) {
@@ -131,7 +132,7 @@ class AudioSynthWaveformModulated : public AudioStream
 public:
 	AudioSynthWaveformModulated(void) : AudioStream(2, inputQueueArray),
 		phase_accumulator(0), phase_increment(0), modulation_factor(32768),
-		magnitude(0), arbdata(NULL), priorphase(0), sample(0), tone_offset(0),
+		magnitude(0), arbdata(NULL), sample(0), tone_offset(0),
 		tone_type(WAVEFORM_SINE), modulation_type(0) {
 	}
 
@@ -142,6 +143,7 @@ public:
 			freq = AUDIO_SAMPLE_RATE_EXACT / 2;
 		}
 		phase_increment = freq * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT);
+		if (phase_increment > 0x7FFE0000u) phase_increment = 0x7FFE0000;
 	}
 	void amplitude(float n) {	// 0 to 1.0
 		if (n < 0) {
@@ -198,7 +200,6 @@ private:
 	int32_t  magnitude;
 	const int16_t *arbdata;
 	uint32_t phasedata[AUDIO_BLOCK_SAMPLES];
-	uint32_t priorphase;
 	int16_t  sample; // for WAVEFORM_SAMPLE_HOLD
 	int16_t  tone_offset;
 	uint8_t  tone_type;
