@@ -64,7 +64,6 @@ public:
 			freq = AUDIO_SAMPLE_RATE_EXACT / 2;
 		}
 		phase_increment = freq * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT);
-		//tone_incr = (t_freq * (0x80000000LL/AUDIO_SAMPLE_RATE_EXACT)) + 0.5;
 	}
 	void phase(float angle) {
 		if (angle < 0.0) {
@@ -126,6 +125,85 @@ private:
 	int16_t  tone_offset;
 };
 
+
+class AudioSynthWaveformModulated : public AudioStream
+{
+public:
+	AudioSynthWaveformModulated(void) : AudioStream(2, inputQueueArray),
+		phase_accumulator(0), phase_increment(0), modulation_factor(32768),
+		magnitude(0), arbdata(NULL), priorphase(0), sample(0), tone_offset(0),
+		tone_type(WAVEFORM_SINE), modulation_type(0) {
+	}
+
+	void frequency(float freq) {
+		if (freq < 0.0) {
+			freq = 0.0;
+		} else if (freq > AUDIO_SAMPLE_RATE_EXACT / 2) {
+			freq = AUDIO_SAMPLE_RATE_EXACT / 2;
+		}
+		phase_increment = freq * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT);
+	}
+	void amplitude(float n) {	// 0 to 1.0
+		if (n < 0) {
+			n = 0;
+		} else if (n > 1.0) {
+			n = 1.0;
+		}
+		magnitude = n * 65536.0;
+	}
+	void offset(float n) {
+		if (n < -1.0) {
+			n = -1.0;
+		} else if (n > 1.0) {
+			n = 1.0;
+		}
+		tone_offset = n * 32767.0;
+	}
+	void begin(short t_type) {
+		tone_type = t_type;
+	}
+	void begin(float t_amp, float t_freq, short t_type) {
+		amplitude(t_amp);
+		frequency(t_freq);
+		tone_type = t_type;
+	}
+	void arbitraryWaveform(const int16_t *data, float maxFreq) {
+		arbdata = data;
+	}
+	void frequencyModulation(float octaves) {
+		if (octaves > 12.0) {
+			octaves = 12.0;
+		} else if (octaves < 0.1) {
+			octaves = 0.1;
+		}
+		modulation_factor = octaves * 4096.0;
+		modulation_type = 0;
+	}
+	void phaseModulation(float degrees) {
+		if (degrees > 18000.0) {
+			degrees = 18000.0;
+		} else if (degrees < 30.0) {
+			degrees = 30.0;
+		}
+		modulation_factor = degrees * (65536.0 / 360.0);
+		modulation_type = 1;
+	}
+	virtual void update(void);
+
+private:
+	audio_block_t *inputQueueArray[2];
+	uint32_t phase_accumulator;
+	uint32_t phase_increment;
+	uint32_t modulation_factor;
+	int32_t  magnitude;
+	const int16_t *arbdata;
+	uint32_t phasedata[AUDIO_BLOCK_SAMPLES];
+	uint32_t priorphase;
+	int16_t  sample; // for WAVEFORM_SAMPLE_HOLD
+	int16_t  tone_offset;
+	uint8_t  tone_type;
+	uint8_t  modulation_type;
+};
 
 
 #endif

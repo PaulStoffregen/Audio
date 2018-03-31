@@ -181,4 +181,208 @@ void AudioSynthWaveform::update(void)
 	release(block);
 }
 
+//--------------------------------------------------------------------------------
+
+void AudioSynthWaveformModulated::update(void)
+{
+	audio_block_t *block, *moddata, *shapedata;
+	int16_t *bp, *end;
+	int32_t val1, val2;
+	int16_t magnitude15;
+	uint32_t i, ph, index, index2, scale, priorphase;
+	const uint32_t inc = phase_increment;
+
+	moddata = receiveReadOnly(0);
+	shapedata = receiveReadOnly(1);
+
+	ph = phase_accumulator;
+	priorphase = phasedata[AUDIO_BLOCK_SAMPLES-1];
+	if (moddata && modulation_type == 0) {
+		// Frequency Modulation
+		bp = moddata->data;
+		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+			int32_t n = (*bp++) * modulation_factor; // n is # of octaves to mod
+			int32_t ipart = n >> 27; // 4 integer bits
+			n &= 0x7FFFFFF;          // 27 fractional bits
+			#ifdef IMPROVE_EXPONENTIAL_ACCURACY
+			// exp2 polynomial suggested by Stefan Stenzel on "music-dsp"
+			// mail list, Wed, 3 Sep 2014 10:08:55 +0200
+			int32_t x = n << 3;
+			n = multiply_accumulate_32x32_rshift32_rounded(536870912, x, 1494202713);
+			int32_t sq = multiply_32x32_rshift32_rounded(x, x);
+			n = multiply_accumulate_32x32_rshift32_rounded(n, sq, 1934101615);
+			n = n + (multiply_32x32_rshift32_rounded(sq,
+				multiply_32x32_rshift32_rounded(x, 1358044250)) << 1);
+			#else
+			// exp2 algorithm by Laurent de Soras
+			// http://www.musicdsp.org/showone.php?id=106
+			n = (n + 134217728) << 3;
+			n = multiply_32x32_rshift32_rounded(n, n);
+			n = multiply_32x32_rshift32_rounded(n, 715827883) << 3;
+			n = n + 715827882;
+			#endif
+			uint32_t scale = n >> (14 - ipart);
+			uint32_t phinc = ((uint64_t)inc * scale) >> 16; // TODO: saturate 31 bits??
+			ph += phinc;
+			phasedata[i] = ph;
+		}
+		release(moddata);
+	} else if (moddata) {
+		// Phase Modulation
+
+		// TODO.....
+
+		release(moddata);
+	} else {
+		// No Modulation Input
+		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+			phasedata[i] = ph;
+			ph += inc;
+		}
+	}
+	phase_accumulator = ph;
+
+	if (magnitude == 0) {
+		if (shapedata) release(shapedata);
+		return;
+	}
+	block = allocate();
+	if (!block) {
+		if (shapedata) release(shapedata);
+		return;
+	}
+	bp = block->data;
+
+	switch(tone_type) {
+	case WAVEFORM_SINE:
+		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+			ph = phasedata[i];
+			index = ph >> 24;
+			val1 = AudioWaveformSine[index];
+			val2 = AudioWaveformSine[index+1];
+			scale = (ph >> 8) & 0xFFFF;
+			val2 *= scale;
+			val1 *= 0x10000 - scale;
+			*bp++ = multiply_32x32_rshift32(val1 + val2, magnitude);
+		}
+		break;
+
+	case WAVEFORM_ARBITRARY:
+		if (!arbdata) {
+			release(block);
+			if (shapedata) release(shapedata);
+			return;
+		}
+		// len = 256
+		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+			ph = phasedata[i];
+			index = ph >> 24;
+			index2 = index + 1;
+			if (index2 >= 256) index2 = 0;
+			val1 = *(arbdata + index);
+			val2 = *(arbdata + index2);
+			scale = (ph >> 8) & 0xFFFF;
+			val2 *= scale;
+			val1 *= 0x10000 - scale;
+			*bp++ = multiply_32x32_rshift32(val1 + val2, magnitude);
+		}
+		break;
+
+	case WAVEFORM_PULSE:
+		if (shapedata) {
+			magnitude15 = signed_saturate_rshift(magnitude, 16, 1);
+			for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+				uint32_t width = ((shapedata->data[i] + 0x8000) & 0xFFFF) << 16;
+				if (phasedata[i] < width) {
+					*bp++ = magnitude15;
+				} else {
+					*bp++ = -magnitude15;
+				}
+			}
+			break;
+		} // else fall through to orginary square without shape modulation
+
+	case WAVEFORM_SQUARE:
+		magnitude15 = signed_saturate_rshift(magnitude, 16, 1);
+		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+			if (phasedata[i] & 0x80000000) {
+				*bp++ = -magnitude15;
+			} else {
+				*bp++ = magnitude15;
+			}
+		}
+		break;
+
+	case WAVEFORM_SAWTOOTH:
+		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+			*bp++ = signed_multiply_32x16t(magnitude, phasedata[i]);
+		}
+		break;
+
+	case WAVEFORM_SAWTOOTH_REVERSE:
+		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+			*bp++ = signed_multiply_32x16t(0xFFFFFFFFu - magnitude, phasedata[i]);
+		}
+		break;
+
+	case WAVEFORM_TRIANGLE_VARIABLE:
+		if (shapedata) {
+			for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+				uint32_t width = (shapedata->data[i] + 0x8000) & 0xFFFF;
+				uint32_t rise = 0xFFFFFFFF / width;
+				uint32_t fall = 0xFFFFFFFF / (0xFFFF - width);
+				width = width << 15;
+				uint32_t n;
+				ph = phasedata[i];
+				if (ph < width) {
+					n = (ph >> 16) * rise;
+					*bp++ = ((n >> 16) * magnitude) >> 16;
+				} else if (ph < 0xFFFFFFFF - width) {
+					n = 0x7FFFFFFF - (((ph - width) >> 16) * fall);
+					*bp++ = ((n >> 16) * magnitude) >> 16;
+				} else {
+					n = ((ph + width) >> 16) * rise + 0x80000000;
+					*bp++ = ((n >> 16) * magnitude) >> 16;
+				}
+				ph += inc;
+			}
+			break;
+		} // else fall through to orginary triangle without shape modulation
+
+	case WAVEFORM_TRIANGLE:
+		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+			ph = phasedata[i];
+			uint32_t phtop = ph >> 30;
+			if (phtop == 1 || phtop == 2) {
+				*bp++ = ((0xFFFF - (ph >> 15)) * magnitude) >> 16;
+			} else {
+				*bp++ = ((ph >> 15) * magnitude) >> 16;
+			}
+		}
+		break;
+	case WAVEFORM_SAMPLE_HOLD:
+		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+			ph = phasedata[i];
+			if (ph < priorphase) {
+				sample = random(magnitude) - (magnitude >> 1);
+			}
+			priorphase = ph;
+			*bp++ = sample;
+		}
+		break;
+	}
+
+	if (tone_offset) {
+		bp = block->data;
+		end = bp + AUDIO_BLOCK_SAMPLES;
+		do {
+			val1 = *bp;
+			*bp++ = signed_saturate_rshift(val1 + tone_offset, 16, 0);
+		} while (bp < end);
+	}
+	if (shapedata) release(shapedata);
+	transmit(block, 0);
+	release(block);
+}
+
 

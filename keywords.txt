@@ -60,6 +60,7 @@ AudioPlaySerialflashRaw	KEYWORD2
 AudioRecordQueue	KEYWORD2
 AudioSynthToneSweep	KEYWORD2
 AudioSynthWaveform	KEYWORD2
+AudioSynthWaveformModulated	KEYWORD2
 AudioSynthWaveformSine	KEYWORD2
 AudioSynthWaveformSineHires	KEYWORD2
 AudioSynthWaveformSineModulated	KEYWORD2
@@ -173,6 +174,8 @@ decode	KEYWORD2
 secondMix	KEYWORD2
 pitchMod	KEYWORD2
 shape	KEYWORD2
+frequencyModulation	KEYWORD2
+phaseModulation	KEYWORD2
 
 AudioMemoryUsage	KEYWORD2
 AudioMemoryUsageMax	KEYWORD2
