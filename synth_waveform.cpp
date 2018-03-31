@@ -199,6 +199,7 @@ void AudioSynthWaveformModulated::update(void)
 	moddata = receiveReadOnly(0);
 	shapedata = receiveReadOnly(1);
 
+	// Pre-compute the phase angle for every output sample of this update
 	ph = phase_accumulator;
 	priorphase = phasedata[AUDIO_BLOCK_SAMPLES-1];
 	if (moddata && modulation_type == 0) {
@@ -239,9 +240,13 @@ void AudioSynthWaveformModulated::update(void)
 		release(moddata);
 	} else if (moddata) {
 		// Phase Modulation
-
-		// TODO.....
-
+		bp = moddata->data;
+		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+			// more than +/- 180 deg shift by 32 bit overflow of "n"
+			uint32_t n = (uint16_t)(*bp++) * modulation_factor;
+			phasedata[i] = ph + n;
+			ph += inc;
+		}
 		release(moddata);
 	} else {
 		// No Modulation Input
@@ -252,6 +257,7 @@ void AudioSynthWaveformModulated::update(void)
 	}
 	phase_accumulator = ph;
 
+	// If the amplitude is zero, no output, but phase still increments properly
 	if (magnitude == 0) {
 		if (shapedata) release(shapedata);
 		return;
@@ -263,6 +269,7 @@ void AudioSynthWaveformModulated::update(void)
 	}
 	bp = block->data;
 
+	// Now generate the output samples using the pre-computed phase angles
 	switch(tone_type) {
 	case WAVEFORM_SINE:
 		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
@@ -341,17 +348,17 @@ void AudioSynthWaveformModulated::update(void)
 				uint32_t width = (shapedata->data[i] + 0x8000) & 0xFFFF;
 				uint32_t rise = 0xFFFFFFFF / width;
 				uint32_t fall = 0xFFFFFFFF / (0xFFFF - width);
-				width = width << 15;
+				uint32_t halfwidth = width << 15;
 				uint32_t n;
 				ph = phasedata[i];
-				if (ph < width) {
+				if (ph < halfwidth) {
 					n = (ph >> 16) * rise;
 					*bp++ = ((n >> 16) * magnitude) >> 16;
-				} else if (ph < 0xFFFFFFFF - width) {
-					n = 0x7FFFFFFF - (((ph - width) >> 16) * fall);
+				} else if (ph < 0xFFFFFFFF - halfwidth) {
+					n = 0x7FFFFFFF - (((ph - halfwidth) >> 16) * fall);
 					*bp++ = ((n >> 16) * magnitude) >> 16;
 				} else {
-					n = ((ph + width) >> 16) * rise + 0x80000000;
+					n = ((ph + halfwidth) >> 16) * rise + 0x80000000;
 					*bp++ = ((n >> 16) * magnitude) >> 16;
 				}
 				ph += inc;
@@ -373,7 +380,7 @@ void AudioSynthWaveformModulated::update(void)
 	case WAVEFORM_SAMPLE_HOLD:
 		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
 			ph = phasedata[i];
-			if (ph < priorphase) {
+			if (ph < priorphase) { // does not work for phase modulation
 				sample = random(magnitude) - (magnitude >> 1);
 			}
 			priorphase = ph;

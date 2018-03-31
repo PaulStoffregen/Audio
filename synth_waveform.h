@@ -182,12 +182,12 @@ public:
 		modulation_type = 0;
 	}
 	void phaseModulation(float degrees) {
-		if (degrees > 18000.0) {
-			degrees = 18000.0;
+		if (degrees > 9000.0) {
+			degrees = 9000.0;
 		} else if (degrees < 30.0) {
 			degrees = 30.0;
 		}
-		modulation_factor = degrees * (65536.0 / 360.0);
+		modulation_factor = degrees * (65536.0 / 180.0);
 		modulation_type = 1;
 	}
 	virtual void update(void);
