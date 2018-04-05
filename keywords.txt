@@ -51,6 +51,7 @@ AudioFilterStateVariable	KEYWORD2
 AudioInputAnalog	KEYWORD2
 AudioInputAnalogStereo	KEYWORD2
 AudioMixer4	KEYWORD2
+AudioAmplifier	KEYWORD2
 AudioOutputAnalog	KEYWORD2
 AudioOutputAnalogStereo	KEYWORD2
 AudioPlayMemory	KEYWORD2

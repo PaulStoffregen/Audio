@@ -363,6 +363,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioOutputTDM","data":{"defaults":{"name":{"value":"new"}},"shortName":"tdm","inputs":16,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputADAT","data":{"defaults":{"name":{"value":"new"}},"shortName":"adat","inputs":8,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputUSB","data":{"defaults":{"name":{"value":"new"}},"shortName":"usb","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioAmplifier","data":{"defaults":{"name":{"value":"new"}},"shortName":"amp","inputs":1,"outputs":1,"category":"mixer-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioMixer4","data":{"defaults":{"name":{"value":"new"}},"shortName":"mixer","inputs":4,"outputs":1,"category":"mixer-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioPlayMemory","data":{"defaults":{"name":{"value":"new"}},"shortName":"playMem","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioPlaySdWav","data":{"defaults":{"name":{"value":"new"}},"shortName":"playSdWav","inputs":0,"outputs":2,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -1395,6 +1396,43 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		Find and uncomment "#define MACOSX_ADAPTIVE_LIMIT".</p>
 </script>
 <script type="text/x-red" data-template-name="AudioOutputUSB">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioAmplifier">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Amplify or attenuate a signal, or switch it on/off.
+		</p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Input signal</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Amplified/Attn. Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>gain</span>(level);</p>
+	<p class=desc>Adjust the amplification or attenuation.
+		"level" may be any floating point number from 0 to 32767.0.
+		1.0 passes the signal through directly.  Level of 0 shuts the channel
+		off completely.  Between 0 to 1.0 attenuates the signal, and above
+		1.0 amplifies it.  Negative numbers may also be used, to invert the
+		signal.
+	</p>
+	<!--<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; SamplePlayer
+	</p>-->
+	<h3>Notes</h3>
+	<p>Gain of 0 and 1.0 are handled efficiently as special cases.  Zero
+		discards data without processing.  1.0 passes data directly, with
+		minimal overhead</p>
+	<p>Signal clipping can occur when any channel has gain greater than 1.0</p>
+</script>
+<script type="text/x-red" data-template-name="AudioAmplifier">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
