@@ -122,7 +122,7 @@ void AudioSynthWaveform::update(void)
 			if (phtop == 1 || phtop == 2) {
 				*bp++ = ((0xFFFF - (ph >> 15)) * magnitude) >> 16;
 			} else {
-				*bp++ = ((ph >> 15) * magnitude) >> 16;
+				*bp++ = (((int32_t)ph >> 15) * magnitude) >> 16;
 			}
 			ph += inc;
 		}
@@ -373,7 +373,7 @@ void AudioSynthWaveformModulated::update(void)
 			if (phtop == 1 || phtop == 2) {
 				*bp++ = ((0xFFFF - (ph >> 15)) * magnitude) >> 16;
 			} else {
-				*bp++ = ((ph >> 15) * magnitude) >> 16;
+				*bp++ = (((int32_t)ph >> 15) * magnitude) >> 16;
 			}
 		}
 		break;
