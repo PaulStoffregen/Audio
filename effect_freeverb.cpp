@@ -89,7 +89,7 @@ static int16_t sat16(int32_t n, int rshift)
 
 // TODO: move this to one of the data files, use in output_adat.cpp, output_tdm.cpp, etc
 static const audio_block_t zeroblock = {
-0, 0, 0, {
+0, 0, 0, 
 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 #if AUDIO_BLOCK_SAMPLES > 16
 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -112,7 +112,7 @@ static const audio_block_t zeroblock = {
 #if AUDIO_BLOCK_SAMPLES > 112
 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 #endif
-} };
+};
 
 void AudioEffectFreeverb::update()
 {
