@@ -3,6 +3,12 @@
 // Requires the MikroElektronika Audio Codec board or similar hardware
 //   http://www.mikroe.com/add-on-boards/audio-voice/audio-codec-proto/
 //
+// When using AudioInputI2Sslave & AudioOutputI2Sslave with MikroE-506,
+// the sample rate will be the crystal frequency divided by 256.  The
+// MikroE-506 comes with a 12.288 MHz crystal, for 48 kHz sample rate.
+// To get 44.1 kHz (as expected by the Teensy Audio Library) the crystal
+// should be replaced with 11.2896 MHz.
+//
 // Recommended connections:
 //
 //    Mikroe   Teensy 3.1
@@ -50,7 +56,7 @@ void setup() {
 
   wm8731m1.volume(0.50);
   wm8731m1.inputSelect(AUDIO_INPUT_MIC);
-  // wm8731m1.inputSelect(AUDIO_INPUT_LINEIN); // not connected on MikroE-516
+  // wm8731m1.inputSelect(AUDIO_INPUT_LINEIN); // not connected on MikroE-506
 }
 
 elapsedMillis msec;

@@ -4129,19 +4129,19 @@ value  frequency
 	</p>
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>enable</span>();</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Turn on the WS8731.
 	</p>
 	<p class=func><span class=keyword>disable</span>();</p>
 	<p class=desc>not implemented
 	</p>
 	<p class=func><span class=keyword>volume</span>(level);</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Set the headphone volume level. Range is 0 to 1.0.
 	</p>
 	<p class=func><span class=keyword>inputLevel</span>(level);</p>
-	<p class=desc>not implemented
+	<p class=desc>Adjust the line level input gain.  Range is 0 to 1.0.
 	</p>
 	<p class=func><span class=keyword>inputSelect</span>(input);</p>
-	<p class=desc>not implemented
+	<p class=desc>Select which input to use: AUDIO_INPUT_LINEIN or AUDIO_INPUT_MIC.
 	</p>
 	<!--
 <h3>Examples</h3>
@@ -4171,25 +4171,29 @@ value  frequency
 	</p>
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>enable</span>();</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Turn on the WS8731, in I2S Master mode.  I2S slave mode
+		communication must be used by Teensy.
 	</p>
 	<p class=func><span class=keyword>disable</span>();</p>
 	<p class=desc>not implemented
 	</p>
 	<p class=func><span class=keyword>volume</span>(level);</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Set the headphone volume level. Range is 0 to 1.0.
 	</p>
 	<p class=func><span class=keyword>inputLevel</span>(level);</p>
-	<p class=desc>not implemented
+	<p class=desc>Adjust the line level input gain.  Range is 0 to 1.0.
 	</p>
 	<p class=func><span class=keyword>inputSelect</span>(input);</p>
-	<p class=desc>not implemented
+	<p class=desc>Select which input to use: AUDIO_INPUT_LINEIN or AUDIO_INPUT_MIC.
 	</p>
 	<h3>Examples</h3>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; WM8731MikroSine
 	</p>
 	<h3>Notes</h3>
-	<p></p>
+	<p>The WM8731 will implement a sample rate of its crystal frequency divided by 256.
+		To get the 44.1 kHz sample rate the Teensy Audio Library expects, an
+		11.2896 MHz crystal should be used.
+	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioControlWM8731master">
 	<div class="form-row">
