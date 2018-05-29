@@ -39,8 +39,9 @@
 #define STATE_PARSE1			8  // looking for 20 byte ID header
 #define STATE_PARSE2			9  // looking for 16 byte format header
 #define STATE_PARSE3			10 // looking for 8 byte data header
-#define STATE_PARSE4			11 // ignoring unknown chunk
-#define STATE_STOP			12
+#define STATE_PARSE4			11 // ignoring unknown chunk after "fmt "
+#define STATE_PARSE5			12 // ignoring unknown chunk before "fmt "
+#define STATE_STOP			13
 
 void AudioPlaySdWav::begin(void)
 {
@@ -234,20 +235,35 @@ start:
 		data_length -= len;
 		if (data_length > 0) return false;
 		// parse the header...
-		if (header[0] == 0x46464952 && header[2] == 0x45564157
-		  && header[3] == 0x20746D66 && header[4] >= 16) {
-			if (header[4] > sizeof(header)) {
-				// if such .wav files exist, increasing the
-				// size of header[] should accomodate them...
-				//Serial.println("WAVEFORMATEXTENSIBLE too long");
-				break;
+		if (header[0] == 0x46464952 && header[2] == 0x45564157) {
+			//Serial.println("is wav file");
+			if (header[3] == 0x20746D66) {
+				// "fmt " header
+				if (header[4] < 16) {
+					// WAV "fmt " info must be at least 16 bytes
+					break;
+				}
+				if (header[4] > sizeof(header)) {
+					// if such .wav files exist, increasing the
+					// size of header[] should accomodate them...
+					//Serial.println("WAVEFORMATEXTENSIBLE too long");
+					break;
+				}
+				//Serial.println("header ok");
+				header_offset = 0;
+				state = STATE_PARSE2;
+			} else {
+				// first chuck is something other than "fmt "
+				//Serial.print("skipping \"");
+				//Serial.printf("\" (%08X), ", __builtin_bswap32(header[3]));
+				//Serial.print(header[4]);
+				//Serial.println(" bytes");
+				header_offset = 12;
+				state = STATE_PARSE5;
 			}
-			//Serial.println("header ok");
 			p += len;
 			size -= len;
 			data_length = header[4];
-			header_offset = 0;
-			state = STATE_PARSE2;
 			goto start;
 		}
 		//Serial.println("unknown WAV header");
@@ -324,6 +340,19 @@ start:
 		header_offset = 0;
 		state = STATE_PARSE3;
 		//Serial.println("consumed unknown chunk");
+		goto start;
+
+	  // skip past "junk" data before "fmt " header
+	  case STATE_PARSE5:
+		len = data_length;
+		if (size < len) len = size;
+		buffer_offset += len;
+		data_length -= len;
+		if (data_length > 0) return false;
+		p += len;
+		size -= len;
+		data_length = 8;
+		state = STATE_PARSE1;
 		goto start;
 
 	  // playing mono at native sample rate
