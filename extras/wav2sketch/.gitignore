@@ -1,2 +1,6 @@
+AudioSampleKickULAW.cpp
+AudioSampleKickULAW.h
+AudioSampleKickPCM.cpp
+AudioSampleKickPCM.h
 AudioSampleKick.cpp
 AudioSampleKick.h

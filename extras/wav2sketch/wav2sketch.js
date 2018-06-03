@@ -14,12 +14,22 @@ function readFile() {
 function processFile(file) {
   var context = new window.AudioContext();
 	context.decodeAudioData(file, function(buffer) {
-  	var source = context.createBufferSource();
-  	source.buffer = buffer;
-  	source.loop = false;
-  	source.connect(context.destination);
-  	source.start(0); 
+  	var monoData = buffer.getChannelData(0); // start with mono, do stereo later
+    var thisLength = monoData.length;
+    
+    // AudioPlayMemory requires padding to 2.9 ms boundary (128 samples @ 44100)
+    var padLength = padding(thisLength, 128);
+    var arraylen = ((thisLength + padLength) * 2 + 3) / 4 + 1;
+    console.log(10241, thisLength, padLength, arraylen);
+    console.log(monoData);
 	});
+}
+
+// compute the extra padding needed
+function padding(sampleLength, block) {
+	var extra = sampleLength % block;
+	if (extra == 0) return 0;
+	return block - extra;
 }
 
 function generateOutputFile(fileContents) {
@@ -29,9 +39,18 @@ function generateOutputFile(fileContents) {
   return textFileURL;
 }
 
+function generateCPPFile(fileName, audioData) {
+  var out = "";
+  out += '// Audio data converted from audio file by wav2sketch_js\n\n';
+  out += '#include "AudioSample' + fileName + '.h"\n\n';
+  out += 'const unsigned int AudioSample' + fileName + '[' + audioData.length + '] = {';
+  out += audioData.join(',') + ',};';
+  return out;
+}
+
 var outputFileHolder = document.getElementById('outputFileHolder');
 var downloadLink = document.createElement('a');
 downloadLink.setAttribute('download', 'test.txt');
-downloadLink.href = generateOutputFile("this is a test");
+downloadLink.href = generateOutputFile(generateCPPFile('test.wav',[0,1,2,3]));
 downloadLink.innerHTML = 'download link';
 outputFileHolder.appendChild(downloadLink);
