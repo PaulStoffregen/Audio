@@ -12,17 +12,30 @@ function readFile() {
 }
 
 function processFile(file) {
-  var context = new window.AudioContext();
+  var context = new OfflineAudioContext(1,10*44100,44100);
 	context.decodeAudioData(file, function(buffer) {
   	var monoData = buffer.getChannelData(0); // start with mono, do stereo later
-    var thisLength = monoData.length;
-    
-    // AudioPlayMemory requires padding to 2.9 ms boundary (128 samples @ 44100)
-    var padLength = padding(thisLength, 128);
-    var arraylen = ((thisLength + padLength) * 2 + 3) / 4 + 1;
-    console.log(10241, thisLength, padLength, arraylen);
-    console.log(monoData);
+    var outputData = [];
+    for(var i=0;i<monoData.length;i+=2) {
+      var a = floatToUnsignedInt16(monoData[i]);
+      var b = floatToUnsignedInt16(monoData[i+1]);
+      outputData.push((65536*b + a).toString(16));
+    }
+    var padLength = padding(outputData.length, 128);
+    for(var i=0;i<padLength;i++) {
+      outputData.push((0).toString(16));
+    }
+    console.log(outputData);
 	});
+}
+
+function floatToUnsignedInt16(f) {
+  f = Math.max(-1, Math.min(1, f));
+  var uint;
+  // horrible hacks going on here - basically i don't understand bitwise operators
+  if(f>=0) uint = Math.round(f * 32767);
+  else uint = Math.round((f + 1) * 32767 + 32768);
+  return uint;
 }
 
 // compute the extra padding needed
