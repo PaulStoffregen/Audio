@@ -21,3 +21,17 @@ function processFile(file) {
   	source.start(0); 
 	});
 }
+
+function generateOutputFile(fileContents) {
+  var textFileURL = null;
+  var blob = new Blob([fileContents], {type: 'text/plain'});
+  textFileURL = window.URL.createObjectURL(blob);
+  return textFileURL;
+}
+
+var outputFileHolder = document.getElementById('outputFileHolder');
+var downloadLink = document.createElement('a');
+downloadLink.setAttribute('download', 'test.txt');
+downloadLink.href = generateOutputFile("this is a test");
+downloadLink.innerHTML = 'download link';
+outputFileHolder.appendChild(downloadLink);
