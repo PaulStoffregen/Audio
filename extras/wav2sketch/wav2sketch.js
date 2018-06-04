@@ -1,15 +1,22 @@
+/*
+  TODO
+  multiple files
+  stereo
+  non-44100 sample rates
+*/
+
 var audioFileChooser = document.getElementById('audioFileChooser');
 
 audioFileChooser.addEventListener('change', readFile);
 
 function readFile() {
-  // TODO: deal with multiple files
-  var fileReader = new FileReader();
-  fileReader.readAsArrayBuffer(audioFileChooser.files[0]);
-  window.testFile = audioFileChooser;
-  fileReader.addEventListener('load', function(ev) {
-    processFile(ev.target.result, audioFileChooser.files[0].name);
-  });
+  for(var i = 0; i < audioFileChooser.files.length; i++) {
+    var fileReader = new FileReader();
+    fileReader.readAsArrayBuffer(audioFileChooser.files[i]);
+    fileReader.addEventListener('load', function(fileName, ev) {
+      processFile(ev.target.result, fileName);
+    }.bind(null, audioFileChooser.files[i].name));
+  }
 }
 
 function processFile(file, fileName) {
@@ -50,6 +57,7 @@ function processFile(file, fileName) {
     outputFileHolder.appendChild(downloadLink1);
     outputFileHolder.appendChild(document.createElement('br'));
     outputFileHolder.appendChild(downloadLink2);
+    outputFileHolder.appendChild(document.createElement('br'));
 	});
 }
 
