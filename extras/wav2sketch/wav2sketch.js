@@ -23,7 +23,7 @@ function processFile(file, fileName) {
 	context.decodeAudioData(file, function(buffer) {
   	var monoData = [];
     if(buffer.numberOfChannels == 1) {
-      monoData = buffer.getChannelData(1);
+      monoData = buffer.getChannelData(0);
     } else if(buffer.numberOfChannels == 2) {
       var leftData = buffer.getChannelData(0);
       var rightData = buffer.getChannelData(1);
