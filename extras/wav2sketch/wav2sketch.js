@@ -6,12 +6,13 @@ function readFile() {
   // TODO: deal with multiple files
   var fileReader = new FileReader();
   fileReader.readAsArrayBuffer(audioFileChooser.files[0]);
+  window.testFile = audioFileChooser;
   fileReader.addEventListener('load', function(ev) {
-    processFile(ev.target.result);
+    processFile(ev.target.result, audioFileChooser.files[0].name);
   });
 }
 
-function processFile(file) {
+function processFile(file, fileName) {
   var context = new OfflineAudioContext(1,10*44100,44100);
 	context.decodeAudioData(file, function(buffer) {
   	var monoData = buffer.getChannelData(0); // start with mono, do stereo later
@@ -19,13 +20,25 @@ function processFile(file) {
     for(var i=0;i<monoData.length;i+=2) {
       var a = floatToUnsignedInt16(monoData[i]);
       var b = floatToUnsignedInt16(monoData[i+1]);
-      outputData.push((65536*b + a).toString(16));
+      var out = (65536*b + a).toString(16);
+      while(out.length < 8) out = '0' + out;
+      out = '0x' + out;
+      outputData.push(out);
     }
     var padLength = padding(outputData.length, 128);
     for(var i=0;i<padLength;i++) {
-      outputData.push((0).toString(16));
+      outputData.push('0x00000000');
     }
-    console.log(outputData);
+
+    var outputFileHolder = document.getElementById('outputFileHolder');
+    var downloadLink = document.createElement('a');
+    var formattedName = fileName.split('.')[0];
+    formattedName = formattedName.charAt(0).toUpperCase() + formattedName.slice(1).toLowerCase();
+    downloadLink.href = generateOutputFile(generateCPPFile(fileName, formattedName, outputData));
+    downloadLink.setAttribute('download', 'AudioSample' + formattedName + '.cpp');
+    downloadLink.innerHTML = 'download link';
+    outputFileHolder.appendChild(downloadLink);
+
 	});
 }
 
@@ -52,18 +65,13 @@ function generateOutputFile(fileContents) {
   return textFileURL;
 }
 
-function generateCPPFile(fileName, audioData) {
+function generateCPPFile(fileName, formattedName, audioData) {
+  var formattedName = fileName.split('.')[0];
+  formattedName = formattedName.charAt(0).toUpperCase() + formattedName.slice(1).toLowerCase();
   var out = "";
   out += '// Audio data converted from audio file by wav2sketch_js\n\n';
-  out += '#include "AudioSample' + fileName + '.h"\n\n';
-  out += 'const unsigned int AudioSample' + fileName + '[' + audioData.length + '] = {';
+  out += '#include "AudioSample' + formattedName + '.h"\n\n';
+  out += 'const unsigned int AudioSample' + formattedName + '[' + audioData.length + '] = {';
   out += audioData.join(',') + ',};';
   return out;
 }
-
-var outputFileHolder = document.getElementById('outputFileHolder');
-var downloadLink = document.createElement('a');
-downloadLink.setAttribute('download', 'test.txt');
-downloadLink.href = generateOutputFile(generateCPPFile('test.wav',[0,1,2,3]));
-downloadLink.innerHTML = 'download link';
-outputFileHolder.appendChild(downloadLink);
