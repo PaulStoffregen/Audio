@@ -1,8 +1,7 @@
 /*
   TODO
-  multiple files
-  stereo
   non-44100 sample rates
+  u-law encoding
 */
 
 var audioFileChooser = document.getElementById('audioFileChooser');
@@ -22,7 +21,18 @@ function readFile() {
 function processFile(file, fileName) {
   var context = new OfflineAudioContext(1,10*44100,44100);
 	context.decodeAudioData(file, function(buffer) {
-  	var monoData = buffer.getChannelData(0); // start with mono, do stereo later
+  	var monoData = [];
+    if(buffer.numberOfChannels == 1) {
+      monoData = buffer.getChannelData(1);
+    } else if(buffer.numberOfChannels == 2) {
+      var leftData = buffer.getChannelData(0);
+      var rightData = buffer.getChannelData(1);
+      for(var i=0;i<buffer.length;i++) {
+        monoData[i] = (leftData[i] + rightData[i]) / 2;
+      }
+    } else {
+      alert("ONLY MONO AND STEREO FILES ARE SUPPORTED");
+    }
     var outputData = [];
     for(var i=0;i<monoData.length;i+=2) {
       var a = floatToUnsignedInt16(monoData[i]);
