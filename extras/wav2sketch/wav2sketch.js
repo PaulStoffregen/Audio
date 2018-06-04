@@ -26,19 +26,30 @@ function processFile(file, fileName) {
       outputData.push(out);
     }
     var padLength = padding(outputData.length, 128);
+
+    var statusInt = (outputData.length*2).toString(16);
+    while(statusInt.length < 4) statusInt = '0' + statusInt;
+    statusInt = '0x8100' + statusInt;
+    outputData.unshift(statusInt);
+
     for(var i=0;i<padLength;i++) {
       outputData.push('0x00000000');
     }
 
     var outputFileHolder = document.getElementById('outputFileHolder');
-    var downloadLink = document.createElement('a');
+    var downloadLink1 = document.createElement('a');
+    var downloadLink2 = document.createElement('a');
     var formattedName = fileName.split('.')[0];
     formattedName = formattedName.charAt(0).toUpperCase() + formattedName.slice(1).toLowerCase();
-    downloadLink.href = generateOutputFile(generateCPPFile(fileName, formattedName, outputData));
-    downloadLink.setAttribute('download', 'AudioSample' + formattedName + '.cpp');
-    downloadLink.innerHTML = 'download link';
-    outputFileHolder.appendChild(downloadLink);
-
+    downloadLink1.href = generateOutputFile(generateCPPFile(fileName, formattedName, outputData));
+    downloadLink1.setAttribute('download', 'AudioSample' + formattedName + '.cpp');
+    downloadLink1.innerHTML = 'Download AudioSample' + formattedName + '.cpp';
+    downloadLink2.href = generateOutputFile(generateHeaderFile(formattedName, outputData));
+    downloadLink2.setAttribute('download', 'AudioSample' + formattedName + '.h');
+    downloadLink2.innerHTML = 'Download AudioSample' + formattedName + '.h';
+    outputFileHolder.appendChild(downloadLink1);
+    outputFileHolder.appendChild(document.createElement('br'));
+    outputFileHolder.appendChild(downloadLink2);
 	});
 }
 
@@ -73,5 +84,12 @@ function generateCPPFile(fileName, formattedName, audioData) {
   out += '#include "AudioSample' + formattedName + '.h"\n\n';
   out += 'const unsigned int AudioSample' + formattedName + '[' + audioData.length + '] = {';
   out += audioData.join(',') + ',};';
+  return out;
+}
+
+function generateHeaderFile(formattedName, audioData) {
+  var out = "";
+  out += '// Audio data converted from audio file by wav2sketch_js\n\n';
+  out += 'extern const unsigned int AudioSample' + formattedName + '[' + audioData.length + '];';
   return out;
 }
