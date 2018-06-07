@@ -19,8 +19,9 @@ function readFile() {
 }
 
 function processFile(file, fileName) {
-  var context = new OfflineAudioContext(1,10*44100,44100);
+  var context = new OfflineAudioContext(1,100*44100,44100); // 100 seconds for now
 	context.decodeAudioData(file, function(buffer) {
+    console.log(buffer.sampleRate);
   	var monoData = [];
     if(buffer.numberOfChannels == 1) {
       monoData = buffer.getChannelData(0);
