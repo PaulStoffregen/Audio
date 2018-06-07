@@ -75,7 +75,8 @@ function processFile(file, fileName) {
 // http://2ality.com/2012/02/js-integers.html
 function toInteger(x) {
   x = Number(x);
-  return x < 0 ? Math.ceil(x) : Math.floor(x);
+  return Math.round(x);
+  //return x < 0 ? Math.ceil(x) : Math.floor(x);
 }
 
 function modulo(a, b) {
