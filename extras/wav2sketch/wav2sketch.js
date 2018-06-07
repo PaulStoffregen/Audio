@@ -45,8 +45,9 @@ function processFile(file, fileName) {
     var padLength = padding(outputData.length, 128);
 
     var statusInt = (outputData.length*2).toString(16);
-    while(statusInt.length < 4) statusInt = '0' + statusInt;
-    statusInt = '0x8100' + statusInt;
+    while(statusInt.length < 6) statusInt = '0' + statusInt;
+    if(outputData.length*2>0xFFFFFF) alert("DATA TOO LONG");
+    statusInt = '0x81' + statusInt;
     outputData.unshift(statusInt);
 
     for(var i=0;i<padLength;i++) {
