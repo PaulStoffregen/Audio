@@ -95,14 +95,23 @@ function generateOutputFile(fileContents) {
   return textFileURL;
 }
 
+function formatAudioData(audioData) {
+  var outputString = '';
+  for(var i = 0; i < audioData.length; i ++) {
+    if(i%8==0 && i>0) outputString += '\n'
+    outputString += audioData[i] + ',';
+  }
+  return outputString;
+}
+
 function generateCPPFile(fileName, formattedName, audioData) {
   var formattedName = fileName.split('.')[0];
   formattedName = formattedName.charAt(0).toUpperCase() + formattedName.slice(1).toLowerCase();
   var out = "";
   out += '// Audio data converted from audio file by wav2sketch_js\n\n';
   out += '#include "AudioSample' + formattedName + '.h"\n\n';
-  out += 'const unsigned int AudioSample' + formattedName + '[' + audioData.length + '] = {';
-  out += audioData.join(',') + ',};';
+  out += 'const unsigned int AudioSample' + formattedName + '[' + audioData.length + '] = {\n';
+  out += formatAudioData(audioData) + '\n};';
   return out;
 }
 
