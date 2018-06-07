@@ -35,8 +35,8 @@ function processFile(file, fileName) {
     }
     var outputData = [];
     for(var i=0;i<monoData.length;i+=2) {
-      var a = floatToUnsignedInt16(monoData[i]);
-      var b = floatToUnsignedInt16(monoData[i+1]);
+      var a = toUint16(monoData[i]*0x7fff);
+      var b = toUint16(monoData[i+1]*0x7fff);
       var out = (65536*b + a).toString(16);
       while(out.length < 8) out = '0' + out;
       out = '0x' + out;
@@ -72,13 +72,18 @@ function processFile(file, fileName) {
 	});
 }
 
-function floatToUnsignedInt16(f) {
-  f = Math.max(-1, Math.min(1, f));
-  var uint;
-  // horrible hacks going on here - basically i don't understand bitwise operators
-  if(f>=0) uint = Math.round(f * 32767);
-  else uint = Math.round((f + 1) * 32767 + 32768);
-  return uint;
+// http://2ality.com/2012/02/js-integers.html
+function toInteger(x) {
+  x = Number(x);
+  return x < 0 ? Math.ceil(x) : Math.floor(x);
+}
+
+function modulo(a, b) {
+  return a - Math.floor(a/b)*b;
+}
+
+function toUint16(x) {
+  return modulo(toInteger(x), Math.pow(2, 16));
 }
 
 // compute the extra padding needed
