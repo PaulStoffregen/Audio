@@ -19,7 +19,22 @@ function readFile() {
 }
 
 function processFile(file, fileName) {
-  var context = new OfflineAudioContext(1,100*44100,44100); // 100 seconds for now
+  // determine sample rate
+  // ideas borrowed from https://github.com/ffdead/wav.js
+  var sampleRate = 0;
+  try {
+    var sampleRateBytes = new Uint8Array(file, 24, 4);
+    for(var i = 0; i < sampleRateBytes.length; i ++) {
+      sampleRate |= a[i] << (i*8);
+    }
+    if([44100, 22050, 11025].indexOf(sampleRate) == -1) {
+      sampleRate = 44100;
+    }
+  } catch(err) {
+    sampleRate = 44100; 
+  }
+
+  var context = new OfflineAudioContext(1, 100*sampleRate, sampleRate); // 100 seconds for now
 	context.decodeAudioData(file, function(buffer) {
     console.log(buffer.sampleRate);
   	var monoData = [];

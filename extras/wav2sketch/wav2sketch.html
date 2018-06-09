@@ -6,9 +6,16 @@
     <h1>Teensy Audio Wav2Sketch Utility</h1>
     <p>Upload an audio file to convert it into Teensy audio format.</p>
     <form>
-      <label>Sample rate</label>
+      <label>Input sample rate</label>
       <select>
-        <option>Auto</option>
+        <option>Auto-detect</option>
+        <option>44100</option>
+        <option>22050</option>
+        <option>11025</option>
+      </select><br/><br/>
+      <label>Output sample rate</label>
+      <select>
+        <option>Use input sample rate</option>
         <option>44100</option>
         <option>22050</option>
         <option>11025</option>
