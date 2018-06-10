@@ -11,27 +11,35 @@ audioFileChooser.addEventListener('change', readFile);
 function readFile() {
   for(var i = 0; i < audioFileChooser.files.length; i++) {
     var fileReader = new FileReader();
+    var sampleRateChoice = document.getElementById('sampleRate').value;
+    if(sampleRateChoice == "auto") sampleRateChoice = null;
+    else sampleRateChoice = parseInt(sampleRateChoice);
     fileReader.readAsArrayBuffer(audioFileChooser.files[i]);
     fileReader.addEventListener('load', function(fileName, ev) {
-      processFile(ev.target.result, fileName);
+      processFile(ev.target.result, fileName, sampleRateChoice);
     }.bind(null, audioFileChooser.files[i].name));
   }
 }
 
-function processFile(file, fileName) {
+function processFile(file, fileName, sampleRateChoice) {
   // determine sample rate
   // ideas borrowed from https://github.com/ffdead/wav.js
   var sampleRate = 0;
-  try {
-    var sampleRateBytes = new Uint8Array(file, 24, 4);
-    for(var i = 0; i < sampleRateBytes.length; i ++) {
-      sampleRate |= a[i] << (i*8);
+  if(!sampleRateChoice) {
+    try {
+      var sampleRateBytes = new Uint8Array(file, 24, 4);
+      for(var i = 0; i < sampleRateBytes.length; i ++) {
+        sampleRate |= sampleRateBytes[i] << (i*8);
+      }
+    } catch(err) {
+      console.log('problem reading sample rate');
     }
     if([44100, 22050, 11025].indexOf(sampleRate) == -1) {
       sampleRate = 44100;
     }
-  } catch(err) {
-    sampleRate = 44100; 
+  } else {
+    console.log('using chosen sample rate of ' + sampleRateChoice);
+    sampleRate = sampleRateChoice;
   }
 
   var context = new OfflineAudioContext(1, 100*sampleRate, sampleRate); // 100 seconds for now
@@ -48,6 +56,7 @@ function processFile(file, fileName) {
       }
     } else {
       alert("ONLY MONO AND STEREO FILES ARE SUPPORTED");
+      // NB - would be trivial to add support for n channels, given that everything ends up mono anyway
     }
     var outputData = [];
     for(var i=0;i<monoData.length;i+=2) {
@@ -63,7 +72,12 @@ function processFile(file, fileName) {
     var statusInt = (outputData.length*2).toString(16);
     while(statusInt.length < 6) statusInt = '0' + statusInt;
     if(outputData.length*2>0xFFFFFF) alert("DATA TOO LONG");
-    statusInt = '0x81' + statusInt;
+    var compressionCode = '0';
+    if(true) compressionCode = '8';
+    var sampleRateCode = '1';
+    if(sampleRate == 22050) sampleRateCode = '2';
+    if(sampleRate == 11025) sampleRateCode = '3';
+    statusInt = '0x' + compressionCode + sampleRateCode + statusInt;
     outputData.unshift(statusInt);
 
     for(var i=0;i<padLength;i++) {
