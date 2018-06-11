@@ -71,6 +71,11 @@ function processFile(file, fileName, sampleRateChoice) {
       sampleRateCode = '3';
     }
 
+    var ulawOut = [];
+    for(var i = 0; i < monoData.length; i ++) {
+      ulawOut.push(ulaw_encode(toInteger(monoData[i]*0x7fff)).toString(16));
+    }
+    window.ulawOut = ulawOut;
     var outputData = createWords(monoData, padLength);
 
     var statusInt = (monoData.length).toString(16);
@@ -95,6 +100,30 @@ function processFile(file, fileName, sampleRateChoice) {
     outputFileHolder.appendChild(downloadLink2);
     outputFileHolder.appendChild(document.createElement('br'));
 	});
+}
+
+function ulaw_encode(audio)
+{
+	var mag, neg; // both uint32
+
+	// http://en.wikipedia.org/wiki/G.711
+	if (audio >= 0) {
+		mag = audio;
+		neg = 0;
+	} else {
+		mag = audio * -1;
+		neg = 0x80;
+	}
+	mag += 128;
+	if (mag > 0x7FFF) mag = 0x7FFF;
+	if (mag >= 0x4000) return neg | 0x70 | ((mag >> 10) & 0x0F);  // 01wx yz00 0000 0000
+	if (mag >= 0x2000) return neg | 0x60 | ((mag >> 9) & 0x0F);   // 001w xyz0 0000 0000
+	if (mag >= 0x1000) return neg | 0x50 | ((mag >> 8) & 0x0F);   // 0001 wxyz 0000 0000
+	if (mag >= 0x0800) return neg | 0x40 | ((mag >> 7) & 0x0F);   // 0000 1wxy z000 0000
+	if (mag >= 0x0400) return neg | 0x30 | ((mag >> 6) & 0x0F);   // 0000 01wx yz00 0000
+	if (mag >= 0x0200) return neg | 0x20 | ((mag >> 5) & 0x0F);   // 0000 001w xyz0 0000
+	if (mag >= 0x0100) return neg | 0x10 | ((mag >> 4) & 0x0F);   // 0000 0001 wxyz 0000
+	                   return neg | 0x00 | ((mag >> 3) & 0x0F);   // 0000 0000 1wxy z000
 }
 
 function createWords(audioData, padLength) {
@@ -124,6 +153,10 @@ function modulo(a, b) {
 
 function toUint16(x) {
   return modulo(toInteger(x), Math.pow(2, 16));
+}
+
+function toUint8(x) {
+  return modulo(toInteger(x), Math.pow(2, 8));
 }
 
 // compute the extra padding needed

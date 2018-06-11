@@ -353,4 +353,3 @@ void die(const char *format, ...)
 	fprintf(stderr, "\n");
 	exit(1);
 }
-
