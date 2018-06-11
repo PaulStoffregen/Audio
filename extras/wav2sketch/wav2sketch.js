@@ -1,7 +1,7 @@
 /*
   TODO
-  non-44100 sample rates
   u-law encoding
+  browser feature check (offlineaudiocontext might still be a bit niche)
 */
 
 var audioFileChooser = document.getElementById('audioFileChooser');
@@ -67,20 +67,28 @@ function processFile(file, fileName, sampleRateChoice) {
       out = '0x' + out;
       outputData.push(out);
     }
-    var padLength = padding(outputData.length, 128);
+    var padLength;
+    var compressionCode = '0';
+    var sampleRateCode;
+    if(true) compressionCode = '8'; // add u-law support here later
+    if(sampleRate == 44100) {
+      padLength = padding(outputData.length/2, 128);
+      sampleRateCode = '1';
+    } else if(sampleRate == 22050) {
+      padLength = padding(outputData.length/2, 64);
+      sampleRateCode = '2';
+    } else if(sampleRate == 11025) {
+      padLength = padding(outputData.length/2, 32);
+      sampleRateCode = '3';
+    }
 
     var statusInt = (outputData.length*2).toString(16);
     while(statusInt.length < 6) statusInt = '0' + statusInt;
     if(outputData.length*2>0xFFFFFF) alert("DATA TOO LONG");
-    var compressionCode = '0';
-    if(true) compressionCode = '8';
-    var sampleRateCode = '1';
-    if(sampleRate == 22050) sampleRateCode = '2';
-    if(sampleRate == 11025) sampleRateCode = '3';
     statusInt = '0x' + compressionCode + sampleRateCode + statusInt;
     outputData.unshift(statusInt);
 
-    for(var i=0;i<padLength;i++) {
+    for(var i=0;i<padLength/2;i++) {
       outputData.push('0x00000000');
     }
 
@@ -134,15 +142,13 @@ function generateOutputFile(fileContents) {
 function formatAudioData(audioData) {
   var outputString = '';
   for(var i = 0; i < audioData.length; i ++) {
-    if(i%8==0 && i>0) outputString += '\n'
+    if(i%8==0 && i>0) outputString += '\n';
     outputString += audioData[i] + ',';
   }
   return outputString;
 }
 
 function generateCPPFile(fileName, formattedName, audioData) {
-  var formattedName = fileName.split('.')[0];
-  formattedName = formattedName.charAt(0).toUpperCase() + formattedName.slice(1).toLowerCase();
   var out = "";
   out += '// Audio data converted from audio file by wav2sketch_js\n\n';
   out += '#include "AudioSample' + formattedName + '.h"\n\n';
