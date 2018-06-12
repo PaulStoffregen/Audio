@@ -1,6 +1,5 @@
 /*
   TODO
-  u-law encoding
   browser feature check (offlineaudiocontext might still be a bit niche)
 */
 
@@ -12,19 +11,21 @@ function readFile() {
   for(var i = 0; i < audioFileChooser.files.length; i++) {
     var fileReader = new FileReader();
     var sampleRateChoice = document.getElementById('sampleRate').value;
+    var encodingChoice = document.getElementById('encoding').value;
     if(sampleRateChoice == "auto") sampleRateChoice = null;
     else sampleRateChoice = parseInt(sampleRateChoice);
     fileReader.readAsArrayBuffer(audioFileChooser.files[i]);
     fileReader.addEventListener('load', function(fileName, ev) {
-      processFile(ev.target.result, fileName, sampleRateChoice);
+      processFile(ev.target.result, fileName, sampleRateChoice, encodingChoice);
     }.bind(null, audioFileChooser.files[i].name));
   }
 }
 
-function processFile(file, fileName, sampleRateChoice) {
+function processFile(file, fileName, sampleRateChoice, encodingChoice) {
   // determine sample rate
   // ideas borrowed from https://github.com/ffdead/wav.js
   var sampleRate = 0;
+  var encoding = encodingChoice;
   if(!sampleRateChoice) {
     try {
       var sampleRateBytes = new Uint8Array(file, 24, 4);
@@ -57,9 +58,10 @@ function processFile(file, fileName, sampleRateChoice) {
       // NB - would be trivial to add support for n channels, given that everything ends up mono anyway
     }
     var padLength;
-    var compressionCode = '0';
+    var encodingCode = '0';
     var sampleRateCode;
-    if(true) compressionCode = '8'; // add u-law support here later
+    if(encoding == 'u-law') encodingCode = '0';
+    else encodingCode = '8'; // PCM
     if(sampleRate == 44100) {
       padLength = padding(monoData.length, 128);
       sampleRateCode = '1';
@@ -73,15 +75,20 @@ function processFile(file, fileName, sampleRateChoice) {
 
     var ulawOut = [];
     for(var i = 0; i < monoData.length; i ++) {
-      ulawOut.push(ulaw_encode(toInteger(monoData[i]*0x7fff)).toString(16));
+      ulawOut.push(ulaw_encode(toInteger(monoData[i]*0x7fff)));
     }
     window.ulawOut = ulawOut;
-    var outputData = createWords(monoData, padLength);
+    var outputData;
+    if(encoding == 'u-law') {
+      outputData = createULawWords(ulawOut, padLength);
+    } else {
+      outputData = createWords(monoData, padLength);
+    }
 
     var statusInt = (monoData.length).toString(16);
     while(statusInt.length < 6) statusInt = '0' + statusInt;
     if(monoData.length>0xFFFFFF) alert("DATA TOO LONG");
-    statusInt = '0x' + compressionCode + sampleRateCode + statusInt;
+    statusInt = '0x' + encodingCode + sampleRateCode + statusInt;
     outputData.unshift(statusInt);
 
     var outputFileHolder = document.getElementById('outputFileHolder');
@@ -89,7 +96,7 @@ function processFile(file, fileName, sampleRateChoice) {
     var downloadLink2 = document.createElement('a');
     var formattedName = fileName.split('.')[0];
     formattedName = formattedName.charAt(0).toUpperCase() + formattedName.slice(1).toLowerCase();
-    downloadLink1.href = generateOutputFile(generateCPPFile(fileName, formattedName, outputData, sampleRate));
+    downloadLink1.href = generateOutputFile(generateCPPFile(fileName, formattedName, outputData, sampleRate, encoding));
     downloadLink1.setAttribute('download', 'AudioSample' + formattedName + '.cpp');
     downloadLink1.innerHTML = 'Download AudioSample' + formattedName + '.cpp';
     downloadLink2.href = generateOutputFile(generateHeaderFile(formattedName, outputData));
@@ -133,6 +140,22 @@ function createWords(audioData, padLength) {
     var a = toUint16(i<audioData.length?audioData[i]*0x7fff:0x0000);
     var b = toUint16(i+1<audioData.length?audioData[i+1]*0x7fff:0x0000);
     var out = (65536*b + a).toString(16);
+    while(out.length < 8) out = '0' + out;
+    out = '0x' + out;
+    outputData.push(out);
+  }
+  return outputData;
+}
+
+function createULawWords(audioData, padLength) {
+  var totalLength = audioData.length + padLength;
+  var outputData = [];
+  for(var i = 0; i < totalLength; i += 4) {
+    var a = i<audioData.length ? audioData[i] : 0;
+    var b = i+1<audioData.length ? audioData[i+1] : 0;
+    var c = i+2<audioData.length ? audioData[i+2] : 0;
+    var d = i+3<audioData.length ? audioData[i+3] : 0;
+    var out = (a + 0x100*b + 0x10000*c + 0x1000000*d).toString(16);
     while(out.length < 8) out = '0' + out;
     out = '0x' + out;
     outputData.push(out);
@@ -186,7 +209,7 @@ function generateCPPFile(fileName, formattedName, audioData, sampleRate, encodin
   var out = "";
   out += '// Audio data converted from audio file by wav2sketch_js\n\n';
   out += '#include "AudioSample' + formattedName + '.h"\n\n';
-  out += '// Converted from ' + fileName + ', using ' + sampleRate + ' Hz, 16 bit PCM encoding\n';
+  out += '// Converted from ' + fileName + ', using ' + sampleRate + ' Hz, 16 bit ' + encodingType + ' encoding\n';
   out += 'const unsigned int AudioSample' + formattedName + '[' + audioData.length + '] = {\n';
   out += formatAudioData(audioData) + '\n};';
   return out;
