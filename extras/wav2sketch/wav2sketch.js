@@ -106,7 +106,7 @@ function processFile(file, fileName, sampleRateChoice, encodingChoice) {
     var outputFileHolder = document.getElementById('outputFileHolder');
     var downloadLink1 = document.createElement('a');
     var downloadLink2 = document.createElement('a');
-    var formattedName = fileName.split('.')[0];
+    var formattedName = fileName.split('.')[0].split(' ').join('');
     formattedName = formattedName.charAt(0).toUpperCase() + formattedName.slice(1).toLowerCase();
     downloadLink1.href = generateOutputFile(generateCPPFile(fileName, formattedName, outputData, sampleRate, encoding));
     downloadLink1.setAttribute('download', 'AudioSample' + formattedName + '.cpp');
