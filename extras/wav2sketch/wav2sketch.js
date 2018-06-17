@@ -1,11 +1,23 @@
 /*
-  TODO
-  browser feature check (offlineaudiocontext might still be a bit niche)
+  WAV2SKETCH utility - converts audio files to Teensy code
+  Javascript version by Matt Bradshaw, converted from original by Paul Stoffregen
+
+  HOW IT WORKS:
+  File loader listens for a user choosing a file
+  Check desired sample rate and encoding
+  If no desired sample rate chosen, file's header is read to see if the sample rate can be determined
+  Create an OfflineAudioContext with appropriate sample rate
+  Read data from audio file as a series of floating point numbers
+  Convert these floating point numbers to unsigned integers
+  Add padding required by Teensy audio library
+  Pack unsigned integers into 32-bit words, with u-law encoding if desired
 */
 
 var audioFileChooser = document.getElementById('audioFileChooser');
 
 audioFileChooser.addEventListener('change', readFile);
+
+if(!window.OfflineAudioContext) alert("Browser does not support OfflineAudioContext");
 
 function readFile() {
   for(var i = 0; i < audioFileChooser.files.length; i++) {
