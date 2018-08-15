@@ -383,7 +383,8 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioSynthWaveformDc","data":{"defaults":{"name":{"value":"new"}},"shortName":"dc","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthNoiseWhite","data":{"defaults":{"name":{"value":"new"}},"shortName":"noise","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthNoisePink","data":{"defaults":{"name":{"value":"new"}},"shortName":"pink","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioEffectFade","data":{"defaults":{"name":{"value":"new"}},"shortName":"fade","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioSynthByteBeat","data":{"defaults":{"name":{"value":"new"}},"shortName":"byte","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+	        {"type":"AudioEffectFade","data":{"defaults":{"name":{"value":"new"}},"shortName":"fade","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectChorus","data":{"defaults":{"name":{"value":"new"}},"shortName":"chorus","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectFlange","data":{"defaults":{"name":{"value":"new"}},"shortName":"flange","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectReverb","data":{"defaults":{"name":{"value":"new"}},"shortName":"reverb","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -2399,6 +2400,59 @@ The actual packets are taken
 	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioSynthNoisePink">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioSynthByteBeat">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Implementation of seveal bytebeat signal generators, which generate strange
+	        noises by evaluating bit level operators on an incrementing phase value
+	        at audio rates.</p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Bytebeat Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>equation</span>(equation);</p>
+	<p class=desc>Set the bytebeat to evaluate, 0 to 15.
+	</p>
+	<p class=func><span class=keyword>p0</span>(parameter);</p>
+	<p class=desc>Set the first bytebeat parameter. Parameters affect each
+	  bytebeat in unique and unpredictable ways. Valid range is
+	  0 to 255.
+	</p>
+	<p class=func><span class=keyword>p1</span>(parameter);</p>
+	<p class=desc>Set the second bytebeat parameter.
+	</p>
+	<p class=func><span class=keyword>p2</span>(parameter);</p>
+	<p class=desc>Set the third bytebeat parameter.
+	</p>
+	<p class=func><span class=keyword>bytepitch</span>(depth);</p>
+	<p class=desc>Set the bytepitch, which affects the speed and duration
+	  of each bytebeat's evolution.
+	</p>
+	<p class=func><span class=keyword>pitch</span>(depth);</p>
+	<p class=desc>Set the pitch of the output. Also affects the speed of
+	  the bytebeat, but in a different way from bytepitch. Although results
+	  are often musical, don't expect perfect or predictable tuning.
+	</p>
+	
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Synthesis &gt; ProtoByteBeat
+	</p>
+	<h3>Notes</h3>
+	<p> Not every combination of parameter values will produce sound for
+	  every bytebeat. Experimentation is key to get musical(ish) results!
+	</p>
+	<p></p>
+</script>
+<script type="text/x-red" data-template-name="AudioSynthSimpleDrum">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
