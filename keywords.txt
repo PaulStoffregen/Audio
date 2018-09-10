@@ -72,6 +72,7 @@ AudioSynthNoiseWhite	KEYWORD2
 AudioSynthNoisePink	KEYWORD2
 AudioSynthKarplusStrong	KEYWORD2
 AudioSynthSimpleDrum	KEYWORD2
+AudioSynthWavetable	KEYWORD2
 isPlaying	KEYWORD2
 positionMillis	KEYWORD2
 lengthMillis	KEYWORD2
@@ -178,6 +179,10 @@ pitchMod	KEYWORD2
 shape	KEYWORD2
 frequencyModulation	KEYWORD2
 phaseModulation	KEYWORD2
+setInstrument	KEYWORD2
+playFrequency	KEYWORD2
+playNote	KEYWORD2
+setFrequency	KEYWORD2
 
 AudioMemoryUsage	KEYWORD2
 AudioMemoryUsageMax	KEYWORD2
