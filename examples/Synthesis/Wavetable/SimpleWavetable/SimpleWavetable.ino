@@ -1,3 +1,17 @@
+/* Play a flute sound when a button is pressed.
+
+   Connect a pushbutton to pin 1 and pots to pins A2 & A3.
+   The audio tutorial kit is the intended hardware:
+     https://www.pjrc.com/store/audio_tutorial_kit.html
+
+   Without pots connected, this program will play a very
+   strange sound due to rapid random fluctuation of the
+   pitch and volume!
+
+   Requires Teensy 3.2 or higher.
+   Requires Audio Shield: https://www.pjrc.com/store/teensy3_audio.html
+*/
+
 #include <Bounce.h>
 #include <Audio.h>
 #include <Wire.h>

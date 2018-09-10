@@ -46,6 +46,7 @@ enum envelopeStateEnum { STATE_IDLE, STATE_DELAY, STATE_ATTACK, STATE_HOLD, STAT
 #define NOTE(N) (440.0 * pow(2.0, (N - 69) / 12.0))
 #define DECIBEL_SHIFT(dB) (pow(10.0, dB/20.0))
 
+// TODO: move all this stuff into the AudioSynthWavetable class, not global scope
 struct sample_data {
 	// SAMPLE VALUES
 	const int16_t* sample;
@@ -166,7 +167,7 @@ public:
 	void playFrequency(float freq, int amp = DEFAULT_AMPLITUDE);
 	void playNote(int note, int amp = DEFAULT_AMPLITUDE);
 	bool isPlaying(void) { return env_state != STATE_IDLE; }
-    void setFrequency(float freq);
+	void setFrequency(float freq);
 	virtual void update(void);
 	
 	envelopeStateEnum getEnvState(void) { return env_state; }

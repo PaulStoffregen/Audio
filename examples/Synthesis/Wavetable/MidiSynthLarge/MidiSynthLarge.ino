@@ -1,3 +1,12 @@
+/* Play notes when your computer sends USB MIDI messages.
+
+   To use this example, you must run software on your computer which
+   sends MIDI.  Tools > USB Type must be set to MIDI when uploading.
+
+   Requires Teensy 3.6 due to 820 kbytes of wavetable data
+   Requires Audio Shield: https://www.pjrc.com/store/teensy3_audio.html
+*/
+
 #include "bassoon_samples.h"
 #include "clarinet_samples.h"
 #include "distortiongt_samples.h"

@@ -1,3 +1,13 @@
+/* Play notes when your computer sends USB MIDI messages.
+
+   To use this example, you must run software on your computer which
+   sends MIDI.  Tools > USB Type must be set to MIDI when uploading.
+
+   Requires Teensy 3.6 due to 520 kbytes of wavetable data
+   Requires Audio Shield: https://www.pjrc.com/store/teensy3_audio.html
+*/
+
+// TODO: smaller samples, to fit in Teensy 3.2 memory
 #include "Pizzicato_samples.h"
 #include "FrenchHorns_samples.h"
 #include "Viola_samples.h"

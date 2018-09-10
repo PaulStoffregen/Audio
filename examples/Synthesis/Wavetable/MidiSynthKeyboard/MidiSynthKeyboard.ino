@@ -1,3 +1,14 @@
+/* Play notes with a regular USB MIDI Instrument.
+
+   To use this example, connect a USB instrument to Teensy 3.6's
+   USB host port.  This cable is recommended:
+     https://www.pjrc.com/store/cable_usb_host_t36.html
+
+   Requires Teensy 3.6 for USB host capability.
+   Requires Audio Shield: https://www.pjrc.com/store/teensy3_audio.html
+*/
+
+
 #include "Pizzicato_samples.h"
 #include "FrenchHorns_samples.h"
 #include "Viola_samples.h"

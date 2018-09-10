@@ -1,3 +1,9 @@
+/* Play Zelda music.
+
+   Requires Teensy 3.6 due to 520 kbytes of wavetable data
+   Requires Audio Shield: https://www.pjrc.com/store/teensy3_audio.html
+*/
+
 #include <Bounce.h>
 #include <Audio.h>
 #include <Wire.h>
