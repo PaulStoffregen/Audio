@@ -1,5 +1,5 @@
 #include "Pizzicato_samples.h"
-const sample_data Pizzicato_samples[4] = {
+const AudioSynthWavetable::sample_data Pizzicato_samples[4] = {
 	{
 		(int16_t*)sample_0_Pizzicato_PizzViolinE3,	//16-bit PCM encoded audio sample
 		true,	//Whether or not to loop this sample

@@ -1,5 +1,5 @@
 #include "recorder_samples.h"
-const sample_data recorder_samples[1] = {
+const AudioSynthWavetable::sample_data recorder_samples[1] = {
 	{
 		(int16_t*)sample_0_recorder_recorderax2, // sample
 		true, // LOOP

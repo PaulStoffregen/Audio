@@ -1,10 +1,10 @@
 #pragma once
 #include <Audio.h>
 
-extern const sample_data distortiongt_samples[4];
+extern const AudioSynthWavetable::sample_data distortiongt_samples[4];
 const uint8_t distortiongt_ranges[] = {62, 66, 72, 127, };
 
-const instrument_data distortiongt = {4, distortiongt_ranges, distortiongt_samples };
+const AudioSynthWavetable::instrument_data distortiongt = {4, distortiongt_ranges, distortiongt_samples };
 
 
 extern const uint32_t sample_0_distortiongt_distgtra2[1024];

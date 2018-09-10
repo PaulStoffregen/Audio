@@ -1,5 +1,5 @@
 #include "steelstrgtr_samples.h"
-const sample_data steelstrgtr_samples[2] = {
+const AudioSynthWavetable::sample_data steelstrgtr_samples[2] = {
 	{
 		(int16_t*)sample_0_steelstrgtr_acgtrg2, // sample
 		true, // LOOP

@@ -1,5 +1,5 @@
 #include "mutedgtr_samples.h"
-const sample_data mutedgtr_samples[1] = {
+const AudioSynthWavetable::sample_data mutedgtr_samples[1] = {
 	{
 		(int16_t*)sample_0_mutedgtr_mgtr, // sample
 		true, // LOOP

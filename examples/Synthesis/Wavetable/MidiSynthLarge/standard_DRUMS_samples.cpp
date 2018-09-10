@@ -1,5 +1,5 @@
 #include "standard_DRUMS_samples.h"
-const sample_data standard_DRUMS_samples[48] = {
+const AudioSynthWavetable::sample_data standard_DRUMS_samples[48] = {
 	{
 		(int16_t*)sample_0_standard_DRUMS_filtersnap, // sample
 		false, // LOOP

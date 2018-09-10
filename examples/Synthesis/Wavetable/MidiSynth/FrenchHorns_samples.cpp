@@ -1,5 +1,5 @@
 #include "FrenchHorns_samples.h"
-const sample_data FrenchHorns_samples[1] = {
+const AudioSynthWavetable::sample_data FrenchHorns_samples[1] = {
 	{
 		(int16_t*)sample_0_FrenchHorns_FrenchHornsA4L,	//16-bit PCM encoded audio sample
 		true,	//Whether or not to loop this sample

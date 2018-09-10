@@ -1,5 +1,5 @@
 #include "glockenspiel_samples.h"
-const sample_data glockenspiel_samples[2] = {
+const AudioSynthWavetable::sample_data glockenspiel_samples[2] = {
 	{
 		(int16_t*)sample_0_glockenspiel_sinetick, // sample
 		false, // LOOP

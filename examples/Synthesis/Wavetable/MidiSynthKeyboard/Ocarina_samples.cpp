@@ -1,5 +1,5 @@
 #include "Ocarina_samples.h"
-const sample_data Ocarina_samples[3] = {
+const AudioSynthWavetable::sample_data Ocarina_samples[3] = {
 	{
 		(int16_t*)sample_0_Ocarina_OcarinaF4,	//16-bit PCM encoded audio sample
 		true,	//Whether or not to loop this sample

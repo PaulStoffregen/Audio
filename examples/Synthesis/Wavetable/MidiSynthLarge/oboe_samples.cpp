@@ -1,5 +1,5 @@
 #include "oboe_samples.h"
-const sample_data oboe_samples[3] = {
+const AudioSynthWavetable::sample_data oboe_samples[3] = {
 	{
 		(int16_t*)sample_0_oboe_oboecx3, // sample
 		true, // LOOP

@@ -1,5 +1,5 @@
 #include "tuba_samples.h"
-const sample_data tuba_samples[2] = {
+const AudioSynthWavetable::sample_data tuba_samples[2] = {
 	{
 		(int16_t*)sample_0_tuba_tubaax1, // sample
 		true, // LOOP

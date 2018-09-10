@@ -1,5 +1,5 @@
 #include "clarinet_samples.h"
-const sample_data clarinet_samples[2] = {
+const AudioSynthWavetable::sample_data clarinet_samples[2] = {
 	{
 		(int16_t*)sample_0_clarinet_clarinetd2, // sample
 		true, // LOOP

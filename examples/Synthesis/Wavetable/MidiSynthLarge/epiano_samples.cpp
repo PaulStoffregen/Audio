@@ -1,5 +1,5 @@
 #include "epiano_samples.h"
-const sample_data epiano_samples[4] = {
+const AudioSynthWavetable::sample_data epiano_samples[4] = {
 	{
 		(int16_t*)sample_0_epiano_coldglass7wave, // sample
 		true, // LOOP

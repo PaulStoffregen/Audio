@@ -1,5 +1,5 @@
 #include "overdrivegt_samples.h"
-const sample_data overdrivegt_samples[3] = {
+const AudioSynthWavetable::sample_data overdrivegt_samples[3] = {
 	{
 		(int16_t*)sample_0_overdrivegt_distgtra2, // sample
 		true, // LOOP

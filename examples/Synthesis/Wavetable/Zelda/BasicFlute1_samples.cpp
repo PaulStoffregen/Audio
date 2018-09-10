@@ -1,5 +1,5 @@
 #include "BasicFlute1_samples.h"
-const sample_data BasicFlute1_samples[2] = {
+const AudioSynthWavetable::sample_data BasicFlute1_samples[2] = {
 	{
 		(int16_t*)sample_0_BasicFlute1_BreathyFluteC2,	//16-bit PCM encoded audio sample
 		true,	//Whether or not to loop this sample

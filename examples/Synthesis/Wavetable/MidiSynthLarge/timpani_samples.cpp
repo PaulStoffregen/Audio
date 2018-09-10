@@ -1,5 +1,5 @@
 #include "timpani_samples.h"
-const sample_data timpani_samples[3] = {
+const AudioSynthWavetable::sample_data timpani_samples[3] = {
 	{
 		(int16_t*)sample_0_timpani_timpani, // sample
 		true, // LOOP

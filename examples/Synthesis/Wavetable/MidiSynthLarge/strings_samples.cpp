@@ -1,5 +1,5 @@
 #include "strings_samples.h"
-const sample_data strings_samples[3] = {
+const AudioSynthWavetable::sample_data strings_samples[3] = {
 	{
 		(int16_t*)sample_0_strings_stringsg2, // sample
 		true, // LOOP

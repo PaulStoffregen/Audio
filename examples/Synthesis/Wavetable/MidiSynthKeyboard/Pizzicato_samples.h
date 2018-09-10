@@ -1,10 +1,10 @@
 #pragma once
 #include <Audio.h>
 
-extern const sample_data Pizzicato_samples[4];
+extern const AudioSynthWavetable::sample_data Pizzicato_samples[4];
 const uint8_t Pizzicato_ranges[] = {68, 83, 93, 127, };
 
-const instrument_data Pizzicato = {4, Pizzicato_ranges, Pizzicato_samples };
+const AudioSynthWavetable::instrument_data Pizzicato = {4, Pizzicato_ranges, Pizzicato_samples };
 
 
 extern const uint32_t sample_0_Pizzicato_PizzViolinE3[2944];

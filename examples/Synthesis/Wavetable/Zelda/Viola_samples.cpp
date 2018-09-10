@@ -1,5 +1,5 @@
 #include "Viola_samples.h"
-const sample_data Viola_samples[8] = {
+const AudioSynthWavetable::sample_data Viola_samples[8] = {
 	{
 		(int16_t*)sample_0_Viola_ViolinBb2,	//16-bit PCM encoded audio sample
 		true,	//Whether or not to loop this sample

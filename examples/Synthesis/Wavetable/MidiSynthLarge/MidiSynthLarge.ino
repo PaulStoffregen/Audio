@@ -164,7 +164,7 @@ void OnPress(int key)
 	//Serial.println();
 }
 
-const instrument_data* const midi_map[] = {
+const AudioSynthWavetable::instrument_data * const midi_map[] = {
 	&piano, &piano, &piano, &piano, &piano, &piano, &piano, &piano, // 000: pianos
 	&vibraphone, &vibraphone, &vibraphone, &vibraphone, &vibraphone, &vibraphone, &vibraphone, &vibraphone, // 008: chrom percus
 	&harmonica, &harmonica, &harmonica, &harmonica, &harmonica, &harmonica, &harmonica, &harmonica, // 016: organs
@@ -183,7 +183,7 @@ const instrument_data* const midi_map[] = {
 	&gtfretnoise, &gtfretnoise, &gtfretnoise, &gtfretnoise, &gtfretnoise, &gtfretnoise, &gtfretnoise, &gtfretnoise, // 120: sound effects
 };
 
-const instrument_data* channel_map[17] = {
+const AudioSynthWavetable::instrument_data * channel_map[17] = {
 	&piano, &piano, &piano, &piano, &piano, &piano, &piano, &piano, &piano, &piano, &standard_DRUMS, &piano, &piano, &piano, &piano, &piano, &piano,
 };
 

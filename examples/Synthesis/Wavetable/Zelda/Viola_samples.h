@@ -1,10 +1,10 @@
 #pragma once
 #include <Audio.h>
 
-extern const sample_data Viola_samples[8];
+extern const AudioSynthWavetable::sample_data Viola_samples[8];
 const uint8_t Viola_ranges[] = {58, 65, 68, 73, 79, 92, 96, 127, };
 
-const instrument_data Viola = {8, Viola_ranges, Viola_samples };
+const AudioSynthWavetable::instrument_data Viola = {8, Viola_ranges, Viola_samples };
 
 
 extern const uint32_t sample_0_Viola_ViolinBb2[768];

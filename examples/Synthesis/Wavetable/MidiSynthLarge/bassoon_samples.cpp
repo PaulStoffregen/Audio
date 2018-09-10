@@ -1,5 +1,5 @@
 #include "bassoon_samples.h"
-const sample_data bassoon_samples[2] = {
+const AudioSynthWavetable::sample_data bassoon_samples[2] = {
 	{
 		(int16_t*)sample_0_bassoon_bassoonc2, // sample
 		true, // LOOP

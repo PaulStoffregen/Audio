@@ -1,5 +1,5 @@
 #include "piano_samples.h"
-const sample_data piano_samples[4] = {
+const AudioSynthWavetable::sample_data piano_samples[4] = {
 	{
 		(int16_t*)sample_0_piano_kpianob1, // sample
 		true, // LOOP

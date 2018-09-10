@@ -1,5 +1,5 @@
 #include "trumpet_samples.h"
-const sample_data trumpet_samples[5] = {
+const AudioSynthWavetable::sample_data trumpet_samples[5] = {
 	{
 		(int16_t*)sample_0_trumpet_htrumpetd2, // sample
 		true, // LOOP

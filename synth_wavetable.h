@@ -2,7 +2,7 @@
  * Copyright (c) 2017, TeensyAudio PSU Team
  *
  * Development of this audio library was sponsored by PJRC.COM, LLC.
- * Please support PJRC's efforts to develop open source 
+ * Please support PJRC's efforts to develop open source
  * software by purchasing Teensy or other PJRC products.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -31,64 +31,64 @@
 #include <math.h>
 #include <stdint.h>
 
+// TODO: move all this stuff into the AudioSynthWavetable class (used in sample data)
 #define UNITY_GAIN INT32_MAX // Max amplitude / no attenuation
-#define DEFAULT_AMPLITUDE 90
 #define SAMPLES_PER_MSEC (AUDIO_SAMPLE_RATE_EXACT/1000.0)
-#define TRIANGLE_INITIAL_PHASE (-0x40000000)
 #define LFO_SMOOTHNESS 3
 #define LFO_PERIOD (AUDIO_BLOCK_SAMPLES/(1 << (LFO_SMOOTHNESS-1)))
-
 #define ENVELOPE_PERIOD 8
-
-enum envelopeStateEnum { STATE_IDLE, STATE_DELAY, STATE_ATTACK, STATE_HOLD, STATE_DECAY, STATE_SUSTAIN, STATE_RELEASE };
-
 #define CENTS_SHIFT(C) (pow(2.0, C/1200.0))
 #define NOTE(N) (440.0 * pow(2.0, (N - 69) / 12.0))
 #define DECIBEL_SHIFT(dB) (pow(10.0, dB/20.0))
 
-// TODO: move all this stuff into the AudioSynthWavetable class, not global scope
-struct sample_data {
-	// SAMPLE VALUES
-	const int16_t* sample;
-	const bool LOOP;
-	const int INDEX_BITS;
-	const float PER_HERTZ_PHASE_INCREMENT;
-	const uint32_t MAX_PHASE;
-	const uint32_t LOOP_PHASE_END;
-	const uint32_t LOOP_PHASE_LENGTH;
-	const uint16_t INITIAL_ATTENUATION_SCALAR;
-	
-	// VOLUME ENVELOPE VALUES
-	const uint32_t DELAY_COUNT;
-	const uint32_t ATTACK_COUNT;
-	const uint32_t HOLD_COUNT;
-	const uint32_t DECAY_COUNT;
-	const uint32_t RELEASE_COUNT;
-	const int32_t SUSTAIN_MULT;
+// TODO: move all this stuff into the AudioSynthWavetable class (used in this file)
+#define DEFAULT_AMPLITUDE 90
+#define TRIANGLE_INITIAL_PHASE (-0x40000000)
+enum envelopeStateEnum { STATE_IDLE, STATE_DELAY, STATE_ATTACK, STATE_HOLD, STATE_DECAY, STATE_SUSTAIN, STATE_RELEASE };
 
-	// VIRBRATO VALUES
-	const uint32_t VIBRATO_DELAY;
-	const uint32_t VIBRATO_INCREMENT;
-	const float VIBRATO_PITCH_COEFFICIENT_INITIAL;
-	const float VIBRATO_PITCH_COEFFICIENT_SECOND;
-
-	// MODULATION VALUES
-	const uint32_t MODULATION_DELAY;
-	const uint32_t MODULATION_INCREMENT;
-	const float MODULATION_PITCH_COEFFICIENT_INITIAL;
-	const float MODULATION_PITCH_COEFFICIENT_SECOND;
-	const int32_t MODULATION_AMPLITUDE_INITIAL_GAIN;
-	const int32_t MODULATION_AMPLITUDE_SECOND_GAIN;
-};
-
-struct instrument_data {
-	const uint8_t sample_count;
-	const uint8_t* sample_note_ranges;
-	const sample_data* samples;
-};
 
 class AudioSynthWavetable : public AudioStream
 {
+public:
+	struct sample_data {
+		// SAMPLE VALUES
+		const int16_t* sample;
+		const bool LOOP;
+		const int INDEX_BITS;
+		const float PER_HERTZ_PHASE_INCREMENT;
+		const uint32_t MAX_PHASE;
+		const uint32_t LOOP_PHASE_END;
+		const uint32_t LOOP_PHASE_LENGTH;
+		const uint16_t INITIAL_ATTENUATION_SCALAR;
+
+		// VOLUME ENVELOPE VALUES
+		const uint32_t DELAY_COUNT;
+		const uint32_t ATTACK_COUNT;
+		const uint32_t HOLD_COUNT;
+		const uint32_t DECAY_COUNT;
+		const uint32_t RELEASE_COUNT;
+		const int32_t SUSTAIN_MULT;
+
+		// VIRBRATO VALUES
+		const uint32_t VIBRATO_DELAY;
+		const uint32_t VIBRATO_INCREMENT;
+		const float VIBRATO_PITCH_COEFFICIENT_INITIAL;
+		const float VIBRATO_PITCH_COEFFICIENT_SECOND;
+
+		// MODULATION VALUES
+		const uint32_t MODULATION_DELAY;
+		const uint32_t MODULATION_INCREMENT;
+		const float MODULATION_PITCH_COEFFICIENT_INITIAL;
+		const float MODULATION_PITCH_COEFFICIENT_SECOND;
+		const int32_t MODULATION_AMPLITUDE_INITIAL_GAIN;
+		const int32_t MODULATION_AMPLITUDE_SECOND_GAIN;
+	};
+
+	struct instrument_data {
+		const uint8_t sample_count;
+		const uint8_t* sample_note_ranges;
+		const sample_data* samples;
+	};
 public:
 	/**
 	 * Class constructor.
@@ -100,7 +100,7 @@ public:
 	 *
 	 * A wavetable uses a set of samples to generate sound.
 	 * This function is used to set the instrument samples.
-	 * @param instrument a struct of type instrument_data, commonly prodced from a 
+	 * @param instrument a struct of type instrument_data, commonly prodced from a
 	 * decoded SoundFont file using the SoundFont Decoder Script which accompanies this library.
 	 */
 	void setInstrument(const instrument_data& instrument) {
@@ -164,12 +164,13 @@ public:
 
 	// Defined in AudioSynthWavetable.cpp
 	void stop(void);
+	// TODO: amplitude should be 0 to 1.0 scale
 	void playFrequency(float freq, int amp = DEFAULT_AMPLITUDE);
 	void playNote(int note, int amp = DEFAULT_AMPLITUDE);
 	bool isPlaying(void) { return env_state != STATE_IDLE; }
 	void setFrequency(float freq);
 	virtual void update(void);
-	
+
 	envelopeStateEnum getEnvState(void) { return env_state; }
 
 private:

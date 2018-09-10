@@ -1,10 +1,10 @@
 #pragma once
 #include <Audio.h>
 
-extern const sample_data nylonstrgtr_samples[3];
+extern const AudioSynthWavetable::sample_data nylonstrgtr_samples[3];
 const uint8_t nylonstrgtr_ranges[] = {56, 77, 127, };
 
-const instrument_data nylonstrgtr = {3, nylonstrgtr_ranges, nylonstrgtr_samples };
+const AudioSynthWavetable::instrument_data nylonstrgtr = {3, nylonstrgtr_ranges, nylonstrgtr_samples };
 
 
 extern const uint32_t sample_0_nylonstrgtr_nguitrf2[1920];
