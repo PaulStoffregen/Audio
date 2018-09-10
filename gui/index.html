@@ -371,6 +371,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioPlaySerialflashRaw","data":{"defaults":{"name":{"value":"new"}},"shortName":"playFlashRaw","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioPlayQueue","data":{"defaults":{"name":{"value":"new"}},"shortName":"queue","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioRecordQueue","data":{"defaults":{"name":{"value":"new"}},"shortName":"queue","inputs":1,"outputs":0,"category":"record-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioSynthWavetable","data":{"defaults":{"name":{"value":"new"}},"shortName":"wavetable","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthSimpleDrum","data":{"defaults":{"name":{"value":"new"}},"shortName":"drum","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthKarplusStrong","data":{"defaults":{"name":{"value":"new"}},"shortName":"string","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveformSine","data":{"defaults":{"name":{"value":"new"}},"shortName":"sine","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -1837,6 +1838,71 @@ The actual packets are taken
 		<input type="text" id="node-input-name" placeholder="Name">
 	</div>
 </script>
+
+
+<script type="text/x-red" data-help-name="AudioSynthWavetable">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Synthesize musical instruments using wavetable samples.
+		Sample data is extracted from SoundFont2 files.
+		</p>
+	<p align=center><a href="https://www.youtube.com/watch?v=5laaNHLhS98">YouTube Video Demo</a><br>
+		<a href="https://www.youtube.com/watch?v=5laaNHLhS98"><img border=0 src="img/wavetablevideo.jpg"></a>
+		</p>
+	<p><small>
+		Portland State University capstone project by
+		Ryan Mellmer, Nicholas Craig, Joshua Bucklin, Aida Keifer,
+		Jonathan Jensen, Yu Tang, &amp; Connor Delaplane.
+	</small></p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>setInstrument</span>(instrument);</p>
+	<p class=desc>blah blah
+	</p>
+	<p class=func><span class=keyword>amplitude</span>(volume);</p>
+	<p class=desc>blah blah
+	</p>
+	<p class=func><span class=keyword>setFrequency</span>(freq);</p>
+	<p class=desc>blah blah
+	</p>
+	<p class=func><span class=keyword>playFrequency</span>(freq, amplitude);</p>
+	<p class=desc>blah blah
+	</p>
+	<p class=func><span class=keyword>stop</span>();</p>
+	<p class=desc>blah blah
+	</p>
+	<p class=func><span class=keyword>isPlaying</span>();</p>
+	<p class=desc>blah blah
+	</p>
+	<p class=func><span class=keyword>getEnvState</span>();</p>
+	<p class=desc>blah blah
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; Wavetable &gt; MidiSynth
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; Wavetable &gt; MidiSynthKeyboard
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; Wavetable &gt; MidiSynthLarge
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; Wavetable &gt; SimpleWavetable
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; Wavetable &gt; Zelda
+	</p>
+	<h3>Notes</h3>
+	<p></p>
+</script>
+<script type="text/x-red" data-template-name="AudioSynthWavetable">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
 
 <script type="text/x-red" data-help-name="AudioSynthSimpleDrum">
 	<h3>Summary</h3>
