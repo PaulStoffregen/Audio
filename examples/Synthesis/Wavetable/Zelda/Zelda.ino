@@ -1,6 +1,8 @@
-/* Play Zelda music.
+/* Play Zelda music, Overland Theme from The Wind Walker
 
-   Requires Teensy 3.6 due to 520 kbytes of wavetable data
+   Reference for this music:
+   https://www.youtube.com/watch?v=RekBzP114do&t=1091s
+
    Requires Audio Shield: https://www.pjrc.com/store/teensy3_audio.html
 */
 
@@ -12,9 +14,9 @@
 #include <SerialFlash.h>
 
 #include "Pizzicato_samples.h"
-#include "FrenchHorns_samples.h"
 #include "Viola_samples.h"
-#include "BasicFlute1_samples.h"
+#include "WT_Trumpet_samples.h"
+#include "MutedTrumpet_samples.h"
 #include "PlaySynthMusic.h"
 
 //#define DEBUG_ALLOC
@@ -97,12 +99,12 @@ void setup() {
 		for (int j = 0; j < 4; ++j)
 			mixer[i].gain(j, 0.25);
 	for (int i = 0; i < 4; ++i)
-		mixer[TOTAL_MIXERS - 1].gain(i, i < SECONDARY_MIXERS ? 1.0 / SECONDARY_MIXERS : 0.0);
+		mixer[TOTAL_MIXERS - 1].gain(i, 0.5);
 	
-	usbMIDI.setHandleNoteOn(OnNoteOn);
-	usbMIDI.setHandleNoteOff(OnNoteOff);
+	//usbMIDI.setHandleNoteOn(OnNoteOn);
+	//usbMIDI.setHandleNoteOff(OnNoteOff);
 	//volumeTimer.begin(setVolume, 100000);
-	guitarHeroTimer.begin(guitarHeroMode, 1000000/120);
+	//guitarHeroTimer.begin(guitarHeroMode, 1000000/120);
 	//midiMapTimer.begin(printVoices, 5000);
 
   delay(2000);
@@ -111,16 +113,6 @@ void setup() {
 void loop() {
   unsigned char c,opcode,chan;
   unsigned long d_time;
-  
-  // Volume control
-  //  uncomment if you have a volume pot soldered to your audio shield
-  /*
-  int n = analogRead(15);
-  if (n != volume) {
-    volume = n;
-    codec.volume((float)n / 1023);
-  }
-  */
   
   // read the next note from the table
   c = *sp++;
@@ -151,10 +143,10 @@ void loop() {
         wavetable[chan].setInstrument(Viola);
         break;
       case 57:
-        wavetable[chan].setInstrument(BasicFlute1);
+        wavetable[chan].setInstrument(WT_Trumpet);
         break;
       default:
-        wavetable[chan].setInstrument(FrenchHorns);
+        wavetable[chan].setInstrument(MutedTrumpet);
         break;
     }
     return;
@@ -181,7 +173,7 @@ void loop() {
     return;
   }
 
-	usbMIDI.read();
+	//usbMIDI.read();
 	//for (int i = 0; i < TOTAL_BUTTONS; ++i) buttons[i].update();
 	//if (buttons[0].fallingEdge()) AudioSynthWavetable::print_performance();
 	//if (buttons[1].risingEdge()) {
