@@ -77,10 +77,12 @@ CODE_BLOCK_TO_TEST
  */
 void AudioSynthWavetable::stop(void) {
 	cli();
-	env_state = STATE_RELEASE;
-	env_count = current_sample->RELEASE_COUNT;
-	if (env_count == 0) env_count = 1;
-	env_incr = -(env_mult) / (env_count * ENVELOPE_PERIOD);
+	if (env_state != STATE_IDLE) {
+		env_state = STATE_RELEASE;
+		env_count = current_sample->RELEASE_COUNT;
+		if (env_count == 0) env_count = 1;
+		env_incr = -(env_mult) / (env_count * ENVELOPE_PERIOD);
+	}
 	PRINT_ENV(STATE_RELEASE);
 	sei();
 }
