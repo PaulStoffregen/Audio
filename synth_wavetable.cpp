@@ -162,11 +162,9 @@ void AudioSynthWavetable::setFrequency(float freq) {
  *
  */
 void AudioSynthWavetable::update(void) {
-	cli();
 	// exit if nothing to do
 	if (env_state == STATE_IDLE || (current_sample->LOOP == false && tone_phase >= current_sample->MAX_PHASE)) {
 		env_state = STATE_IDLE;
-		sei();
 		return;
 	}
 	// else locally copy object state and continue
@@ -191,7 +189,6 @@ void AudioSynthWavetable::update(void) {
 	int32_t mod_phase = this->mod_phase;
 	int32_t mod_pitch_offset_init = this->mod_pitch_offset_init;
 	int32_t mod_pitch_offset_scnd = this->mod_pitch_offset_scnd;
-	sei();
 
 	audio_block_t* block;
 	block = allocate();
@@ -401,7 +398,6 @@ void AudioSynthWavetable::update(void) {
 	}
 
 	// copy state back, unless there was a state change
-	cli();
 	if (this->state_change == false) {
 		this->tone_phase = tone_phase;
 		this->env_state = env_state;
@@ -419,7 +415,6 @@ void AudioSynthWavetable::update(void) {
 			this->vib_phase = this->mod_phase = TRIANGLE_INITIAL_PHASE;
 		}
 	}
-	sei();
 
 	transmit(block);
 	release(block);
