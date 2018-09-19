@@ -31,21 +31,9 @@
 #include <math.h>
 #include <stdint.h>
 
-// TODO: move all this stuff into the AudioSynthWavetable class (used in sample data)
-#define UNITY_GAIN INT32_MAX // Max amplitude / no attenuation
-#define SAMPLES_PER_MSEC (AUDIO_SAMPLE_RATE_EXACT/1000.0)
-#define LFO_SMOOTHNESS 3
-#define LFO_PERIOD (AUDIO_BLOCK_SAMPLES/(1 << (LFO_SMOOTHNESS-1)))
-#define ENVELOPE_PERIOD 8
-#define CENTS_SHIFT(C) (pow(2.0, C/1200.0))
-#define NOTE(N) (440.0 * pow(2.0, (N - 69) / 12.0))
-#define DECIBEL_SHIFT(dB) (pow(10.0, dB/20.0))
-
-// TODO: move all this stuff into the AudioSynthWavetable class (used in this file)
-#define DEFAULT_AMPLITUDE 90
-#define TRIANGLE_INITIAL_PHASE (-0x40000000)
-enum envelopeStateEnum { STATE_IDLE, STATE_DELAY, STATE_ATTACK, STATE_HOLD, STATE_DECAY, STATE_SUSTAIN, STATE_RELEASE };
-
+#define WAVETABLE_CENTS_SHIFT(C) (pow(2.0, (C)/1200.0))
+#define WAVETABLE_NOTE_TO_FREQUENCY(N) (440.0 * pow(2.0, ((N) - 69) / 12.0))
+#define WAVETABLE_DECIBEL_SHIFT(dB) (pow(10.0, (dB)/20.0))
 
 class AudioSynthWavetable : public AudioStream
 {
@@ -83,12 +71,21 @@ public:
 		const int32_t MODULATION_AMPLITUDE_INITIAL_GAIN;
 		const int32_t MODULATION_AMPLITUDE_SECOND_GAIN;
 	};
+	static const int32_t UNITY_GAIN = INT32_MAX;
+	static constexpr float SAMPLES_PER_MSEC = (AUDIO_SAMPLE_RATE_EXACT/1000.0);
+	static const int32_t LFO_SMOOTHNESS = 3;
+	static constexpr float LFO_PERIOD = (AUDIO_BLOCK_SAMPLES/(1 << (LFO_SMOOTHNESS-1)));
+	static const int32_t ENVELOPE_PERIOD = 8;
 
 	struct instrument_data {
 		const uint8_t sample_count;
 		const uint8_t* sample_note_ranges;
 		const sample_data* samples;
 	};
+	enum { DEFAULT_AMPLITUDE = 90 };
+	enum { TRIANGLE_INITIAL_PHASE = -0x40000000 };
+	enum envelopeStateEnum { STATE_IDLE, STATE_DELAY, STATE_ATTACK, STATE_HOLD, STATE_DECAY, STATE_SUSTAIN, STATE_RELEASE };
+
 public:
 	/**
 	 * Class constructor.
