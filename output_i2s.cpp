@@ -24,9 +24,14 @@
  * THE SOFTWARE.
  */
 
+#if defined(ARDUINO_ARCH_SAMD)
+#include <Arduino.h>
+#endif
+
+#if I2S_INTERFACES_COUNT > 0
+
 #include "output_i2s.h"
 #include "memcpy_audio.h"
-
 
 audio_block_t * AudioOutputI2S::block_left_1st = NULL;
 audio_block_t * AudioOutputI2S::block_right_1st = NULL;
@@ -535,4 +540,5 @@ void AudioOutputI2Sslave::config_i2s(void)
 #endif
 }
 
+#endif
 

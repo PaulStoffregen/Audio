@@ -31,6 +31,8 @@
 #define digitalWriteFast digitalWrite
 #endif
 
+#if SPI_INTERFACES_COUNT > 0
+
 //#define INTERNAL_TEST
 
 // While 20 MHz (Teensy actually uses 16 MHz in most cases) and even 24 MHz
@@ -295,3 +297,5 @@ void AudioEffectDelayExternal::write(uint32_t offset, uint32_t count, const int1
 	}
 #endif
 }
+
+#endif

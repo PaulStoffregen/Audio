@@ -82,6 +82,7 @@
 #include "effect_multiply.h"
 #include "effect_delay.h"
 #include "effect_delay_ext.h"
+
 #include "effect_midside.h"
 #include "effect_reverb.h"
 #include "effect_waveshaper.h"
@@ -89,7 +90,10 @@
 #include "filter_fir.h"
 #include "filter_variable.h"
 #include "input_adcs.h"
+
+#if I2S_INTERFACES_COUNT > 0
 #include "input_i2s.h"
+#endif
 
 #if 0
 #include "input_adc.h"
@@ -99,7 +103,10 @@
 
 #include "mixer.h"
 #include "output_dacs.h"
+
+#if I2S_INTERFACES_COUNT > 0
 #include "output_i2s.h"
+#endif
 
 #if 0
 #include "output_dac.h"
@@ -112,8 +119,11 @@
 
 #include "play_memory.h"
 #include "play_queue.h"
+
+#if SPI_INTERFACES_COUNT > 0
 #include "play_sd_raw.h"
 #include "play_sd_wav.h"
+#endif
 
 #if 0
 #include "play_serialflash_raw.h"

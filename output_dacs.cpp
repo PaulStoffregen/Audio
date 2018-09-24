@@ -41,9 +41,9 @@ audio_block_t AudioOutputAnalogStereo::block_silent;
 bool AudioOutputAnalogStereo::update_responsibility = false;
 Adafruit_ZeroDMA *AudioOutputAnalogStereo::dma0;
 Adafruit_ZeroDMA *AudioOutputAnalogStereo::dma1;
-DmacDescriptor *AudioOutputAnalogStereo::desc0;
-DmacDescriptor *AudioOutputAnalogStereo::desc1;
+DmacDescriptor *AudioOutputAnalogStereo::desc;
 static ZeroDMAstatus    stat;
+static uint32_t *saddr;
 
 void dummyCallback(Adafruit_ZeroDMA *dma)
 {
@@ -107,7 +107,7 @@ void AudioOutputAnalogStereo::begin(void)
 	dma0->setAction(DMA_TRIGGER_ACTON_BEAT);
 	dma1->setAction(DMA_TRIGGER_ACTON_BEAT);
 	
-	desc0 = dma0->addDescriptor(
+	desc = dma0->addDescriptor(
 	  dac_buffer,						// move data from here
 	  (void *)(&DAC->DATA[0]),			// to here
 	  AUDIO_BLOCK_SAMPLES,               // this many...
@@ -116,8 +116,21 @@ void AudioOutputAnalogStereo::begin(void)
 	  false,
 	  DMA_ADDRESS_INCREMENT_STEP_SIZE_2,
 	  DMA_STEPSEL_SRC);
+	desc->BTCTRL.bit.BLOCKACT = DMA_BLOCK_ACTION_INT;
+
+	desc = dma0->addDescriptor(
+	  dac_buffer + AUDIO_BLOCK_SAMPLES,	// move data from here
+	  (void *)(&DAC->DATA[0]),			// to here
+	  AUDIO_BLOCK_SAMPLES,               // this many...
+	  DMA_BEAT_SIZE_HWORD,               // bytes/hword/words
+	  true,                             // increment source addr?
+	  false,
+	  DMA_ADDRESS_INCREMENT_STEP_SIZE_2,
+	  DMA_STEPSEL_SRC);
+	desc->BTCTRL.bit.BLOCKACT = DMA_BLOCK_ACTION_INT;
+	dma0->loop(true);
 	  
-	desc1 = dma1->addDescriptor(
+	desc = dma1->addDescriptor(
 		((uint16_t *)dac_buffer) + 1,		// move data from here
 		(void *)(&DAC->DATA[1]),			// to here
 		AUDIO_BLOCK_SAMPLES,               // this many...
@@ -126,7 +139,21 @@ void AudioOutputAnalogStereo::begin(void)
 		false,
 		DMA_ADDRESS_INCREMENT_STEP_SIZE_2,
 		DMA_STEPSEL_SRC);						 // increment dest addr?
-		
+	desc->BTCTRL.bit.BLOCKACT = DMA_BLOCK_ACTION_INT;
+
+	desc = dma1->addDescriptor(
+		((uint16_t *)(dac_buffer + AUDIO_BLOCK_SAMPLES)) + 1, // move data from here
+		(void *)(&DAC->DATA[1]),			// to here
+		AUDIO_BLOCK_SAMPLES,               // this many...
+		DMA_BEAT_SIZE_HWORD,               // bytes/hword/words
+		true,                             // increment source addr?
+		false,
+		DMA_ADDRESS_INCREMENT_STEP_SIZE_2,
+		DMA_STEPSEL_SRC);						 // increment dest addr?
+	desc->BTCTRL.bit.BLOCKACT = DMA_BLOCK_ACTION_INT;
+	dma1->loop(true);
+	saddr = dac_buffer;
+
 	update_responsibility = update_setup();
 	dma1->setCallback(AudioOutputAnalogStereo::isr);
 	dma0->setCallback(dummyCallback);
@@ -185,27 +212,19 @@ void AudioOutputAnalogStereo::isr(Adafruit_ZeroDMA *dma)
 	const uint32_t *src_left, *src_right, *end;
 	uint32_t *dest;
 	audio_block_t *block_left, *block_right;
-	uint32_t saddr;
-	
-	//PORT[PORTA].Group->OUTTGL.reg |= (1UL << 21);	
-	saddr = desc0->SRCADDR.reg;
-	saddr -= (AUDIO_BLOCK_SAMPLES) * 2 * (1<<1);
 
-	if (saddr == (uint32_t)dac_buffer) {
+	if (saddr == dac_buffer) {
 		//DMA has finished the first half
-		dma0->changeDescriptor(desc0, dac_buffer + AUDIO_BLOCK_SAMPLES);
-		dma1->changeDescriptor(desc1, ((uint16_t *)(dac_buffer + AUDIO_BLOCK_SAMPLES)) + 1);
 		dest = dac_buffer;
 		end = dac_buffer + AUDIO_BLOCK_SAMPLES;
+		saddr = (uint32_t *)end;
 	} else {
 		//DMA has finished the second half
-		dma0->changeDescriptor(desc0, dac_buffer);
-		dma1->changeDescriptor(desc1, ((uint16_t *)dac_buffer) + 1 );
 		dest = dac_buffer + AUDIO_BLOCK_SAMPLES;
 		end = dac_buffer + AUDIO_BLOCK_SAMPLES*2;
+		saddr = dac_buffer;
 	}
-	dma0->startJob();
-	dma1->startJob();
+
 	block_left = block_left_1st;
 	if (!block_left) block_left = &block_silent;
 	block_right = block_right_1st;

@@ -24,6 +24,12 @@
  * THE SOFTWARE.
  */
 
+#if defined(ARDUINO_ARCH_SAMD)
+#include <Arduino.h>
+#endif
+
+#if SPI_INTERFACES_COUNT > 0
+
 #include "play_sd_wav.h"
 #include "spi_interrupt.h"
 
@@ -563,7 +569,7 @@ uint32_t AudioPlaySdWav::lengthMillis(void)
 	return ((uint64_t)tlength * b2m) >> 32;
 }
 
-
+#endif
 
 
 

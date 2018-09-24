@@ -24,6 +24,12 @@
  * THE SOFTWARE.
  */
 
+#if defined(ARDUINO_ARCH_SAMD)
+#include <Arduino.h>
+#endif
+
+#if I2S_INTERFACES_COUNT > 0
+
 #include "input_i2s.h"
 #include "output_i2s.h"
 
@@ -263,6 +269,8 @@ void AudioInputI2Sslave::begin(void)
 	dma.attachInterrupt(isr);
 #endif
 }
+
+#endif
 
 
 
