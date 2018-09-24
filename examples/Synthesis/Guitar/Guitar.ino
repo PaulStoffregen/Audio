@@ -1,7 +1,10 @@
 #include <Audio.h>
 #include <Wire.h>
+#ifndef __SAMD51__
+#include <SD.h>
 #include <SPI.h>
-
+#include <SerialFlash.h>
+#endif
 #include "chords.h"
 
 // Special thanks to Matthew Rahtz - http://amid.fish/karplus-strong/
@@ -14,7 +17,11 @@ AudioSynthKarplusStrong  string5;
 AudioSynthKarplusStrong  string6;
 AudioMixer4              mixer1;
 AudioMixer4              mixer2;
-AudioOutputAnalogStereo  dacs;
+#if defined(__SAMD51__)
+AudioOutputAnalogStereo  audioOut;
+#else
+AudioOutputI2S           audioOut;
+#endif
 AudioConnection          patchCord1(string1, 0, mixer1, 0);
 AudioConnection          patchCord2(string2, 0, mixer1, 1);
 AudioConnection          patchCord3(string3, 0, mixer1, 2);
@@ -22,8 +29,12 @@ AudioConnection          patchCord4(string4, 0, mixer1, 3);
 AudioConnection          patchCord5(mixer1, 0, mixer2, 0);
 AudioConnection          patchCord6(string5, 0, mixer2, 1);
 AudioConnection          patchCord7(string6, 0, mixer2, 2);
-AudioConnection          patchCord8(mixer2, 0, dacs, 0);
-AudioConnection          patchCord9(mixer2, 0, dacs, 1);
+AudioConnection          patchCord8(mixer2, 0, audioOut, 0);
+AudioConnection          patchCord9(mixer2, 0, audioOut, 1);
+
+#ifndef __SAMD51__
+AudioControlSGTL5000     sgtl5000_1;
+#endif
 
 const int finger_delay = 5;
 const int hand_delay = 220;
@@ -32,6 +43,10 @@ int chordnum=0;
 
 void setup() {
   AudioMemory(15);
+#ifndef __SAMD51__
+  sgtl5000_1.enable();
+  sgtl5000_1.volume(0.6);
+#endif
   mixer1.gain(0, 0.15);
   mixer1.gain(1, 0.15);
   mixer1.gain(2, 0.15);
@@ -95,6 +110,11 @@ void loop() {
   delay(hand_delay);
   strum_dn(chord, 0.7);
   delay(hand_delay);
+#ifndef __SAMD51__
+  Serial.print("Max CPU Usage = ");
+  Serial.print(AudioProcessorUsageMax(), 1);
+  Serial.println("%");
+#endif
 }
 
 void strum_up(const float *chord, float velocity)
@@ -128,5 +148,6 @@ void strum_dn(const float *chord, float velocity)
   if (chord[0] > 20.0) string6.noteOn(chord[0], velocity);
   delay(finger_delay);
 }
+
 
 

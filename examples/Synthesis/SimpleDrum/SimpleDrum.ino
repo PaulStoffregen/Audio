@@ -1,16 +1,12 @@
-#include <Audio.h>
-#include <Wire.h>
-#include <SPI.h>
-#include <SD.h>
-#include <SerialFlash.h>
-
 #include <synth_simple_drum.h>
 
 #include <Audio.h>
 #include <Wire.h>
+#ifndef __SAMD51__
 #include <SPI.h>
 #include <SD.h>
 #include <SerialFlash.h>
+#endif
 
 // GUItool: begin automatically generated code
 AudioSynthSimpleDrum     drum2;          //xy=399,244
@@ -18,14 +14,20 @@ AudioSynthSimpleDrum     drum3;          //xy=424,310
 AudioSynthSimpleDrum     drum1;          //xy=431,197
 AudioSynthSimpleDrum     drum4;          //xy=464,374
 AudioMixer4              mixer1;         //xy=737,265
-AudioOutputI2S           i2s1;           //xy=979,214
+#ifndef __SAMD51__
+AudioOutputI2S           audioOut;       
+#else
+AudioOutputAnalogStereo  audioOut;
+#endif 
 AudioConnection          patchCord1(drum2, 0, mixer1, 1);
 AudioConnection          patchCord2(drum3, 0, mixer1, 2);
 AudioConnection          patchCord3(drum1, 0, mixer1, 0);
 AudioConnection          patchCord4(drum4, 0, mixer1, 3);
-AudioConnection          patchCord5(mixer1, 0, i2s1, 0);
-AudioConnection          patchCord6(mixer1, 0, i2s1, 1);
+AudioConnection          patchCord5(mixer1, 0, audioOut, 0);
+AudioConnection          patchCord6(mixer1, 0, audioOut, 1);
+#ifndef __SAMD51__
 AudioControlSGTL5000     sgtl5000_1;     //xy=930,518
+#endif
 // GUItool: end automatically generated code
 
 static uint32_t next;
@@ -62,8 +64,10 @@ void setup() {
   drum4.secondMix(0.0);
   drum4.pitchMod(0.0);
   
+#ifndef __SAMD51__
   sgtl5000_1.enable();
   sgtl5000_1.volume(0.5);
+#endif
 
   AudioInterrupts();
 
@@ -96,8 +100,10 @@ void loop() {
     num++;
 
     Serial.print("Diagnostics: ");
+#ifndef __SAMD51__
     Serial.print(AudioProcessorUsageMax());
     Serial.print(" ");
+#endif
     Serial.println(AudioMemoryUsageMax());
     AudioProcessorUsageMaxReset();
   }

@@ -3,18 +3,27 @@
 
 #include <Audio.h>
 #include <Wire.h>
+#ifndef __SAMD51__
 #include <SPI.h>
 #include <SD.h>
 #include <SerialFlash.h>
+#endif
 
 // GUItool: begin automatically generated code
 AudioSynthWaveform       waveform1;      //xy=188,240
 AudioEffectEnvelope      envelope1;      //xy=371,237
-AudioOutputI2S           i2s1;           //xy=565,241
+
+#ifndef __SAMD51__
+AudioOutputI2S           audioOut;           //xy=565,241
+#else
+AudioOutputAnalogStereo  audioOut;
+#endif 
 AudioConnection          patchCord1(waveform1, envelope1);
-AudioConnection          patchCord2(envelope1, 0, i2s1, 0);
-AudioConnection          patchCord3(envelope1, 0, i2s1, 1);
+AudioConnection          patchCord2(envelope1, 0, audioOut, 0);
+AudioConnection          patchCord3(envelope1, 0, audioOut, 1);
+#ifndef __SAMD51__
 AudioControlSGTL5000     audioShield;     //xy=586,175
+#endif
 // GUItool: end automatically generated code
 
 
@@ -23,8 +32,10 @@ void setup(void)
 
   // Set up
   AudioMemory(8);
+#ifndef __SAMD51__
   audioShield.enable();
   audioShield.volume(0.45);
+#endif
 
   waveform1.pulseWidth(0.5);
   waveform1.begin(0.4, 220, WAVEFORM_PULSE);

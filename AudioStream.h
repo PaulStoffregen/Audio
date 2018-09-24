@@ -37,6 +37,11 @@
 #if defined(__SAMD51__)
 #include "sam.h"
 
+#define NVIC_ENABLE_IRQ NVIC_EnableIRQ
+#define NVIC_DISABLE_IRQ NVIC_DisableIRQ
+#define IRQ_SOFTWARE SOFTWARE_IRQn
+#define NVIC_SET_PRIORITY NVIC_SetPriority
+
 //we're gonna commandeer this kinda useless IQRn and use it as a software interrupt 
 #define SOFTWARE_IRQn EVSYS_4_IRQn
 #define SOFTWARE_Handler EVSYS_4_Handler

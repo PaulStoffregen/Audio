@@ -56,6 +56,7 @@
 // at the same time, because AudioNoInterrupts() prevents any updates
 // while you make changes.
 //
+
 #define AudioNoInterrupts() (NVIC_DISABLE_IRQ(IRQ_SOFTWARE))
 #define AudioInterrupts()   (NVIC_ENABLE_IRQ(IRQ_SOFTWARE))
 

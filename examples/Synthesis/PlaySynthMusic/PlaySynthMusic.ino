@@ -7,9 +7,11 @@
  
 #include <Audio.h>
 #include <Wire.h>
+#ifndef __SAMD51__
 #include <SD.h>
 #include <SPI.h>
 #include <SerialFlash.h>
+#endif
 
 #include "PlaySynthMusic.h"
 
@@ -107,7 +109,11 @@ AudioConnection patchCord32(env15, 0, mixer4, 3);
 // Now create 2 mixers for the main output
 AudioMixer4     mixerLeft;
 AudioMixer4     mixerRight;
+#ifndef __SAMD51__
 AudioOutputI2S  audioOut;
+#else
+AudioOutputAnalogStereo  audioOut;
+#endif
 
 // Mix all channels to both the outputs
 AudioConnection patchCord33(mixer1, 0, mixerLeft, 0);
@@ -121,7 +127,9 @@ AudioConnection patchCord40(mixer4, 0, mixerRight, 3);
 AudioConnection patchCord41(mixerLeft, 0, audioOut, 0);
 AudioConnection patchCord42(mixerRight, 0, audioOut, 1);
 
+#ifndef __SAMD51__
 AudioControlSGTL5000 codec;
+#endif
 
 // Initial value of the volume control
 int volume = 50;
@@ -142,8 +150,10 @@ void setup()
   // so give it 12 just to be sure.
   AudioMemory(18);
   
+#ifndef __SAMD51__
   codec.enable();
   codec.volume(0.45);
+#endif
 
   // reduce the gain on some channels, so half of the channels
   // are "positioned" to the left, half to the right, but all

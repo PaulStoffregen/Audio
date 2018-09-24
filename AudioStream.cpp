@@ -232,24 +232,15 @@ bool AudioStream::update_scheduled = false;
 bool AudioStream::update_setup(void)
 {
 	if (update_scheduled) return false;
-#if defined(ARDUINO_ARCH_SAMD)
-	NVIC_SetPriority(SOFTWARE_IRQn, 208);
-	NVIC_EnableIRQ(SOFTWARE_IRQn);
-#else
 	NVIC_SET_PRIORITY(IRQ_SOFTWARE, 208); // 255 = lowest priority
 	NVIC_ENABLE_IRQ(IRQ_SOFTWARE);
-#endif
 	update_scheduled = true;
 	return true;
 }
 
 void AudioStream::update_stop(void)
 {
-#if defined(ARDUINO_ARCH_SAMD)
-	NVIC_DisableIRQ(SOFTWARE_IRQn);
-#else
 	NVIC_DISABLE_IRQ(IRQ_SOFTWARE);
-#endif
 	update_scheduled = false;
 }
 
