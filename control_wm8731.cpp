@@ -109,6 +109,18 @@ bool AudioControlWM8731::inputLevel(float n)
 	return true;
 }
 
+bool AudioControlWM8731::inputSelect(int n)
+{
+	if (n == AUDIO_INPUT_LINEIN) {
+		write(WM8731_REG_ANALOG, 0x12);
+	} else if (n == AUDIO_INPUT_MIC) {
+		write(WM8731_REG_ANALOG, 0x15);
+	} else {
+		return false;
+	}
+	return true;
+}
+
 /******************************************************************/
 
 

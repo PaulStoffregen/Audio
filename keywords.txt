@@ -4,6 +4,7 @@ AudioInputI2S	KEYWORD2
 AudioInputI2SQuad	KEYWORD2
 AudioInputI2Sslave	KEYWORD2
 AudioInputTDM	KEYWORD2
+AudioInputPDM	KEYWORD2
 AudioInputUSB	KEYWORD2
 AudioOutputI2S	KEYWORD2
 AudioOutputI2SQuad	KEYWORD2
@@ -50,6 +51,7 @@ AudioFilterStateVariable	KEYWORD2
 AudioInputAnalog	KEYWORD2
 AudioInputAnalogStereo	KEYWORD2
 AudioMixer4	KEYWORD2
+AudioAmplifier	KEYWORD2
 AudioOutputAnalog	KEYWORD2
 AudioOutputAnalogStereo	KEYWORD2
 AudioPlayMemory	KEYWORD2
@@ -70,6 +72,7 @@ AudioSynthNoiseWhite	KEYWORD2
 AudioSynthNoisePink	KEYWORD2
 AudioSynthKarplusStrong	KEYWORD2
 AudioSynthSimpleDrum	KEYWORD2
+AudioSynthWavetable	KEYWORD2
 isPlaying	KEYWORD2
 positionMillis	KEYWORD2
 lengthMillis	KEYWORD2
@@ -176,6 +179,10 @@ pitchMod	KEYWORD2
 shape	KEYWORD2
 frequencyModulation	KEYWORD2
 phaseModulation	KEYWORD2
+setInstrument	KEYWORD2
+playFrequency	KEYWORD2
+playNote	KEYWORD2
+setFrequency	KEYWORD2
 
 AudioMemoryUsage	KEYWORD2
 AudioMemoryUsageMax	KEYWORD2

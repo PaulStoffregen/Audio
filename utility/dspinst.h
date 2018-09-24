@@ -31,6 +31,7 @@
 
 // computes limit((val >> rshift), 2**bits)
 static inline int32_t signed_saturate_rshift(int32_t val, int bits, int rshift) __attribute__((always_inline, unused));
+// Vindor: add "const"
 static inline int32_t signed_saturate_rshift(int32_t val, const int bits, const int rshift)
 {
 #if defined(KINETISK)

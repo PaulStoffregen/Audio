@@ -122,7 +122,7 @@ void AudioSynthWaveform::update(void)
 			if (phtop == 1 || phtop == 2) {
 				*bp++ = ((0xFFFF - (ph >> 15)) * magnitude) >> 16;
 			} else {
-				*bp++ = ((ph >> 15) * magnitude) >> 16;
+				*bp++ = (((int32_t)ph >> 15) * magnitude) >> 16;
 			}
 			ph += inc;
 		}
@@ -138,10 +138,10 @@ void AudioSynthWaveform::update(void)
 				*bp++ = ((n >> 16) * magnitude) >> 16;
 			} else if (ph < 0xFFFFFFFF - pulse_width/2) {
 				uint32_t n = 0x7FFFFFFF - (((ph - pulse_width/2) >> 16) * fall);
-				*bp++ = ((n >> 16) * magnitude) >> 16;
+				*bp++ = (((int32_t)n >> 16) * magnitude) >> 16;
 			} else {
 				uint32_t n = ((ph + pulse_width/2) >> 16) * rise + 0x80000000;
-				*bp++ = ((n >> 16) * magnitude) >> 16;
+				*bp++ = (((int32_t)n >> 16) * magnitude) >> 16;
 			}
 			ph += inc;
 		}
@@ -356,10 +356,10 @@ void AudioSynthWaveformModulated::update(void)
 					*bp++ = ((n >> 16) * magnitude) >> 16;
 				} else if (ph < 0xFFFFFFFF - halfwidth) {
 					n = 0x7FFFFFFF - (((ph - halfwidth) >> 16) * fall);
-					*bp++ = ((n >> 16) * magnitude) >> 16;
+					*bp++ = (((int32_t)n >> 16) * magnitude) >> 16;
 				} else {
 					n = ((ph + halfwidth) >> 16) * rise + 0x80000000;
-					*bp++ = ((n >> 16) * magnitude) >> 16;
+					*bp++ = (((int32_t)n >> 16) * magnitude) >> 16;
 				}
 				ph += inc;
 			}
@@ -373,7 +373,7 @@ void AudioSynthWaveformModulated::update(void)
 			if (phtop == 1 || phtop == 2) {
 				*bp++ = ((0xFFFF - (ph >> 15)) * magnitude) >> 16;
 			} else {
-				*bp++ = ((ph >> 15) * magnitude) >> 16;
+				*bp++ = (((int32_t)ph >> 15) * magnitude) >> 16;
 			}
 		}
 		break;
