@@ -24,6 +24,10 @@
  * THE SOFTWARE.
  */
 
+// Vindor
+#ifdef SDCARD
+
+#include <Arduino.h>
 #include "play_sd_raw.h"
 #include "spi_interrupt.h"
 
@@ -124,3 +128,6 @@ uint32_t AudioPlaySdRaw::lengthMillis(void)
 {
 	return ((uint64_t)file_size * B2M) >> 32;
 }
+
+// Vindor
+#endif

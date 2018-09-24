@@ -1,9 +1,6 @@
-/* Audio Library for Teensy 3.X
- * Copyright (c) 2014, Paul Stoffregen, paul@pjrc.com
- *
- * Development of this audio library was funded by PJRC.COM, LLC by sales of
- * Teensy and Audio Adaptor boards.  Please support PJRC's efforts to develop
- * open source software by purchasing Teensy or other PJRC products.
+/* ADAT for Teensy 3.X
+ * Copyright (c) 2017, Ernstjan Freriks,
+ * Thanks to Frank Bösing & KPC & Paul Stoffregen!
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,46 +21,55 @@
  * THE SOFTWARE.
  */
 
-#ifndef output_i2s_h_
-#define output_i2s_h_
+#ifndef output_ADAT_h_
+#define output_ADAT_h_
 
 #include "Arduino.h"
 #include "AudioStream.h"
 #include "DMAChannel.h"
 
-class AudioOutputI2S : public AudioStream
+class AudioOutputADAT : public AudioStream
 {
 public:
-	AudioOutputI2S(void) : AudioStream(2, inputQueueArray) { begin(); }
+	AudioOutputADAT(void) : AudioStream(8, inputQueueArray) { begin(); }
 	virtual void update(void);
 	void begin(void);
-	friend class AudioInputI2S;
-	static void config_i2s(void); // Vindor, make public
+	static void mute_PCM(const bool mute);
 protected:
-	AudioOutputI2S(int dummy): AudioStream(2, inputQueueArray) {} // to be used only inside AudioOutputI2Sslave !!
-	static audio_block_t *block_left_1st;
-	static audio_block_t *block_right_1st;
+	AudioOutputADAT(int dummy): AudioStream(8, inputQueueArray) {}
+	static void config_ADAT(void);
+	static audio_block_t *block_ch1_1st;
+	static audio_block_t *block_ch2_1st;
+	static audio_block_t *block_ch3_1st;
+	static audio_block_t *block_ch4_1st;
+	static audio_block_t *block_ch5_1st;
+	static audio_block_t *block_ch6_1st;
+	static audio_block_t *block_ch7_1st;
+	static audio_block_t *block_ch8_1st;
 	static bool update_responsibility;
 	static DMAChannel dma;
 	static void isr(void);
+	static void setI2SFreq(int freq);
 private:
-	static audio_block_t *block_left_2nd;
-	static audio_block_t *block_right_2nd;
-	static uint16_t block_left_offset;
-	static uint16_t block_right_offset;
-	audio_block_t *inputQueueArray[2];
+	//static uint32_t vucp;
+	static audio_block_t *block_ch1_2nd;
+	static audio_block_t *block_ch2_2nd;
+	static audio_block_t *block_ch3_2nd;
+	static audio_block_t *block_ch4_2nd;
+	static audio_block_t *block_ch5_2nd;
+	static audio_block_t *block_ch6_2nd;
+	static audio_block_t *block_ch7_2nd;
+	static audio_block_t *block_ch8_2nd;
+	static uint16_t ch1_offset;
+	static uint16_t ch2_offset;
+	static uint16_t ch3_offset;
+	static uint16_t ch4_offset;
+	static uint16_t ch5_offset;
+	static uint16_t ch6_offset;
+	static uint16_t ch7_offset;
+	static uint16_t ch8_offset;
+	audio_block_t *inputQueueArray[8];
 };
 
-
-class AudioOutputI2Sslave : public AudioOutputI2S
-{
-public:
-	AudioOutputI2Sslave(void) : AudioOutputI2S(0) { begin(); } ;
-	void begin(void);
-	friend class AudioInputI2Sslave;
-	friend void dma_ch0_isr(void);
-protected:
-	static void config_i2s(void);
-};
 
 #endif

@@ -1,5 +1,5 @@
-/* Audio Library for Teensy 3.X
- * Copyright (c) 2014, Paul Stoffregen, paul@pjrc.com
+/* Copyright (c) 2018 John-Michael Reed
+ * bleeplabs.com
  *
  * Development of this audio library was funded by PJRC.COM, LLC by sales of
  * Teensy and Audio Adaptor boards.  Please support PJRC's efforts to develop
@@ -22,14 +22,37 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ *
+ * Combine analog signals with bitwise expressions like XOR.
+ * Combining two simple oscillators results in interesting new waveforms,
+ * Combining white noise or dynamic incoming audio results in aggressive digital distortion.
  */
 
+#ifndef effect_digital_combine_h_
+#define effect_digital_combine_h_
 #include <Arduino.h>
-#include "spi_interrupt.h"
+#include "AudioStream.h"
 
-#ifdef SPI_HAS_NOTUSINGINTERRUPT
-
-unsigned short AudioUsingSPICount = 0;
+class AudioEffectDigitalCombine : public AudioStream
+{
+public:
+	enum combineMode {
+		OR    = 0,
+		XOR   = 1,
+		AND   = 2,
+		MODULO = 3,
+	};
+	AudioEffectDigitalCombine() : AudioStream(2, inputQueueArray), mode_sel(OR) { }
+	void setCombineMode(int mode_in) {
+		if (mode_in > 3) {
+	  		mode_in = 3;
+	  	}
+	  	mode_sel = mode_in;
+	}
+	virtual void update(void);
+private:
+	short mode_sel;
+	audio_block_t *inputQueueArray[2];
+};
 
 #endif
-

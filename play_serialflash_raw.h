@@ -30,6 +30,10 @@
 
 #include "Arduino.h"
 #include <AudioStream.h>
+
+// Vindor
+#ifdef USE_SERIAL_FLASH
+
 #include <SerialFlash.h>
 
 class AudioPlaySerialflashRaw : public AudioStream
@@ -50,4 +54,7 @@ private:
 	volatile bool playing;
 };
 
+#endif
+
+// Vindor
 #endif

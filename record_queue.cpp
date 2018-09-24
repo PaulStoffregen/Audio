@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "record_queue.h"
 #include "utility/dspinst.h"
 

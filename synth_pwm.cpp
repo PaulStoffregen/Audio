@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "synth_pwm.h"
 #include "utility/dspinst.h"
 

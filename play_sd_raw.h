@@ -27,6 +27,9 @@
 #ifndef play_sd_raw_h_
 #define play_sd_raw_h_
 
+// Vindor
+#ifdef SDCARD
+
 #include "Arduino.h"
 #include "AudioStream.h"
 #include "SD.h"
@@ -48,5 +51,8 @@ private:
 	volatile uint32_t file_offset;
 	volatile bool playing;
 };
+
+// Vindor
+#endif
 
 #endif

@@ -74,6 +74,8 @@ public:
 		release_forced_count = milliseconds2count(milliseconds);
 		if (release_count == 0) release_count = 1;
 	}
+	bool isActive();
+	bool isSustain();
 	using AudioStream::release;
 	virtual void update(void);
 private:

@@ -355,6 +355,8 @@ static inline void clr_q_psr(void)
 // bits after a shift left by the constant z.
 // This comes from rockbox.org
 
+// Vindor
+#if 1
 static inline int32_t FRACMUL_SHL(int32_t x, int32_t y, const int z)
 {
     int32_t t, t2;
@@ -366,5 +368,9 @@ static inline int32_t FRACMUL_SHL(int32_t x, int32_t y, const int z)
            [c] "Mr" (z + 1), [d] "M" (31 - z));
     return t;
 }
-
+// Vindor
+#else
+static inline int32_t FRACMUL_SHL(int32_t x, int32_t y, const int z)
+{ return 0; }
+#endif
 #endif

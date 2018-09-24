@@ -24,6 +24,10 @@
  * THE SOFTWARE.
  */
 
+// Vindor
+#ifdef SDCARD
+
+#include <Arduino.h>
 #include "play_sd_wav.h"
 #include "spi_interrupt.h"
 
@@ -568,3 +572,5 @@ uint32_t AudioPlaySdWav::lengthMillis(void)
 
 
 
+// Vindor
+#endif

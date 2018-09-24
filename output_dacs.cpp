@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "output_dacs.h"
 #include "utility/pdb.h"
 

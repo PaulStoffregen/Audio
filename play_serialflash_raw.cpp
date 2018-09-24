@@ -25,6 +25,10 @@
  * THE SOFTWARE.
  */
 
+// Vindor
+#ifdef USE_SERIAL_FLASH
+
+#include <Arduino.h>
 #include "play_serialflash_raw.h"
 #include "spi_interrupt.h"
 
@@ -109,4 +113,5 @@ uint32_t AudioPlaySerialflashRaw::lengthMillis(void)
 	return ((uint64_t)file_size * B2M) >> 32;
 }
 
-
+// Vindor
+#endif

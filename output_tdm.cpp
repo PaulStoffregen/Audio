@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "output_tdm.h"
 #include "memcpy_audio.h"
 #if defined(KINETISK)

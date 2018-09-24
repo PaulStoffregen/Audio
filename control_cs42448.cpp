@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "control_cs42448.h"
 #include "Wire.h"
 

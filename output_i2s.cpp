@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "output_i2s.h"
 #include "memcpy_audio.h"
 
@@ -46,8 +47,9 @@ void AudioOutputI2S::begin(void)
 
 	// TODO: should we set & clear the I2S_TCSR_SR bit here?
 	config_i2s();
+// Vindor
 #ifdef I2S_ALT_CHANNEL
-	CORE_PIN22_CONFIG = PORT_PCR_MUX(6); // pin 22, PTC1, I2S0_TXD0
+	CORE_PIN3_CONFIG = PORT_PCR_MUX(6); // pin 3, PTA12, I2S0_TXD0
 #else
 	CORE_PIN22_CONFIG = PORT_PCR_MUX(6); // pin 22, PTC1, I2S0_TXD0
 #endif
@@ -257,6 +259,7 @@ void AudioOutputI2S::update(void)
 //
 #if F_CPU == 96000000 || F_CPU == 48000000 || F_CPU == 24000000
   // PLL is at 96 MHz in these modes
+// Vindor
   // patch from https://github.com/dturner/Audio/commit/77ee3c3c0548ede9cb92472532b7dbf4cbed7b1c
   #define MCLK_MULT 147
   #define MCLK_DIV  1250
@@ -341,6 +344,7 @@ void AudioOutputI2S::config_i2s(void)
 	I2S0_RCR5 = I2S_RCR5_WNW(31) | I2S_RCR5_W0W(31) | I2S_RCR5_FBT(31);
 
 	// configure pin mux for 3 clock signals
+// Vindor
 #ifdef I2S_ALT_CHANNEL
         CORE_PIN4_CONFIG = PORT_PCR_MUX(6); // pin 4, PTA13, I2S0_TX_FS (LRCLK)
         CORE_PIN9_CONFIG  = PORT_PCR_MUX(6); // pin  9, PTC3, I2S0_TX_BCLK
@@ -351,8 +355,6 @@ void AudioOutputI2S::config_i2s(void)
 	CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK
 #endif
 }
-
-
 
 /******************************************************************/
 

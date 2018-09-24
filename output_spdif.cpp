@@ -23,6 +23,7 @@
 
  // 2015/08/23: (FB) added mute_PCM() - sets or unsets VALID in VUCP (and adjusts PARITY)
 
+#include <Arduino.h>
 #include "output_spdif.h"
 
 #if defined(KINETISK)

@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "synth_whitenoise.h"
 
 // Park-Miller-Carta Pseudo-Random Number Generator

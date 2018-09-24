@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "analyze_peak.h"
 
 void AudioAnalyzePeak::update(void)

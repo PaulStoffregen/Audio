@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "filter_biquad.h"
 #include "utility/dspinst.h"
 

@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "output_pwm.h"
 
 audio_block_t * AudioOutputPWM::block_1st = NULL;

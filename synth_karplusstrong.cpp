@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "synth_karplusstrong.h"
 
 static uint32_t pseudorand(uint32_t lo)

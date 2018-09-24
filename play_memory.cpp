@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "play_memory.h"
 #include "utility/dspinst.h"
 

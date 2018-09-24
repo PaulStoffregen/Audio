@@ -30,6 +30,9 @@ AudioConnection          patchCord4(playRaw1, 0, i2s1, 1);
 AudioControlSGTL5000     sgtl5000_1;     //xy=265,212
 // GUItool: end automatically generated code
 
+// For a stereo recording version, see this forum thread:
+// https://forum.pjrc.com/threads/46150?p=158388&viewfull=1#post158388
+
 // Bounce objects to easily and reliably read the buttons
 Bounce buttonRecord = Bounce(0, 8);
 Bounce buttonStop =   Bounce(1, 8);  // 8 = 8 ms debounce time
