@@ -52,7 +52,7 @@ int pcm_mode=0;
 
 void wav2c(FILE *in, FILE *out, FILE *outh)
 {
-	uint32_t header[5];
+	uint32_t header[4];
 	int16_t format, channels, bits;
 	uint32_t rate;
 	uint32_t i, length, padlength=0, arraylen;
@@ -60,14 +60,18 @@ void wav2c(FILE *in, FILE *out, FILE *outh)
 	int32_t audio=0;
 
 	// read the WAV file's header
-	for (i=0; i<5; i++) {
+	for (i=0; i < 4; i++) {
 		header[i] = read_uint32(in);
 	}
-	chunkSize = header[4];
-	if (header[0] != 0x46464952 || header[2] != 0x45564157
-	  || header[3] != 0x20746D66 || !(chunkSize == 16 || chunkSize == 18 || chunkSize == 40)) {
-		 die("error in format of file %s", filename);
+	while (header[3] != 0x20746D66) {
+		// skip past unknown sections until "fmt "
+		chunkSize = read_uint32(in);
+		for (i=0; i < chunkSize; i++) {
+			read_uint8(in);
+		}
+		header[3] = read_uint32(in);
 	}
+	chunkSize = read_uint32(in);
 
 	// read the audio format parameters
 	format = read_int16(in);

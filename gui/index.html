@@ -349,6 +349,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioInputAnalog","data":{"defaults":{"name":{"value":"new"}},"shortName":"adc","inputs":0,"outputs":1,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputAnalogStereo","data":{"defaults":{"name":{"value":"new"}},"shortName":"adcs","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputI2Sslave","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2sslave","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputPDM","data":{"defaults":{"name":{"value":"new"}},"shortName":"pdm","inputs":0,"outputs":1,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputTDM","data":{"defaults":{"name":{"value":"new"}},"shortName":"tdm","inputs":0,"outputs":16,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputUSB","data":{"defaults":{"name":{"value":"new"}},"shortName":"usb","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputI2S","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -362,6 +363,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioOutputTDM","data":{"defaults":{"name":{"value":"new"}},"shortName":"tdm","inputs":16,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputADAT","data":{"defaults":{"name":{"value":"new"}},"shortName":"adat","inputs":8,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputUSB","data":{"defaults":{"name":{"value":"new"}},"shortName":"usb","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioAmplifier","data":{"defaults":{"name":{"value":"new"}},"shortName":"amp","inputs":1,"outputs":1,"category":"mixer-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioMixer4","data":{"defaults":{"name":{"value":"new"}},"shortName":"mixer","inputs":4,"outputs":1,"category":"mixer-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioPlayMemory","data":{"defaults":{"name":{"value":"new"}},"shortName":"playMem","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioPlaySdWav","data":{"defaults":{"name":{"value":"new"}},"shortName":"playSdWav","inputs":0,"outputs":2,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -369,12 +371,14 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioPlaySerialflashRaw","data":{"defaults":{"name":{"value":"new"}},"shortName":"playFlashRaw","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioPlayQueue","data":{"defaults":{"name":{"value":"new"}},"shortName":"queue","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioRecordQueue","data":{"defaults":{"name":{"value":"new"}},"shortName":"queue","inputs":1,"outputs":0,"category":"record-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioSynthWavetable","data":{"defaults":{"name":{"value":"new"}},"shortName":"wavetable","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthSimpleDrum","data":{"defaults":{"name":{"value":"new"}},"shortName":"drum","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthKarplusStrong","data":{"defaults":{"name":{"value":"new"}},"shortName":"string","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveformSine","data":{"defaults":{"name":{"value":"new"}},"shortName":"sine","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveformSineHires","data":{"defaults":{"name":{"value":"new"}},"shortName":"sine_hires","inputs":0,"outputs":2,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveformSineModulated","data":{"defaults":{"name":{"value":"new"}},"shortName":"sine_fm","inputs":1,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveform","data":{"defaults":{"name":{"value":"new"}},"shortName":"waveform","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioSynthWaveformModulated","data":{"defaults":{"name":{"value":"new"}},"shortName":"waveformMod","inputs":2,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveformPWM","data":{"defaults":{"name":{"value":"new"}},"shortName":"pwm","inputs":1,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthToneSweep","data":{"defaults":{"name":{"value":"new"}},"shortName":"tonesweep","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioSynthWaveformDc","data":{"defaults":{"name":{"value":"new"}},"shortName":"dc","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -384,6 +388,8 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioEffectChorus","data":{"defaults":{"name":{"value":"new"}},"shortName":"chorus","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectFlange","data":{"defaults":{"name":{"value":"new"}},"shortName":"flange","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectReverb","data":{"defaults":{"name":{"value":"new"}},"shortName":"reverb","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectFreeverb","data":{"defaults":{"name":{"value":"new"}},"shortName":"freeverb","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectFreeverbStereo","data":{"defaults":{"name":{"value":"new"}},"shortName":"freeverbs","inputs":1,"outputs":2,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectEnvelope","data":{"defaults":{"name":{"value":"new"}},"shortName":"envelope","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectMultiply","data":{"defaults":{"name":{"value":"new"}},"shortName":"multiply","inputs":2,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectDelay","data":{"defaults":{"name":{"value":"new"}},"shortName":"delay","inputs":1,"outputs":8,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -391,6 +397,8 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioEffectBitcrusher","data":{"shortName":"bitcrusher","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectMidSide","data":{"shortName":"midside","inputs":2,"outputs":2,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectWaveshaper","data":{"shortName":"waveshape","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectGranular","data":{"shortName":"granular","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectDigitalCombine","data":{"shortName":"combine","inputs":2,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioFilterBiquad","data":{"defaults":{"name":{"value":"new"}},"shortName":"biquad","inputs":1,"outputs":1,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioFilterFIR","data":{"defaults":{"name":{"value":"new"}},"shortName":"fir","inputs":1,"outputs":1,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioFilterStateVariable","data":{"defaults":{"name":{"value":"new"}},"shortName":"filter","inputs":2,"outputs":3,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -751,6 +759,56 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		memory.</p>
 </script>
 <script type="text/x-red" data-template-name="AudioInputTDM">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioInputPDM">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Receive (and filter) a Pulse Density Modulated bitstream.
+		</p>
+	<p align=center><img src="img/pdmmic.jpg"><br><small>PDM MEMS Mic</small></p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Filtered Audio Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from the PDM data, filters out the high frequency
+		noise and gives you the audio signal.</p>
+	<h3>Hardware</h3>
+	<p>PDM has been tested with this <a href="https://www.adafruit.com/product/3492">
+		Adafruit MP34DT01-M Microphone Board</a>.
+		</p>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>9</td><td>CLK</td><td>Output, 2.8235 MHz</td></tr>
+		<tr class=odd><td align=center>13</td><td>DATA</td><td>Input, Data on rising edge</td></tr>
+	</table>
+	<p>Data is input on the rising edge.  The SEL pin on MP34DT01-M should be
+		connected LOW for proper data capture.</p>
+	<!--<h3>Examples</h3>-->
+	<h3>Notes</h3>
+	<p>Filtering consumes approximately 39% of the CPU when running at
+		96 MHz.  The code currently consumes this time inside a high
+		priority interrupt, blocking other libraries.  Perhaps future
+		versions will perform filtering at lower priority.
+		</p>
+	<p>The filter used is a 512 tap FIR with approx &plusmn;1.1 dB gain
+		flatness to 10 kHz.  While far from audiophile grade, this should
+		perform far better than the rapid rolloff of Cascaded Integrator
+		Comb (CIC) or simple moving average filters commonly used on
+		other microcontrollers.  The filter also consumes 2104 bytes of
+		RAM for buffering and 32K of Flash for a lookup table to optimized
+		the filter computation.
+		</p>
+</script>
+<script type="text/x-red" data-template-name="AudioInputPDM">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1345,6 +1403,44 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</div>
 </script>
 
+<script type="text/x-red" data-help-name="AudioAmplifier">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Amplify or attenuate a signal, or switch it on/off.
+		</p>
+	<p align=center><img src="img/ampschematics.png"></p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Input signal</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Amplified/Attn. Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>gain</span>(level);</p>
+	<p class=desc>Adjust the amplification or attenuation.
+		"level" may be any floating point number from 0 to 32767.0.
+		1.0 passes the signal through directly.  Level of 0 shuts the channel
+		off completely.  Between 0 to 1.0 attenuates the signal, and above
+		1.0 amplifies it.  Negative numbers may also be used, to invert the
+		signal.
+	</p>
+	<!--<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; SamplePlayer
+	</p>-->
+	<h3>Notes</h3>
+	<p>Gain of 0 and 1.0 are handled efficiently as special cases.  Zero
+		discards data without processing.  1.0 passes data directly, with
+		minimal overhead</p>
+	<p>Signal clipping can occur when any channel has gain greater than 1.0</p>
+</script>
+<script type="text/x-red" data-template-name="AudioAmplifier">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
 <script type="text/x-red" data-help-name="AudioMixer4">
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
@@ -1743,6 +1839,71 @@ The actual packets are taken
 	</div>
 </script>
 
+
+<script type="text/x-red" data-help-name="AudioSynthWavetable">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Synthesize musical instruments using wavetable samples.
+		Sample data is extracted from SoundFont2 files.
+		</p>
+	<p align=center><a href="https://www.youtube.com/watch?v=5laaNHLhS98">YouTube Video Demo</a><br>
+		<a href="https://www.youtube.com/watch?v=5laaNHLhS98"><img border=0 src="img/wavetablevideo.jpg"></a>
+		</p>
+	<p><small>
+		Portland State University capstone project by
+		Ryan Mellmer, Nicholas Craig, Joshua Bucklin, Aida Keifer,
+		Jonathan Jensen, Yu Tang, &amp; Connor Delaplane.
+	</small></p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>setInstrument</span>(instrument);</p>
+	<p class=desc>blah blah
+	</p>
+	<p class=func><span class=keyword>amplitude</span>(volume);</p>
+	<p class=desc>blah blah
+	</p>
+	<p class=func><span class=keyword>setFrequency</span>(freq);</p>
+	<p class=desc>blah blah
+	</p>
+	<p class=func><span class=keyword>playFrequency</span>(freq, amplitude);</p>
+	<p class=desc>blah blah
+	</p>
+	<p class=func><span class=keyword>stop</span>();</p>
+	<p class=desc>blah blah
+	</p>
+	<p class=func><span class=keyword>isPlaying</span>();</p>
+	<p class=desc>blah blah
+	</p>
+	<p class=func><span class=keyword>getEnvState</span>();</p>
+	<p class=desc>blah blah
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; Wavetable &gt; MidiSynth
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; Wavetable &gt; MidiSynthKeyboard
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; Wavetable &gt; MidiSynthLarge
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; Wavetable &gt; SimpleWavetable
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; Wavetable &gt; Zelda
+	</p>
+	<h3>Notes</h3>
+	<p></p>
+</script>
+<script type="text/x-red" data-template-name="AudioSynthWavetable">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+
 <script type="text/x-red" data-help-name="AudioSynthSimpleDrum">
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
@@ -1815,7 +1976,7 @@ The actual packets are taken
 	<h3>Notes</h3>
 	<p></p>
 </script>
-<script type="text/x-red" data-template-name="AudioSynthSimpleDrum">
+<script type="text/x-red" data-template-name="AudioSynthKarplusStrong">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1900,7 +2061,7 @@ The actual packets are taken
 		a very accurate sine wave.  At least the upper 25 bits are believe
 		to be perfect.  This is mainly intended for testing 24 bit codec chips!</p>
 </script>
-<script type="text/x-red" data-template-name="AudioSynthWaveformSine">
+<script type="text/x-red" data-template-name="AudioSynthWaveformSineHires">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1956,7 +2117,8 @@ The actual packets are taken
 <script type="text/x-red" data-help-name="AudioSynthWaveform">
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
-	<p>Create a waveform: sine, sawtooth, square, triangle, pulse or arbitrary.</p>
+	<p>Create a waveform: sine, sawtooth, square, triangle, pulse, random S&H or arbitrary.</p>
+	<p align=center><img src="img/waveforms.png"></p>
 	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -1975,6 +2137,10 @@ The actual packets are taken
 	</p>
 	<p class=func><span class=keyword>amplitude</span>(level);</p>
 	<p class=desc>Change the amplitude.  Set to 0 to turn the signal off.
+	</p>
+	<p class=func><span class=keyword>offset</span>(level);</p>
+	<p class=desc>Add a DC offset, from -1.0 to +1.0.  Useful for generating
+		waveforms to use as control or modulation signals.
 	</p>
 	<p class=func><span class=keyword>phase</span>(angle);</p>
 	<p class=desc>
@@ -1996,6 +2162,8 @@ The actual packets are taken
 		do this automatically.
 	</p>
 	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; Waveforms
+	</p>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; PlaySynthMusic
 	</p>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; pulseWidth
@@ -2010,6 +2178,7 @@ The actual packets are taken
 		<li><span class=literal>WAVEFORM_SAWTOOTH_REVERSE</span></li>
 		<li><span class=literal>WAVEFORM_SQUARE</span></li>
 		<li><span class=literal>WAVEFORM_TRIANGLE</span></li>
+		<li><span class=literal>WAVEFORM_TRIANGLE_VARIABLE</span></li>
 		<li><span class=literal>WAVEFORM_ARBITRARY</span></li>
 		<li><span class=literal>WAVEFORM_PULSE</span></li>
 		<li><span class=literal>WAVEFORM_SAMPLE_HOLD</span></li>
@@ -2017,6 +2186,92 @@ The actual packets are taken
 	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioSynthWaveform">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioSynthWaveformModulated">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Create a waveform <b>with modulation</b>: sine, sawtooth, square, triangle, pulse, random S&H or arbitrary.</p>
+	<p align=center><img src="img/waveformsmod.png"></p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Frequency or Phase</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Shape (Pulse &amp; Var Triangle)</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Waveform Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>begin</span>(waveform);</p>
+	<p class=desc>Configure the waveform type to create.
+	</p>
+	<p class=func><span class=keyword>begin</span>(level, frequency, waveform);</p>
+	<p class=desc>Output a waveform, and set the amplitude and base frequency.
+	</p>
+	<p class=func><span class=keyword>frequency</span>(freq);</p>
+	<p class=desc>Change the base (unmodulated) frequency.
+	</p>
+	<p class=func><span class=keyword>amplitude</span>(level);</p>
+	<p class=desc>Change the amplitude.  Set to 0 to turn the signal off.
+	</p>
+	<p class=func><span class=keyword>offset</span>(level);</p>
+	<p class=desc>Add a DC offset, from -1.0 to +1.0.  Useful for generating
+		waveforms to use as control or modulation signals.
+	</p>
+	<p class=func><span class=keyword>frequencyModulation</span>(octaves);</p>
+	<p class=desc>
+		Configure for frequency modulation mode (the default) where the
+		input signal will adjust the frequency by a specific number of
+		octaves (the default is 8 octaves).  If the -1.0 to +1.0 signal
+		represents a &plusmn;10 volt range and you wish to have control
+		at 1 volt/octave, then configure for 10 octaves range.  The
+		maximum modulation sensitivity is 12 octaves.
+	</p>
+	<p class=func><span class=keyword>phaseModulation</span>(degrees);</p>
+	<p class=desc>
+		Configure for phase modulation mode where the input signal will
+		adjust the waveform phase angle a specific number of degrees.
+		180.0 allows a full scale &plusmn;1.0 signal to span 1 full
+		cycle of the waveform.  Maximum modulation sensitivity is 9000
+		degrees (&plusmn;25 cycles).
+	</p>
+	<p class=func><span class=keyword>arbitraryWaveform</span>(array, maxFreq);</p>
+	<p class=desc>
+		Configure the waveform to be used with WAVEFORM_ARBITRARY.  Array
+		must be an array of 256 samples.  Currently, the data is used
+		without any filtering, which can cause aliasing with frequencies
+		above 172 Hz.  For higher frequency output, you must bandwidth
+		limit your waveform data.  Someday, "maxFreq" will be used to
+		do this automatically.
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; WaveformsModulated
+	</p>
+	<h3>Notes</h3>
+	<p>Supported Waveforms:<br>
+		<ul>
+		<li><span class=literal>WAVEFORM_SINE</span></li>
+		<li><span class=literal>WAVEFORM_SAWTOOTH</span></li>
+		<li><span class=literal>WAVEFORM_SAWTOOTH_REVERSE</span></li>
+		<li><span class=literal>WAVEFORM_SQUARE</span></li>
+		<li><span class=literal>WAVEFORM_TRIANGLE</span></li>
+		<li><span class=literal>WAVEFORM_TRIANGLE_VARIABLE</span></li>
+		<li><span class=literal>WAVEFORM_ARBITRARY</span></li>
+		<li><span class=literal>WAVEFORM_PULSE</span></li>
+		<li><span class=literal>WAVEFORM_SAMPLE_HOLD</span></li>
+		</ul>
+	</p>
+	<p>The Sample &amp; Hold waveform does not support phase modulation.
+		Attempting to modulate its phase may give random or
+		inconsistent results.  Use only frequency modulation
+		to vary the Sample &amp; Hold waveform speed
+	</p>
+</script>
+<script type="text/x-red" data-template-name="AudioSynthWaveformModulated">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -2407,6 +2662,88 @@ double s_freq = .0625;</p>
 	</div>
 </script>
 
+<script type="text/x-red" data-help-name="AudioEffectFreeverb">
+<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>High quality Reverb effect, based on Freeverb by Jezar at Dreampoint.
+	</p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class="top"><th>Port</th><th>Purpose</th></tr>
+		<tr class="odd"><td align="center">In 0</td><td>Input</td></tr>
+		<tr class="odd"><td align="center">Out 0</td><td>Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>roomsize</span>(amount);</p>
+	<p class=desc>Sets the amount of reverberant echo or apparent room
+		size, from 0 (smallest) to 1.0 (largest);
+	</p>
+	<p class=func><span class=keyword>damping</span>(amount);</p>
+	<p class=desc>Sets the damping factor, from 0 to 1.0.  More damping
+		causes higher frequency echo to decay, creating a softer sound,
+		similar to a large room filled with people or materials which
+		absorb some sound as it travels between reflecting surfaces.
+		Lower damping simulates a harsher reverberant field.
+	</p>
+
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Freeverb
+		</p>
+	<h3>Notes</h3>
+	<p>Freeverb mono consumes about 21% of the CPU time on Teensy 3.2 and
+		requires about 22K of RAM.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioEffectFreeverb">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioEffectFreeverbStereo">
+<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>High quality stereo Reverb effect, based on Freeverb by Jezar at Dreampoint.
+	</p>
+	<p>Teensy 3.5 or 3.6 required to run stereo version.</p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class="top"><th>Port</th><th>Purpose</th></tr>
+		<tr class="odd"><td align="center">In 0</td><td>Input</td></tr>
+		<tr class="odd"><td align="center">Out 0</td><td>Left Output</td></tr>
+		<tr class="odd"><td align="center">Out 1</td><td>Right Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>roomsize</span>(amount);</p>
+	<p class=desc>Sets the amount of reverberant echo or apparent room
+		size, from 0 (smallest) to 1.0 (largest);
+	</p>
+	<p class=func><span class=keyword>damping</span>(amount);</p>
+	<p class=desc>Sets the damping factor, from 0 to 1.0.  More damping
+		causes higher frequency echo to decay, creating a softer sound,
+		similar to a large room filled with people or materials which
+		absorb some sound as it travels between reflecting surfaces.
+		Lower damping simulates a harsher reverberant field.
+	</p>
+
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Freeverb_Stereo
+		</p>
+	<h3>Notes</h3>
+	<p>Freeverb mono consumes about 18% of the CPU time on Teensy 3.6 and
+		requires about 45K of RAM.</p>
+	<p>Teensy 3.2 does not have enough RAM to
+		run this effect while playing WAV file and implementing USB Serial.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioEffectFreeverbStereo">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
 <script type="text/x-red" data-help-name="AudioEffectEnvelope">
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
@@ -2462,6 +2799,14 @@ double s_freq = .0625;</p>
 		short times are recommended.  Zero may be used to completely
 		disable this feature (never extra latency).  Longer times help
 		reduce clicks or pops.  The default is 5 millisecond.
+	</p>
+	<p class=func><span class=keyword>isActive</span>();</p>
+	<p class=desc>Returns true when the envelope is currently in any of
+		its 6 phases.
+	</p>
+	<p class=func><span class=keyword>isSustain</span>();</p>
+	<p class=desc>Returns true when the envelope is currently in the
+		sustain phase.
 	</p>
 	<h3>Examples</h3>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; PlaySynthMusic
@@ -2814,6 +3159,95 @@ double s_freq = .0625;</p>
 		</p>
 </script>
 <script type="text/x-red" data-template-name="AudioEffectWaveshaper">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioEffectGranular">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Classic granular effect that uses a variable speed buffer to shift the pitch
+		and freeze incoming audio.
+		Contributed by Bleep Labs.
+	</p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Signal</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Input Signal</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Granular Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>begin</span>(array, length);</p>
+	<p class=desc>Initialize the granular processing with an array of 16 bit
+		integers used to store the sound grains.  Until memory is allocated
+		with this function, no audio appears at the output.
+		</p>
+	<p class=func><span class=keyword>setSpeed</span>(ratio);</p>
+	<p class=desc>Configure the relative speed grains will be played.  1.0
+		plays the grains without any change.  Less than 1.0 slows the sound,
+		and greater than 1.0 speeds up.  The allowed range is 0.125 to 8.0,
+		for &plusmn;3 octaves shift.
+		</p>
+	<p class=func><span class=keyword>beginFreeze</span>(grainLength);</p>
+	<p class=desc>Freeze the sound by sampling one grain, then repeated playing
+		it.  The grainLength is specified in milliseconds, up to the size allowed
+		by the array from begin().
+		</p>
+	<p class=func><span class=keyword>beginPitchShift</span>(grainLength);</p>
+	<p class=desc>Pitch shift by continuously sampling grains and playing them
+		at altered speed.  The grainLength is specified in milliseconds, up to
+		one third of the memory from begin();
+		</p>
+	<p class=func><span class=keyword>end</span>();</p>
+	<p class=desc>Stop granual processing.  The input signal is passed to the
+		output without any changes.
+		</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Granular</p>
+	<!--<h3>Notes</h3>
+	<p> </p>-->
+</script>
+<script type="text/x-red" data-template-name="AudioEffectGranular">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioEffectDigitalCombine">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Combine signals with digital logic functions, with results from
+		interesting new waveforms to aggressive digital distortion.
+		Contributed by Bleep Labs.
+	</p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Signal</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Input Signal #1</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Input Signal #2</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Combined Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>setCombineMode</span>(mode);</p>
+	<p class=desc>Configure which digital combine operation is performed.
+	</p>
+	<p class=desc>Supported modes:<br>
+		<span class=keyword>AudioEffectDigitalCombine</span><b>::OR</b><br>
+		<span class=keyword>AudioEffectDigitalCombine</span><b>::XOR</b><br>
+		<span class=keyword>AudioEffectDigitalCombine</span><b>::AND</b><br>
+		<span class=keyword>AudioEffectDigitalCombine</span><b>::MODULO</b><br>
+	</p>
+	<h3>Examples</h3>
+	<!--<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Combine</p>-->
+	<!--<h3>Notes</h3>
+	<p> </p>-->
+</script>
+<script type="text/x-red" data-template-name="AudioEffectDigitalCombine">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -3761,19 +4195,19 @@ value  frequency
 	</p>
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>enable</span>();</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Turn on the WS8731.
 	</p>
 	<p class=func><span class=keyword>disable</span>();</p>
 	<p class=desc>not implemented
 	</p>
 	<p class=func><span class=keyword>volume</span>(level);</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Set the headphone volume level. Range is 0 to 1.0.
 	</p>
 	<p class=func><span class=keyword>inputLevel</span>(level);</p>
-	<p class=desc>not implemented
+	<p class=desc>Adjust the line level input gain.  Range is 0 to 1.0.
 	</p>
 	<p class=func><span class=keyword>inputSelect</span>(input);</p>
-	<p class=desc>not implemented
+	<p class=desc>Select which input to use: AUDIO_INPUT_LINEIN or AUDIO_INPUT_MIC.
 	</p>
 	<!--
 <h3>Examples</h3>
@@ -3803,25 +4237,29 @@ value  frequency
 	</p>
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>enable</span>();</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Turn on the WS8731, in I2S Master mode.  I2S slave mode
+		communication must be used by Teensy.
 	</p>
 	<p class=func><span class=keyword>disable</span>();</p>
 	<p class=desc>not implemented
 	</p>
 	<p class=func><span class=keyword>volume</span>(level);</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Set the headphone volume level. Range is 0 to 1.0.
 	</p>
 	<p class=func><span class=keyword>inputLevel</span>(level);</p>
-	<p class=desc>not implemented
+	<p class=desc>Adjust the line level input gain.  Range is 0 to 1.0.
 	</p>
 	<p class=func><span class=keyword>inputSelect</span>(input);</p>
-	<p class=desc>not implemented
+	<p class=desc>Select which input to use: AUDIO_INPUT_LINEIN or AUDIO_INPUT_MIC.
 	</p>
 	<h3>Examples</h3>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; WM8731MikroSine
 	</p>
 	<h3>Notes</h3>
-	<p></p>
+	<p>The WM8731 will implement a sample rate of its crystal frequency divided by 256.
+		To get the 44.1 kHz sample rate the Teensy Audio Library expects, an
+		11.2896 MHz crystal should be used.
+	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioControlWM8731master">
 	<div class="form-row">

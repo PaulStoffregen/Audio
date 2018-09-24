@@ -80,7 +80,10 @@
 #include "effect_delay_ext.h"
 #include "effect_midside.h"
 #include "effect_reverb.h"
+#include "effect_freeverb.h"
 #include "effect_waveshaper.h"
+#include "effect_granular.h"
+#include "effect_combine.h"
 #include "filter_biquad.h"
 #include "filter_fir.h"
 #include "filter_variable.h"
@@ -89,6 +92,7 @@
 #include "input_i2s.h"
 #include "input_i2s_quad.h"
 #include "input_tdm.h"
+#include "input_pdm.h"
 #include "mixer.h"
 #include "output_dac.h"
 #include "output_dacs.h"
@@ -114,5 +118,6 @@
 #include "synth_karplusstrong.h"
 #include "synth_simple_drum.h"
 #include "synth_pwm.h"
+#include "synth_wavetable.h"
 
 #endif
