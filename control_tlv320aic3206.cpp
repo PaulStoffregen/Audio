@@ -19,8 +19,8 @@
 #  define AIC_FS                                                     44100UL
 #endif
 
-//define AIC_BITS                                                        16
-#define AIC_BITS                                                        32
+#define AIC_BITS                                                        16
+//#define AIC_BITS                                                        32
 
 #define AIC_I2S_SLAVE                                                     1
 #if AIC_I2S_SLAVE
