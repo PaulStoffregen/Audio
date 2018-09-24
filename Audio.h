@@ -70,6 +70,7 @@
 #include "control_ak4558.h"
 #include "control_cs4272.h"
 #include "control_cs42448.h"
+#include "control_tlv320aic3206.h"
 #include "effect_bitcrusher.h"
 #include "effect_chorus.h"
 #include "effect_fade.h"
