@@ -76,9 +76,9 @@
 #define AIC3206_MIC_BIAS_VSUPPLY         4
 #define AIC3206_DEFAULT_MIC_BIAS AIC3206_MIC_BIAS_2_5
 
-#define BOTH_CHAN 0
-#define LEFT_CHAN 1
-#define RIGHT_CHAN 2
+#define AIC3206_BOTH_CHAN 0
+#define AIC3206_LEFT_CHAN 1
+#define AIC3206_RIGHT_CHAN 2
 
 class AudioControlTLV320AIC3206: public AudioControl
 {
@@ -90,13 +90,13 @@ class AudioControlTLV320AIC3206: public AudioControl
 		AudioControlTLV320AIC3206(int _resetPin, bool _debugToSerial) {  resetPinAIC = _resetPin; debugToSerial = _debugToSerial; };
 		bool enable(void);
 		bool disable(void);
-		bool outputSelect(int n);
+		bool outputSelect(int n);  //use AIC3206_OUTPUT_HEADPHONE_JACK_OUT or one of other choices defined earlier
 		bool volume(float n);
 		bool volume_dB(float n);
 		bool inputLevel(float n);  //dummy to be compatible with Teensy Audio Library
-		bool inputSelect(int n);
+		bool inputSelect(int n);   //use AIC3206_INPUT_IN1 or one of other choices defined earlier
 		bool setInputGain_dB(float n);
-		bool setMicBias(int n);
+		bool setMicBias(int n);  //use AIC3206_MIC_BIAS_OFF or AIC3206_MIC_BIAS_2_5 or one of other choices defined earlier
 		bool updateInputBasedOnMicDetect(int setting = AIC3206_INPUT_IN1); //which input to monitor
 		bool enableMicDetect(bool);
 		int  readMicDetect(void);
@@ -106,7 +106,7 @@ class AudioControlTLV320AIC3206: public AudioControl
 		void setHPFonADC(bool enable, float cutoff_Hz, float fs_Hz);
 		float getHPCutoff_Hz(void) { return HP_cutoff_Hz; }
 		float getSampleRate_Hz(void) { return sample_rate_Hz; }
-		void setIIRCoeffOnADC(int chan, uint32_t *coeff);
+		void setIIRCoeffOnADC(int chan, uint32_t *coeff);  //for chan, use AIC3206_BOTH_CHAN or AIC3206_LEFT_CHAN or AIC3206_RIGHT_CHAN
 		bool enableAutoMuteDAC(bool, uint8_t);
 	private:
 	  void aic_reset(void);

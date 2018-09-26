@@ -666,7 +666,7 @@ void AudioControlTLV320AIC3206::setHPFonADC(bool enable, float cutoff_Hz, float 
 		coeff[0] = 0x7FFFFFFF; coeff[1] = 0; coeff[2]=0;
 	}
 	
-	setIIRCoeffOnADC(BOTH_CHAN, coeff); //needs twos-compliment
+	setIIRCoeffOnADC(AIC3206_BOTH_CHAN, coeff); //needs twos-compliment
 }
 
 
@@ -677,10 +677,10 @@ void AudioControlTLV320AIC3206::setIIRCoeffOnADC(int chan, uint32_t *coeff) {
 	uint32_t prev_state = aic_readPage(0x00,0x51);
 	aic_writePage(0x00,0x51,prev_state & (0b00111111));  //clear first two bits
 	
-	if (chan == BOTH_CHAN) {
+	if (chan == AIC3206_BOTH_CHAN) {
 		setIIRCoeffOnADC_Left(coeff);
 		setIIRCoeffOnADC_Right(coeff);
-	} else if (chan == LEFT_CHAN) {
+	} else if (chan == AIC3206_LEFT_CHAN) {
 		setIIRCoeffOnADC_Left(coeff);
 	} else {
 		setIIRCoeffOnADC_Right(coeff);
