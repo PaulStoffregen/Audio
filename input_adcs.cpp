@@ -336,13 +336,7 @@ static const uint8_t pin2sc1a[] = {
 
 static int analogReadADC1(uint8_t pin)
 {
-        ADC1_SC1A = 9;
-        while (1) {
-                if ((ADC1_SC1A & ADC_SC1_COCO)) {
-                        return ADC1_RA;
-                }
-        }
-
+	
         if (pin >= sizeof(pin2sc1a)) return 0;
         uint8_t channel = pin2sc1a[pin];
 	if ((channel & 0x80) == 0) return 0;
