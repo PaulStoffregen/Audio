@@ -1,4 +1,4 @@
-/* Audio Library for Teensy 3.X
+ /* Audio Library for Teensy 3.X
  * Copyright (c) 2017, Paul Stoffregen, paul@pjrc.com
  *
  * Development of this audio library was funded by PJRC.COM, LLC by sales of
@@ -27,6 +27,7 @@
 #include <Arduino.h>
 #include "input_tdm.h"
 #include "output_tdm.h"
+#include "memcpy_audio.h"
 #if defined(KINETISK)
 
 DMAMEM static uint32_t tdm_rx_buffer[AUDIO_BLOCK_SAMPLES*16];
@@ -66,7 +67,7 @@ void AudioInputTDM::begin(void)
 	dma.attachInterrupt(isr);
 }
 
-// TODO: needs optimization...
+#if 0
 static void memcpy_tdm_rx(uint32_t *dest1, uint32_t *dest2, const uint32_t *src)
 {
 	uint32_t i, in1, in2;
@@ -79,6 +80,7 @@ static void memcpy_tdm_rx(uint32_t *dest1, uint32_t *dest2, const uint32_t *src)
 		*dest2++ = (in1 << 16) | (in2 & 0x0000FFFF);
 	}
 }
+#endif 
 
 void AudioInputTDM::isr(void)
 {
@@ -103,7 +105,8 @@ void AudioInputTDM::isr(void)
 		for (i=0; i < 16; i += 2) {
 			uint32_t *dest1 = (uint32_t *)(block_incoming[i]->data);
 			uint32_t *dest2 = (uint32_t *)(block_incoming[i+1]->data);
-			memcpy_tdm_rx(dest1, dest2, src);
+			//memcpy_tdm_rx(dest1, dest2, src);
+			memcpy_tdmrx(dest1, dest2, src);
 			src++;
 		}
 	}

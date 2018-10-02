@@ -38,7 +38,8 @@ void memcpy_tointerleaveL(int16_t *dst, const int16_t *srcL);
 void memcpy_tointerleaveR(int16_t *dst, const int16_t *srcR);
 void memcpy_tointerleaveQuad(int16_t *dst, const int16_t *src1, const int16_t *src2,
 	const int16_t *src3, const int16_t *src4);
-void memcpy_tdmtx(uint32_t *dest, const uint32_t *src1, const uint32_t *src2);	
+void memcpy_tdmtx(uint32_t *dest, const uint32_t *src1, const uint32_t *src2);
+void memcpy_tdmrx(uint32_t *dest1, uint32_t *dest2, const uint32_t *src);
 #ifdef __cplusplus
 }
 #endif
