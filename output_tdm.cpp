@@ -70,7 +70,7 @@ void AudioOutputTDM::begin(void)
 	dma.attachInterrupt(isr);
 }
 
-// TODO: needs optimization...
+#if 0
 static void memcpy_tdm_tx(uint32_t *dest, const uint32_t *src1, const uint32_t *src2)
 {
 	uint32_t i, in1, in2, out1, out2;
@@ -85,6 +85,7 @@ static void memcpy_tdm_tx(uint32_t *dest, const uint32_t *src1, const uint32_t *
 		dest += 16;
 	}
 }
+#endif
 
 void AudioOutputTDM::isr(void)
 {
@@ -107,7 +108,8 @@ void AudioOutputTDM::isr(void)
 	for (i=0; i < 16; i += 2) {
 		src1 = block_input[i] ? (uint32_t *)(block_input[i]->data) : zeros;
 		src2 = block_input[i+1] ? (uint32_t *)(block_input[i+1]->data) : zeros;
-		memcpy_tdm_tx(dest, src1, src2);
+		//memcpy_tdm_tx(dest, src1, src2);
+		memcpy_tdmtx(dest, src1, src2);
 		dest++;
 	}
 	for (i=0; i < 16; i++) {
@@ -201,7 +203,7 @@ void AudioOutputTDM::config_tdm(void)
 	I2S0_TCR2 = I2S_TCR2_SYNC(0) | I2S_TCR2_BCP | I2S_TCR2_MSEL(1)
 		| I2S_TCR2_BCD | I2S_TCR2_DIV(0);
 	I2S0_TCR3 = I2S_TCR3_TCE;
-	I2S0_TCR4 = I2S_TCR4_FRSZ(7) | I2S_TCR4_SYWD(0) | I2S_TCR4_MF
+	I2S0_TCR4 = I2S_TCR4_FRSZ(7) | I2S_TCR4_SYWD(63) | I2S_TCR4_MF
 		| I2S_TCR4_FSE | I2S_TCR4_FSD;
 	I2S0_TCR5 = I2S_TCR5_WNW(31) | I2S_TCR5_W0W(31) | I2S_TCR5_FBT(31);
 
@@ -211,7 +213,7 @@ void AudioOutputTDM::config_tdm(void)
 	I2S0_RCR2 = I2S_RCR2_SYNC(1) | I2S_TCR2_BCP | I2S_RCR2_MSEL(1)
 		| I2S_RCR2_BCD | I2S_RCR2_DIV(0);
 	I2S0_RCR3 = I2S_RCR3_RCE;
-	I2S0_RCR4 = I2S_RCR4_FRSZ(7) | I2S_RCR4_SYWD(0) | I2S_RCR4_MF
+	I2S0_RCR4 = I2S_RCR4_FRSZ(7) | I2S_RCR4_SYWD(15) | I2S_RCR4_MF
 		| I2S_RCR4_FSE | I2S_RCR4_FSD;
 	I2S0_RCR5 = I2S_RCR5_WNW(31) | I2S_RCR5_W0W(31) | I2S_RCR5_FBT(31);
 
