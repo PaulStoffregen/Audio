@@ -240,7 +240,7 @@
 	BX lr
 
 
-	
+
 /* void memcpy_tdmtx(uint32_t *dest, const uint32_t *src1, const uint32_t *src2) */
  .global	memcpy_tdmtx
 .thumb_func
@@ -284,5 +284,50 @@
 
 	BX lr
 
+
+/* void memcpy_tdmrx(uint32_t *dest1, uint32_t *dest2, const uint32_t *src) */
+ .global memcpy_tdmrx
+.thumb_func
+	memcpy_tdmrx:
+
+	@ r0: dst1
+	@ r1: dst2
+	@ r2: src
+
+  push {r4-r12, r14}
+	add r14,r2,#((AUDIO_BLOCK_SAMPLES/2)*64)
+
+  .align 2
+.looptdmrx:
+
+	ldr   r3, [r2], #32
+	ldr   r4, [r2], #32
+	pkhtb r5,r4,r3,ASR #16
+	pkhbt r6,r4,r3,LSL #16
+
+	ldr   r3, [r2], #32
+	ldr   r4, [r2], #32
+	pkhtb r7,r4,r3,ASR #16
+	pkhbt r8,r4,r3,LSL #16
+
+	ldr   r3, [r2], #32
+	ldr   r4, [r2], #32
+	pkhtb r9,r4,r3,ASR #16
+	pkhbt r10,r4,r3,LSL #16
+
+	ldr   r3, [r2], #32
+	ldr   r4, [r2], #32
+	pkhtb r11,r4,r3,ASR #16
+	pkhbt r12,r4,r3,LSL #16
+
+	stmia r0!,{r5, r7, r9, r11}
+	stmia r1!,{r6, r8, r10, r12}
+
+	cmp r14, r2
+	bne .looptdmrx
+	pop  {r4-r12, r14}
+
+	BX lr
+	
 .END
 #endif
