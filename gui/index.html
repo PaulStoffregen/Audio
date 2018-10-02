@@ -1744,20 +1744,32 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		<tr class=odd><td align=center>Out 0</td><td>Sound Output</td></tr>
 	</table>
 	<h3>Functions</h3>
+<!--	
 	<p class=func><span class=keyword>play</span>(int16);</p>
 	<p class=desc>not yet implemented
 	</p>
 	<p class=func><span class=keyword>play</span>(int16[], length);</p>
 	<p class=desc>not yet implemented
 	</p>
+-->
+	<p class=func><span class=keyword>available</span>();</p>
+	<p class=desc>
+		A single 'userblock' is maintained for this object. 
+		If one is already allocated this function will return true, if one 
+		is not already allocated a single attempt to acquire one will be 
+		made and will return true if that succeeds, otherwise false 
+		will be returned.
+	</p>  	
 	<p class=func><span class=keyword>getBuffer</span>();</p>
-	<p class=desc>Returns a pointer to an array of 128 int16.  This buffer
-		is within the audio library memory pool, providing the most efficient
-		way to input data to the audio system.  The buffer is likely to be
-		populated by previously used data, so the entire 128 words should be
-		written before calling playBuffer().  Only a single buffer should be
-		requested at a time.  This function may return NULL if no memory is
-		available.
+	<p class=desc>
+		Returns a pointer to an array of 128 int16. This buffer is within
+		the audio library memory pool, providing the most efficient way 
+		to input data to the audio system. The buffer is likely to be 
+		populated by previously used data, so the entire 128 words should 
+		be written before calling playBuffer(). Only a single buffer 
+		should be requested at a time. This function will not return 
+		until a free memory block is available. Calling available() 
+		first will return true if a buffer is allocated or false otherwise. 
 	</p>
 	<p class=func><span class=keyword>playBuffer</span>();</p>
 	<p class=desc>Transmit the buffer previously obtained from getBuffer().
