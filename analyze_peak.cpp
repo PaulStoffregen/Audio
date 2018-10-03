@@ -26,6 +26,7 @@
 
 #include <Arduino.h>
 #include "analyze_peak.h"
+#include "arm_math.h"
 
 void AudioAnalyzePeak::update(void)
 {
@@ -41,16 +42,35 @@ void AudioAnalyzePeak::update(void)
 	end = p + AUDIO_BLOCK_SAMPLES;
 	min = min_sample;
 	max = max_sample;
+
+#if defined(KINETISL)
 	do {
 		int16_t d=*p++;
 		// TODO: can we speed this up with SSUB16 and SEL
 		// http://www.m4-unleashed.com/parallel-comparison/
 		if (d<min) min=d;
-		if (d>max) max=d;
+		if (d>max) max=d;	
 	} while (p < end);
 	min_sample = min;
 	max_sample = max;
+#else
+  	// yes, we can. 3.5 times faster!
+  	// https://www.waybackmachine.org/web/20161111030547/http://www.m4-unleashed.com/parallel-comparison/
+  	do {
+    		uint32_t data = *__SIMD32(p)++;// Load next two samples in a single access    
+    		(void)__SSUB16(max, data);// Parallel comparison of max and new samples    
+    		max = __SEL(max, data);// Select max on each 16-bits half    
+    		(void)__SSUB16(data, min);// Parallel comparison of new samples and min
+    		min = __SEL(min, data);// Select min on each 16-bits half    
+ 	} while (p < end);
+  	// Now we have maximum on even samples on low halfword of max
+  	// and maximum on odd samples on high halfword
+  	// look for max between halfwords 1 & 0 by comparing on low halfword
+  	(void)__SSUB16(max, max >> 16);
+  	max_sample = __SEL(max, max >> 16);// Select max on low 16-bits
+  	(void)__SSUB16(min >> 16, min);// look for min between halfwords 1 & 0 by comparing on low halfword
+  	min_sample = __SEL(min, min >> 16);// Select min on low 16-bits
+#endif	
 	new_output = true;
 	release(block);
 }
-
