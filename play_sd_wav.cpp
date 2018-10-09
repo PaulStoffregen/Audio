@@ -28,7 +28,6 @@
 #include <Arduino.h>
 #endif
 
-#if SPI_INTERFACES_COUNT > 0
 
 #include "play_sd_wav.h"
 #include "spi_interrupt.h"
@@ -568,9 +567,4 @@ uint32_t AudioPlaySdWav::lengthMillis(void)
 	uint32_t b2m = *(volatile uint32_t *)&bytes2millis;
 	return ((uint64_t)tlength * b2m) >> 32;
 }
-
-#endif
-
-
-
 

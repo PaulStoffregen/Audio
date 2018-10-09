@@ -121,10 +121,9 @@
 #include "play_memory.h"
 #include "play_queue.h"
 
-#if SPI_INTERFACES_COUNT > 0
 #include "play_sd_raw.h"
 #include "play_sd_wav.h"
-#endif
+#include "play_qspi_wav.h"
 
 #if 0
 #include "play_serialflash_raw.h"

@@ -28,8 +28,6 @@
 #include <Arduino.h>
 #endif
 
-#if SPI_INTERFACES_COUNT > 0
-
 #include "play_sd_raw.h"
 #include "spi_interrupt.h"
 
@@ -129,5 +127,3 @@ uint32_t AudioPlaySdRaw::lengthMillis(void)
 {
 	return ((uint64_t)file_size * B2M) >> 32;
 }
-
-#endif

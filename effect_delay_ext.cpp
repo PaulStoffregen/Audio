@@ -31,7 +31,6 @@
 #define digitalWriteFast digitalWrite
 #endif
 
-#if SPI_INTERFACES_COUNT > 0
 
 //#define INTERNAL_TEST
 
@@ -298,4 +297,3 @@ void AudioEffectDelayExternal::write(uint32_t offset, uint32_t count, const int1
 #endif
 }
 
-#endif

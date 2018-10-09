@@ -36,14 +36,14 @@ class AudioPlaySdWav : public AudioStream
 public:
 	AudioPlaySdWav(void) : AudioStream(0, NULL) { begin(); }
 	void begin(void);
-	bool play(const char *filename);
-	void stop(void);
+	virtual bool play(const char *filename);
+	virtual void stop(void);
 	bool isPlaying(void);
 	uint32_t positionMillis(void);
 	uint32_t lengthMillis(void);
 	virtual void update(void);
-private:
-	File wavfile;
+
+protected:
 	bool consume(uint32_t size);
 	bool parse_format(void);
 	uint32_t header[6];		// temporary storage of wav header data
@@ -60,6 +60,9 @@ private:
 	uint8_t state;
 	uint8_t state_play;
 	uint8_t leftover_bytes;
+
+private:
+	File wavfile;
 };
 
 #endif
