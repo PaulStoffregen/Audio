@@ -6,7 +6,7 @@
 #include <Audio.h>
 #include <Adafruit_SPIFlash_FatFs.h>
 #include "Adafruit_QSPI_GD25Q.h"
-#define FLASH_TYPE     SPIFLASHTYPE_W25Q16BV  // Flash chip type.
+#define FLASH_TYPE     SPIFLASHTYPE_W25Q64  // Flash chip type.
 Adafruit_QSPI_GD25Q flash;
 
 // create an Adafruit_M0_Express_CircuitPython object which gives
@@ -17,11 +17,14 @@ Adafruit_M0_Express_CircuitPython pythonfs(flash);
 AudioPlayQspiWav           playWav1;
 AudioPlayQspiWav           playWav2;
 AudioMixer4               mixer1;
+AudioMixer4               mixer2;
 AudioOutputAnalogStereo  audioOutput;
 AudioConnection          patchCord1(playWav1, 0, mixer1, 0);
-AudioConnection          patchCord2(playWav2, 0, mixer1, 1);
-AudioConnection          patchCord3(mixer1, 0, audioOutput, 0);
-AudioConnection          patchCord4(mixer1, 1, audioOutput, 1);
+AudioConnection          patchCord2(playWav1, 1, mixer2, 0);
+AudioConnection          patchCord3(playWav2, 0, mixer1, 1);
+AudioConnection          patchCord4(playWav2, 1, mixer2, 1);
+AudioConnection          patchCord5(mixer1, 0, audioOutput, 0);
+AudioConnection          patchCord6(mixer2, 0, audioOutput, 1);
 
 void setup() {
   // Audio connections require memory to work.  For more
@@ -60,7 +63,7 @@ void playFiles(const char *filename1, const char *filename2)
   Serial.print("Playing files: ");
   Serial.print(filename1);
   Serial.print(" and  ");
-  Serial.print(filename2);
+  Serial.println(filename2);
 
   // run while the file plays.
   playWav1.play(filename1);
@@ -77,7 +80,6 @@ void playFiles(const char *filename1, const char *filename2)
 
 
 void loop() {
-  playFiles("WAV1.WAV", "WAV2.WAV");  // filenames are always uppercase 8.3 format
+  playFiles("WAV1.wav", "WAV2.wav");
   delay(1500);
 }
-
