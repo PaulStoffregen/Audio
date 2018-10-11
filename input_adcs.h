@@ -40,8 +40,8 @@ class AudioInputAnalogStereo : public AudioStream
 	AudioInputAnalogStereo() : AudioStream(0, NULL) {
 		init(A2, A3);
 	}
-	AudioInputAnalogStereo(uint8_t pin0) : AudioStream(0, NULL) {
-		init(pin0, 0);
+	AudioInputAnalogStereo(uint8_t pin0, uint8_t pin1) : AudioStream(0, NULL) {
+		init(pin0, pin1);
 	}
 	virtual void update(void);
 	private:
@@ -55,8 +55,7 @@ class AudioInputAnalogStereo : public AudioStream
 	static bool update_responsibility;
 	static Adafruit_ZeroDMA *dma0;
 	static Adafruit_ZeroDMA *dma1;
-	static DmacDescriptor *desc0;
-	static DmacDescriptor *desc1;
+	static DmacDescriptor *desc;
 	static void isr0(Adafruit_ZeroDMA *dma);
 	static void isr1(Adafruit_ZeroDMA *dma);
 	static void init(uint8_t pin0, uint8_t pin1);

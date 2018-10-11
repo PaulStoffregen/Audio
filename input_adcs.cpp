@@ -28,6 +28,7 @@
 #include "utility/pdb.h"
 #include "utility/dspinst.h"
 
+#define __SAMD51__
 #if defined(__SAMD51__)
 
 #include "wiring_private.h"
@@ -46,24 +47,19 @@ int32_t AudioInputAnalogStereo::hpf_x1[2] = { 0, 0 };
 bool AudioInputAnalogStereo::update_responsibility = false;
 Adafruit_ZeroDMA *AudioInputAnalogStereo::dma0;
 Adafruit_ZeroDMA *AudioInputAnalogStereo::dma1;
-DmacDescriptor *AudioInputAnalogStereo::desc0;
-DmacDescriptor *AudioInputAnalogStereo::desc1;
+DmacDescriptor *AudioInputAnalogStereo::desc;
 static ZeroDMAstatus    stat;
+
+static uint32_t *daddrL, *daddrR;
 
 void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
 {
-	uint32_t tmp;
 	
 	dma0 = new Adafruit_ZeroDMA;
 	dma1 = new Adafruit_ZeroDMA;
 
 	stat = dma0->allocate();
 	stat = dma1->allocate();
-
-	// Note for review:
-	// Probably not useful to spin cycles here stabilizing
-	// since DC blocking is similar to te external analog filters
-	tmp = (uint16_t) analogRead(pin0);
 
 #if 0
 	tmp = ( ((int32_t) tmp) << 14);
@@ -76,67 +72,78 @@ void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
 	hpf_y1[1] = 0;     // Output will settle here when stable
 #endif
 	
-	ADC0->CTRLA.bit.PRESCALER = ADC_CTRLA_PRESCALER_DIV4_Val;
-	ADC0->CTRLB.bit.RESSEL = ADC_CTRLB_RESSEL_16BIT_Val;
+	pinPeripheral(pin0, PIO_ANALOG);
+	pinPeripheral(pin1, PIO_ANALOG);
+
+	GCLK->PCHCTRL[ADC0_GCLK_ID].reg = GCLK_PCHCTRL_GEN_GCLK1_Val | (1 << GCLK_PCHCTRL_CHEN_Pos); //use clock generator 1 (48Mhz)
+
+	ADC0->CTRLA.bit.PRESCALER = ADC_CTRLA_PRESCALER_DIV32_Val;
+	ADC0->CTRLB.reg = ADC_CTRLB_RESSEL_16BIT | ADC_CTRLB_FREERUN;
 	
 	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_CTRLB );  //wait for sync
 	
-	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_CTRLB );  //wait for sync
-	
-	ADC0->SAMPCTRL.reg = 0x1F;                        // Set max Sampling Time Length
+	ADC0->SAMPCTRL.reg = 5;                        // sampling Time Length
 	
 	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_SAMPCTRL );  //wait for sync
 	
-	ADC0->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_8 |    
-						ADC_AVGCTRL_ADJRES(0x0ul);   // Adjusting result by 0
+	ADC0->INPUTCTRL.reg = ADC_INPUTCTRL_MUXNEG_GND;   // No Negative input (Internal Ground)
+
+	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_INPUTCTRL );  //wait for sync
+
+	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_INPUTCTRL ); //wait for sync
+	ADC0->INPUTCTRL.bit.MUXPOS = g_APinDescription[pin0].ulADCChannelNumber; // Selection for the positive ADC input
+
+	// Averaging (see datasheet table in AVGCTRL register description)
+	ADC0->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_16 | // default to 16bit result for now
+			ADC_AVGCTRL_ADJRES(0x0ul);   // Adjusting result by 0
 						
 	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_AVGCTRL );  //wait for sync
+
+	ADC0->REFCTRL.bit.REFSEL = ADC_REFCTRL_REFSEL_INTVCC1_Val;
 	
-	while(ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_REFCTRL);
-	ADC0->REFCTRL.bit.REFSEL = ADC_REFCTRL_REFSEL_AREFA_Val;
-	
-	ADC0->CTRLB.bit.FREERUN = 0x01; 
 	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_ENABLE ); //wait for sync
 	ADC0->CTRLA.bit.ENABLE = 0x01;             // Enable ADC
+
+	// Start conversion
+	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_ENABLE ); //wait for sync
+
 	ADC0->SWTRIG.bit.START = 1;
-	
+
+	//******* Initialize ADC1 *********//
 	GCLK->PCHCTRL[ADC1_GCLK_ID].reg = GCLK_PCHCTRL_GEN_GCLK1_Val | (1 << GCLK_PCHCTRL_CHEN_Pos); //use clock generator 1 (48Mhz)
-	
-	//TODO: this will be a different pin on feather M4
-	pinPeripheral(2, PIO_ANALOG);
-	
-	ADC1->CTRLA.bit.PRESCALER = ADC_CTRLA_PRESCALER_DIV4_Val;
-	ADC1->CTRLB.bit.RESSEL = ADC_CTRLB_RESSEL_16BIT_Val;
-	
+
+	ADC1->CTRLA.bit.PRESCALER = ADC_CTRLA_PRESCALER_DIV32_Val;
+	ADC1->CTRLB.reg = ADC_CTRLB_RESSEL_16BIT | ADC_CTRLB_FREERUN;;
+
 	while( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_CTRLB );  //wait for sync
-	
-	ADC1->SAMPCTRL.reg = 0x1F;                        // Set max Sampling Time Length
-	
+
+	ADC1->SAMPCTRL.reg = 5;                        // sampling Time Length
+
 	while( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_SAMPCTRL );  //wait for sync
 	
 	ADC1->INPUTCTRL.reg = ADC_INPUTCTRL_MUXNEG_GND;   // No Negative input (Internal Ground)
-	
+
 	while( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_INPUTCTRL );  //wait for sync
-	
+
 	while( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_INPUTCTRL ); //wait for sync
-	ADC1->INPUTCTRL.bit.MUXPOS = 2;
-	
-	//TODO: decide on oversampling ctrl
+	ADC1->INPUTCTRL.bit.MUXPOS = g_APinDescription[pin1].ulADCChannelNumber; // Selection for the positive ADC input
+
 	// Averaging (see datasheet table in AVGCTRL register description)
-	ADC1->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_8 |    
+	ADC1->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_16 | // default to 16bit result for now
 						ADC_AVGCTRL_ADJRES(0x0ul);   // Adjusting result by 0
-						
+
 	while( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_AVGCTRL );  //wait for sync
-	
-	while(ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_REFCTRL);
-	ADC1->REFCTRL.bit.REFSEL = ADC_REFCTRL_REFSEL_AREFA_Val;
-	
-	
-	ADC1->CTRLB.bit.FREERUN = 0x01; 
+
+	ADC1->REFCTRL.bit.REFSEL = ADC_REFCTRL_REFSEL_INTVCC1_Val;
+
 	while( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_ENABLE ); //wait for sync
 	ADC1->CTRLA.bit.ENABLE = 0x01;             // Enable ADC
+
+	// Start conversion
+	while( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_ENABLE ); //wait for sync
+
 	ADC1->SWTRIG.bit.START = 1;
-	
+
 	//TODO: on SAMD51 lets find an unused timer and use that
 	GCLK->PCHCTRL[AUDIO_GCLK_ID].reg = GCLK_PCHCTRL_GEN_GCLK0_Val | (1 << GCLK_PCHCTRL_CHEN_Pos);
 	AUDIO_TC->COUNT8.WAVE.reg = TC_WAVE_WAVEGEN_NFRQ;
@@ -162,25 +169,48 @@ void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
 	dma0->setAction(DMA_TRIGGER_ACTON_BEAT);
 	dma1->setAction(DMA_TRIGGER_ACTON_BEAT);
 	
-	desc0 = dma0->addDescriptor(
+	desc = dma0->addDescriptor(
 	(void *)(&ADC0->RESULT.reg),		// move data from here
 	left_buffer,			// to here
 	AUDIO_BLOCK_SAMPLES / 2,               // this many...
 	DMA_BEAT_SIZE_HWORD,               // bytes/hword/words
 	false,                             // increment source addr?
 	true);
+	desc->BTCTRL.bit.BLOCKACT = DMA_BLOCK_ACTION_INT;
+
+	desc = dma0->addDescriptor(
+	(void *)(&ADC0->RESULT.reg),		// move data from here
+	left_buffer + AUDIO_BLOCK_SAMPLES / 2,			// to here
+	AUDIO_BLOCK_SAMPLES / 2,               // this many...
+	DMA_BEAT_SIZE_HWORD,               // bytes/hword/words
+	false,                             // increment source addr?
+	true);
+	desc->BTCTRL.bit.BLOCKACT = DMA_BLOCK_ACTION_INT;
+	dma0->loop(true);
 	
-	desc1 = dma1->addDescriptor(
+	desc = dma1->addDescriptor(
 	(void *)(&ADC1->RESULT.reg),		// move data from here
 	right_buffer,			// to here
 	AUDIO_BLOCK_SAMPLES / 2,               // this many...
 	DMA_BEAT_SIZE_HWORD,               // bytes/hword/words
 	false,                             // increment source addr?
 	true);
+	desc->BTCTRL.bit.BLOCKACT = DMA_BLOCK_ACTION_INT;
+
+	desc = dma1->addDescriptor(
+	(void *)(&ADC1->RESULT.reg),		// move data from here
+	right_buffer + AUDIO_BLOCK_SAMPLES / 2,			// to here
+	AUDIO_BLOCK_SAMPLES / 2,               // this many...
+	DMA_BEAT_SIZE_HWORD,               // bytes/hword/words
+	false,                             // increment source addr?
+	true);
+	desc->BTCTRL.bit.BLOCKACT = DMA_BLOCK_ACTION_INT;
+	dma1->loop(true);
+
+	dma1->setCallback(AudioInputAnalogStereo::isr1);
 	
 	update_responsibility = update_setup();
 	dma0->setCallback(AudioInputAnalogStereo::isr0);
-	dma1->setCallback(AudioInputAnalogStereo::isr1);
 	dma0->startJob();
 	dma1->startJob();
 }
@@ -188,28 +218,26 @@ void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
 
 void AudioInputAnalogStereo::isr0(Adafruit_ZeroDMA *dma)
 {
-	uint32_t daddr, offset;
+	uint32_t offset;
 	const uint16_t *src, *end;
 	uint16_t *dest;
-	
-	daddr = desc0->DSTADDR.reg;
 
 	//digitalWriteFast(32, HIGH);
-	if (daddr != (uint32_t)(left_buffer + AUDIO_BLOCK_SAMPLES / 2)) {
+	if (daddrL != (uint32_t *)(left_buffer + AUDIO_BLOCK_SAMPLES / 2)) {
 		// DMA is receiving to the first half of the buffer
 		// need to remove data from the second half
-		desc0->DSTADDR.reg = (uint32_t)(left_buffer + AUDIO_BLOCK_SAMPLES / 2);
 		src = (uint16_t *)&left_buffer[AUDIO_BLOCK_SAMPLES/2];
 		end = (uint16_t *)&left_buffer[AUDIO_BLOCK_SAMPLES];
+		daddrL = (uint32_t *)(left_buffer + AUDIO_BLOCK_SAMPLES / 2);
 	} else {
 		// DMA is receiving to the second half of the buffer
 		// need to remove data from the first half
-		desc0->DSTADDR.reg = (uint32_t)(left_buffer + AUDIO_BLOCK_SAMPLES);
 		src = (uint16_t *)&left_buffer[0];
 		end = (uint16_t *)&left_buffer[AUDIO_BLOCK_SAMPLES/2];
 		//if (update_responsibility) AudioStream::update_all();
+		daddrL = (uint32_t *)left_buffer;
 	}
-	dma0->startJob();
+
 	if (block_left != NULL) {
 		offset = offset_left;
 		if (offset > AUDIO_BLOCK_SAMPLES/2) offset = AUDIO_BLOCK_SAMPLES/2;
@@ -224,28 +252,25 @@ void AudioInputAnalogStereo::isr0(Adafruit_ZeroDMA *dma)
 
 void AudioInputAnalogStereo::isr1(Adafruit_ZeroDMA *dma)
 {
-	uint32_t daddr, offset;
+	uint32_t offset;
 	const uint16_t *src, *end;
 	uint16_t *dest;
-	
-	daddr = desc1->DSTADDR.reg;
 
 	//digitalWriteFast(33, HIGH);
-	if (daddr != (uint32_t)(right_buffer + AUDIO_BLOCK_SAMPLES / 2)) {
+	if (daddrR != (uint32_t *)(right_buffer + AUDIO_BLOCK_SAMPLES / 2)) {
 		// DMA is receiving to the first half of the buffer
 		// need to remove data from the second half
-		desc1->DSTADDR.reg = (uint32_t)(right_buffer + AUDIO_BLOCK_SAMPLES / 2);
 		src = (uint16_t *)&right_buffer[AUDIO_BLOCK_SAMPLES/2];
 		end = (uint16_t *)&right_buffer[AUDIO_BLOCK_SAMPLES];
+		daddrR = (uint32_t *)(right_buffer + AUDIO_BLOCK_SAMPLES / 2);
 		if (update_responsibility) AudioStream::update_all();
 	} else {
 		// DMA is receiving to the second half of the buffer
 		// need to remove data from the first half
-		desc1->DSTADDR.reg = (uint32_t)(right_buffer + AUDIO_BLOCK_SAMPLES);
 		src = (uint16_t *)&right_buffer[0];
 		end = (uint16_t *)&right_buffer[AUDIO_BLOCK_SAMPLES/2];
+		daddrR = (uint32_t *)right_buffer;
 	}
-	dma1->startJob();
 	
 	if (block_right != NULL) {
 		offset = offset_right;
