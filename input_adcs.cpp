@@ -94,8 +94,9 @@ void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
 	ADC0->INPUTCTRL.bit.MUXPOS = g_APinDescription[pin0].ulADCChannelNumber; // Selection for the positive ADC input
 
 	// Averaging (see datasheet table in AVGCTRL register description)
-	ADC0->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_16 | // default to 16bit result for now
-			ADC_AVGCTRL_ADJRES(0x0ul);   // Adjusting result by 0
+	//TODO: this is weirdly set for a 13 bit result for now... we may want to change later
+	ADC0->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_4 |
+			ADC_AVGCTRL_ADJRES(0x1ul);
 						
 	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_AVGCTRL );  //wait for sync
 
@@ -128,9 +129,9 @@ void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
 	while( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_INPUTCTRL ); //wait for sync
 	ADC1->INPUTCTRL.bit.MUXPOS = g_APinDescription[pin1].ulADCChannelNumber; // Selection for the positive ADC input
 
-	// Averaging (see datasheet table in AVGCTRL register description)
-	ADC1->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_16 | // default to 16bit result for now
-						ADC_AVGCTRL_ADJRES(0x0ul);   // Adjusting result by 0
+	//TODO: this is weirdly set for a 13 bit result for now... we may want to change later
+	ADC1->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_4 |
+						ADC_AVGCTRL_ADJRES(0x1ul);
 
 	while( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_AVGCTRL );  //wait for sync
 
