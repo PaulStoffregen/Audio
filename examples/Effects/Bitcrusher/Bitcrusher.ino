@@ -1,16 +1,24 @@
+/* Press button 1 (top left) on the trellis to cycle through different bit depths.
+Press button 2 to cycle through differnt sample rates.
+This example plays a WAV file off the QSPI filesystem. */
+
 #include <Audio.h>
-#include <Wire.h>
-#include <SPI.h>
-#include <SD.h>
-#include <SerialFlash.h>
-#include <Bounce.h>
+#include <Adafruit_Keypad.h>
+#include <Adafruit_SPIFlash_FatFs.h>
+#include "Adafruit_QSPI_GD25Q.h"
+#define FLASH_TYPE     SPIFLASHTYPE_W25Q16BV  // Flash chip type.
+Adafruit_QSPI_GD25Q flash;
+
+#define NEO_PIN 10
+#define NUM_KEYS 32
 
 // Bitcrusher example by Jonathan Payne (Pensive) jon@jonnypayne.com
 // No rights reserved. Do what you like with it.
+// modified for trellis m4 by Dean Miller for Adafruit
 
 // Create the Audio components.
-AudioPlaySdWav      playWav1;       //this will play a looping demo file
-AudioOutputI2S      headphones;           // and it will come out of the headphone socket.
+AudioPlayQspiWav           playWav1;
+AudioOutputAnalogStereo     headphones;
 
 //Audio Effect BitCrusher defs here
 AudioEffectBitcrusher   left_BitCrusher;
@@ -22,76 +30,56 @@ AudioConnection         patchCord2(playWav1, 1, right_BitCrusher, 0);
 AudioConnection         patchCord3(left_BitCrusher, 0, headphones, 0);
 AudioConnection         patchCord4(right_BitCrusher, 0, headphones, 1);
 
-// Create an object to control the audio shield.
-//
-AudioControlSGTL5000 audioShield;
+const byte ROWS = 4; // four rows
+const byte COLS = 8; // eight columns
+//define the symbols on the buttons of the keypads
+byte trellisKeys[ROWS][COLS] = {
+  {1,  2,  3,  4,  5,  6,  7,  8},
+  {9,  10, 11, 12, 13, 14, 15, 16},
+  {17, 18, 19, 20, 21, 22, 23, 24},
+  {25, 26, 27, 28, 29, 30, 31, 32}
+};
+byte rowPins[ROWS] = {14, 15, 16, 17}; //connect to the row pinouts of the keypad
+byte colPins[COLS] = {2, 3, 4, 5, 6, 7, 8, 9}; //connect to the column pinouts of the keypad
 
+//initialize an instance of class NewKeypad
+Adafruit_Keypad customKeypad = Adafruit_Keypad( makeKeymap(trellisKeys), rowPins, colPins, ROWS, COLS);
 
-// Use these with the Teensy Audio Shield
-#define SDCARD_CS_PIN    10
-#define SDCARD_MOSI_PIN  7
-#define SDCARD_SCK_PIN   14
-
-// Use these with the Teensy 3.5 & 3.6 SD card
-//#define SDCARD_CS_PIN    BUILTIN_SDCARD
-//#define SDCARD_MOSI_PIN  11  // not actually used
-//#define SDCARD_SCK_PIN   13  // not actually used
-
-// Use these for the SD+Wiz820 or other adaptors
-//#define SDCARD_CS_PIN    4
-//#define SDCARD_MOSI_PIN  11
-//#define SDCARD_SCK_PIN   13
-
-
-// Bounce objects to read six pushbuttons (pins 0-5)
-//
-Bounce button0 = Bounce(0, 5); // cycles the bitcrusher through all bitdepths
-Bounce button1 = Bounce(1, 5); //cycles the bitcrusher through some key samplerates
-Bounce button2 = Bounce(2, 5); // turns on the compressor (or "Automatic Volume Leveling")
-
-unsigned long SerialMillisecondCounter;
+Adafruit_M0_Express_CircuitPython pythonfs(flash);
 
 //BitCrusher
 int current_CrushBits = 16; //this defaults to passthrough.
 int current_SampleRate = 44100; // this defaults to passthrough.
 
-//Compressor
-boolean compressorOn = false; // default this to off.
-
 void setup() {
-  // Configure the pushbutton pins for pullups.
-  // Each button should connect from the pin to GND.
-  pinMode(0, INPUT_PULLUP);
-  pinMode(1, INPUT_PULLUP);
-  pinMode(2, INPUT_PULLUP);
-  Serial.begin(38400); // open the serial
+  Serial.begin(9600); // open the serial
+
+  customKeypad.begin();
 
   // Audio connections require memory to work.  For more
   // detailed information, see the MemoryAndCpuUsage example
   AudioMemory(40); //this is WAY more tha nwe need
-
-  // turn on the output
-  audioShield.enable();
-  audioShield.volume(0.7);
-
-  // by default the Teensy 3.1 DAC uses 3.3Vp-p output
-  // if your 3.3V power has noise, switching to the
-  // internal 1.2V reference can give you a clean signal
-  //dac.analogReference(INTERNAL);
-
-  // reduce the gain on mixer channels, so more than 1
-  // sound can play simultaneously without clipping
-
-  //SDCard Initialise
-  SPI.setMOSI(SDCARD_MOSI_PIN);
-  SPI.setSCK(SDCARD_SCK_PIN);
-  if (!(SD.begin(SDCARD_CS_PIN))) {
-    // stop here, but print a message repetitively
-    while (1) {
-      Serial.println("Unable to access the SD card");
-      delay(500);
+  // Initialize flash library and check its chip ID.
+  if (!flash.begin()) {
+    while(1){
+      Serial.println("Error, failed to initialize flash chip!");
+      delay(1000);
     }
   }
+  flash.setFlashType(FLASH_TYPE);
+
+  // First call begin to mount the filesystem.  Check that it returns true
+  // to make sure the filesystem was mounted.
+  if (!pythonfs.begin()) {
+    while(1){
+      Serial.println("Failed to mount filesystem!");
+      Serial.println("Was CircuitPython loaded on the board first to create the filesystem?");
+    }
+  }
+  Serial.println("Mounted filesystem!");
+
+  playWav1.useFilesystem(&pythonfs);
+  
   // Bitcrusher
   left_BitCrusher.bits(current_CrushBits); //set the crusher to defaults. This will passthrough clean at 16,44100
   left_BitCrusher.sampleRate(current_SampleRate); //set the crusher to defaults. This will passthrough clean at 16,44100
@@ -126,94 +114,60 @@ void setup() {
 	decay
 	floating point figure is dB/s rate at which gain is reduced
 */
-// Initialise the AutoVolumeLeveller
-  audioShield.autoVolumeControl(1, 1, 0, -6, 40, 20); // **BUG** with a max gain of 0, turning the AVC off leaves a hung AVC problem where the attack seems to hang in a loop. with it set 1 or 2, this does not occur.
-  audioShield.autoVolumeDisable();
-  audioShield.audioPostProcessorEnable();
 
-  SerialMillisecondCounter = millis();
 }
-
-int val; //temporary variable for memory usage reporting.
 
 void loop() {
 
-  if (millis() - SerialMillisecondCounter >= 5000) {
-    Serial.print("Proc = ");
-    Serial.print(AudioProcessorUsage());
-    Serial.print(" (");
-    Serial.print(AudioProcessorUsageMax());
-    Serial.print("),  Mem = ");
-    Serial.print(AudioMemoryUsage());
-    Serial.print(" (");
-    Serial.print(AudioMemoryUsageMax());
-    Serial.println(")");
-    SerialMillisecondCounter = millis();
-    AudioProcessorUsageMaxReset();
-    AudioMemoryUsageMaxReset();
+  customKeypad.tick();
+  
+  while(customKeypad.available())
+  {
+    keypadEvent e = customKeypad.read();
+    if(e.bit.EVENT == KEY_JUST_PRESSED){
+        if(e.bit.KEY == 1){
+          //Bitcrusher BitDepth
+          if (current_CrushBits >= 2) { //eachtime you press it, deduct 1 bit from the settings.
+              current_CrushBits--;
+          } else {
+            current_CrushBits = 16; // if you get down to 1 go back to the top.
+          }
+      
+          left_BitCrusher.bits(current_CrushBits);
+          left_BitCrusher.sampleRate(current_SampleRate);
+          right_BitCrusher.bits(current_CrushBits);
+          right_BitCrusher.sampleRate(current_SampleRate);
+          Serial.print("Bitcrusher set to ");
+          Serial.print(current_CrushBits);
+          Serial.print(" Bit, Samplerate at ");
+          Serial.print(current_SampleRate);
+          Serial.println("Hz");
+        }
+        else if(e.bit.KEY == 2){
+          //Bitcrusher SampleRate // the lowest sensible setting is 345. There is a 128 sample buffer, and this will copy sample 1, to each of the other 127 samples.
+          if (current_SampleRate >= 690) { // 345 * 2, so we can do one more divide
+            current_SampleRate = current_SampleRate / 2; // half the sample rate each time
+          } else {
+            current_SampleRate=44100; // if you get down to the minimum then go back to the top and start over.
+          }
+      
+          left_BitCrusher.bits(current_CrushBits);
+          left_BitCrusher.sampleRate(current_SampleRate);
+          right_BitCrusher.bits(current_CrushBits);
+          right_BitCrusher.sampleRate(current_SampleRate);
+          Serial.print("Bitcrusher set to ");
+          Serial.print(current_CrushBits);
+          Serial.print(" Bit, Samplerate at ");
+          Serial.print(current_SampleRate);
+          Serial.println("Hz");
+        }
+      }
   }
-
-
-  // Update all the button objects
-  button0.update();
-  button1.update();
-  button2.update();
 
   // Start test sound if it is not playing. This will loop infinitely.
   if (! (playWav1.isPlaying())){
-    playWav1.play("SDTEST1.WAV"); // http://www.pjrc.com/teensy/td_libs_AudioDataFiles.html
+    playWav1.play("A4-49-96.wav");
   }
 
-  if (button0.fallingEdge()) {
-    //Bitcrusher BitDepth
-    if (current_CrushBits >= 2) { //eachtime you press it, deduct 1 bit from the settings.
-        current_CrushBits--;
-    } else {
-      current_CrushBits = 16; // if you get down to 1 go back to the top.
-    }
-
-    left_BitCrusher.bits(current_CrushBits);
-    left_BitCrusher.sampleRate(current_SampleRate);
-    right_BitCrusher.bits(current_CrushBits);
-    right_BitCrusher.sampleRate(current_SampleRate);
-    Serial.print("Bitcrusher set to ");
-    Serial.print(current_CrushBits);
-    Serial.print(" Bit, Samplerate at ");
-    Serial.print(current_SampleRate);
-    Serial.println("Hz");
-  }
-
-  if (button1.fallingEdge()) {
-    //Bitcrusher SampleRate // the lowest sensible setting is 345. There is a 128 sample buffer, and this will copy sample 1, to each of the other 127 samples.
-    if (current_SampleRate >= 690) { // 345 * 2, so we can do one more divide
-      current_SampleRate = current_SampleRate / 2; // half the sample rate each time
-    } else {
-      current_SampleRate=44100; // if you get down to the minimum then go back to the top and start over.
-    }
-
-    left_BitCrusher.bits(current_CrushBits);
-    left_BitCrusher.sampleRate(current_SampleRate);
-    right_BitCrusher.bits(current_CrushBits);
-    right_BitCrusher.sampleRate(current_SampleRate);
-    Serial.print("Bitcrusher set to ");
-    Serial.print(current_CrushBits);
-    Serial.print(" Bit, Samplerate at ");
-    Serial.print(current_SampleRate);
-    Serial.println("Hz");
-  }
-
-  if (button2.fallingEdge()) {
-    if (compressorOn) {
-      //turn off compressor
-      audioShield.autoVolumeDisable();
-      compressorOn = false;
-    } else {
-      //turn on compressor
-      audioShield.autoVolumeEnable();
-      compressorOn = true;
-    }
-    Serial.print("Compressor: ");
-    Serial.println(compressorOn);
-  }
+  delay(10);
 }
-
