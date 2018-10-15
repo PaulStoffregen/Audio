@@ -12,37 +12,25 @@
 // This example code is in the public domain.
 
 #include <Audio.h>
-#include <Wire.h>
-#include <SPI.h>
-#include <SD.h>
-#include <SerialFlash.h>
-
-const int myInput = AUDIO_INPUT_LINEIN;
-//const int myInput = AUDIO_INPUT_MIC;
 
 // Create the Audio components.  These should be created in the
 // order data flows, inputs/sources -> processing -> outputs
 //
-AudioInputI2S          audioInput;         // audio shield: mic or line-in
+AudioInputAnalogStereo  audioInput(PIN_MIC, 0);
 AudioSynthWaveformSine sinewave;
 AudioAnalyzeFFT1024    myFFT;
-AudioOutputI2S         audioOutput;        // audio shield: headphones & line-out
+AudioOutputAnalogStereo  audioOutput;
 
 // Connect either the live input or synthesized sine wave
 AudioConnection patchCord1(audioInput, 0, myFFT, 0);
 //AudioConnection patchCord1(sinewave, 0, myFFT, 0);
 
-AudioControlSGTL5000 audioShield;
-
 void setup() {
+  Serial.begin(115200);
+  
   // Audio connections require memory to work.  For more
   // detailed information, see the MemoryAndCpuUsage example
   AudioMemory(12);
-
-  // Enable the audio shield and set the output volume.
-  audioShield.enable();
-  audioShield.inputSelect(myInput);
-  audioShield.volume(0.5);
 
   // Configure the window algorithm to use
   myFFT.windowFunction(AudioWindowHanning1024);
