@@ -95,8 +95,8 @@ void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
 
 	// Averaging (see datasheet table in AVGCTRL register description)
 	//TODO: this is weirdly set for a 13 bit result for now... we may want to change later
-	ADC0->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_4 |
-			ADC_AVGCTRL_ADJRES(0x1ul);
+	ADC0->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_1 |
+			ADC_AVGCTRL_ADJRES(0x0ul);
 						
 	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_AVGCTRL );  //wait for sync
 
@@ -130,8 +130,8 @@ void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
 	ADC1->INPUTCTRL.bit.MUXPOS = g_APinDescription[pin1].ulADCChannelNumber; // Selection for the positive ADC input
 
 	//TODO: this is weirdly set for a 13 bit result for now... we may want to change later
-	ADC1->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_4 |
-						ADC_AVGCTRL_ADJRES(0x1ul);
+	ADC1->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_1 |
+						ADC_AVGCTRL_ADJRES(0x0ul);
 
 	while( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_AVGCTRL );  //wait for sync
 
@@ -333,6 +333,22 @@ void AudioInputAnalogStereo::update(void)
 	offset_left = 0;
 	offset_right = 0;
 	__enable_irq();
+
+	// gain up to 16 bits
+	p = out_left->data;
+	end = p + AUDIO_BLOCK_SAMPLES;
+	do {
+		tmp = (int16_t)(*p);
+		*p++ = (tmp-((1<<12)/2))*4;
+	} while (p < end);
+
+	// DC removal, RIGHT
+	p = out_right->data;
+	end = p + AUDIO_BLOCK_SAMPLES;
+	do {
+		tmp = (int16_t)(*p);
+		*p++ = (tmp-((1<<12)/2))*4;
+	} while (p < end);
 
 #if 0 //TODO: fix this, FRACMUL_SHL doesn't work
 	//
