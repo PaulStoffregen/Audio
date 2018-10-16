@@ -339,7 +339,7 @@ void AudioInputAnalogStereo::update(void)
 	end = p + AUDIO_BLOCK_SAMPLES;
 	do {
 		tmp = (int16_t)(*p);
-		*p++ = (tmp-((1<<12)/2))*4;
+		*p++ = (tmp-((1<<12)/2))*16;
 	} while (p < end);
 
 	// DC removal, RIGHT
@@ -347,7 +347,7 @@ void AudioInputAnalogStereo::update(void)
 	end = p + AUDIO_BLOCK_SAMPLES;
 	do {
 		tmp = (int16_t)(*p);
-		*p++ = (tmp-((1<<12)/2))*4;
+		*p++ = (tmp-((1<<12)/2))*16;
 	} while (p < end);
 
 #if 0 //TODO: fix this, FRACMUL_SHL doesn't work
