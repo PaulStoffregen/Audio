@@ -78,7 +78,7 @@
 #elif defined(__MKL26Z64__)
 #define AUDIO_BLOCK_SAMPLES  64
 #elif defined(__SAMD51__)
-#define AUDIO_BLOCK_SAMPLES  64
+#define AUDIO_BLOCK_SAMPLES  128
 #endif
 #endif
 
