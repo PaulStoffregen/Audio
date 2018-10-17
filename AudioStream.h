@@ -78,7 +78,7 @@
 #elif defined(__MKL26Z64__)
 #define AUDIO_BLOCK_SAMPLES  64
 #elif defined(__SAMD51__)
-#define AUDIO_BLOCK_SAMPLES  128
+#define AUDIO_BLOCK_SAMPLES  64
 #endif
 #endif
 
@@ -88,7 +88,14 @@
 #elif defined(__MKL26Z64__)
 #define AUDIO_SAMPLE_RATE_EXACT 22058.82353 // 48 MHz / 2176, or 96 MHz * 1 / 17 / 256
 #elif defined(__SAMD51__)
-#define AUDIO_SAMPLE_RATE_EXACT 44117.6471
+
+//#define AUDIO_CLKRATE (SystemCoreClock >> 6)
+//#define AUDIO_PRESCALER TC_CTRLA_PRESCALER_DIV64
+//#define AUDIO_SAMPLE_RATE_EXACT 22058.82353 // 120 MHz / 64 / 85 
+
+#define AUDIO_CLKRATE (SystemCoreClock >> 4)
+#define AUDIO_PRESCALER TC_CTRLA_PRESCALER_DIV16
+#define AUDIO_SAMPLE_RATE_EXACT 44117.6471 // 120 MHz / 16 / 170
 #endif
 #endif
 

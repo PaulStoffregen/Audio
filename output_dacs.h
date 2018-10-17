@@ -50,7 +50,6 @@ class AudioOutputAnalogStereo : public AudioStream
 	static bool update_responsibility;
 	audio_block_t *inputQueueArray[2];
 	static Adafruit_ZeroDMA *dma0;
-	static Adafruit_ZeroDMA *dma1;
 	static DmacDescriptor *desc;
 	static void isr(Adafruit_ZeroDMA *dma);
 };

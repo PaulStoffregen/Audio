@@ -40,23 +40,15 @@ audio_block_t * AudioOutputAnalogStereo::block_right_2nd = NULL;
 audio_block_t AudioOutputAnalogStereo::block_silent;
 bool AudioOutputAnalogStereo::update_responsibility = false;
 Adafruit_ZeroDMA *AudioOutputAnalogStereo::dma0;
-Adafruit_ZeroDMA *AudioOutputAnalogStereo::dma1;
 DmacDescriptor *AudioOutputAnalogStereo::desc;
 static ZeroDMAstatus    stat;
 static uint32_t *saddr;
 
-void dummyCallback(Adafruit_ZeroDMA *dma)
-{
-	//do nothing. This is currently required for the DMA library
-}
-
 void AudioOutputAnalogStereo::begin(void)
 {
 	dma0 = new Adafruit_ZeroDMA();
-	dma1 = new Adafruit_ZeroDMA();
 
 	stat = dma0->allocate();
-	stat = dma1->allocate();
 	
 	pinPeripheral(PIN_DAC0, PIO_ANALOG);
 	pinPeripheral(PIN_DAC1, PIO_ANALOG);
@@ -93,72 +85,42 @@ void AudioOutputAnalogStereo::begin(void)
 	WAIT_TC8_REGS_SYNC(AUDIO_TC)
 	while (AUDIO_TC->COUNT8.CTRLA.bit.SWRST);
 	
-	AUDIO_TC->COUNT8.CTRLA.reg |= TC_CTRLA_MODE_COUNT8 | TC_CTRLA_PRESCALER_DIV16;
+	AUDIO_TC->COUNT8.CTRLA.reg |= TC_CTRLA_MODE_COUNT8 | AUDIO_PRESCALER;
 	WAIT_TC8_REGS_SYNC(AUDIO_TC)
 
-	AUDIO_TC->COUNT8.PER.reg = (uint8_t)( (SystemCoreClock >> 4) / AUDIO_TC_FREQ);
+	AUDIO_TC->COUNT8.PER.reg = (uint8_t)( AUDIO_CLKRATE / AUDIO_TC_FREQ);
 	WAIT_TC8_REGS_SYNC(AUDIO_TC)
 	
 	AUDIO_TC->COUNT8.CTRLA.reg |= TC_CTRLA_ENABLE;
 	WAIT_TC8_REGS_SYNC(AUDIO_TC)
 	
 	dma0->setTrigger(TC2_DMAC_ID_OVF);
-	dma1->setTrigger(TC2_DMAC_ID_OVF);
 	dma0->setAction(DMA_TRIGGER_ACTON_BEAT);
-	dma1->setAction(DMA_TRIGGER_ACTON_BEAT);
 	
 	desc = dma0->addDescriptor(
 	  dac_buffer,						// move data from here
 	  (void *)(&DAC->DATA[0]),			// to here
 	  AUDIO_BLOCK_SAMPLES,               // this many...
-	  DMA_BEAT_SIZE_HWORD,               // bytes/hword/words
+	  DMA_BEAT_SIZE_WORD,               // bytes/hword/words
 	  true,                             // increment source addr?
-	  false,
-	  DMA_ADDRESS_INCREMENT_STEP_SIZE_2,
-	  DMA_STEPSEL_SRC);
+	  false);
 	desc->BTCTRL.bit.BLOCKACT = DMA_BLOCK_ACTION_INT;
 
 	desc = dma0->addDescriptor(
 	  dac_buffer + AUDIO_BLOCK_SAMPLES,	// move data from here
 	  (void *)(&DAC->DATA[0]),			// to here
 	  AUDIO_BLOCK_SAMPLES,               // this many...
-	  DMA_BEAT_SIZE_HWORD,               // bytes/hword/words
+	  DMA_BEAT_SIZE_WORD,               // bytes/hword/words
 	  true,                             // increment source addr?
-	  false,
-	  DMA_ADDRESS_INCREMENT_STEP_SIZE_2,
-	  DMA_STEPSEL_SRC);
+	  false);
 	desc->BTCTRL.bit.BLOCKACT = DMA_BLOCK_ACTION_INT;
 	dma0->loop(true);
-	  
-	desc = dma1->addDescriptor(
-		((uint16_t *)dac_buffer) + 1,		// move data from here
-		(void *)(&DAC->DATA[1]),			// to here
-		AUDIO_BLOCK_SAMPLES,               // this many...
-		DMA_BEAT_SIZE_HWORD,               // bytes/hword/words
-		true,                             // increment source addr?
-		false,
-		DMA_ADDRESS_INCREMENT_STEP_SIZE_2,
-		DMA_STEPSEL_SRC);						 // increment dest addr?
-	desc->BTCTRL.bit.BLOCKACT = DMA_BLOCK_ACTION_INT;
 
-	desc = dma1->addDescriptor(
-		((uint16_t *)(dac_buffer + AUDIO_BLOCK_SAMPLES)) + 1, // move data from here
-		(void *)(&DAC->DATA[1]),			// to here
-		AUDIO_BLOCK_SAMPLES,               // this many...
-		DMA_BEAT_SIZE_HWORD,               // bytes/hword/words
-		true,                             // increment source addr?
-		false,
-		DMA_ADDRESS_INCREMENT_STEP_SIZE_2,
-		DMA_STEPSEL_SRC);						 // increment dest addr?
-	desc->BTCTRL.bit.BLOCKACT = DMA_BLOCK_ACTION_INT;
-	dma1->loop(true);
 	saddr = dac_buffer;
 
 	update_responsibility = update_setup();
-	dma1->setCallback(AudioOutputAnalogStereo::isr);
-	dma0->setCallback(dummyCallback);
+	dma0->setCallback(AudioOutputAnalogStereo::isr);
 	dma0->startJob();
-	dma1->startJob();
 }
 
 void AudioOutputAnalogStereo::analogReference(int ref)
