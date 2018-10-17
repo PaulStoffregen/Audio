@@ -72,10 +72,5 @@
   #error "Unsupported F_BUS speed"
 #endif
 
-#else
-
-#define AUDIO_TC_FREQ 44100
-
-#endif //ARDUINO_ARCH_SAMD
-
+#endif
 #endif

@@ -1,9 +1,4 @@
 #include <Audio.h>
-#include <Wire.h>
-#include <SPI.h>
-#include <SD.h>
-#include <SerialFlash.h>
-#include <Bounce.h>
 
 // WAV files converted to code by wav2sketch
 #include "AudioSampleSnare.h"        // http://www.freesound.org/people/KEVOY/sounds/82583/
@@ -12,6 +7,12 @@
 #include "AudioSampleKick.h"         // http://www.freesound.org/people/DWSD/sounds/171104/
 #include "AudioSampleGong.h"         // http://www.freesound.org/people/juskiddink/sounds/86773/
 #include "AudioSampleCashregister.h" // http://www.freesound.org/people/kiddpark/sounds/201159/
+
+#include <Adafruit_Keypad.h>
+#include <Adafruit_NeoPixel_ZeroDMA.h>
+
+#define NEO_PIN 11
+#define NUM_KEYS 32
 
 // Create the Audio components.  These should be created in the
 // order data flows, inputs/sources -> processing -> outputs
@@ -24,8 +25,7 @@ AudioPlayMemory    sound4;
 AudioPlayMemory    sound5;
 AudioMixer4        mix1;    // two 4-channel mixers are needed in
 AudioMixer4        mix2;    // tandem to combine 6 audio sources
-AudioOutputI2S     headphones;
-AudioOutputAnalog  dac;     // play to both I2S audio board and on-chip DAC
+AudioOutputAnalogStereo  audioOut;
 
 // Create Audio connections between the components
 //
@@ -36,41 +36,37 @@ AudioConnection c4(sound3, 0, mix1, 3);
 AudioConnection c5(mix1, 0, mix2, 0);   // output of mix1 into 1st input on mix2
 AudioConnection c6(sound4, 0, mix2, 1);
 AudioConnection c7(sound5, 0, mix2, 2);
-AudioConnection c8(mix2, 0, headphones, 0);
-AudioConnection c9(mix2, 0, headphones, 1);
-AudioConnection c10(mix2, 0, dac, 0);
+AudioConnection c8(mix2, 0, audioOut, 0);
+AudioConnection c9(mix2, 0, audioOut, 1);
 
-// Create an object to control the audio shield.
-// 
-AudioControlSGTL5000 audioShield;
+Adafruit_NeoPixel_ZeroDMA strip(NUM_KEYS, NEO_PIN, NEO_GRB);
 
-// Bounce objects to read six pushbuttons (pins 0-5)
-//
-Bounce button0 = Bounce(0, 5);
-Bounce button1 = Bounce(1, 5);  // 5 ms debounce time
-Bounce button2 = Bounce(2, 5);
-Bounce button3 = Bounce(3, 5);
-Bounce button4 = Bounce(4, 5);
-Bounce button5 = Bounce(5, 5);
+const byte ROWS = 4; // four rows
+const byte COLS = 8; // eight columns
+//define the symbols on the buttons of the keypads
+byte trellisKeys[ROWS][COLS] = {
+  {1,  2,  3,  4,  5,  6,  7,  8},
+  {9,  10, 11, 12, 13, 14, 15, 16},
+  {17, 18, 19, 20, 21, 22, 23, 24},
+  {25, 26, 27, 28, 29, 30, 31, 32}
+};
+byte rowPins[ROWS] = {14, 15, 16, 17}; //connect to the row pinouts of the keypad
+byte colPins[COLS] = {2, 3, 4, 5, 6, 7, 8, 9}; //connect to the column pinouts of the keypad
 
+//initialize an instance of class NewKeypad
+Adafruit_Keypad customKeypad = Adafruit_Keypad( makeKeymap(trellisKeys), rowPins, colPins, ROWS, COLS); 
 
 void setup() {
-  // Configure the pushbutton pins for pullups.
-  // Each button should connect from the pin to GND.
-  pinMode(0, INPUT_PULLUP);
-  pinMode(1, INPUT_PULLUP);
-  pinMode(2, INPUT_PULLUP);
-  pinMode(3, INPUT_PULLUP);
-  pinMode(4, INPUT_PULLUP);
-  pinMode(5, INPUT_PULLUP);
+
+  strip.begin();
+  strip.show(); // Initialize all pixels to 'off'
+  strip.setBrightness(255);
+
+  customKeypad.begin();
 
   // Audio connections require memory to work.  For more
   // detailed information, see the MemoryAndCpuUsage example
   AudioMemory(10);
-
-  // turn on the output
-  audioShield.enable();
-  audioShield.volume(0.5);
 
   // by default the Teensy 3.1 DAC uses 3.3Vp-p output
   // if your 3.3V power has noise, switching to the
@@ -88,38 +84,41 @@ void setup() {
 }
 
 void loop() {
-  // Update all the button objects
-  button0.update();
-  button1.update();
-  button2.update();
-  button3.update();
-  button4.update();
-  button5.update();
 
-  // When the buttons are pressed, just start a sound playing.
-  // The audio library will play each sound through the mixers
-  // so any combination can play simultaneously.
-  //
-  if (button0.fallingEdge()) {
-    sound0.play(AudioSampleSnare);
+  customKeypad.tick();
+  
+  stip.clear();
+  while(customKeypad.available())
+  {
+    keypadEvent e = customKeypad.read();
+    int keyindex = e.bit.KEY - 1;
+    if(e.bit.EVENT == KEY_JUST_PRESSED){
+      strip.setPixelColor(keyindex, 0x0000FF);
+      switch(e.bit.KEY){
+        case(1):
+          sound0.play(AudioSampleSnare);
+          break;
+        case(2):
+          sound1.play(AudioSampleTomtom);
+          break;
+        case(3):
+          sound2.play(AudioSampleHihat);
+          break;
+        case(4):
+          sound3.play(AudioSampleKick);
+          break;
+        case(5):
+          sound4.play(AudioSampleGong);
+          break;
+        case(6):
+          sound5.play(AudioSampleCashregister);
+          break;
+        default:
+          break;
+      }
+    }
   }
-  if (button1.fallingEdge()) {
-    sound1.play(AudioSampleTomtom);
-  }
-  if (button2.fallingEdge()) {
-    sound2.play(AudioSampleHihat);
-  }
-  if (button3.fallingEdge()) {
-    sound3.play(AudioSampleKick);
-  }
-  if (button4.fallingEdge()) {
-    // comment this line to work with Teensy 3.0.
-    // the Gong sound is very long, too much for 3.0's memory
-    sound4.play(AudioSampleGong);
-  }
-  if (button5.fallingEdge()) {
-    sound5.play(AudioSampleCashregister);
-  }
-
+  strip.show();
+  delay(10);
 }
 
