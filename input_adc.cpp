@@ -101,6 +101,14 @@ void AudioInputAnalog::init(uint8_t pin)
 	dma.attachInterrupt(isr);
 }
 
+void AudioInputAnalog::setAnalogReference(int ref){
+	// set analog reference:
+	// INTERNAL - range 0 to 1.2 volts
+	// EXTERNAL - range 0 to 3.3 volts
+	analogReference(ref);
+	// re-enable the ADC for hardware trigger and DMA
+	ADC0_SC2 |= ADC_SC2_ADTRG | ADC_SC2_DMAEN;
+}
 
 void AudioInputAnalog::isr(void)
 {
