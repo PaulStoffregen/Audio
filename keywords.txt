@@ -90,6 +90,8 @@ setLowpass	KEYWORD2
 setHighpass	KEYWORD2
 setBandpass	KEYWORD2
 setNotch	KEYWORD2
+setLowShelf	KEYWORD2
+setHighShelf	KEYWORD2
 muteOutput	KEYWORD2
 unmuteOutput	KEYWORD2
 muteInput	KEYWORD2
