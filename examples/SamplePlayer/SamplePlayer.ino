@@ -87,7 +87,7 @@ void loop() {
 
   customKeypad.tick();
   
-  stip.clear();
+  strip.clear();
   while(customKeypad.available())
   {
     keypadEvent e = customKeypad.read();
