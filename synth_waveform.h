@@ -75,6 +75,9 @@ public:
 		}
 		phase_offset = angle * (4294967296.0 / 360.0);
 	}
+	void restart() {
+		phase_accumulator = 0;
+	}
 	void amplitude(float n) {	// 0 to 1.0
 		if (n < 0) {
 			n = 0;
