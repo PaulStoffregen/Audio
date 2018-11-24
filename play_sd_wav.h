@@ -34,7 +34,7 @@
 class AudioPlaySdWav : public AudioStream
 {
 public:
-	AudioPlaySdWav(void) : AudioStream(0, NULL) { begin(); }
+	AudioPlaySdWav(void) : AudioStream(0, NULL), block_left(NULL), block_right(NULL) { begin(); }
 	void begin(void);
 	bool play(const char *filename);
 	void stop(void);
