@@ -137,14 +137,14 @@ AudioEffectReverb::init_comb_filters(void)
 void
 AudioEffectReverb::clear_buffers(void)
 {
-  memset(apf1_buf, 0, APF1_BUF_LEN);
-  memset(apf2_buf, 0, APF1_BUF_LEN);
-  memset(apf3_buf, 0, APF1_BUF_LEN);
+  memset(apf1_buf, 0, sizeof(apf1_buf));
+  memset(apf2_buf, 0, sizeof(apf2_buf));
+  memset(apf3_buf, 0, sizeof(apf3_buf));
 
-  memset(lpf1_buf, 0, LPF1_BUF_LEN);
-  memset(lpf2_buf, 0, LPF2_BUF_LEN);
-  memset(lpf3_buf, 0, LPF3_BUF_LEN);
-  memset(lpf4_buf, 0, LPF4_BUF_LEN);
+  memset(lpf1_buf, 0, sizeof(lpf1_buf));
+  memset(lpf2_buf, 0, sizeof(lpf2_buf));
+  memset(lpf3_buf, 0, sizeof(lpf3_buf));
+  memset(lpf4_buf, 0, sizeof(lpf4_buf));
 }
 
 void
