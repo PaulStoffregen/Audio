@@ -1,10 +1,6 @@
 // Playtune bytestream for file "..\..\Downloads\Good Midi\Overworld.mid" created by MIDITONES V1.14 on Sun Mar  5 00:09:03 2017
-// command line: miditones.exe -t16 -v -i ..\..\Downloads\Good Midi\Overworld 
-#ifdef __AVR__
-#include <avr/pgmspace.h>
-#else
-#define PROGMEM
-#endif
+#include <Arduino.h>
+
 const unsigned char PROGMEM score [] = {
 0xC0,48, 0x90,66,127, 0xC1,48, 0x91,62,127, 0xC2,48, 0x92,38,127, 0xC3,48, 0x93,38,127, 0,222, 0x92,45,127, 0,222, 
 0x92,50,127, 0,222, 0x92,38,127, 0x93,52,127, 1,188, 0x93,50,127, 0,222, 0x93,50,127, 0,222, 0x92,33,127, 

@@ -45,7 +45,7 @@ void AudioSynthNoiseWhite::update(void)
 	end = p + AUDIO_BLOCK_SAMPLES/2;
 	lo = seed;
 	do {
-#if defined(KINETISK)
+#if defined(__ARM_ARCH_7EM__)
 		hi = multiply_16bx16t(16807, lo); // 16807 * (lo >> 16)
 		lo = 16807 * (lo & 0xFFFF);
 		lo += (hi & 0x7FFF) << 16;

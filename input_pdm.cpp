@@ -24,6 +24,8 @@
  * THE SOFTWARE.
  */
 
+ #if !defined(__IMXRT1052__) && !defined(__IMXRT1062__)
+ 
 #include <Arduino.h>
 #include "input_pdm.h"
 #include "utility/dspinst.h"
@@ -1712,3 +1714,4 @@ for ($n=0; $n < 512; $n += 8) {
 print "\n};\n";
 print "// max=$max, min=$min\n";
 */
+#endif

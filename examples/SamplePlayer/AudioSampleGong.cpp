@@ -1,8 +1,9 @@
 // Audio data converted from WAV file by wav2sketch
 
 #include "AudioSampleGong.h"
-
+#include <Arduino.h>
 // Converted from gong.wav, using 11025 Hz, u-law encoding
+PROGMEM
 const unsigned int AudioSampleGong[27633] = {
 0x0301AFA4,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,
 0x00000000,0x00000000,0x00000000,0x00000000,0x00008000,0x00000000,0x00000000,0x80800000,

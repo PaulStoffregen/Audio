@@ -1,5 +1,6 @@
 #include "MutedTrumpet_samples.h"
 
+PROGMEM
 static const uint32_t sample_0_MutedTrumpet_HRMMUTED4[8192] = {
 0xffdaffd4,0xffdeffdd,0xffe4ffe1,0xffe2ffe5,0xffd0ffda,0xffbfffc7,0xffb8ffb9,0xffb8ffb9,
 0xffb1ffb3,0xffaeffb1,0xffabffaa,0xffb1ffaf,0xffacffb0,0xffa2ffa7,0xffa3ffa0,0xffa9ffa7,
@@ -1018,6 +1019,7 @@ static const uint32_t sample_0_MutedTrumpet_HRMMUTED4[8192] = {
 0x00000000,0x00000000,0x00000000,0x00000000,
 };
 
+PROGMEM
 static const uint32_t sample_1_MutedTrumpet_HRMMUTEC5[6912] = {
 0x00000000,0xfffeffff,0x0000ffff,0xffff0000,0xfffffffe,0xffffffff,0xfffdfffe,0xfffdfffd,
 0xfffbfffc,0xfff9fff9,0xfffbfffa,0xfffbfffb,0xfffafffb,0xfffafff9,0xfffbfffb,0xfff8fff9,
@@ -1875,6 +1877,7 @@ static const uint32_t sample_1_MutedTrumpet_HRMMUTEC5[6912] = {
 0x00000000,0x00000000,0x00000000,0x00000000,
 };
 
+PROGMEM
 static const uint32_t sample_2_MutedTrumpet_HRMMUTEC6[4608] = {
 0xff89ff87,0xff85ff8a,0xff7cff7f,0xff7bff7b,0xff79ff7a,0xff74ff77,0xff73ff72,0xff7cff78,
 0xff82ff80,0xff85ff83,0xff8bff88,0xff8eff8d,0xff90ff90,0xff8cff8f,0xff87ff89,0xff7eff83,
@@ -2531,4 +2534,3 @@ static const AudioSynthWavetable::sample_data MutedTrumpet_samples[3] = {
 static const uint8_t MutedTrumpet_ranges[] = {71, 82, 127, };
 
 const AudioSynthWavetable::instrument_data MutedTrumpet = {3, MutedTrumpet_ranges, MutedTrumpet_samples };
-

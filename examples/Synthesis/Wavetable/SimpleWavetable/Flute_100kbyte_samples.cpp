@@ -1,5 +1,6 @@
 #include "Flute_100kbyte_samples.h"
 
+PROGMEM
 static const uint32_t sample_0_Flute_100kbyte_FluteD4[7936] = {
 0xfbfffc4b,0xfba4fbac,0xfbbffbb2,0xfc00fbdc,0xfc3afc16,0xfcb8fc57,0xfcf9fcf3,0xfc87fcad,
 0xfcabfc77,0xfd8cfd0c,0xfe7dfe0c,0xff24fee0,0xffc4ff61,0x006a002d,0x002d004c,0xffe90000,
@@ -988,6 +989,7 @@ static const uint32_t sample_0_Flute_100kbyte_FluteD4[7936] = {
 0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,
 };
 
+PROGMEM
 static const uint32_t sample_1_Flute_100kbyte_FluteE5[9472] = {
 0x03f00410,0x03f003c0,0x04500410,0x04500460,0x04200410,0x03800400,0x02f00320,0x01900230,
 0x005000c0,0xff30ffb0,0xff70ff40,0xfe10fe90,0xfd70fde0,0xfc70fcc0,0xfc30fc00,0xfc40fca0,
@@ -2169,6 +2171,7 @@ static const uint32_t sample_1_Flute_100kbyte_FluteE5[9472] = {
 0x00000000,0x00000000,
 };
 
+PROGMEM
 static const uint32_t sample_2_Flute_100kbyte_FluteE6[7936] = {
 0x01b003e0,0x02e00250,0x01300150,0x003000f0,0x01400180,0xffc0fed0,0xff600100,0x0080ffc0,
 0xffd0feb0,0xff500130,0x0070feb0,0xfed00060,0x00d0ffc0,0xff10ff50,0xff500030,0x0080ff60,
@@ -3241,4 +3244,3 @@ static const AudioSynthWavetable::sample_data Flute_100kbyte_samples[3] = {
 static const uint8_t Flute_100kbyte_ranges[] = {68, 83, 127, };
 
 const AudioSynthWavetable::instrument_data Flute_100kbyte = {3, Flute_100kbyte_ranges, Flute_100kbyte_samples };
-

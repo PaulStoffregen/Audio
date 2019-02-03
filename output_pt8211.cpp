@@ -26,6 +26,8 @@
 
 //Adapted to PT8211, Frank Bösing, Ben-Rheinland
 
+#if !defined(__IMXRT1052__) && !defined(__IMXRT1062__)
+
 #include <Arduino.h>
 #include "output_pt8211.h"
 #include "memcpy_audio.h"
@@ -459,3 +461,4 @@ void AudioOutputPT8211::config_i2s(void)
 	CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK
 #endif
 }
+#endif

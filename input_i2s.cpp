@@ -24,6 +24,8 @@
  * THE SOFTWARE.
  */
 
+#if !defined(__IMXRT1052__) && !defined(__IMXRT1062__)
+
 #include <Arduino.h>
 #include "input_i2s.h"
 #include "output_i2s.h"
@@ -203,7 +205,4 @@ void AudioInputI2Sslave::begin(void)
 	I2S0_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE; // TX clock enable, because sync'd to TX
 	dma.attachInterrupt(isr);
 }
-
-
-
-
+#endif
