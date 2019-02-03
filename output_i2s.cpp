@@ -42,14 +42,6 @@ DMAChannel AudioOutputI2S::dma(false);
 #define SAI1
 //#define SAI2
 
-//TODO: Copy these to imrtx.h:
-#define CCM_ANALOG_PLL_AUDIO_LOCK	((uint32_t)(1<<31))
-#define I2S_TCR2_BCP			((uint32_t)1<<25)
-#define I2S_RCR2_BCP			((uint32_t)1<<25)
-#define I2S_TCR4_FCONT			((uint32_t)1<<28)	// FIFO Continue on Error
-#define I2S_RCR4_FCONT			((uint32_t)1<<28)	// FIFO Continue on Error
-#define I2S_TCR4_FSP			((uint32_t)1<< 1)
-#define I2S_RCR4_FSP			((uint32_t)1<< 1)
 typedef struct
 {
   uint32_t CSR;
