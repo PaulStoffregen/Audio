@@ -486,7 +486,7 @@ void AudioOutputI2S::config_i2s(void)
 
 void AudioOutputI2Sslave::begin(void)
 {
-#if 0
+
 	dma.begin(true); // Allocate the DMA channel first
 
 	//pinMode(2, OUTPUT);
@@ -536,7 +536,6 @@ void AudioOutputI2Sslave::begin(void)
 	update_responsibility = update_setup();
 	dma.enable();
 	dma.attachInterrupt(isr);
-#endif
 }
 
 void AudioOutputI2Sslave::config_i2s(void)
