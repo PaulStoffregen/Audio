@@ -91,7 +91,7 @@ void AudioInputI2S::begin(void)
 	update_responsibility = update_setup();
 	dma.enable();
 	dma.attachInterrupt(isr);
-	pinMode(13, OUTPUT);
+	//pinMode(13, OUTPUT);
 }
 
 void AudioInputI2S::isr(void)
@@ -101,7 +101,7 @@ void AudioInputI2S::isr(void)
 	int16_t *dest_left, *dest_right;
 	audio_block_t *left, *right;
 
-	digitalWriteFast(13, HIGH);
+	//digitalWriteFast(13, HIGH);
 #if defined(KINETISK) || defined(__IMXRT1052__) || defined(__IMXRT1062__)
 	daddr = (uint32_t)(dma.TCD->DADDR);
 #endif
@@ -138,7 +138,7 @@ void AudioInputI2S::isr(void)
 			} while (src < end);
 		}
 	}
-	digitalWriteFast(13, LOW);
+	//digitalWriteFast(13, LOW);
 }
 
 
