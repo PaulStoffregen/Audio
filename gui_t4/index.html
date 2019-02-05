@@ -24,7 +24,7 @@
   limitations under the License.
 -->
 <head>
-<title>Audio System Design Tool for Teensy Audio Library, Teensy 3.0, 3.1, 3.2, 3.5, 3.6</title>
+<title>Audio System Design Tool for Teensy Audio Library, Teensy 4</title>
 <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
 <link href="jquery/css/smoothness/jquery-ui-1.10.3.custom.min.css" rel="stylesheet" media="screen">
 <link rel="stylesheet" type="text/css" href="orion/built-editor.css"/>
@@ -53,7 +53,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 <div class="navbar navbar-inverse navbar-fixed-top">
 	<div class="navbar-inner">
 		<div class="container-fluid">
-			<span class="brand">Audio System Design Tool for <a href="http://www.pjrc.com/teensy/td_libs_Audio.html" target="_blank">Teensy Audio Library</a>, <span class="keyword">Teensy 3.0, 3.1, 3.2, 3.5, 3.6</span></span>
+			<span class="brand">Audio System Design Tool for <a href="http://www.pjrc.com/teensy/td_libs_Audio.html" target="_blank">Teensy Audio Library</a>, <span class="keyword">Teensy 4</span></span>
 			<div class="btn-group pull-right">
 				<a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-align-justify"></i> <span class="caret"></span></a>
 				<ul class="dropdown-menu">
@@ -345,6 +345,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 <script  type="text/x-red" data-container-name="NodeDefinitions">
 	{"nodes":[
 		{"type":"AudioInputI2S","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputI2S2","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s2","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},		
 		{"type":"AudioInputI2SQuad","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_quad","inputs":0,"outputs":4,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputAnalog","data":{"defaults":{"name":{"value":"new"}},"shortName":"adc","inputs":0,"outputs":1,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputAnalogStereo","data":{"defaults":{"name":{"value":"new"}},"shortName":"adcs","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -353,12 +354,10 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioInputTDM","data":{"defaults":{"name":{"value":"new"}},"shortName":"tdm","inputs":0,"outputs":16,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputUSB","data":{"defaults":{"name":{"value":"new"}},"shortName":"usb","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputI2S","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputI2S2","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s2","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},		
 		{"type":"AudioOutputI2SQuad","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_quad","inputs":4,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputSPDIF","data":{"defaults":{"name":{"value":"new"}},"shortName":"spdif","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputPT8211","data":{"defaults":{"name":{"value":"new"}},"shortName":"pt8211","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioOutputAnalog","data":{"defaults":{"name":{"value":"new"}},"shortName":"dac","inputs":1,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioOutputAnalogStereo","data":{"defaults":{"name":{"value":"new"}},"shortName":"dacs","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioOutputPWM","data":{"defaults":{"name":{"value":"new"}},"shortName":"pwm","inputs":1,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputI2Sslave","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2sslave","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputTDM","data":{"defaults":{"name":{"value":"new"}},"shortName":"tdm","inputs":16,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputADAT","data":{"defaults":{"name":{"value":"new"}},"shortName":"adat","inputs":8,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -447,8 +446,8 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		<tr class=odd><td align=center>23</td><td>LRCLK</td><td>Output</td></tr>
 	</table>
 	<p>Audio from
-		master mode I2S may be used in the same project as ADC, DAC and
-		PWM signals, because all remain in sync to Teensy's timing</p>
+		master mode I2S may be used in the same project as ADC 
+		signals, because all remain in sync to Teensy's timing</p>
 	<h3>Examples</h3>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughStereo
 	</p>
@@ -483,6 +482,73 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		<input type="text" id="node-input-name" placeholder="Name">
 	</div>
 </script>
+
+<script type="text/x-red" data-help-name="AudioInputI2S2">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Receive 16 bit stereo audio from the
+	<a href="http://www.pjrc.com/store/teensy3_audio.html" target="_blank">audio shield</a>
+		or another I2S device, using I2S master mode.</p>
+	<p align=center><img src="img/audioshield_inputs.jpg"></p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Left Channel</td></tr>
+		<tr class=odd><td align=center>Out 1</td><td>Right Channel</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from the I2S hardware to its 2 output ports.</p>
+	<h3>Hardware</h3>
+	<p align=center><img src="img/audioshield_backside.jpg"></p>
+	<p>The I2S signals are used in "master" mode, where Teensy creates
+		all 3 clock signals and controls all data timing.</p>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>9</td><td>BCLK</td><td>Output</td></tr>
+		<tr class=odd><td align=center>11</td><td>MCLK</td><td>Output</td></tr>
+		<tr class=odd><td align=center>13</td><td>RX</td><td>Input</td></tr>
+		<tr class=odd><td align=center>23</td><td>LRCLK</td><td>Output</td></tr>
+	</table>
+	<p>Audio from
+		master mode I2S may be used in the same project as ADC 
+		signals, because all remain in sync to Teensy's timing</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughStereo
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Recorder
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; PeakMeterStereo
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; FFT
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; SpectrumAnalyzerBasic
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Chorus
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Flange
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Filter
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Filter_FIR
+	</p>
+	<h3>Notes</h3>
+	<p>Normally, this object is used with the Audio Shield, which
+		is controlled separately by the "sgtl5000" object.</p>
+	<p>Only one I2S input and one I2S output object may be used.  Master
+		and slave modes may not be mixed (both must be of the same type).
+	</p>
+	<p>I2S master objects can be used together with non-I2S input and output
+		objects, for simultaneous audio streaming on different hardware.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioInputI2S2">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
 
 <script type="text/x-red" data-help-name="AudioInputI2SQuad">
 	<h3>Summary</h3>
@@ -909,6 +975,65 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioOutputI2S">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioOutputI2S2">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Transmit 16 bit stereo audio to the
+	<a href="http://www.pjrc.com/store/teensy3_audio.html" target="_blank">audio shield</a>
+		or another I2S device, using I2S master mode.</p>
+	<p align=center><img src="img/audioshield_outputs.jpg"></p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Left Channel</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Right Channel</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from its 2 input ports to the I2S hardware.</p>
+	<h3>Hardware</h3>
+	<p align=center><img src="img/audioshield_backside.jpg"></p>
+	<p>The I2S signals are used in "master" mode, where Teensy creates
+		all 3 clock signals and controls all data timing.</p>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>9</td><td>BCLK</td><td>Output</td></tr>
+		<tr class=odd><td align=center>11</td><td>MCLK</td><td>Output</td></tr>
+		<tr class=odd><td align=center>22</td><td>TX</td><td>Output</td></tr>
+		<tr class=odd><td align=center>23</td><td>LRCLK</td><td>Output</td></tr>
+	</table>
+	<p>Audio from
+		master mode I2S may be used in the same project as ADC, DAC and
+		PWM signals, because all remain in sync to Teensy's timing</p>
+	<h3>Examples</h3>
+	<p>Nearly all the examples use this object.  Here are some of the highlights:</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughStereo
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; SamplePlayer
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Recorder
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; WavFilePlayer
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Chorus
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; PlaySynthMusic
+	</p>
+	<h3>Notes</h3>
+	<p>Normally, this object is used with the Audio Shield, which
+		is controlled separately by the "sgtl5000" object.</p>
+	<p>Only one I2S input and one I2S output object may be used.  Master
+		and slave modes may not be mixed (both must be of the same type).
+	</p>
+</script>
+<script type="text/x-red" data-template-name="AudioOutputI2S2">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
