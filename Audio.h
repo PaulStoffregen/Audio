@@ -91,6 +91,7 @@
 #include "input_adc.h"
 #include "input_adcs.h"
 #include "input_i2s.h"
+#include "input_i2s2.h"
 #include "input_i2s_quad.h"
 #include "input_tdm.h"
 #include "input_pdm.h"
