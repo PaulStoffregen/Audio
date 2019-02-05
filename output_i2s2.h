@@ -39,7 +39,7 @@ public:
 	AudioOutputI2S2(void) : AudioStream(2, inputQueueArray) { begin(); }
 	virtual void update(void);
 	void begin(void);
-	friend class AudioInputI2S2;
+	friend class AudioInputI2S;
 protected:
 	AudioOutputI2S2(int dummy): AudioStream(2, inputQueueArray) {} // to be used only inside AudioOutputI2Sslave !!
 	static void config_i2s(void);
@@ -56,18 +56,18 @@ private:
 	audio_block_t *inputQueueArray[2];
 };
 
-
-class AudioOutputI2S2slave : public AudioOutputI2S2
+#if 0
+class AudioOutputI2Sslave : public AudioOutputI2S
 {
 public:
-	AudioOutputI2S2slave(void) : AudioOutputI2S2(0) { begin(); } ;
+	AudioOutputI2Sslave(void) : AudioOutputI2S(0) { begin(); } ;
 	void begin(void);
-	friend class AudioInputI2S2slave;
+	friend class AudioInputI2Sslave;
 	friend void dma_ch0_isr(void);
 protected:
 	static void config_i2s(void);
 };
-
+#endif
 
 #endif
 #endif //defined(__IMXRT1062__)
