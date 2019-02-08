@@ -191,7 +191,7 @@ void AudioOutputMQS::config_i2s(void)
 //TODO: Check if frequencies are correct!
 
 	int fs = AUDIO_SAMPLE_RATE_EXACT;
-	int oversample = 64;
+	int oversample = 64*8;
 	// PLL between 27*24 = 648MHz und 54*24=1296MHz
 	int n1 = 4; //SAI prescaler 4 => (n1*n2) = multiple of 4
 	int n2 = 1 + (24000000 * 27) / (fs * oversample * n1);
@@ -220,7 +220,7 @@ void AudioOutputMQS::config_i2s(void)
 //	I2S3_TCSR = (1<<25); //Reset
 	I2S3_TCR1 = I2S_TCR1_RFW(1);
 	I2S3_TCR2 = I2S_TCR2_SYNC(0) /*| I2S_TCR2_BCP*/ // sync=0; tx is async;
-		    | (I2S_TCR2_BCD | I2S_TCR2_DIV((0)) | I2S_TCR2_MSEL(1));
+		    | (I2S_TCR2_BCD | I2S_TCR2_DIV((7)) | I2S_TCR2_MSEL(1));
 	I2S3_TCR3 = I2S_TCR3_TCE;
 	I2S3_TCR4 = I2S_TCR4_FRSZ((2-1)) | I2S_TCR4_SYWD((16-1)) | I2S_TCR4_MF | I2S_TCR4_FSD /*| I2S_TCR4_FSE*/ /* | I2S_TCR4_FSP */;
 	I2S3_TCR5 = I2S_TCR5_WNW((16-1)) | I2S_TCR5_W0W((16-1)) | I2S_TCR5_FBT((16-1));
