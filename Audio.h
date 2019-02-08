@@ -101,6 +101,7 @@
 #include "output_i2s.h"
 #include "output_i2s2.h"
 #include "output_i2s_quad.h"
+#include "output_mqs.h"
 #include "output_pwm.h"
 #include "output_spdif.h"
 #include "output_pt8211.h"
