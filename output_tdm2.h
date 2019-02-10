@@ -1,5 +1,5 @@
 /* Audio Library for Teensy 3.X
- * Copyright (c) 2014, Paul Stoffregen, paul@pjrc.com
+ * Copyright (c) 2017, Paul Stoffregen, paul@pjrc.com
  *
  * Development of this audio library was funded by PJRC.COM, LLC by sales of
  * Teensy and Audio Adaptor boards.  Please support PJRC's efforts to develop
@@ -25,49 +25,30 @@
  */
 
 #if defined(__IMXRT1052__) || defined(__IMXRT1062__)
-#ifndef output_i2s2_h_
-#define output_i2s2_h_
+#ifndef output_tdm2_h_
+#define output_tdm2_h_
 
 #include "Arduino.h"
 #include "AudioStream.h"
 #include "DMAChannel.h"
 
-
-class AudioOutputI2S2 : public AudioStream
+class AudioOutputTDM2 : public AudioStream
 {
 public:
-	AudioOutputI2S2(void) : AudioStream(2, inputQueueArray) { begin(); }
+	AudioOutputTDM2(void) : AudioStream(16, inputQueueArray) { begin(); }
 	virtual void update(void);
 	void begin(void);
-	friend class AudioInputI2S2;
+	friend class AudioInputTDM2;
 protected:
-	AudioOutputI2S2(int dummy): AudioStream(2, inputQueueArray) {} // to be used only inside AudioOutputI2Sslave !!
-	static void config_i2s(void);
-	static audio_block_t *block_left_1st;
-	static audio_block_t *block_right_1st;
+	static void config_tdm(void);
+	static audio_block_t *block_input[16];
 	static bool update_responsibility;
 	static DMAChannel dma;
 	static void isr(void);
 private:
-	static audio_block_t *block_left_2nd;
-	static audio_block_t *block_right_2nd;
-	static uint16_t block_left_offset;
-	static uint16_t block_right_offset;
-	audio_block_t *inputQueueArray[2];
-};
-
-
-class AudioOutputI2S2slave : public AudioOutputI2S2
-{
-public:
-	AudioOutputI2S2slave(void) : AudioOutputI2S2(0) { begin(); } ;
-	void begin(void);
-	friend class AudioInputI2S2slave;
-	friend void dma_ch0_isr(void);
-protected:
-	static void config_i2s(void);
+	audio_block_t *inputQueueArray[16];
 };
 
 
 #endif
-#endif //defined(__IMXRT1062__)
+#endif

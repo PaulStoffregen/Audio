@@ -1,5 +1,5 @@
 /* Audio Library for Teensy 3.X
- * Copyright (c) 2014, Paul Stoffregen, paul@pjrc.com
+ * Copyright (c) 2016, Paul Stoffregen, paul@pjrc.com
  *
  * Development of this audio library was funded by PJRC.COM, LLC by sales of
  * Teensy and Audio Adaptor boards.  Please support PJRC's efforts to develop
@@ -24,30 +24,38 @@
  * THE SOFTWARE.
  */
 
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
-#ifndef output_i2s2_h_
-#define output_i2s2_h_
+//Frank Bösing, Ben-Rheinland
+
+#ifndef output_pt8211_2_h_
+#define output_pt8211_2_h_
+
+	//uncomment to enable oversampling:
+#define AUDIO_PT8211_OVERSAMPLING
+	//uncomment ONE of these to define interpolation type for oversampling:
+// #define AUDIO_PT8211_INTERPOLATION_LINEAR
+#define AUDIO_PT8211_INTERPOLATION_CIC
 
 #include "Arduino.h"
 #include "AudioStream.h"
 #include "DMAChannel.h"
 
-
-class AudioOutputI2S2 : public AudioStream
+class AudioOutputPT8211_2 : public AudioStream
 {
 public:
-	AudioOutputI2S2(void) : AudioStream(2, inputQueueArray) { begin(); }
+	AudioOutputPT8211_2(void) : AudioStream(2, inputQueueArray) { begin(); }
 	virtual void update(void);
 	void begin(void);
-	friend class AudioInputI2S2;
 protected:
-	AudioOutputI2S2(int dummy): AudioStream(2, inputQueueArray) {} // to be used only inside AudioOutputI2Sslave !!
 	static void config_i2s(void);
 	static audio_block_t *block_left_1st;
 	static audio_block_t *block_right_1st;
 	static bool update_responsibility;
 	static DMAChannel dma;
-	static void isr(void);
+	static void isr(void)
+	#if defined(AUDIO_PT8211_OVERSAMPLING)
+		__attribute__((optimize("unroll-loops")))
+	#endif
+	;
 private:
 	static audio_block_t *block_left_2nd;
 	static audio_block_t *block_right_2nd;
@@ -56,18 +64,4 @@ private:
 	audio_block_t *inputQueueArray[2];
 };
 
-
-class AudioOutputI2S2slave : public AudioOutputI2S2
-{
-public:
-	AudioOutputI2S2slave(void) : AudioOutputI2S2(0) { begin(); } ;
-	void begin(void);
-	friend class AudioInputI2S2slave;
-	friend void dma_ch0_isr(void);
-protected:
-	static void config_i2s(void);
-};
-
-
 #endif
-#endif //defined(__IMXRT1062__)

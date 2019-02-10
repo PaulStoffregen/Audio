@@ -41,15 +41,6 @@ DMAChannel AudioOutputI2S::dma(false);
 #if defined(__IMXRT1052__) || defined(__IMXRT1062__)
 #include "utility/imxrt_hw.h"
 
-//TODO: Copy these to imrtx.h:
-#if !defined(I2S_TCR2_BCP)
-#define I2S_TCR2_BCP			((uint32_t)1<<25)
-#define I2S_RCR2_BCP			((uint32_t)1<<25)
-#define I2S_TCR4_FCONT			((uint32_t)1<<28)	// FIFO Continue on Error
-#define I2S_RCR4_FCONT			((uint32_t)1<<28)	// FIFO Continue on Error
-#define I2S_TCR4_FSP			((uint32_t)1<< 1)
-#define I2S_RCR4_FSP			((uint32_t)1<< 1)
-#endif
 
 void AudioOutputI2S::begin(void)
 {
@@ -60,9 +51,6 @@ void AudioOutputI2S::begin(void)
 
 	config_i2s();
 	CORE_PIN6_CONFIG  = 3;  //1:TX_DATA0
-  #if defined(SAI2)
-  	CORE_PIN2_CONFIG  = 2;  //2:TX_DATA0
-  #endif
 
 	dma.TCD->SADDR = i2s_tx_buffer;
 	dma.TCD->SOFF = 2;
@@ -76,15 +64,10 @@ void AudioOutputI2S::begin(void)
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
 	dma.TCD->DADDR = (void *)((uint32_t)&I2S1_TDR0 + 2);
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI1_TX);
-	//I2S1_RCSR = (1<<25); //Reset
-	//I2S1_TCSR = (1<<25); //Reset
+
 	I2S1_RCSR |= I2S_RCSR_RE;
-	//I2S1_TCSR = I2S_TCSR_SR;
 	I2S1_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
-#if defined(SAI2)
-	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI2_TX);
-	I2S2_TCSR = I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;  //SAI2
-#endif
+
 	update_responsibility = update_setup();
 	dma.attachInterrupt(isr);
 	dma.enable();
@@ -430,18 +413,6 @@ void AudioOutputI2S::config_i2s(void)
 //	CORE_PIN6_CONFIG  = 3;  //1:TX_DATA0
 //	CORE_PIN7_CONFIG  = 3;  //1:RX_DATA0
 
-#if defined(SAI2)
-	i2s = ((I2S_STRUCT *)0x40388000);
-	if (i2s->TX.CSR & I2S_TCSR_TE) return;
-	if (i2s->RX.CSR & I2S_RCSR_RE) return;
-
-	CORE_PIN5_CONFIG  = 2;  //2:MCLK
-	CORE_PIN4_CONFIG  = 2;  //2:TX_BCLK
-	CORE_PIN3_CONFIG  = 2;  //2:TX_SYNC
-//	CORE_PIN2_CONFIG  = 2;  //2:TX_DATA0
-//	CORE_PIN33_CONFIG = 2;  //2:RX_DATA0
-#endif
-
 	int rsync = 0;
 	int tsync = 1;
 
@@ -462,21 +433,6 @@ void AudioOutputI2S::config_i2s(void)
 	I2S1_RCR3 = I2S_RCR3_RCE;
 	I2S1_RCR4 = I2S_RCR4_FRSZ((2-1)) | I2S_RCR4_SYWD((32-1)) | I2S_RCR4_MF | I2S_RCR4_FSE | I2S_RCR4_FSP | I2S_RCR4_FSD;
 	I2S1_RCR5 = I2S_RCR5_WNW((32-1)) | I2S_RCR5_W0W((32-1)) | I2S_RCR5_FBT((32-1));
-
-
-#if defined(SAI2)
-	CCM_CCGR5 |= CCM_CCGR5_SAI2(CCM_CCGR_ON);
-
-	CCM_CSCMR1 = (CCM_CSCMR1 & ~(CCM_CSCMR1_SAI2_CLK_SEL_MASK))
-		   | CCM_CSCMR1_SAI2_CLK_SEL(2); // &0x03 // (0,1,2): PLL3PFD0, PLL5, PLL4,
-	CCM_CS2CDR = (CCM_CS2CDR & ~(CCM_CS2CDR_SAI2_CLK_PRED_MASK | CCM_CS2CDR_SAI2_CLK_PODF_MASK))
-		   | CCM_CS2CDR_SAI2_CLK_PRED(n1-1) | CCM_CS2CDR_SAI2_CLK_PODF(n2-1);
-	IOMUXC_GPR_GPR1 = (IOMUXC_GPR_GPR1 & ~(IOMUXC_GPR_GPR1_SAI2_MCLK3_SEL_MASK))
-			| (IOMUXC_GPR_GPR1_SAI2_MCLK_DIR | IOMUXC_GPR_GPR1_SAI2_MCLK3_SEL(0));	//Select MCLK
-	sai_rxConfig(32, 2, 1);
-	sai_txConfig(32, 2, 0);
-
-#endif
 
 #endif
 }

@@ -25,49 +25,38 @@
  */
 
 #if defined(__IMXRT1052__) || defined(__IMXRT1062__)
-#ifndef output_i2s2_h_
-#define output_i2s2_h_
+#ifndef _input_i2s2_h_
+#define _input_i2s2_h_
 
 #include "Arduino.h"
 #include "AudioStream.h"
 #include "DMAChannel.h"
 
-
-class AudioOutputI2S2 : public AudioStream
+class AudioInputI2S2 : public AudioStream
 {
 public:
-	AudioOutputI2S2(void) : AudioStream(2, inputQueueArray) { begin(); }
+	AudioInputI2S2(void) : AudioStream(0, NULL) { begin(); }
 	virtual void update(void);
 	void begin(void);
-	friend class AudioInputI2S2;
 protected:
-	AudioOutputI2S2(int dummy): AudioStream(2, inputQueueArray) {} // to be used only inside AudioOutputI2Sslave !!
-	static void config_i2s(void);
-	static audio_block_t *block_left_1st;
-	static audio_block_t *block_right_1st;
+	AudioInputI2S2(int dummy): AudioStream(0, NULL) {} // to be used only inside AudioInputI2Sslave !!
 	static bool update_responsibility;
 	static DMAChannel dma;
 	static void isr(void);
 private:
-	static audio_block_t *block_left_2nd;
-	static audio_block_t *block_right_2nd;
-	static uint16_t block_left_offset;
-	static uint16_t block_right_offset;
-	audio_block_t *inputQueueArray[2];
+	static audio_block_t *block_left;
+	static audio_block_t *block_right;
+	static uint16_t block_offset;
 };
 
 
-class AudioOutputI2S2slave : public AudioOutputI2S2
+class AudioInputI2S2slave : public AudioInputI2S2
 {
 public:
-	AudioOutputI2S2slave(void) : AudioOutputI2S2(0) { begin(); } ;
+	AudioInputI2S2slave(void) : AudioInputI2S2(0) { begin(); }
 	void begin(void);
-	friend class AudioInputI2S2slave;
-	friend void dma_ch0_isr(void);
-protected:
-	static void config_i2s(void);
+	friend void dma_ch1_isr(void);
 };
 
-
 #endif
-#endif //defined(__IMXRT1062__)
+#endif //#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
