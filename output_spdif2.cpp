@@ -24,21 +24,21 @@
  // 2015/08/23: (FB) added mute_PCM() - sets or unsets VALID in VUCP (and adjusts PARITY)
 
 #include <Arduino.h>
-#include "output_spdif.h"
+#include "output_spdif2.h"
 #include "utility/imxrt_hw.h"
 
-audio_block_t * AudioOutputSPDIF::block_left_1st = NULL;
-audio_block_t * AudioOutputSPDIF::block_right_1st = NULL;
-audio_block_t * AudioOutputSPDIF::block_left_2nd = NULL;
-audio_block_t * AudioOutputSPDIF::block_right_2nd = NULL;
-uint16_t  AudioOutputSPDIF::block_left_offset = 0;
-uint16_t  AudioOutputSPDIF::block_right_offset = 0;
-bool AudioOutputSPDIF::update_responsibility = false;
+audio_block_t * AudioOutputSPDIF2::block_left_1st = NULL;
+audio_block_t * AudioOutputSPDIF2::block_right_1st = NULL;
+audio_block_t * AudioOutputSPDIF2::block_left_2nd = NULL;
+audio_block_t * AudioOutputSPDIF2::block_right_2nd = NULL;
+uint16_t  AudioOutputSPDIF2::block_left_offset = 0;
+uint16_t  AudioOutputSPDIF2::block_right_offset = 0;
+bool AudioOutputSPDIF2::update_responsibility = false;
 
 /* DMAMEM */ static uint32_t SPDIF_tx_buffer[AUDIO_BLOCK_SAMPLES * 4]; //2 KB
-DMAChannel AudioOutputSPDIF::dma(false);
+DMAChannel AudioOutputSPDIF2::dma(false);
 
-#if defined(KINETISK) || defined(__IMXRT1052__) || defined(__IMXRT1062__)
+#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
 
 #define PREAMBLE_B  (0xE8) //11101000
 #define PREAMBLE_M  (0xE2) //11100010
@@ -47,7 +47,7 @@ DMAChannel AudioOutputSPDIF::dma(false);
 #define VUCP_VALID   ((0xCC) << 24)
 #define VUCP_INVALID ((0xD4) << 24)// To mute PCM, set VUCP = invalid.
 
-uint32_t  AudioOutputSPDIF::vucp = VUCP_VALID;
+uint32_t  AudioOutputSPDIF2::vucp = VUCP_VALID;
 
 static const
 uint16_t bmclookup[256] = { //biphase mark encoded values (least significant bit first)
@@ -84,9 +84,8 @@ uint16_t bmclookup[256] = { //biphase mark encoded values (least significant bit
 	0xccaa, 0x4caa, 0x2caa, 0xacaa, 0x34aa, 0xb4aa, 0xd4aa, 0x54aa,
 	0x32aa, 0xb2aa, 0xd2aa, 0x52aa, 0xcaaa, 0x4aaa, 0x2aaa, 0xaaaa
 };
-#endif
 
-void AudioOutputSPDIF::begin(void)
+void AudioOutputSPDIF2::begin(void)
 {
 
 	dma.begin(true); // Allocate the DMA channel first
@@ -96,9 +95,8 @@ void AudioOutputSPDIF::begin(void)
 
 	// TODO: should we set & clear the I2S_TCSR_SR bit here?
 	config_SPDIF();
-#if defined(KINETISK)
-	CORE_PIN22_CONFIG = PORT_PCR_MUX(6); // pin 22, PTC1, I2S0_TXD0
 
+	CORE_PIN2_CONFIG  = 2;  //2:TX_DATA0
 	const int nbytes_mlno = 2 * 4; // 8 Bytes per minor loop
 
 	dma.TCD->SADDR = SPDIF_tx_buffer;
@@ -106,41 +104,18 @@ void AudioOutputSPDIF::begin(void)
 	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(2) | DMA_TCD_ATTR_DSIZE(2);
 	dma.TCD->NBYTES_MLNO = nbytes_mlno;
 	dma.TCD->SLAST = -sizeof(SPDIF_tx_buffer);
-	dma.TCD->DADDR = &I2S0_TDR0;
+	dma.TCD->DADDR = &I2S2_TDR0;
 	dma.TCD->DOFF = 0;
 	dma.TCD->CITER_ELINKNO = sizeof(SPDIF_tx_buffer) / nbytes_mlno;
 	dma.TCD->DLASTSGA = 0;
 	dma.TCD->BITER_ELINKNO = sizeof(SPDIF_tx_buffer) / nbytes_mlno;
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
-	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_TX);
+	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI2_TX);
 	update_responsibility = update_setup();
 	dma.enable();
 
-	I2S0_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE | I2S_TCSR_FR;
+	I2S2_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE | I2S_TCSR_FR;
 	dma.attachInterrupt(isr);
-#elif defined(__IMXRT1052__) || defined(__IMXRT1062__)
-	CORE_PIN6_CONFIG  = 3;  //1:TX_DATA0
-	const int nbytes_mlno = 2 * 4; // 8 Bytes per minor loop
-
-	dma.TCD->SADDR = SPDIF_tx_buffer;
-	dma.TCD->SOFF = 4;
-	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(2) | DMA_TCD_ATTR_DSIZE(2);
-	dma.TCD->NBYTES_MLNO = nbytes_mlno;
-	dma.TCD->SLAST = -sizeof(SPDIF_tx_buffer);
-	dma.TCD->DADDR = &I2S1_TDR0;
-	dma.TCD->DOFF = 0;
-	dma.TCD->CITER_ELINKNO = sizeof(SPDIF_tx_buffer) / nbytes_mlno;
-	dma.TCD->DLASTSGA = 0;
-	dma.TCD->BITER_ELINKNO = sizeof(SPDIF_tx_buffer) / nbytes_mlno;
-	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
-	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI1_TX);
-	update_responsibility = update_setup();
-	dma.enable();
-
-	I2S1_RCSR |= I2S_RCSR_RE;
-	I2S1_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE | I2S_TCSR_FR;
-	dma.attachInterrupt(isr);
-#endif
 }
 
 /*
@@ -155,7 +130,7 @@ void AudioOutputSPDIF::begin(void)
 
 */
 
-void AudioOutputSPDIF::isr(void)
+void AudioOutputSPDIF2::isr(void)
 {
 	static uint16_t frame = 0;
 	const int16_t *src;
@@ -171,7 +146,7 @@ void AudioOutputSPDIF::isr(void)
 		// so we must fill the second half
 		dest = (int32_t *)&SPDIF_tx_buffer[AUDIO_BLOCK_SAMPLES * 4/2];
 		end = (int32_t *)&SPDIF_tx_buffer[AUDIO_BLOCK_SAMPLES * 4];
-		if (AudioOutputSPDIF::update_responsibility) AudioStream::update_all();
+		if (AudioOutputSPDIF2::update_responsibility) AudioStream::update_all();
 	} else {
 		// DMA is transmitting the second half of the buffer
 		// so we must fill the first half
@@ -180,9 +155,9 @@ void AudioOutputSPDIF::isr(void)
 	}
 
 
-	block = AudioOutputSPDIF::block_left_1st;
+	block = AudioOutputSPDIF2::block_left_1st;
 	if (block) {
-		offset = AudioOutputSPDIF::block_left_offset;
+		offset = AudioOutputSPDIF2::block_left_offset;
 		src = &block->data[offset];
 		do {
 
@@ -209,12 +184,12 @@ void AudioOutputSPDIF::isr(void)
 		} while (dest < end);
 		offset += AUDIO_BLOCK_SAMPLES/2;
 		if (offset < AUDIO_BLOCK_SAMPLES) {
-			AudioOutputSPDIF::block_left_offset = offset;
+			AudioOutputSPDIF2::block_left_offset = offset;
 		} else {
-			AudioOutputSPDIF::block_left_offset = 0;
+			AudioOutputSPDIF2::block_left_offset = 0;
 			AudioStream::release(block);
-			AudioOutputSPDIF::block_left_1st = AudioOutputSPDIF::block_left_2nd;
-			AudioOutputSPDIF::block_left_2nd = NULL;
+			AudioOutputSPDIF2::block_left_1st = AudioOutputSPDIF2::block_left_2nd;
+			AudioOutputSPDIF2::block_left_2nd = NULL;
 		}
 	} else {
 		do {
@@ -232,9 +207,9 @@ void AudioOutputSPDIF::isr(void)
 
 
 	dest -= AUDIO_BLOCK_SAMPLES * 4/2 - 4/2;
-	block = AudioOutputSPDIF::block_right_1st;
+	block = AudioOutputSPDIF2::block_right_1st;
 	if (block) {
-		offset = AudioOutputSPDIF::block_right_offset;
+		offset = AudioOutputSPDIF2::block_right_offset;
 		src = &block->data[offset];
 
 		do {
@@ -255,12 +230,12 @@ void AudioOutputSPDIF::isr(void)
 
 		offset += AUDIO_BLOCK_SAMPLES/2;
 		if (offset < AUDIO_BLOCK_SAMPLES) {
-			AudioOutputSPDIF::block_right_offset = offset;
+			AudioOutputSPDIF2::block_right_offset = offset;
 		} else {
-			AudioOutputSPDIF::block_right_offset = 0;
+			AudioOutputSPDIF2::block_right_offset = 0;
 			AudioStream::release(block);
-			AudioOutputSPDIF::block_right_1st = AudioOutputSPDIF::block_right_2nd;
-			AudioOutputSPDIF::block_right_2nd = NULL;
+			AudioOutputSPDIF2::block_right_1st = AudioOutputSPDIF2::block_right_2nd;
+			AudioOutputSPDIF2::block_right_2nd = NULL;
 		}
 	} else {
 		do {
@@ -272,12 +247,12 @@ void AudioOutputSPDIF::isr(void)
 
 }
 
-void AudioOutputSPDIF::mute_PCM(const bool mute)
+void AudioOutputSPDIF2::mute_PCM(const bool mute)
 {
 	vucp = mute?VUCP_INVALID:VUCP_VALID;
 }
 
-void AudioOutputSPDIF::update(void)
+void AudioOutputSPDIF2::update(void)
 {
 
 	audio_block_t *block;
@@ -323,87 +298,9 @@ void AudioOutputSPDIF::update(void)
 
 }
 
-#if defined(KINETISK)
-#if F_CPU == 96000000 || F_CPU == 48000000 || F_CPU == 24000000
-  // PLL is at 96 MHz in these modes
-  #define MCLK_MULT 2
-  #define MCLK_DIV  17
-#elif F_CPU == 72000000
-  #define MCLK_MULT 8
-  #define MCLK_DIV  51
-#elif F_CPU == 120000000
-  #define MCLK_MULT 8
-  #define MCLK_DIV  85
-#elif F_CPU == 144000000
-  #define MCLK_MULT 4
-  #define MCLK_DIV  51
-#elif F_CPU == 168000000
-  #define MCLK_MULT 8
-  #define MCLK_DIV  119
-#elif F_CPU == 180000000
-  #define MCLK_MULT 16
-  #define MCLK_DIV  255
-  #define MCLK_SRC  0
-#elif F_CPU == 192000000
-  #define MCLK_MULT 1
-  #define MCLK_DIV  17
-#elif F_CPU == 216000000
-  #define MCLK_MULT 8
-  #define MCLK_DIV  153
-  #define MCLK_SRC  0
-#elif F_CPU == 240000000
-  #define MCLK_MULT 4
-  #define MCLK_DIV  85
-#elif F_CPU == 16000000
-  #define MCLK_MULT 12
-  #define MCLK_DIV  17
-#else
-  #error "This CPU Clock Speed is not supported by the Audio library";
-#endif
-
-#ifndef MCLK_SRC
-#if F_CPU >= 20000000
-  #define MCLK_SRC  3  // the PLL
-#else
-  #define MCLK_SRC  0  // system clock
-#endif
-#endif
-#endif
-
-void AudioOutputSPDIF::config_SPDIF(void)
+void AudioOutputSPDIF2::config_SPDIF(void)
 {
-#if defined(KINETISK)
-	SIM_SCGC6 |= SIM_SCGC6_I2S;
-	SIM_SCGC7 |= SIM_SCGC7_DMA;
-	SIM_SCGC6 |= SIM_SCGC6_DMAMUX;
-
-	// enable MCLK output
-	I2S0_MCR = I2S_MCR_MICS(MCLK_SRC) | I2S_MCR_MOE;
-	while (I2S0_MCR & I2S_MCR_DUF) ;
-	I2S0_MDR = I2S_MDR_FRACT((MCLK_MULT-1)) | I2S_MDR_DIVIDE((MCLK_DIV-1));
-
-	// configure transmitter
-	I2S0_TMR = 0;
-	I2S0_TCR1 = I2S_TCR1_TFW(1);  // watermark
-	I2S0_TCR2 = I2S_TCR2_SYNC(0) | I2S_TCR2_MSEL(1) | I2S_TCR2_BCD | I2S_TCR2_DIV(0);
-	I2S0_TCR3 = I2S_TCR3_TCE;
-
-	//4 Words per Frame 32 Bit Word-Length -> 128 Bit Frame-Length, MSB First:
-	I2S0_TCR4 = I2S_TCR4_FRSZ(3) | I2S_TCR4_SYWD(0) | I2S_TCR4_MF | I2S_TCR4_FSP | I2S_TCR4_FSD;
-	I2S0_TCR5 = I2S_TCR5_WNW(31) | I2S_TCR5_W0W(31) | I2S_TCR5_FBT(31);
-
-	I2S0_RCSR = 0;
-
-#if 0
-	// configure pin mux for 3 clock signals (debug only)
-	CORE_PIN23_CONFIG = PORT_PCR_MUX(6); // pin 23, PTC2, I2S0_TX_FS (LRCLK)	44.1kHz
-	CORE_PIN9_CONFIG  = PORT_PCR_MUX(6); // pin  9, PTC3, I2S0_TX_BCLK		5.6 MHz
-	CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK			11.43MHz
-#endif
-
-#elif defined(__IMXRT1052__) || defined(__IMXRT1062__)
-
-	CCM_CCGR5 |= CCM_CCGR5_SAI1(CCM_CCGR_ON);
+	CCM_CCGR5 |= CCM_CCGR5_SAI2(CCM_CCGR_ON);
 //PLL:
 	int fs = AUDIO_SAMPLE_RATE_EXACT;
 	// PLL between 27*24 = 648MHz und 54*24=1296MHz
@@ -416,52 +313,35 @@ void AudioOutputSPDIF::config_SPDIF(void)
 	int c1 = C * c2 - (c0 * c2);
 	set_audioClock(c0, c1, c2);
 
-	CCM_CSCMR1 = (CCM_CSCMR1 & ~(CCM_CSCMR1_SAI1_CLK_SEL_MASK))
-		   | CCM_CSCMR1_SAI1_CLK_SEL(2); // &0x03 // (0,1,2): PLL3PFD0, PLL5, PLL4
-	CCM_CS1CDR = (CCM_CS1CDR & ~(CCM_CS1CDR_SAI1_CLK_PRED_MASK | CCM_CS1CDR_SAI1_CLK_PODF_MASK))
-		   | CCM_CS1CDR_SAI1_CLK_PRED(n1-1) // &0x07
-		   | CCM_CS1CDR_SAI1_CLK_PODF(n2-1); // &0x3f
+	CCM_CSCMR1 = (CCM_CSCMR1 & ~(CCM_CSCMR1_SAI2_CLK_SEL_MASK))
+		   | CCM_CSCMR1_SAI2_CLK_SEL(2); // &0x03 // (0,1,2): PLL3PFD0, PLL5, PLL4,
+	CCM_CS2CDR = (CCM_CS2CDR & ~(CCM_CS2CDR_SAI2_CLK_PRED_MASK | CCM_CS2CDR_SAI2_CLK_PODF_MASK))
+		   | CCM_CS2CDR_SAI2_CLK_PRED(n1-1)
+		   | CCM_CS2CDR_SAI2_CLK_PODF(n2-1);
+	IOMUXC_GPR_GPR1 = (IOMUXC_GPR_GPR1 & ~(IOMUXC_GPR_GPR1_SAI2_MCLK3_SEL_MASK))
+			| (IOMUXC_GPR_GPR1_SAI2_MCLK_DIR | IOMUXC_GPR_GPR1_SAI2_MCLK3_SEL(0));	//Select MCLK
 
-	IOMUXC_GPR_GPR1 = (IOMUXC_GPR_GPR1 & ~(IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL_MASK))
-			| (IOMUXC_GPR_GPR1_SAI1_MCLK_DIR | IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL(0));	//Select MCLK
-
-	int rsync = 0;
-	int tsync = 1;
 	// configure transmitter
-	I2S1_TMR = 0;
-	I2S1_TCR1 = I2S_TCR1_RFW(0);  // watermark
-	I2S1_TCR2 = I2S_TCR2_SYNC(tsync) | I2S_TCR2_MSEL(1) | I2S_TCR2_BCD | I2S_TCR2_DIV(0);
-	I2S1_TCR3 = I2S_TCR3_TCE;
+	I2S2_TMR = 0;
+	I2S2_TCR1 = I2S_TCR1_RFW(0);  // watermark
+	I2S2_TCR2 = I2S_TCR2_SYNC(0) | I2S_TCR2_MSEL(1) | I2S_TCR2_BCD | I2S_TCR2_DIV(0);
+	I2S2_TCR3 = I2S_TCR3_TCE;
 
 	//4 Words per Frame 32 Bit Word-Length -> 128 Bit Frame-Length, MSB First:
-	I2S1_TCR4 = I2S_TCR4_FRSZ(3) | I2S_TCR4_SYWD(0) | I2S_TCR4_MF | I2S_TCR4_FSP | I2S_TCR4_FSD;
-	I2S1_TCR5 = I2S_TCR5_WNW(31) | I2S_TCR5_W0W(31) | I2S_TCR5_FBT(31);
-
-	//I2S1_RCSR = 0;
-	I2S1_RMR = 0;
-	//I2S1_RCSR = (1<<25); //Reset
-	I2S1_RCR1 = I2S_RCR1_RFW(0);
-	I2S1_RCR2 = I2S_RCR2_SYNC(rsync) | I2S_TCR2_MSEL(1) | I2S_TCR2_BCD | I2S_TCR2_DIV(0);
-	I2S1_RCR3 = I2S_RCR3_RCE;
-	I2S1_RCR4 = I2S_TCR4_FRSZ(3) | I2S_TCR4_SYWD(0) | I2S_TCR4_MF | I2S_TCR4_FSP | I2S_TCR4_FSD;
-	I2S1_RCR5 = I2S_TCR5_WNW(31) | I2S_TCR5_W0W(31) | I2S_TCR5_FBT(31);
-
+	I2S2_TCR4 = I2S_TCR4_FRSZ(3) | I2S_TCR4_SYWD(0) | I2S_TCR4_MF | I2S_TCR4_FSP | I2S_TCR4_FSD;
+	I2S2_TCR5 = I2S_TCR5_WNW(31) | I2S_TCR5_W0W(31) | I2S_TCR5_FBT(31);
 #if 0
 	//debug only:
-	CORE_PIN23_CONFIG = 3;  //1:MCLK	11.43MHz
-	CORE_PIN21_CONFIG = 3;  //1:RX_BCLK	5.6 MHz
-	CORE_PIN20_CONFIG = 3;  //1:RX_SYNC	44.1 KHz
-//	CORE_PIN6_CONFIG  = 3;  //1:TX_DATA0
-//	CORE_PIN7_CONFIG  = 3;  //1:RX_DATA0
-#endif
-
+	CORE_PIN5_CONFIG  = 2;  //2:MCLK	11.43MHz
+	CORE_PIN4_CONFIG  = 2;  //2:TX_BCLK	5 MHz
+	CORE_PIN3_CONFIG  = 2;  //2:TX_SYNC	44.1 KHz
 #endif
 }
 
 
-#if defined(KINETISL)
+#else
 
-void AudioOutputSPDIF::update(void)
+void AudioOutputSPDIF2::update(void)
 {
 
 	audio_block_t *block;
