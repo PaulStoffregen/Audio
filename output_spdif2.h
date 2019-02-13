@@ -21,23 +21,23 @@
  * THE SOFTWARE.
  */
 
-#ifndef output_SPDIF_h_
-#define output_SPDIF_h_
+#ifndef output_SPDIF2_h_
+#define output_SPDIF2_h_
 
 #include "Arduino.h"
 #include "AudioStream.h"
 #include "DMAChannel.h"
 
-class AudioOutputSPDIF : public AudioStream
+class AudioOutputSPDIF2 : public AudioStream
 {
 public:
-	AudioOutputSPDIF(void) : AudioStream(2, inputQueueArray) { begin(); }
+	AudioOutputSPDIF2(void) : AudioStream(2, inputQueueArray) { begin(); }
 	virtual void update(void);
 	void begin(void);
 	//friend class AudioInputSPDIF;
 	static void mute_PCM(const bool mute);
 protected:
-	//AudioOutputSPDIF(int dummy): AudioStream(2, inputQueueArray) {}
+	//AudioOutputSPDIF2(int dummy): AudioStream(2, inputQueueArray) {}
 	static void config_SPDIF(void);
 	static audio_block_t *block_left_1st;
 	static audio_block_t *block_right_1st;
