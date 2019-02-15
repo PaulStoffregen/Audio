@@ -113,6 +113,7 @@
 #include "play_memory.h"
 #include "play_queue.h"
 #include "play_sd_raw.h"
+#include "play_sd_raw_resampled.h"
 #include "play_sd_wav.h"
 #include "play_serialflash_raw.h"
 #include "record_queue.h"
