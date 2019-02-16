@@ -665,33 +665,6 @@ void AudioOutputADAT::config_ADAT(void)
 #endif
 }
 
-
-#elif defined(KINETISL)
-
-void AudioOutputADAT::update(void)
-{
-
-	audio_block_t *block;
-	block = receiveReadOnly(0); // input 0 = ch1 channel
-	if (block) release(block);
-	block = receiveReadOnly(1); // input 1 = ch2 channel
-	if (block) release(block);
-	block = receiveReadOnly(2); // input 2 = ch3 channel
-	if (block) release(block);
-	block = receiveReadOnly(3); // input 3 = ch4 channel
-	if (block) release(block);
-	block = receiveReadOnly(4); // input 4 = ch5 channel
-	if (block) release(block);
-	block = receiveReadOnly(5); // input 5 = ch6 channel
-	if (block) release(block);
-	block = receiveReadOnly(6); // input 6 = ch7 channel
-	if (block) release(block);
-	block = receiveReadOnly(7); // input 7 = ch8 channel
-	if (block) release(block);
-}
-
-#endif
-
 /*
 
 https://forum.pjrc.com/threads/38753-Discussion-about-a-simple-way-to-change-the-sample-rate
@@ -737,3 +710,30 @@ void AudioOutputADAT::setI2SFreq(int freq) {
     }
   }
 }
+
+#elif defined(KINETISL)
+
+void AudioOutputADAT::update(void)
+{
+
+	audio_block_t *block;
+	block = receiveReadOnly(0); // input 0 = ch1 channel
+	if (block) release(block);
+	block = receiveReadOnly(1); // input 1 = ch2 channel
+	if (block) release(block);
+	block = receiveReadOnly(2); // input 2 = ch3 channel
+	if (block) release(block);
+	block = receiveReadOnly(3); // input 3 = ch4 channel
+	if (block) release(block);
+	block = receiveReadOnly(4); // input 4 = ch5 channel
+	if (block) release(block);
+	block = receiveReadOnly(5); // input 5 = ch6 channel
+	if (block) release(block);
+	block = receiveReadOnly(6); // input 6 = ch7 channel
+	if (block) release(block);
+	block = receiveReadOnly(7); // input 7 = ch8 channel
+	if (block) release(block);
+}
+
+#endif
+

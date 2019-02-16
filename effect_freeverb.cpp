@@ -116,7 +116,7 @@ static const audio_block_t zeroblock = {
 
 void AudioEffectFreeverb::update()
 {
-#if defined(KINETISK)
+#if defined(__ARM_ARCH_7EM__)
 	const audio_block_t *block;
 	audio_block_t *outblock;
 	int i;
@@ -294,7 +294,7 @@ AudioEffectFreeverbStereo::AudioEffectFreeverbStereo() : AudioStream(1, inputQue
 
 void AudioEffectFreeverbStereo::update()
 {
-#if defined(KINETISK)
+#if defined(__ARM_ARCH_7EM__)
 	const audio_block_t *block;
 	audio_block_t *outblockL;
 	audio_block_t *outblockR;

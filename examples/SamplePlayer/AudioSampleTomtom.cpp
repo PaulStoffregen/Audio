@@ -1,8 +1,9 @@
 // Audio data converted from WAV file by wav2sketch
 
 #include "AudioSampleTomtom.h"
-
+#include <Arduino.h>
 // Converted from tomtom.wav, using 11025 Hz, 16 bit PCM encoding
+PROGMEM
 const unsigned int AudioSampleTomtom[3489] = {
 0x83001B3C,0xFC0EFF8B,0xFB40FD97,0x045BFB30,0xEABCEAD6,0x04C2F8B3,0x002B0733,0xFB1C0879,
 0xE9CCED7A,0xEC2AEC4D,0xF7D8EF09,0xF6EC0EE6,0x15A4F3A6,0xFAD81B95,0xF591F001,0x0A3FFF14,

@@ -1,5 +1,5 @@
 /* Audio Library for Teensy 3.X
- * Copyright (c) 2014, Paul Stoffregen, paul@pjrc.com
+ * Copyright (c) 2016, Paul Stoffregen, paul@pjrc.com
  *
  * Development of this audio library was funded by PJRC.COM, LLC by sales of
  * Teensy and Audio Adaptor boards.  Please support PJRC's efforts to develop
@@ -24,59 +24,44 @@
  * THE SOFTWARE.
  */
 
+//Frank Bösing, Ben-Rheinland
 
-#include <Arduino.h>
-#include "analyze_rms.h"
-#include "utility/dspinst.h"
+#ifndef output_pt8211_2_h_
+#define output_pt8211_2_h_
 
-void AudioAnalyzeRMS::update(void)
+	//uncomment to enable oversampling:
+#define AUDIO_PT8211_OVERSAMPLING
+	//uncomment ONE of these to define interpolation type for oversampling:
+// #define AUDIO_PT8211_INTERPOLATION_LINEAR
+#define AUDIO_PT8211_INTERPOLATION_CIC
+
+#include "Arduino.h"
+#include "AudioStream.h"
+#include "DMAChannel.h"
+
+class AudioOutputPT8211_2 : public AudioStream
 {
-	audio_block_t *block = receiveReadOnly();
-	if (!block) {
-		count++;
-		return;
-	}
-#if defined(__ARM_ARCH_7EM__)
-	uint32_t *p = (uint32_t *)(block->data);
-	uint32_t *end = p + AUDIO_BLOCK_SAMPLES/2;
-	int64_t sum = accum;
-	do {
-		uint32_t n1 = *p++;
-		uint32_t n2 = *p++;
-		uint32_t n3 = *p++;
-		uint32_t n4 = *p++;
-		sum = multiply_accumulate_16tx16t_add_16bx16b(sum, n1, n1);
-		sum = multiply_accumulate_16tx16t_add_16bx16b(sum, n2, n2);
-		sum = multiply_accumulate_16tx16t_add_16bx16b(sum, n3, n3);
-		sum = multiply_accumulate_16tx16t_add_16bx16b(sum, n4, n4);
-	} while (p < end);
-	accum = sum;
-	count++;
-#else
-	int16_t *p = block->data;
-	int16_t *end = p + AUDIO_BLOCK_SAMPLES;
-	int64_t sum = accum;
-	do {
-		int32_t n = *p++;
-		sum += n * n;
-	} while (p < end);
-	accum = sum;
-	count++;
+public:
+	AudioOutputPT8211_2(void) : AudioStream(2, inputQueueArray) { begin(); }
+	virtual void update(void);
+	void begin(void);
+protected:
+	static void config_i2s(void);
+	static audio_block_t *block_left_1st;
+	static audio_block_t *block_right_1st;
+	static bool update_responsibility;
+	static DMAChannel dma;
+	static void isr(void)
+	#if defined(AUDIO_PT8211_OVERSAMPLING)
+		__attribute__((optimize("unroll-loops")))
+	#endif
+	;
+private:
+	static audio_block_t *block_left_2nd;
+	static audio_block_t *block_right_2nd;
+	static uint16_t block_left_offset;
+	static uint16_t block_right_offset;
+	audio_block_t *inputQueueArray[2];
+};
+
 #endif
-	release(block);
-}
-
-float AudioAnalyzeRMS::read(void)
-{
-	__disable_irq();
-	int64_t sum = accum;
-	accum = 0;
-	uint32_t num = count;
-	count = 0;
-	__enable_irq();
-	float meansq = sum / (num * AUDIO_BLOCK_SAMPLES);
-	// TODO: shift down to 32 bits and use sqrt_uint32
-	//       but is that really any more efficient?
-	return sqrtf(meansq) / 32767.0;
-}
-

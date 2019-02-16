@@ -25,20 +25,20 @@
  */
 
 
-
+#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
 #include <Arduino.h>
-#include "input_i2s.h"
-#include "output_i2s.h"
+#include "input_i2s2.h"
+#include "output_i2s2.h"
 
-static uint32_t i2s_rx_buffer[AUDIO_BLOCK_SAMPLES];
-audio_block_t * AudioInputI2S::block_left = NULL;
-audio_block_t * AudioInputI2S::block_right = NULL;
-uint16_t AudioInputI2S::block_offset = 0;
-bool AudioInputI2S::update_responsibility = false;
-DMAChannel AudioInputI2S::dma(false);
+static uint32_t i2s2_rx_buffer[AUDIO_BLOCK_SAMPLES];
+audio_block_t * AudioInputI2S2::block_left = NULL;
+audio_block_t * AudioInputI2S2::block_right = NULL;
+uint16_t AudioInputI2S2::block_offset = 0;
+bool AudioInputI2S2::update_responsibility = false;
+DMAChannel AudioInputI2S2::dma(false);
 
 
-void AudioInputI2S::begin(void)
+void AudioInputI2S2::begin(void)
 {
 	dma.begin(true); // Allocate the DMA channel first
 
@@ -46,47 +46,26 @@ void AudioInputI2S::begin(void)
 	//block_right_1st = NULL;
 
 	// TODO: should we set & clear the I2S_RCSR_SR bit here?
-	AudioOutputI2S::config_i2s();
+	AudioOutputI2S2::config_i2s();
 
-#if defined(KINETISK)
-	CORE_PIN13_CONFIG = PORT_PCR_MUX(4); // pin 13, PTC5, I2S0_RXD0
-	dma.TCD->SADDR = (void *)((uint32_t)&I2S0_RDR0 + 2);
+	CORE_PIN33_CONFIG = 2;  //2:RX_DATA0
+	IOMUXC_SAI2_RX_DATA0_SELECT_INPUT = 0;
+
+	dma.TCD->SADDR = (void *)((uint32_t)&I2S2_RDR0+2);
 	dma.TCD->SOFF = 0;
 	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
 	dma.TCD->NBYTES_MLNO = 2;
 	dma.TCD->SLAST = 0;
-	dma.TCD->DADDR = i2s_rx_buffer;
+	dma.TCD->DADDR = i2s2_rx_buffer;
 	dma.TCD->DOFF = 2;
-	dma.TCD->CITER_ELINKNO = sizeof(i2s_rx_buffer) / 2;
-	dma.TCD->DLASTSGA = -sizeof(i2s_rx_buffer);
-	dma.TCD->BITER_ELINKNO = sizeof(i2s_rx_buffer) / 2;
+	dma.TCD->CITER_ELINKNO = sizeof(i2s2_rx_buffer) / 2;
+	dma.TCD->DLASTSGA = -sizeof(i2s2_rx_buffer);
+	dma.TCD->BITER_ELINKNO = sizeof(i2s2_rx_buffer) / 2;
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
-	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_RX);
+	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI2_RX);
 
-	I2S0_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE | I2S_RCSR_FR;
-	I2S0_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE; // TX clock enable, because sync'd to TX
-#elif defined(__IMXRT1052__) || defined(__IMXRT1062__)
-
-	CORE_PIN7_CONFIG  = 3;  //1:RX_DATA0
-	IOMUXC_SAI1_RX_DATA0_SELECT_INPUT = 2;
-	
-	dma.TCD->SADDR = (void *)((uint32_t)&I2S1_RDR0+2);
-	dma.TCD->SOFF = 0;
-	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
-	dma.TCD->NBYTES_MLNO = 2;
-	dma.TCD->SLAST = 0;
-	dma.TCD->DADDR = i2s_rx_buffer;
-	dma.TCD->DOFF = 2;
-	dma.TCD->CITER_ELINKNO = sizeof(i2s_rx_buffer) / 2;
-	dma.TCD->DLASTSGA = -sizeof(i2s_rx_buffer);
-	dma.TCD->BITER_ELINKNO = sizeof(i2s_rx_buffer) / 2;
-	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
-	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI1_RX);
-
-	I2S1_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE;
-	I2S1_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE;
-
-#endif
+	I2S2_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE;
+	I2S2_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE;
 
 	update_responsibility = update_setup();
 	dma.enable();
@@ -94,7 +73,7 @@ void AudioInputI2S::begin(void)
 	//pinMode(13, OUTPUT);
 }
 
-void AudioInputI2S::isr(void)
+void AudioInputI2S2::isr(void)
 {
 	uint32_t daddr, offset;
 	const int16_t *src, *end;
@@ -102,31 +81,29 @@ void AudioInputI2S::isr(void)
 	audio_block_t *left, *right;
 
 	//digitalWriteFast(13, HIGH);
-#if defined(KINETISK) || defined(__IMXRT1052__) || defined(__IMXRT1062__)
 	daddr = (uint32_t)(dma.TCD->DADDR);
-#endif
 	dma.clearInterrupt();
 
-	if (daddr < (uint32_t)i2s_rx_buffer + sizeof(i2s_rx_buffer) / 2) {
+	if (daddr < (uint32_t)i2s2_rx_buffer + sizeof(i2s2_rx_buffer) / 2) {
 		// DMA is receiving to the first half of the buffer
 		// need to remove data from the second half
-		src = (int16_t *)&i2s_rx_buffer[AUDIO_BLOCK_SAMPLES/2];
-		end = (int16_t *)&i2s_rx_buffer[AUDIO_BLOCK_SAMPLES];
-		if (AudioInputI2S::update_responsibility) AudioStream::update_all();
+		src = (int16_t *)&i2s2_rx_buffer[AUDIO_BLOCK_SAMPLES/2];
+		end = (int16_t *)&i2s2_rx_buffer[AUDIO_BLOCK_SAMPLES];
+		if (AudioInputI2S2::update_responsibility) AudioStream::update_all();
 	} else {
 		// DMA is receiving to the second half of the buffer
 		// need to remove data from the first half
-		src = (int16_t *)&i2s_rx_buffer[0];
-		end = (int16_t *)&i2s_rx_buffer[AUDIO_BLOCK_SAMPLES/2];
+		src = (int16_t *)&i2s2_rx_buffer[0];
+		end = (int16_t *)&i2s2_rx_buffer[AUDIO_BLOCK_SAMPLES/2];
 	}
-	left = AudioInputI2S::block_left;
-	right = AudioInputI2S::block_right;
+	left = AudioInputI2S2::block_left;
+	right = AudioInputI2S2::block_right;
 	if (left != NULL && right != NULL) {
-		offset = AudioInputI2S::block_offset;
+		offset = AudioInputI2S2::block_offset;
 		if (offset <= AUDIO_BLOCK_SAMPLES/2) {
 			dest_left = &(left->data[offset]);
 			dest_right = &(right->data[offset]);
-			AudioInputI2S::block_offset = offset + AUDIO_BLOCK_SAMPLES/2;
+			AudioInputI2S2::block_offset = offset + AUDIO_BLOCK_SAMPLES/2;
 
 			do {
 				//Serial.println(*src);
@@ -143,7 +120,7 @@ void AudioInputI2S::isr(void)
 
 
 
-void AudioInputI2S::update(void)
+void AudioInputI2S2::update(void)
 {
 	audio_block_t *new_left=NULL, *new_right=NULL, *out_left=NULL, *out_right=NULL;
 
@@ -198,38 +175,39 @@ void AudioInputI2S::update(void)
 
 /******************************************************************/
 
-
-void AudioInputI2Sslave::begin(void)
+#if 0
+void AudioInputI2S2slave::begin(void)
 {
 	dma.begin(true); // Allocate the DMA channel first
 
 	//block_left_1st = NULL;
 	//block_right_1st = NULL;
 
-	AudioOutputI2Sslave::config_i2s();
-#if defined(KINETISK)
-	CORE_PIN13_CONFIG = PORT_PCR_MUX(4); // pin 13, PTC5, I2S0_RXD0
+	AudioOutputI2S2slave::config_i2s();
 
-	dma.TCD->SADDR = (void *)((uint32_t)&I2S0_RDR0 + 2);
+	CORE_PIN33_CONFIG = 2;  //2:RX_DATA0
+	IOMUXC_SAI2_RX_DATA0_SELECT_INPUT = 0;
+
+	dma.TCD->SADDR = (void *)((uint32_t)&I2S2_RDR0 + 2);
 	dma.TCD->SOFF = 0;
 	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
 	dma.TCD->NBYTES_MLNO = 2;
 	dma.TCD->SLAST = 0;
-	dma.TCD->DADDR = i2s_rx_buffer;
+	dma.TCD->DADDR = i2s2_rx_buffer;
 	dma.TCD->DOFF = 2;
-	dma.TCD->CITER_ELINKNO = sizeof(i2s_rx_buffer) / 2;
-	dma.TCD->DLASTSGA = -sizeof(i2s_rx_buffer);
-	dma.TCD->BITER_ELINKNO = sizeof(i2s_rx_buffer) / 2;
+	dma.TCD->CITER_ELINKNO = sizeof(i2s2_rx_buffer) / 2;
+	dma.TCD->DLASTSGA = -sizeof(i2s2_rx_buffer);
+	dma.TCD->BITER_ELINKNO = sizeof(i2s2_rx_buffer) / 2;
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
 
-	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_RX);
+	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI2_RX);
 	update_responsibility = update_setup();
 	dma.enable();
 
-	I2S0_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE | I2S_RCSR_FR;
-	I2S0_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE; // TX clock enable, because sync'd to TX
+	I2S2_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE | I2S_RCSR_FR;
+	I2S2_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE; // TX clock enable, because sync'd to TX
 	dma.attachInterrupt(isr);
-#endif	
 
 }
-
+#endif
+#endif

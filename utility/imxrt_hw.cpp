@@ -1,5 +1,5 @@
 /* Audio Library for Teensy 3.X
- * Copyright (c) 2014, Paul Stoffregen, paul@pjrc.com
+ * Copyright (c) 2019, Paul Stoffregen, paul@pjrc.com
  *
  * Development of this audio library was funded by PJRC.COM, LLC by sales of
  * Teensy and Audio Adaptor boards.  Please support PJRC's efforts to develop
@@ -23,60 +23,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+/*
+ (c) Frank b
+*/
 
+#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
+#include "imxrt_hw.h"
 
-#include <Arduino.h>
-#include "analyze_rms.h"
-#include "utility/dspinst.h"
+//#define CCM_ANALOG_PLL_AUDIO_LOCK	((uint32_t)(1<<31))
 
-void AudioAnalyzeRMS::update(void)
+PROGMEM
+void set_audioClock(int nfact, int32_t nmult, uint32_t ndiv) // sets PLL4
 {
-	audio_block_t *block = receiveReadOnly();
-	if (!block) {
-		count++;
-		return;
-	}
-#if defined(__ARM_ARCH_7EM__)
-	uint32_t *p = (uint32_t *)(block->data);
-	uint32_t *end = p + AUDIO_BLOCK_SAMPLES/2;
-	int64_t sum = accum;
-	do {
-		uint32_t n1 = *p++;
-		uint32_t n2 = *p++;
-		uint32_t n3 = *p++;
-		uint32_t n4 = *p++;
-		sum = multiply_accumulate_16tx16t_add_16bx16b(sum, n1, n1);
-		sum = multiply_accumulate_16tx16t_add_16bx16b(sum, n2, n2);
-		sum = multiply_accumulate_16tx16t_add_16bx16b(sum, n3, n3);
-		sum = multiply_accumulate_16tx16t_add_16bx16b(sum, n4, n4);
-	} while (p < end);
-	accum = sum;
-	count++;
-#else
-	int16_t *p = block->data;
-	int16_t *end = p + AUDIO_BLOCK_SAMPLES;
-	int64_t sum = accum;
-	do {
-		int32_t n = *p++;
-		sum += n * n;
-	} while (p < end);
-	accum = sum;
-	count++;
+	if (CCM_ANALOG_PLL_AUDIO & CCM_ANALOG_PLL_AUDIO_ENABLE) return;
+
+	CCM_ANALOG_PLL_AUDIO = 0;
+	//CCM_ANALOG_PLL_AUDIO |= CCM_ANALOG_PLL_AUDIO_BYPASS;
+	CCM_ANALOG_PLL_AUDIO |= CCM_ANALOG_PLL_AUDIO_ENABLE
+			     | CCM_ANALOG_PLL_AUDIO_POST_DIV_SELECT(2) // 0: 1/4; 1: 1/2; 0: 1/1
+			     | CCM_ANALOG_PLL_AUDIO_DIV_SELECT(nfact);
+
+	CCM_ANALOG_PLL_AUDIO_NUM   = nmult & CCM_ANALOG_PLL_AUDIO_NUM_MASK;
+	CCM_ANALOG_PLL_AUDIO_DENOM = ndiv & CCM_ANALOG_PLL_AUDIO_DENOM_MASK;
+	while (!(CCM_ANALOG_PLL_AUDIO & CCM_ANALOG_PLL_AUDIO_LOCK)) {}; //Wait for pll-lock
+
+	const int div_post_pll = 1; // other values: 2,4
+	CCM_ANALOG_MISC2 &= ~(CCM_ANALOG_MISC2_DIV_MSB | CCM_ANALOG_MISC2_DIV_LSB);
+	if(div_post_pll>1) CCM_ANALOG_MISC2 |= CCM_ANALOG_MISC2_DIV_LSB;
+	if(div_post_pll>3) CCM_ANALOG_MISC2 |= CCM_ANALOG_MISC2_DIV_MSB;
+}
+
 #endif
-	release(block);
-}
-
-float AudioAnalyzeRMS::read(void)
-{
-	__disable_irq();
-	int64_t sum = accum;
-	accum = 0;
-	uint32_t num = count;
-	count = 0;
-	__enable_irq();
-	float meansq = sum / (num * AUDIO_BLOCK_SAMPLES);
-	// TODO: shift down to 32 bits and use sqrt_uint32
-	//       but is that really any more efficient?
-	return sqrtf(meansq) / 32767.0;
-}
-

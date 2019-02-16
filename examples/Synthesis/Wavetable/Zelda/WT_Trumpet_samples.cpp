@@ -1,5 +1,6 @@
 #include "WT_Trumpet_samples.h"
 
+PROGMEM
 static const uint32_t sample_0_WT_Trumpet_trum04[10112] = {
 0xff9cff8f,0xffceffa9,0xfff90000,0xffd7ffe9,0xffbcffb2,0xff72ffa4,0xffc4ff9e,0xffbcffb2,
 0xffdcffca,0x006a001e,0x012600c2,0x01620159,0x01430152,0x014e014d,0x0118013c,0x00b100e5,
@@ -1265,6 +1266,7 @@ static const uint32_t sample_0_WT_Trumpet_trum04[10112] = {
 0x07f2f8b2,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,
 };
 
+PROGMEM
 static const uint32_t sample_1_WT_Trumpet_trum09[9728] = {
 0x0f1f0a8f,0x15811318,0x0d67137e,0xfeec05c4,0xf883fa6c,0xf8c9f836,0xfb84fa14,0xfe46fceb,
 0xfeb1fee5,0xfe30fe62,0xfd05fdc9,0xfc17fc35,0xfbcafc52,0xf9c7fac5,0xf77af88a,0xf6e0f6d9,
@@ -2534,4 +2536,3 @@ static const AudioSynthWavetable::sample_data WT_Trumpet_samples[2] = {
 static const uint8_t WT_Trumpet_ranges[] = {70, 127, };
 
 const AudioSynthWavetable::instrument_data WT_Trumpet = {2, WT_Trumpet_ranges, WT_Trumpet_samples };
-

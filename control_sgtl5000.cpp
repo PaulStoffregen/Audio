@@ -519,7 +519,8 @@ bool AudioControlSGTL5000::enable(void)
 	//unsigned int n = read(CHIP_ID);
 	//Serial.println(n, HEX);
 
-	write(CHIP_ANA_POWER, 0x4060);  // VDDD is externally driven with 1.8V
+	int r = write(CHIP_ANA_POWER, 0x4060);  // VDDD is externally driven with 1.8V
+	if (!r) return false;
 	write(CHIP_LINREG_CTRL, 0x006C);  // VDDA & VDDIO both over 3.1V
 	write(CHIP_REF_CTRL, 0x01F2); // VAG=1.575, normal ramp, +12.5% bias current
 	write(CHIP_LINE_OUT_CTRL, 0x0F22); // LO_VAGCNTRL=1.65V, OUT_CURRENT=0.54mA

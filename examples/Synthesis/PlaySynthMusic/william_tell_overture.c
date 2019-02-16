@@ -1,10 +1,6 @@
 // Playtune bytestream for file "william_tell_overture.mid" created by MIDITONES V1.6 on Sat Sep  6 16:56:56 2014
 // command line: ./miditones -t16 -v william_tell_overture 
-#ifdef __AVR__
-#include <avr/pgmspace.h>
-#else
-#define PROGMEM
-#endif
+#include <Arduino.h>
 const unsigned char PROGMEM score [] = {
 0x90,72,127, 0x91,72,107, 0x92,72,127, 0x93,72,127, 0x94,72,127, 1,169, 0x80, 0x81, 0x82, 0x83, 
 0x84, 0,183, 0x90,72,127, 0x91,72,107, 0x92,72,127, 0x93,72,127, 0x94,72,127, 0,41, 0x80, 

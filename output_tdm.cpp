@@ -27,7 +27,16 @@
 #include <Arduino.h>
 #include "output_tdm.h"
 #include "memcpy_audio.h"
-#if defined(KINETISK)
+#include "utility/imxrt_hw.h"
+
+#if !defined(I2S_TCR2_BCP)
+#define I2S_TCR2_BCP			((uint32_t)1<<25)
+#define I2S_RCR2_BCP			((uint32_t)1<<25)
+#define I2S_TCR4_FCONT			((uint32_t)1<<28)	// FIFO Continue on Error
+#define I2S_RCR4_FCONT			((uint32_t)1<<28)	// FIFO Continue on Error
+#define I2S_TCR4_FSP			((uint32_t)1<< 1)
+#define I2S_RCR4_FSP			((uint32_t)1<< 1)
+#endif
 
 audio_block_t * AudioOutputTDM::block_input[16] = {
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
@@ -35,7 +44,7 @@ audio_block_t * AudioOutputTDM::block_input[16] = {
 };
 bool AudioOutputTDM::update_responsibility = false;
 static uint32_t zeros[AUDIO_BLOCK_SAMPLES/2];
-DMAMEM static uint32_t tdm_tx_buffer[AUDIO_BLOCK_SAMPLES*16];
+static uint32_t tdm_tx_buffer[AUDIO_BLOCK_SAMPLES*16];
 DMAChannel AudioOutputTDM::dma(false);
 
 void AudioOutputTDM::begin(void)
@@ -48,6 +57,7 @@ void AudioOutputTDM::begin(void)
 
 	// TODO: should we set & clear the I2S_TCSR_SR bit here?
 	config_tdm();
+#if defined(KINETISK)
 	CORE_PIN22_CONFIG = PORT_PCR_MUX(6); // pin 22, PTC1, I2S0_TXD0
 
 	dma.TCD->SADDR = tdm_tx_buffer;
@@ -62,11 +72,35 @@ void AudioOutputTDM::begin(void)
 	dma.TCD->BITER_ELINKNO = sizeof(tdm_tx_buffer) / 4;
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_TX);
+
 	update_responsibility = update_setup();
 	dma.enable();
 
 	I2S0_TCSR = I2S_TCSR_SR;
 	I2S0_TCSR = I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
+#elif defined(__IMXRT1052__) || defined(__IMXRT1062__)
+	CORE_PIN6_CONFIG  = 3;  //1:TX_DATA0
+
+	dma.TCD->SADDR = tdm_tx_buffer;
+	dma.TCD->SOFF = 4;
+	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(2) | DMA_TCD_ATTR_DSIZE(2);
+	dma.TCD->NBYTES_MLNO = 4;
+	dma.TCD->SLAST = -sizeof(tdm_tx_buffer);
+	dma.TCD->DADDR = &I2S1_TDR0;
+	dma.TCD->DOFF = 0;
+	dma.TCD->CITER_ELINKNO = sizeof(tdm_tx_buffer) / 4;
+	dma.TCD->DLASTSGA = 0;
+	dma.TCD->BITER_ELINKNO = sizeof(tdm_tx_buffer) / 4;
+	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
+	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI1_TX);
+
+	update_responsibility = update_setup();
+	dma.enable();
+
+	I2S1_RCSR |= I2S_RCSR_RE;
+	I2S1_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
+
+#endif
 	dma.attachInterrupt(isr);
 }
 
@@ -135,7 +169,7 @@ void AudioOutputTDM::update(void)
 	}
 }
 
-
+#if defined(KINETISK)
 // MCLK needs to be 48e6 / 1088 * 512 = 22.588235 MHz -> 44.117647 kHz sample rate
 //
 #if F_CPU == 96000000 || F_CPU == 48000000 || F_CPU == 24000000
@@ -179,9 +213,11 @@ void AudioOutputTDM::update(void)
   #define MCLK_SRC  0  // system clock
 #endif
 #endif
+#endif
 
 void AudioOutputTDM::config_tdm(void)
 {
+#if defined(KINETISK)
 	SIM_SCGC6 |= SIM_SCGC6_I2S;
 	SIM_SCGC7 |= SIM_SCGC7_DMA;
 	SIM_SCGC6 |= SIM_SCGC6_DMAMUX;
@@ -219,8 +255,63 @@ void AudioOutputTDM::config_tdm(void)
 	CORE_PIN23_CONFIG = PORT_PCR_MUX(6); // pin 23, PTC2, I2S0_TX_FS (LRCLK)
 	CORE_PIN9_CONFIG  = PORT_PCR_MUX(6); // pin  9, PTC3, I2S0_TX_BCLK
 	CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK
+
+#elif defined(__IMXRT1052__) || defined(__IMXRT1062__)
+	CCM_CCGR5 |= CCM_CCGR5_SAI1(CCM_CCGR_ON);
+//PLL:
+	int fs = AUDIO_SAMPLE_RATE_EXACT*2;
+	// PLL between 27*24 = 648MHz und 54*24=1296MHz
+	int n1 = 4; //SAI prescaler 4 => (n1*n2) = multiple of 4
+	int n2 = 1 + (24000000 * 27) / (fs * 256 * n1);
+
+	double C = ((double)fs * 256 * n1 * n2) / 24000000;
+	int c0 = C;
+	int c2 = 10000;
+	int c1 = C * c2 - (c0 * c2);
+	set_audioClock(c0, c1, c2);
+	// clear SAI1_CLK register locations
+	CCM_CSCMR1 = (CCM_CSCMR1 & ~(CCM_CSCMR1_SAI1_CLK_SEL_MASK))
+		   | CCM_CSCMR1_SAI1_CLK_SEL(2); // &0x03 // (0,1,2): PLL3PFD0, PLL5, PLL4
+
+	//n1 = n1 / 2; //Double Speed for TDM
+
+	CCM_CS1CDR = (CCM_CS1CDR & ~(CCM_CS1CDR_SAI1_CLK_PRED_MASK | CCM_CS1CDR_SAI1_CLK_PODF_MASK))
+		   | CCM_CS1CDR_SAI1_CLK_PRED(n1-1) // &0x07
+		   | CCM_CS1CDR_SAI1_CLK_PODF(n2-1); // &0x3f
+
+	IOMUXC_GPR_GPR1 = (IOMUXC_GPR_GPR1 & ~(IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL_MASK))
+			| (IOMUXC_GPR_GPR1_SAI1_MCLK_DIR | IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL(0));	//Select MCLK
+
+	// if either transmitter or receiver is enabled, do nothing
+	if (I2S1_TCSR & I2S_TCSR_TE) return;
+	if (I2S1_RCSR & I2S_RCSR_RE) return;
+
+	// configure transmitter
+	int rsync = 0;
+	int tsync = 1;
+
+	I2S1_TMR = 0;
+	I2S1_TCR1 = I2S_TCR1_RFW(4);
+	I2S1_TCR2 = I2S_TCR2_SYNC(tsync) | I2S_TCR2_BCP | I2S_TCR2_MSEL(1)
+		| I2S_TCR2_BCD | I2S_TCR2_DIV(0);
+	I2S1_TCR3 = I2S_TCR3_TCE;
+	I2S1_TCR4 = I2S_TCR4_FRSZ(7) | I2S_TCR4_SYWD(0) | I2S_TCR4_MF
+		| I2S_TCR4_FSE | I2S_TCR4_FSD;
+	I2S1_TCR5 = I2S_TCR5_WNW(31) | I2S_TCR5_W0W(31) | I2S_TCR5_FBT(31);
+
+	// configure receiver (sync'd to transmitter clocks)
+	I2S1_RMR = 0;
+	I2S1_RCR1 = I2S_RCR1_RFW(4);
+	I2S1_RCR2 = I2S_RCR2_SYNC(rsync) | I2S_TCR2_BCP | I2S_RCR2_MSEL(1)
+		| I2S_RCR2_BCD | I2S_RCR2_DIV(0);
+	I2S1_RCR3 = I2S_RCR3_RCE;
+	I2S1_RCR4 = I2S_RCR4_FRSZ(7) | I2S_RCR4_SYWD(0) | I2S_RCR4_MF
+		| I2S_RCR4_FSE | I2S_RCR4_FSD;
+	I2S1_RCR5 = I2S_RCR5_WNW(31) | I2S_RCR5_W0W(31) | I2S_RCR5_FBT(31);
+
+	CORE_PIN23_CONFIG = 3;  //1:MCLK
+	CORE_PIN21_CONFIG = 3;  //1:RX_BCLK
+	CORE_PIN20_CONFIG = 3;  //1:RX_SYNC
+#endif
 }
 
-
-
-#endif // KINETISK
