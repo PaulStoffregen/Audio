@@ -32,18 +32,19 @@ public:
 
 private:
     volatile bool _playing;
-    volatile uint32_t _file_offset;
+    volatile int32_t _file_offset;
 
     uint32_t _file_size;
     float _readRate = 0.5;
     float _remainder = 0;
 
-    unsigned int _bufferPosition = 0;
-    unsigned int _bufferLength = 0;
-    int16_t _buffer[AUDIO_BLOCK_SAMPLES];
+    int _bufferPosition = 0;
+    int _bufferLength = 0;
+    uint16_t _buffer[AUDIO_BLOCK_SAMPLES];
 
     File _file;
 };
+
 
 
 #endif //PAULSTOFFREGEN_RESAMPLINGSDREADER_H
