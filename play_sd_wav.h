@@ -53,7 +53,7 @@ private:
 	audio_block_t *block_left;
 	audio_block_t *block_right;
 	uint16_t block_offset;		// how much data is in block_left & block_right
-	uint8_t buffer[512];		// buffer one block of data
+	alignas(4) uint8_t buffer[512]; // buffer one block of data
 	uint16_t buffer_offset;		// where we're at consuming "buffer"
 	uint16_t buffer_length;		// how much data is in "buffer" (512 until last read)
 	uint8_t header_offset;		// number of bytes in header[]

@@ -43,6 +43,37 @@
 #define STATE_PARSE5			12 // ignoring unknown chunk before "fmt "
 #define STATE_STOP			13
 
+/**
+  \brief Get Base Priority
+  \details Returns the current value of the Base Priority register
+  \return Base Priority register value
+ */
+static inline uint32_t __get_BASEPRI() __attribute__((always_inline));
+ 
+static inline uint32_t __get_BASEPRI() {
+	uint32_t result;
+	__asm volatile(
+		"mrs %0, basepri"
+		: "=r" (result)
+	);
+	return result;
+}
+
+
+/**
+  \brief Set Base Priority
+  \details Assigns the given value to the Base Priority register
+  \param[in] basePri Base Priority value to set
+ */
+static inline void __set_BASEPRI(const uint32_t value) __attribute__((always_inline));
+
+static inline void __set_BASEPRI(const uint32_t value) {
+	__asm volatile(
+		"msr basepri, %0"
+		:: "r" (value) : "memory"
+	);
+}
+
 void AudioPlaySdWav::begin(void)
 {
 	state = STATE_STOP;
@@ -67,9 +98,12 @@ bool AudioPlaySdWav::play(const char *filename)
 #else 	
 	AudioStartUsingSPI();
 #endif
-	__disable_irq();
+	/* disable interrupts with lower priority than SDHC DMA */
+	const uint32_t last_pri { __get_BASEPRI() };
+	const uint8_t sdhc_pri { NVIC_GET_PRIORITY(IRQ_SDHC) };
+	__set_BASEPRI((sdhc_pri / 16U + 1U) * 16U);
 	wavfile = SD.open(filename);
-	__enable_irq();
+	__set_BASEPRI(last_pri);
 	if (!wavfile) {
 	#if defined(HAS_KINETIS_SDHC)	
 		if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
