@@ -33,7 +33,7 @@ void setup() {
     audioShield.volume(0.5);
 
     playSdRaw1.play("DEMO.RAW");
-    playSdRaw1.setReadRate(1.5);
+    playSdRaw1.setPlaybackRate(1.5);
     Serial.println("playing...");
 }
 
