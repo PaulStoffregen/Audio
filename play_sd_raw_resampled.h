@@ -28,7 +28,7 @@ public:
     uint32_t lengthMillis(void);
     virtual void update(void);
 
-    void setReadRate(float f) {
+    void setPlaybackRate(float f) {
         sdReader.setReadRate(f);
     }
 
