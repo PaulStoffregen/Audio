@@ -27,20 +27,27 @@ public:
     void setReadRate(float f) {
         _readRate = f;
     }
+
+    void enableLinearInterpolation(bool enable_linear_interpolation) {
+        _enable_linear_interpolation = enable_linear_interpolation;
+    }
+
     int available(void);
+
     void close(void);
 
 private:
     volatile bool _playing;
     volatile int32_t _file_offset;
 
+    bool _enable_linear_interpolation = true;
     uint32_t _file_size;
     float _readRate = 0.5;
     float _remainder = 0;
 
     int _bufferPosition = 0;
     int _bufferLength = 0;
-    uint16_t _buffer[AUDIO_BLOCK_SAMPLES];
+    int16_t _buffer[AUDIO_BLOCK_SAMPLES];
 
     File _file;
 };

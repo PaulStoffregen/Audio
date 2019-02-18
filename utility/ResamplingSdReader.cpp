@@ -61,7 +61,25 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
     }
 
     //Serial.printf("buf %d/%d \n", _bufferPosition, _bufferLength);
-    uint16_t result = _buffer[_bufferPosition/2];
+    int16_t result = _buffer[_bufferPosition/2];
+    if (_enable_linear_interpolation) {
+        if (_remainder != 0.0) {
+            if (_readRate > 0.0) {
+                if (_bufferPosition < _bufferLength-2) {
+                    int16_t next =_buffer[(_bufferPosition/2)+1];
+                    int16_t interpolated =  (((1-_remainder) * 1000.0 * result) + (_remainder * 1000.0 * next)) / 1000;
+                    result = interpolated;
+                }
+            } else if (_readRate < 0.0) {
+                if (_bufferPosition >= 2) {
+                    int16_t prev =_buffer[(_bufferPosition/2)-1];
+                    int16_t interpolated = (((1 + _remainder) * 1000.0 * result) + (-_remainder * 1000.0 * prev)) / 1000;
+                    result = interpolated;
+                }
+            }
+        }
+    }
+
     //Serial.printf("result %4x \n", result);
     _remainder += _readRate;
 
