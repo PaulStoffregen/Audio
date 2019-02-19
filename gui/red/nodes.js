@@ -663,10 +663,10 @@ RED.nodes = (function() {
 				for (var w1=0;w1<n.wires.length;w1++) {
 					var wires = (n.wires[w1] instanceof Array)?n.wires[w1]:[n.wires[w1]];
 					for (var w2=0;w2<wires.length;w2++) {
-                        if (!wires[w2]) {
-                            console.log('RED:nodes: murks in wire #', w1, ' of:', n.name, n);
-                            continue;
-                        }
+						if (!wires[w2]) {
+							console.log('RED:nodes: murks in wire #', w1, ' of:', n.name, n);
+							continue;
+						}
 						var parts = wires[w2].split(":");
 						if (parts.length == 2 && parts[0] in node_map) {
 							var dst = node_map[parts[0]];
