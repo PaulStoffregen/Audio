@@ -368,6 +368,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioPlayMemory","data":{"defaults":{"name":{"value":"new"}},"shortName":"playMem","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioPlaySdWav","data":{"defaults":{"name":{"value":"new"}},"shortName":"playSdWav","inputs":0,"outputs":2,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioPlaySdRaw","data":{"defaults":{"name":{"value":"new"}},"shortName":"playSdRaw","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioPlaySdRawResampled","data":{"defaults":{"name":{"value":"new"}},"shortName":"playSdRawRsmpl","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioPlaySerialflashRaw","data":{"defaults":{"name":{"value":"new"}},"shortName":"playFlashRaw","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioPlayQueue","data":{"defaults":{"name":{"value":"new"}},"shortName":"queue","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioRecordQueue","data":{"defaults":{"name":{"value":"new"}},"shortName":"queue","inputs":1,"outputs":0,"category":"record-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -1699,6 +1700,72 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioPlaySdRaw">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioPlaySdRawResampled">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p> Based on AudioPlaySdRaw, Play a RAW data file, stored on a SD card, allowing pitch control / re-sampling </p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Sound Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>setPlaybackRate</span>(float);</p>
+	<p class=desc>set the playback rate; 1.0 is regular playback; -1 is reverse; 2 is double-speed
+	</p>
+	<p class=func><span class=keyword>getPlaybackRate</span>();</p>
+	<p class=desc>return the playback rate as float;
+	</p>
+	<p class=func><span class=keyword>setInterpolationEnabled</span>(bool enableInterpolation);</p>
+	<p class=desc>enable or disable linear interpolation
+	</p>
+	<p class=func><span class=keyword>interpolationEnabled</span>();</p>
+	<p class=desc>returns interpolation enabled as bool
+	</p>
+	<p class=func><span class=keyword>play</span>(filename);</p>
+	<p class=desc>Begin playing a RAW data file.  If a file is already playing,
+		it is stopped and this file starts playing from the beginning.
+		If playback rate is negative, the index is moved to the end of the audio data
+	</p>
+	<p class=func><span class=keyword>stop</span>();</p>
+	<p class=desc>Stop playing.  If not playing, this function has no effect.
+	</p>
+	<p class=func><span class=keyword>isPlaying</span>();</p>
+	<p class=desc>Return true (non-zero) if playing, or false (zero)
+		when not playing.
+	</p>
+	<p class=func><span class=keyword>positionMillis</span>();</p>
+	<p class=desc>While playing, return the current time offset, in
+		milliseconds.  When not playing, the return from this function
+		is undefined.
+	</p>
+	<p class=func><span class=keyword>lengthMillis</span>();</p>
+	<p class=desc>Return the total length of the current sound clip,
+		in milliseconds.  When not playing, the return from this function
+		is undefined.
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Playback &gt; PlayRAWResampled
+	</p>
+	<h3>Notes</h3>
+	<p>The data file must be RAW 16 bit signed integers in LSB-first format.
+	</p>
+	<p>While playing, the audio library accesses the SD card automatically.
+		If card access is required, you must
+		<a href="http://www.pjrc.com/teensy/td_libs_AudioProcessorUsage.html" target="_blank">AudioNoInterrupts()</a>
+		to prevent the library from accessing the SD card while you use it.
+		Disabling the audio library interrupt for too long may cause audible
+		dropouts or glitches.
+	</p>
+</script>
+<script type="text/x-red" data-template-name="AudioPlaySdRawResampled">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
