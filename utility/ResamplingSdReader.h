@@ -46,25 +46,33 @@ public:
     int read(void *buf, uint16_t nbyte);
     bool readNextValue(int16_t *value);
 
-    void setReadRate(float f) {
-        _readRate = f;
+    void setPlaybackRate(float f) {
+        _playbackRate = f;
     }
 
-    void enableLinearInterpolation(bool enable_linear_interpolation) {
-        _enable_linear_interpolation = enable_linear_interpolation;
+    float playbackRate() {
+        return _playbackRate;
     }
 
     int available(void);
 
     void close(void);
 
+    bool interpolationEnabled() {
+        return _enable_interpolation;
+    }
+
+    void setInterpolationEnabled(bool enableInterpolation) {
+        _enable_interpolation = enableInterpolation;
+    }
+
 private:
     volatile bool _playing;
     volatile int32_t _file_offset;
 
-    bool _enable_linear_interpolation = true;
+    bool _enable_interpolation = true;
     uint32_t _file_size;
-    float _readRate = 0.5;
+    float _playbackRate = 1;
     float _remainder = 0;
 
     int _bufferPosition = 0;

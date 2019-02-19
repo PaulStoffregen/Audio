@@ -51,7 +51,19 @@ public:
     virtual void update(void);
 
     void setPlaybackRate(float f) {
-        sdReader.setReadRate(f);
+        sdReader.setPlaybackRate(f);
+    }
+
+    float playbackRate(float f) {
+        return sdReader.playbackRate();
+    }
+
+    bool interpolationEnabled() {
+        return sdReader.interpolationEnabled();
+    }
+
+    void setInterpolationEnabled(bool enableInterpolation) {
+        sdReader.setInterpolationEnabled(enableInterpolation);
     }
 
 private:
