@@ -33,10 +33,15 @@
 
 #include "../spi_interrupt.h"
 
+const unsigned int ResamplingSdReader_NUM_BUFFERS = 2;
+
 class ResamplingSdReader {
 public:
     ResamplingSdReader() {
 
+        for (int i=0; i<ResamplingSdReader_NUM_BUFFERS; i++ ) {
+            _buffers[i] = NULL;
+        }
     }
     void begin(void);
     bool play(const char *filename);
@@ -66,8 +71,10 @@ public:
         _enable_interpolation = enableInterpolation;
     }
 
+    void updateBuffers();
+
 private:
-    volatile bool _playing;
+    volatile bool _playing = false;
     volatile int32_t _file_offset;
 
     bool _enable_interpolation = true;
@@ -76,12 +83,31 @@ private:
     float _remainder = 0;
 
     int _bufferPosition = 0;
-    int _bufferLength = 0;
-    int16_t _buffer[AUDIO_BLOCK_SAMPLES];
+
+    int16_t *_buffers[AUDIO_BLOCK_SAMPLES];
+    unsigned int _bufferLength[ResamplingSdReader_NUM_BUFFERS];
+    bool bufferIsAvailableForRead[ResamplingSdReader_NUM_BUFFERS];
+
+    char _readBuffer = -1;
+    char _playBuffer = -1;
 
     File _file;
+
+    void StartUsingSPI(){
+#if defined(HAS_KINETIS_SDHC)
+        if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStartUsingSPI();
+#else
+        AudioStartUsingSPI();
+#endif
+    }
+
+    void StopUsingSPI() {
+#if defined(HAS_KINETIS_SDHC)
+        if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
+#else
+        AudioStopUsingSPI();
+#endif
+    }
 };
 
-
-
-#endif //PAULSTOFFREGEN_RESAMPLINGSDREADER_H
+#endif //TEENSYAUDIOLIBRARY_RESAMPLINGSDREADER_H

@@ -66,6 +66,9 @@ public:
         sdReader.setInterpolationEnabled(enableInterpolation);
     }
 
+    void updateBuffers() {
+        sdReader.updateBuffers();
+    }
 private:
 
     uint32_t file_size;
