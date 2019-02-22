@@ -32,6 +32,7 @@
 #include "stdint.h"
 #include "utility/ResamplingSdReader.h"
 
+
 class AudioPlaySdRawResampled : public AudioStream
 {
 public:
@@ -65,10 +66,8 @@ public:
     void setInterpolationEnabled(bool enableInterpolation) {
         sdReader.setInterpolationEnabled(enableInterpolation);
     }
+    
 
-    void updateBuffers() {
-        sdReader.updateBuffers();
-    }
 private:
 
     uint32_t file_size;

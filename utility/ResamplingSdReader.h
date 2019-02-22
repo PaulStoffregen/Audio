@@ -33,7 +33,7 @@
 
 #include "../spi_interrupt.h"
 
-const unsigned int ResamplingSdReader_NUM_BUFFERS = 2;
+const unsigned int ResamplingSdReader_NUM_BUFFERS = 4;
 
 class ResamplingSdReader {
 public:
@@ -71,9 +71,8 @@ public:
         _enable_interpolation = enableInterpolation;
     }
 
-    void updateBuffers();
+ private:
 
-private:
     volatile bool _playing = false;
     volatile int32_t _file_offset;
 
@@ -88,10 +87,12 @@ private:
     unsigned int _bufferLength[ResamplingSdReader_NUM_BUFFERS];
     bool bufferIsAvailableForRead[ResamplingSdReader_NUM_BUFFERS];
 
-    char _readBuffer = -1;
-    char _playBuffer = -1;
+    volatile signed char _readBuffer = -1;
+    volatile signed char _playBuffer = -1;
 
     File _file;
+
+    void updateBuffers(void);
 
     void StartUsingSPI(){
 #if defined(HAS_KINETIS_SDHC)
