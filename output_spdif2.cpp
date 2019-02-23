@@ -23,6 +23,8 @@
 
  // 2015/08/23: (FB) added mute_PCM() - sets or unsets VALID in VUCP (and adjusts PARITY)
 
+#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
+ 
 #include <Arduino.h>
 #include "output_spdif2.h"
 #include "utility/imxrt_hw.h"
@@ -35,10 +37,9 @@ uint16_t  AudioOutputSPDIF2::block_left_offset = 0;
 uint16_t  AudioOutputSPDIF2::block_right_offset = 0;
 bool AudioOutputSPDIF2::update_responsibility = false;
 
-/* DMAMEM */ static uint32_t SPDIF_tx_buffer[AUDIO_BLOCK_SAMPLES * 4]; //2 KB
+DMAMEM __attribute__((aligned(32)))
+static uint32_t SPDIF_tx_buffer[AUDIO_BLOCK_SAMPLES * 4]; //2 KB
 DMAChannel AudioOutputSPDIF2::dma(false);
-
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
 
 #define PREAMBLE_B  (0xE8) //11101000
 #define PREAMBLE_M  (0xE2) //11100010
@@ -85,6 +86,7 @@ uint16_t bmclookup[256] = { //biphase mark encoded values (least significant bit
 	0x32aa, 0xb2aa, 0xd2aa, 0x52aa, 0xcaaa, 0x4aaa, 0x2aaa, 0xaaaa
 };
 
+PROGMEM
 void AudioOutputSPDIF2::begin(void)
 {
 
@@ -153,7 +155,6 @@ void AudioOutputSPDIF2::isr(void)
 		dest = (int32_t *)SPDIF_tx_buffer;
 		end = (int32_t *)&SPDIF_tx_buffer[AUDIO_BLOCK_SAMPLES * 4/2];
 	}
-
 
 	block = AudioOutputSPDIF2::block_left_1st;
 	if (block) {
@@ -245,6 +246,11 @@ void AudioOutputSPDIF2::isr(void)
 		} while (dest < end);
 	}
 
+	#if IMXRT_CACHE_ENABLED >= 2
+	dest -= AUDIO_BLOCK_SAMPLES * 4/2 + 4/2;
+	arm_dcache_flush_delete(dest, sizeof(SPDIF_tx_buffer) / 2 );
+	#endif
+
 }
 
 void AudioOutputSPDIF2::mute_PCM(const bool mute)
@@ -298,6 +304,7 @@ void AudioOutputSPDIF2::update(void)
 
 }
 
+PROGMEM
 void AudioOutputSPDIF2::config_SPDIF(void)
 {
 	CCM_CCGR5 |= CCM_CCGR5_SAI2(CCM_CCGR_ON);
