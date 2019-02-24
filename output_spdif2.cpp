@@ -311,16 +311,5 @@ void AudioOutputSPDIF2::config_SPDIF(void)
 }
 
 
-#else
-
-void AudioOutputSPDIF2::update(void)
-{
-
-	audio_block_t *block;
-	block = receiveReadOnly(0); // input 0 = left channel
-	if (block) release(block);
-	block = receiveReadOnly(1); // input 1 = right channel
-	if (block) release(block);
-}
 
 #endif
