@@ -189,18 +189,12 @@ void AudioOutputSPDIF3::isr(void)
 	} while (dest < end);
 	
 	if (block_left != &block_silent) {
-		release(block_left);
-		#if IMXRT_CACHE_ENABLED > 0
-		SCB_CACHE_DCCIMVAC = (uint32_t)block_left;
-		#endif		
+		release(block_left);	
 		block_left_1st = block_left_2nd;
 		block_left_2nd = nullptr;
 	}
 	if (block_right != &block_silent) {
-		release(block_right);
-		#if IMXRT_CACHE_ENABLED > 0
-		SCB_CACHE_DCCIMVAC = (uint32_t)block_right;
-		#endif		
+		release(block_right);	
 		block_right_1st = block_right_2nd;
 		block_right_2nd = nullptr;
 	}
@@ -246,16 +240,10 @@ void AudioOutputSPDIF3::update(void)
 	}
 	__enable_irq();
 	if (block_left) {
-		release(block_left);
-		#if IMXRT_CACHE_ENABLED > 0
-		SCB_CACHE_DCCIMVAC = (uint32_t)block_left;
-		#endif		
+		release(block_left);	
 	}
 	if (block_right) {			
-		release(block_right);
-		#if IMXRT_CACHE_ENABLED > 0
-		SCB_CACHE_DCCIMVAC = (uint32_t)block_right;
-		#endif				
+		release(block_right);		
 	}
 
 }
