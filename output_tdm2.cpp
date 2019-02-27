@@ -31,20 +31,23 @@
 #include "utility/imxrt_hw.h"
 
 audio_block_t * AudioOutputTDM2::block_input[16] = {
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 };
 bool AudioOutputTDM2::update_responsibility = false;
-static uint32_t zeros[AUDIO_BLOCK_SAMPLES/2];
-static uint32_t tdm_tx_buffer[AUDIO_BLOCK_SAMPLES*16];
 DMAChannel AudioOutputTDM2::dma(false);
+DMAMEM __attribute__((aligned(32)))
+static uint32_t zeros[AUDIO_BLOCK_SAMPLES/2];
+DMAMEM __attribute__((aligned(32)))
+static uint32_t tdm_tx_buffer[AUDIO_BLOCK_SAMPLES*16];
+
 
 void AudioOutputTDM2::begin(void)
 {
 	dma.begin(true); // Allocate the DMA channel first
 
 	for (int i=0; i < 16; i++) {
-		block_input[i] = NULL;
+		block_input[i] = nullptr;
 	}
 
 	// TODO: should we set & clear the I2S_TCSR_SR bit here?
@@ -80,13 +83,22 @@ static void memcpy_tdm_tx(uint32_t *dest, const uint32_t *src1, const uint32_t *
 	uint32_t i, in1, in2, out1, out2;
 
 	for (i=0; i < AUDIO_BLOCK_SAMPLES/2; i++) {
+
 		in1 = *src1++;
 		in2 = *src2++;
 		out1 = (in1 << 16) | (in2 & 0xFFFF);
 		out2 = (in1 & 0xFFFF0000) | (in2 >> 16);
 		*dest = out1;
 		*(dest + 8) = out2;
-		dest += 16;
+
+		in1 = *src1++;
+		in2 = *src2++;
+		out1 = (in1 << 16) | (in2 & 0xFFFF);
+		out2 = (in1 & 0xFFFF0000) | (in2 >> 16);
+		*(dest + 16)= out1;
+		*(dest + 24) = out2;
+
+		dest += 32;
 	}
 }
 
@@ -114,10 +126,15 @@ void AudioOutputTDM2::isr(void)
 		memcpy_tdm_tx(dest, src1, src2);
 		dest++;
 	}
+
+	#if IMXRT_CACHE_ENABLED >= 2
+	arm_dcache_flush_delete(dc, sizeof(tdm_tx_buffer) / 2 );
+	#endif
+
 	for (i=0; i < 16; i++) {
 		if (block_input[i]) {
 			release(block_input[i]);
-			block_input[i] = NULL;
+			block_input[i] = nullptr;
 		}
 	}
 }
