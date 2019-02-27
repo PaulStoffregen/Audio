@@ -35,9 +35,8 @@ audio_block_t * AudioOutputI2S2::block_right_2nd = NULL;
 uint16_t  AudioOutputI2S2::block_left_offset = 0;
 uint16_t  AudioOutputI2S2::block_right_offset = 0;
 bool AudioOutputI2S2::update_responsibility = false;
-static uint32_t i2s2_tx_buffer[AUDIO_BLOCK_SAMPLES];
 DMAChannel AudioOutputI2S2::dma(false);
-
+DMAMEM __attribute__((aligned(32))) static uint32_t i2s2_tx_buffer[AUDIO_BLOCK_SAMPLES];
 
 #include "utility/imxrt_hw.h"
 
@@ -105,10 +104,13 @@ void AudioOutputI2S2::isr(void)
 		memcpy_tointerleaveR(dest, blockR->data + offsetR);
 		offsetR += AUDIO_BLOCK_SAMPLES / 2;
 	} else {
-		memset(dest,0,AUDIO_BLOCK_SAMPLES * 2);
-		return;
+		memset(dest,0,AUDIO_BLOCK_SAMPLES * 2);		
 	}
 
+	#if IMXRT_CACHE_ENABLED >= 2		
+	arm_dcache_flush_delete(dest, sizeof(i2s2_tx_buffer) / 2 );
+	#endif	
+	
 	if (offsetL < AUDIO_BLOCK_SAMPLES) {
 		AudioOutputI2S2::block_left_offset = offsetL;
 	} else {

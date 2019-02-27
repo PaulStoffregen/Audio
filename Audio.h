@@ -105,6 +105,7 @@
 #include "output_pwm.h"
 #include "output_spdif.h"
 #include "output_spdif2.h"
+#include "output_spdif3.h"
 #include "output_pt8211.h"
 #include "output_pt8211_2.h"
 #include "output_tdm.h"
