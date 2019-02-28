@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
- #if defined(__IMXRT1052__) || defined(__IMXRT1062__)
+#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
 #include <Arduino.h>
 #include "output_tdm2.h"
 #include "memcpy_audio.h"
@@ -162,7 +162,7 @@ void AudioOutputTDM2::config_tdm(void)
 
 	CCM_CCGR5 |= CCM_CCGR5_SAI2(CCM_CCGR_ON);
 //PLL:
-	int fs = AUDIO_SAMPLE_RATE_EXACT*2; //176.4 khZ
+	int fs = AUDIO_SAMPLE_RATE_EXACT; //176.4 khZ
 	// PLL between 27*24 = 648MHz und 54*24=1296MHz
 	int n1 = 4; //SAI prescaler 4 => (n1*n2) = multiple of 4
 	int n2 = 1 + (24000000 * 27) / (fs * 256 * n1);
@@ -177,7 +177,7 @@ void AudioOutputTDM2::config_tdm(void)
 	CCM_CSCMR1 = (CCM_CSCMR1 & ~(CCM_CSCMR1_SAI2_CLK_SEL_MASK))
 		   | CCM_CSCMR1_SAI2_CLK_SEL(2); // &0x03 // (0,1,2): PLL3PFD0, PLL5, PLL4
 
-	//n1 = n1 / 2; //Double Speed for TDM
+	n1 = n1 / 2; //Double Speed for TDM
 
 	CCM_CS2CDR = (CCM_CS2CDR & ~(CCM_CS2CDR_SAI2_CLK_PRED_MASK | CCM_CS2CDR_SAI2_CLK_PODF_MASK))
 		   | CCM_CS2CDR_SAI2_CLK_PRED(n1-1) // &0x07

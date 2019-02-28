@@ -94,6 +94,7 @@
 #include "input_i2s2.h"
 #include "input_i2s_quad.h"
 #include "input_tdm.h"
+#include "input_tdm2.h"
 #include "input_pdm.h"
 #include "mixer.h"
 #include "output_dac.h"

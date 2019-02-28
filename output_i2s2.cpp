@@ -27,6 +27,7 @@
 #include <Arduino.h>
 #include "output_i2s2.h"
 #include "memcpy_audio.h"
+#include "utility/imxrt_hw.h"
 
 audio_block_t * AudioOutputI2S2::block_left_1st = NULL;
 audio_block_t * AudioOutputI2S2::block_right_1st = NULL;
@@ -71,7 +72,7 @@ void AudioOutputI2S2::begin(void)
 
 void AudioOutputI2S2::isr(void)
 {
-	int16_t *dest;
+	int16_t *dest, *dc;
 	audio_block_t *blockL, *blockR;
 	uint32_t saddr, offsetL, offsetR;
 
