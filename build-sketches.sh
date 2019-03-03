@@ -17,5 +17,6 @@ for example in "${examples[@]}"; do
   else
     # heavy checkmark
     echo -e """$GREEN""\xe2\x9c\x93"
+    echo $platform_stdout
   fi
 done;
