@@ -14,8 +14,11 @@ matrix:
         - sleep 3
         - export DISPLAY=:1.0
         - ./TeensyduinoInstall.linux64 --dir=$HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION
-        - ls -lrt $HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION
-        #- rm -rf $HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION/hardware/teensy/libraries/Audio
+        - ls -lrt $HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION/hardware/teensy/avr/libraries
+        - rm -rf $HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION/hardware/teensy/avr/libraries/Audio
+        - pwd
+        - ls -lrt
+        - ln -s $PWD $HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION/hardware/teensy/avr/libraries/Audio
       script:
         - source build-sketches.sh
 notifications:
