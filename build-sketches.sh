@@ -11,7 +11,7 @@ for example in "${examples[@]}"; do
     # heavy X
     echo -e """$RED""\xe2\x9c\x96"
     echo -e "\n"
-    cat error.txt
+    cat error.txt | grep -v "javax"
     exit_code=1
   else
     # heavy checkmark
