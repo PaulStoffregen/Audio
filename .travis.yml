@@ -16,6 +16,9 @@ matrix:
         - ./TeensyduinoInstall.linux64 --dir=$HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION
         - rm -rf $HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION/hardware/teensy/avr/libraries/Audio
         - ln -s $PWD $HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION/hardware/teensy/avr/libraries/Audio
+        - cp jmdns-log.properties ~/
+        - mv $HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION/arduino $HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION/arduino2
+        - cat $HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION/arduino2 | sed '28s/.*/JAVA_OPTIONS=("-DAPP_DIR=$APPDIR" "-Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel" "-Djava.util.logging.config.file=~\/jmdns-log.properties")/' > $HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION/arduino 
       script:
         - source build-sketches.sh
 notifications:
