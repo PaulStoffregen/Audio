@@ -10,9 +10,9 @@ matrix:
         - tar xf arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz -C $HOME/arduino_ide/ 
         - curl -fsSL https://www.pjrc.com/teensy/td_145/TeensyduinoInstall.linux64 -o TeensyduinoInstall.linux64
         - chmod +x TeensyduinoInstall.linux64
-        - /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_1.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :1 -ac -screen 0 1280x1024x16
-        - sleep 3
-        - export DISPLAY=:1.0
+        #- /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_1.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :1 -ac -screen 0 1280x1024x16
+        #- sleep 3
+        #- export DISPLAY=:1.0
         - ./TeensyduinoInstall.linux64 --dir=$HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION
         - rm -rf $HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION/hardware/teensy/avr/libraries/Audio
         - ln -s $PWD $HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION/hardware/teensy/avr/libraries/Audio
