@@ -29,30 +29,24 @@
 #include "memcpy_audio.h"
 #include "utility/imxrt_hw.h"
 
-#if !defined(I2S_TCR2_BCP)
-#define I2S_TCR2_BCP			((uint32_t)1<<25)
-#define I2S_RCR2_BCP			((uint32_t)1<<25)
-#define I2S_TCR4_FCONT			((uint32_t)1<<28)	// FIFO Continue on Error
-#define I2S_RCR4_FCONT			((uint32_t)1<<28)	// FIFO Continue on Error
-#define I2S_TCR4_FSP			((uint32_t)1<< 1)
-#define I2S_RCR4_FSP			((uint32_t)1<< 1)
-#endif
-
 audio_block_t * AudioOutputTDM::block_input[16] = {
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 };
 bool AudioOutputTDM::update_responsibility = false;
-static uint32_t zeros[AUDIO_BLOCK_SAMPLES/2];
-static uint32_t tdm_tx_buffer[AUDIO_BLOCK_SAMPLES*16];
 DMAChannel AudioOutputTDM::dma(false);
+DMAMEM __attribute__((aligned(32)))
+static uint32_t zeros[AUDIO_BLOCK_SAMPLES/2];
+DMAMEM __attribute__((aligned(32)))
+static uint32_t tdm_tx_buffer[AUDIO_BLOCK_SAMPLES*16];
+
 
 void AudioOutputTDM::begin(void)
 {
 	dma.begin(true); // Allocate the DMA channel first
 
 	for (int i=0; i < 16; i++) {
-		block_input[i] = NULL;
+		block_input[i] = nullptr;
 	}
 
 	// TODO: should we set & clear the I2S_TCSR_SR bit here?
@@ -109,20 +103,29 @@ static void memcpy_tdm_tx(uint32_t *dest, const uint32_t *src1, const uint32_t *
 {
 	uint32_t i, in1, in2, out1, out2;
 
-	for (i=0; i < AUDIO_BLOCK_SAMPLES/2; i++) {
+	for (i=0; i < AUDIO_BLOCK_SAMPLES/4; i++) {
+
 		in1 = *src1++;
 		in2 = *src2++;
 		out1 = (in1 << 16) | (in2 & 0xFFFF);
 		out2 = (in1 & 0xFFFF0000) | (in2 >> 16);
 		*dest = out1;
 		*(dest + 8) = out2;
-		dest += 16;
+
+		in1 = *src1++;
+		in2 = *src2++;
+		out1 = (in1 << 16) | (in2 & 0xFFFF);
+		out2 = (in1 & 0xFFFF0000) | (in2 >> 16);
+		*(dest + 16)= out1;
+		*(dest + 24) = out2;
+
+		dest += 32;
 	}
 }
 
 void AudioOutputTDM::isr(void)
 {
-	uint32_t *dest;
+	uint32_t *dest, *dc;
 	const uint32_t *src1, *src2;
 	uint32_t i, saddr;
 
@@ -138,16 +141,22 @@ void AudioOutputTDM::isr(void)
 		dest = tdm_tx_buffer;
 	}
 	if (update_responsibility) AudioStream::update_all();
+	dc = dest;
 	for (i=0; i < 16; i += 2) {
 		src1 = block_input[i] ? (uint32_t *)(block_input[i]->data) : zeros;
 		src2 = block_input[i+1] ? (uint32_t *)(block_input[i+1]->data) : zeros;
 		memcpy_tdm_tx(dest, src1, src2);
 		dest++;
 	}
+
+	#if IMXRT_CACHE_ENABLED >= 2
+	arm_dcache_flush_delete(dc, sizeof(tdm_tx_buffer) / 2 );
+	#endif
+
 	for (i=0; i < 16; i++) {
 		if (block_input[i]) {
 			release(block_input[i]);
-			block_input[i] = NULL;
+			block_input[i] = nullptr;
 		}
 	}
 }
@@ -252,14 +261,14 @@ void AudioOutputTDM::config_tdm(void)
 	I2S0_RCR5 = I2S_RCR5_WNW(31) | I2S_RCR5_W0W(31) | I2S_RCR5_FBT(31);
 
 	// configure pin mux for 3 clock signals
-	CORE_PIN23_CONFIG = PORT_PCR_MUX(6); // pin 23, PTC2, I2S0_TX_FS (LRCLK)
-	CORE_PIN9_CONFIG  = PORT_PCR_MUX(6); // pin  9, PTC3, I2S0_TX_BCLK
-	CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK
+	CORE_PIN23_CONFIG = PORT_PCR_MUX(6); // pin 23, PTC2, I2S0_TX_FS (LRCLK) - 44.1kHz
+	CORE_PIN9_CONFIG  = PORT_PCR_MUX(6); // pin  9, PTC3, I2S0_TX_BCLK  - 11.2 MHz
+	CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK - 22.5 MHz
 
 #elif defined(__IMXRT1052__) || defined(__IMXRT1062__)
 	CCM_CCGR5 |= CCM_CCGR5_SAI1(CCM_CCGR_ON);
 //PLL:
-	int fs = AUDIO_SAMPLE_RATE_EXACT*2;
+	int fs = AUDIO_SAMPLE_RATE_EXACT;
 	// PLL between 27*24 = 648MHz und 54*24=1296MHz
 	int n1 = 4; //SAI prescaler 4 => (n1*n2) = multiple of 4
 	int n2 = 1 + (24000000 * 27) / (fs * 256 * n1);
@@ -273,7 +282,7 @@ void AudioOutputTDM::config_tdm(void)
 	CCM_CSCMR1 = (CCM_CSCMR1 & ~(CCM_CSCMR1_SAI1_CLK_SEL_MASK))
 		   | CCM_CSCMR1_SAI1_CLK_SEL(2); // &0x03 // (0,1,2): PLL3PFD0, PLL5, PLL4
 
-	//n1 = n1 / 2; //Double Speed for TDM
+	n1 = n1 / 2; //Double Speed for TDM
 
 	CCM_CS1CDR = (CCM_CS1CDR & ~(CCM_CS1CDR_SAI1_CLK_PRED_MASK | CCM_CS1CDR_SAI1_CLK_PODF_MASK))
 		   | CCM_CS1CDR_SAI1_CLK_PRED(n1-1) // &0x07
@@ -299,7 +308,6 @@ void AudioOutputTDM::config_tdm(void)
 		| I2S_TCR4_FSE | I2S_TCR4_FSD;
 	I2S1_TCR5 = I2S_TCR5_WNW(31) | I2S_TCR5_W0W(31) | I2S_TCR5_FBT(31);
 
-	// configure receiver (sync'd to transmitter clocks)
 	I2S1_RMR = 0;
 	I2S1_RCR1 = I2S_RCR1_RFW(4);
 	I2S1_RCR2 = I2S_RCR2_SYNC(rsync) | I2S_TCR2_BCP | I2S_RCR2_MSEL(1)
