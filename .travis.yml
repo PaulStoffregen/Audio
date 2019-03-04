@@ -15,7 +15,10 @@ matrix:
         - export DISPLAY=:1.0
         - ./TeensyduinoInstall.linux64 --dir=$HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION
         - rm -rf $HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION/hardware/teensy/avr/libraries/Audio
-        - ln -s $PWD $HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION/hardware/teensy/avr/libraries/Audio        
+        - ln -s $PWD $HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION/hardware/teensy/avr/libraries/Audio
+        # add java-vm -Dorg.slf4j.simpleLogger.defaultLogLevel=error (replace line 28 of arduino bash script with modified version)
+        - cat $HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION/arduino | sed '28s/.*/JAVA_OPTIONS=("-DAPP_DIR=$APPDIR" "-Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel" "-Dorg.slf4j.simpleLogger.defaultLogLevel=error")/' > $HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION/arduino 
+        - chmod +x $HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION/arduino
       script:
         - source build-sketches.sh
 notifications:
