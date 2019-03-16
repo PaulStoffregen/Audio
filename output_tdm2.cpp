@@ -24,27 +24,30 @@
  * THE SOFTWARE.
  */
 
- #if defined(__IMXRT1052__) || defined(__IMXRT1062__)
+#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
 #include <Arduino.h>
 #include "output_tdm2.h"
 #include "memcpy_audio.h"
 #include "utility/imxrt_hw.h"
 
 audio_block_t * AudioOutputTDM2::block_input[16] = {
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 };
 bool AudioOutputTDM2::update_responsibility = false;
-static uint32_t zeros[AUDIO_BLOCK_SAMPLES/2];
-static uint32_t tdm_tx_buffer[AUDIO_BLOCK_SAMPLES*16];
 DMAChannel AudioOutputTDM2::dma(false);
+DMAMEM __attribute__((aligned(32)))
+static uint32_t zeros[AUDIO_BLOCK_SAMPLES/2];
+DMAMEM __attribute__((aligned(32)))
+static uint32_t tdm_tx_buffer[AUDIO_BLOCK_SAMPLES*16];
+
 
 void AudioOutputTDM2::begin(void)
 {
 	dma.begin(true); // Allocate the DMA channel first
 
 	for (int i=0; i < 16; i++) {
-		block_input[i] = NULL;
+		block_input[i] = nullptr;
 	}
 
 	// TODO: should we set & clear the I2S_TCSR_SR bit here?
@@ -80,19 +83,28 @@ static void memcpy_tdm_tx(uint32_t *dest, const uint32_t *src1, const uint32_t *
 	uint32_t i, in1, in2, out1, out2;
 
 	for (i=0; i < AUDIO_BLOCK_SAMPLES/2; i++) {
+
 		in1 = *src1++;
 		in2 = *src2++;
 		out1 = (in1 << 16) | (in2 & 0xFFFF);
 		out2 = (in1 & 0xFFFF0000) | (in2 >> 16);
 		*dest = out1;
 		*(dest + 8) = out2;
-		dest += 16;
+
+		in1 = *src1++;
+		in2 = *src2++;
+		out1 = (in1 << 16) | (in2 & 0xFFFF);
+		out2 = (in1 & 0xFFFF0000) | (in2 >> 16);
+		*(dest + 16)= out1;
+		*(dest + 24) = out2;
+
+		dest += 32;
 	}
 }
 
 void AudioOutputTDM2::isr(void)
 {
-	uint32_t *dest;
+	uint32_t *dest, *dc;
 	const uint32_t *src1, *src2;
 	uint32_t i, saddr;
 
@@ -108,16 +120,22 @@ void AudioOutputTDM2::isr(void)
 		dest = tdm_tx_buffer;
 	}
 	if (update_responsibility) AudioStream::update_all();
+	dc = dest;
 	for (i=0; i < 16; i += 2) {
 		src1 = block_input[i] ? (uint32_t *)(block_input[i]->data) : zeros;
 		src2 = block_input[i+1] ? (uint32_t *)(block_input[i+1]->data) : zeros;
 		memcpy_tdm_tx(dest, src1, src2);
 		dest++;
 	}
+
+	#if IMXRT_CACHE_ENABLED >= 2
+	arm_dcache_flush_delete(dc, sizeof(tdm_tx_buffer) / 2 );
+	#endif
+
 	for (i=0; i < 16; i++) {
 		if (block_input[i]) {
 			release(block_input[i]);
-			block_input[i] = NULL;
+			block_input[i] = nullptr;
 		}
 	}
 }
@@ -144,7 +162,7 @@ void AudioOutputTDM2::config_tdm(void)
 
 	CCM_CCGR5 |= CCM_CCGR5_SAI2(CCM_CCGR_ON);
 //PLL:
-	int fs = AUDIO_SAMPLE_RATE_EXACT*2; //176.4 khZ
+	int fs = AUDIO_SAMPLE_RATE_EXACT; //176.4 khZ
 	// PLL between 27*24 = 648MHz und 54*24=1296MHz
 	int n1 = 4; //SAI prescaler 4 => (n1*n2) = multiple of 4
 	int n2 = 1 + (24000000 * 27) / (fs * 256 * n1);
@@ -159,7 +177,7 @@ void AudioOutputTDM2::config_tdm(void)
 	CCM_CSCMR1 = (CCM_CSCMR1 & ~(CCM_CSCMR1_SAI2_CLK_SEL_MASK))
 		   | CCM_CSCMR1_SAI2_CLK_SEL(2); // &0x03 // (0,1,2): PLL3PFD0, PLL5, PLL4
 
-	//n1 = n1 / 2; //Double Speed for TDM
+	n1 = n1 / 2; //Double Speed for TDM
 
 	CCM_CS2CDR = (CCM_CS2CDR & ~(CCM_CS2CDR_SAI2_CLK_PRED_MASK | CCM_CS2CDR_SAI2_CLK_PODF_MASK))
 		   | CCM_CS2CDR_SAI2_CLK_PRED(n1-1) // &0x07

@@ -1,5 +1,5 @@
 /* Audio Library for Teensy 3.X
- * Copyright (c) 2019, Paul Stoffregen, paul@pjrc.com
+ * Copyright (c) 2017, Paul Stoffregen, paul@pjrc.com
  *
  * Development of this audio library was funded by PJRC.COM, LLC by sales of
  * Teensy and Audio Adaptor boards.  Please support PJRC's efforts to develop
@@ -23,34 +23,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-/*
- (c) Frank b
-*/
 
 #if defined(__IMXRT1052__) || defined(__IMXRT1062__)
-#include "imxrt_hw.h"
+#ifndef _input_tdm2_h_
+#define _input_tdm2_h_
 
-//#define CCM_ANALOG_PLL_AUDIO_LOCK	((uint32_t)(1<<31))
+#include "Arduino.h"
+#include "AudioStream.h"
+#include "DMAChannel.h"
 
-PROGMEM
-void set_audioClock(int nfact, int32_t nmult, uint32_t ndiv) // sets PLL4
+class AudioInputTDM2 : public AudioStream
 {
-	if (CCM_ANALOG_PLL_AUDIO & CCM_ANALOG_PLL_AUDIO_ENABLE) return;
+public:
+	AudioInputTDM2(void) : AudioStream(0, NULL) { begin(); }
+	virtual void update(void);
+	void begin(void);
+protected:	
+	static bool update_responsibility;
+	static DMAChannel dma;
+	static void isr(void);
+private:
+	static audio_block_t *block_incoming[16];
+};
 
-	CCM_ANALOG_PLL_AUDIO = 0;
-	//CCM_ANALOG_PLL_AUDIO |= CCM_ANALOG_PLL_AUDIO_BYPASS;
-	CCM_ANALOG_PLL_AUDIO |= CCM_ANALOG_PLL_AUDIO_ENABLE
-			     | CCM_ANALOG_PLL_AUDIO_POST_DIV_SELECT(2) // 2: 1/4; 1: 1/2; 0: 1/1
-			     | CCM_ANALOG_PLL_AUDIO_DIV_SELECT(nfact);
-
-	CCM_ANALOG_PLL_AUDIO_NUM   = nmult & CCM_ANALOG_PLL_AUDIO_NUM_MASK;
-	CCM_ANALOG_PLL_AUDIO_DENOM = ndiv & CCM_ANALOG_PLL_AUDIO_DENOM_MASK;
-	while (!(CCM_ANALOG_PLL_AUDIO & CCM_ANALOG_PLL_AUDIO_LOCK)) {}; //Wait for pll-lock
-
-	const int div_post_pll = 1; // other values: 2,4
-	CCM_ANALOG_MISC2 &= ~(CCM_ANALOG_MISC2_DIV_MSB | CCM_ANALOG_MISC2_DIV_LSB);
-	if(div_post_pll>1) CCM_ANALOG_MISC2 |= CCM_ANALOG_MISC2_DIV_LSB;
-	if(div_post_pll>3) CCM_ANALOG_MISC2 |= CCM_ANALOG_MISC2_DIV_MSB;
-}
-
+#endif
 #endif

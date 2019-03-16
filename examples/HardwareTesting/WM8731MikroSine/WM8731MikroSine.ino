@@ -23,6 +23,9 @@
 //     3.3V      +3.3V
 //     GND        GND
 //
+// For connection using I2S master mode (WM8731 in slave mode, with MCLK):
+//  https://forum.pjrc.com/threads/53854?p=198733&viewfull=1#post198733
+//
 // This example code is in the public domain.
 
 #include <Audio.h>

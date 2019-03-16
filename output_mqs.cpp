@@ -38,8 +38,10 @@ audio_block_t * AudioOutputMQS::block_right_2nd = NULL;
 uint16_t  AudioOutputMQS::block_left_offset = 0;
 uint16_t  AudioOutputMQS::block_right_offset = 0;
 bool AudioOutputMQS::update_responsibility = false;
-static uint32_t I2S3_tx_buffer[AUDIO_BLOCK_SAMPLES];
 DMAChannel AudioOutputMQS::dma(false);
+DMAMEM __attribute__((aligned(32)))
+static uint32_t I2S3_tx_buffer[AUDIO_BLOCK_SAMPLES];
+
 
 void AudioOutputMQS::begin(void)
 {
@@ -99,18 +101,21 @@ void AudioOutputMQS::isr(void)
 	if (blockL && blockR) {
 		memcpy_tointerleaveLR(dest, blockL->data + offsetL, blockR->data + offsetR);
 		offsetL += AUDIO_BLOCK_SAMPLES / 2;
-		offsetR += AUDIO_BLOCK_SAMPLES / 2;
+		offsetR += AUDIO_BLOCK_SAMPLES / 2;	
 	} else if (blockL) {
 		memcpy_tointerleaveL(dest, blockL->data + offsetL);
-		offsetL += AUDIO_BLOCK_SAMPLES / 2;
+		offsetL += AUDIO_BLOCK_SAMPLES / 2;		
 	} else if (blockR) {
 		memcpy_tointerleaveR(dest, blockR->data + offsetR);
-		offsetR += AUDIO_BLOCK_SAMPLES / 2;
+		offsetR += AUDIO_BLOCK_SAMPLES / 2;		
 	} else {
-		memset(dest,0,AUDIO_BLOCK_SAMPLES * 2);
-		return;
+		memset(dest,0, sizeof(I2S3_tx_buffer) / 2);		
 	}
-
+	
+	#if IMXRT_CACHE_ENABLED >= 2		
+	arm_dcache_flush_delete(dest, sizeof(I2S3_tx_buffer) / 2 );
+	#endif
+	
 	if (offsetL < AUDIO_BLOCK_SAMPLES) {
 		AudioOutputMQS::block_left_offset = offsetL;
 	} else {
