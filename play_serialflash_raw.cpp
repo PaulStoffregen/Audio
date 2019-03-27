@@ -90,9 +90,15 @@ void AudioPlaySerialflashRaw::update(void)
 		}
 		transmit(block);
 	} else {
-		rawfile.close();
-		AudioStopUsingSPI();
-		playing = false;
+		if (looping) {
+			file_offset = 0;
+			rawfile.seek(0);
+			//Serial.println("looped!");
+		} else {
+			rawfile.close();
+			AudioStopUsingSPI();
+			playing = false;
+		}
 		//Serial.println("Finished playing sample");		//TODO
 	}
 	release(block);
@@ -111,3 +117,7 @@ uint32_t AudioPlaySerialflashRaw::lengthMillis(void)
 }
 
 
+void AudioPlaySerialflashRaw::seek(uint32_t p) {
+	rawfile.seek(p);
+	file_offset = p;
+}

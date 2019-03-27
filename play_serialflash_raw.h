@@ -40,14 +40,21 @@ public:
 	bool play(const char *filename);
 	void stop(void);
 	bool isPlaying(void) { return playing; }
+
+	void seek(uint32_t p);
+
 	uint32_t positionMillis(void);
 	uint32_t lengthMillis(void);
 	virtual void update(void);
+
+	bool looping;
+
 private:
 	SerialFlashFile rawfile;
 	uint32_t file_size;
 	volatile uint32_t file_offset;
 	volatile bool playing;
+
 };
 
 #endif
