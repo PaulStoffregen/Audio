@@ -28,7 +28,7 @@
 #include "utility/dspinst.h"
 
 
-#if defined(KINETISK)
+#if defined(KINETISK) || defined(__SAMD51__)
 
 void AudioSynthWaveformPWM::update(void)
 {

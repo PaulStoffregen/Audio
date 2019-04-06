@@ -28,7 +28,6 @@
 #include "utility/pdb.h"
 #include "utility/dspinst.h"
 
-#define __SAMD51__
 #if defined(__SAMD51__)
 
 #include "wiring_private.h"
@@ -79,35 +78,29 @@ void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
 
 	ADC0->CTRLA.bit.PRESCALER = ADC_CTRLA_PRESCALER_DIV32_Val;
 	ADC0->CTRLB.reg = ADC_CTRLB_RESSEL_16BIT | ADC_CTRLB_FREERUN;
-	
 	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_CTRLB );  //wait for sync
 	
 	ADC0->SAMPCTRL.reg = 5;                        // sampling Time Length
-	
 	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_SAMPCTRL );  //wait for sync
 	
 	ADC0->INPUTCTRL.reg = ADC_INPUTCTRL_MUXNEG_GND;   // No Negative input (Internal Ground)
-
 	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_INPUTCTRL );  //wait for sync
 
-	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_INPUTCTRL ); //wait for sync
 	ADC0->INPUTCTRL.bit.MUXPOS = g_APinDescription[pin0].ulADCChannelNumber; // Selection for the positive ADC input
+	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_INPUTCTRL ); //wait for sync
 
 	// Averaging (see datasheet table in AVGCTRL register description)
 	//TODO: this is weirdly set for a 13 bit result for now... we may want to change later
-	ADC0->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_1 |
-			ADC_AVGCTRL_ADJRES(0x0ul);
-						
+	ADC0->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_1 | ADC_AVGCTRL_ADJRES(0x0);
 	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_AVGCTRL );  //wait for sync
 
 	ADC0->REFCTRL.bit.REFSEL = ADC_REFCTRL_REFSEL_INTVCC1_Val;
-	
 	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_ENABLE ); //wait for sync
+
 	ADC0->CTRLA.bit.ENABLE = 0x01;             // Enable ADC
+	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_ENABLE ); //wait for sync
 
 	// Start conversion
-	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_ENABLE ); //wait for sync
-
 	ADC0->SWTRIG.bit.START = 1;
 
 	//******* Initialize ADC1 *********//
@@ -115,34 +108,69 @@ void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
 
 	ADC1->CTRLA.bit.PRESCALER = ADC_CTRLA_PRESCALER_DIV32_Val;
 	ADC1->CTRLB.reg = ADC_CTRLB_RESSEL_16BIT | ADC_CTRLB_FREERUN;;
-
 	while( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_CTRLB );  //wait for sync
 
 	ADC1->SAMPCTRL.reg = 5;                        // sampling Time Length
-
 	while( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_SAMPCTRL );  //wait for sync
 	
 	ADC1->INPUTCTRL.reg = ADC_INPUTCTRL_MUXNEG_GND;   // No Negative input (Internal Ground)
-
 	while( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_INPUTCTRL );  //wait for sync
 
+   // selection for the positive ADC input - note a different channel is needed for ADC1
+   EAnalogChannel ADC1Channel = No_ADC_Channel;
+
+#if defined(_VARIANT_ITSYBITSY_M4_)
+   switch (pin1)
+   {
+      case PIN_A2: ADC1Channel = ADC_Channel0; break;
+      case PIN_A3: ADC1Channel = ADC_Channel1; break;
+   }
+#elif defined(_VARIANT_FEATHER_M4_)
+   switch (pin1)
+   {
+      case PIN_A2: ADC1Channel = ADC_Channel0; break;
+      case PIN_A3: ADC1Channel = ADC_Channel1; break;
+   }
+#elif defined(_VARIANT_METRO_M4_)
+   switch (pin1)
+   {
+      case PIN_A4: ADC1Channel = ADC_Channel0; break;
+      case PIN_A5: ADC1Channel = ADC_Channel1; break;
+   }
+#elif defined(_VARIANT_GRAND_CENTRAL_M4_)
+   switch (pin1)
+   {
+      case PIN_A3: ADC1Channel = ADC_Channel10; break;
+      case PIN_A4: ADC1Channel = ADC_Channel11; break;
+      case PIN_A5: ADC1Channel = ADC_Channel4; break;
+      case PIN_A6: ADC1Channel = ADC_Channel5; break;
+      case PIN_A7: ADC1Channel = ADC_Channel6; break;
+      case PIN_A8: ADC1Channel = ADC_Channel7; break;
+      case PIN_A9: ADC1Channel = ADC_Channel8; break;
+      case PIN_A10: ADC1Channel = ADC_Channel9; break;
+      case PIN_A11: ADC1Channel = ADC_Channel0; break;
+      case PIN_A12: ADC1Channel = ADC_Channel1; break;
+   }
+#elif defined(_VARIANT_TRELLIS_M4_)
+   // no pins can connect to ADC1
+#else
+#error The Adafruit audio library is compatible with M4 parts only
+#endif
+
+	ADC1->INPUTCTRL.bit.MUXPOS = ADC1Channel;
 	while( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_INPUTCTRL ); //wait for sync
-	ADC1->INPUTCTRL.bit.MUXPOS = g_APinDescription[pin1].ulADCChannelNumber; // Selection for the positive ADC input
 
 	//TODO: this is weirdly set for a 13 bit result for now... we may want to change later
-	ADC1->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_1 |
-						ADC_AVGCTRL_ADJRES(0x0ul);
-
+	ADC1->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_1 | ADC_AVGCTRL_ADJRES(0x0);
 	while( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_AVGCTRL );  //wait for sync
 
 	ADC1->REFCTRL.bit.REFSEL = ADC_REFCTRL_REFSEL_INTVCC1_Val;
-
 	while( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_ENABLE ); //wait for sync
+
 	ADC1->CTRLA.bit.ENABLE = 0x01;             // Enable ADC
+	while( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_ENABLE ); //wait for sync
 
 	// Start conversion
-	while( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_ENABLE ); //wait for sync
-
 	ADC1->SWTRIG.bit.START = 1;
 
 	//TODO: on SAMD51 lets find an unused timer and use that
@@ -219,7 +247,7 @@ void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
 
 void AudioInputAnalogStereo::isr0(Adafruit_ZeroDMA *dma)
 {
-	uint32_t offset;
+   uint32_t offset;
 	const uint16_t *src, *end;
 	uint16_t *dest;
 
