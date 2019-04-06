@@ -41,7 +41,7 @@ void AudioEffectMidSide::update(void)
 		if (blockb) release(blockb); // of the blocks is NULL then it's trouble anyway
 		return;
 	}
-#if defined(KINETISK)
+#if defined(KINETISK) || defined(__SAMD51__)
 	pa = (uint32_t *)(blocka->data);
 	pb = (uint32_t *)(blockb->data);
 	end = pa + AUDIO_BLOCK_SAMPLES/2;

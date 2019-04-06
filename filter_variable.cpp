@@ -45,7 +45,7 @@
 // no audible difference.
 //#define IMPROVE_EXPONENTIAL_ACCURACY
 
-#if defined(KINETISK)
+#if defined(KINETISK) || defined(__SAMD51__)
 
 void AudioFilterStateVariable::update_fixed(const int16_t *in,
 	int16_t *lp, int16_t *bp, int16_t *hp)
