@@ -94,7 +94,7 @@ void AudioOutputAnalogStereo::begin(void)
 	AUDIO_TC->COUNT8.CTRLA.reg |= TC_CTRLA_ENABLE;
 	WAIT_TC8_REGS_SYNC(AUDIO_TC)
 	
-	dma0->setTrigger(TC2_DMAC_ID_OVF);
+	dma0->setTrigger(AUDIO_TC_DMAC_ID_OVF);
 	dma0->setAction(DMA_TRIGGER_ACTON_BEAT);
 	
 	desc = dma0->addDescriptor(

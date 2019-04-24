@@ -47,10 +47,20 @@
 #define SOFTWARE_Handler EVSYS_4_Handler
 
 //TODO: lets try to find an unused timer instead of hardcoding
-#define AUDIO_TC TC2
-#define AUDIO_IRQn TC2_IRQn
-#define AUDIO_Handler TC2_Handler
-#define AUDIO_GCLK_ID TC2_GCLK_ID
+#if defined(ADAFRUIT_PYBADGE_M4_EXPRESS)
+// TC2 is backlight, TC3 is Tone()
+  #define AUDIO_TC TC4
+  #define AUDIO_IRQn TC4_IRQn
+  #define AUDIO_Handler TC4_Handler
+  #define AUDIO_GCLK_ID TC4_GCLK_ID
+  #define AUDIO_TC_DMAC_ID_OVF TC4_DMAC_ID_OVF
+#else
+  #define AUDIO_TC TC2
+  #define AUDIO_IRQn TC2_IRQn
+  #define AUDIO_Handler TC2_Handler
+  #define AUDIO_GCLK_ID TC2_GCLK_ID
+  #define AUDIO_TC_DMAC_ID_OVF TC2_DMAC_ID_OVF
+#endif
 
 #define WAIT_TC8_REGS_SYNC(x) while(x->COUNT8.SYNCBUSY.bit.ENABLE || x->COUNT8.SYNCBUSY.bit.SWRST);
 
