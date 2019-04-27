@@ -49,11 +49,11 @@
 //TODO: lets try to find an unused timer instead of hardcoding
 #if defined(ADAFRUIT_PYBADGE_M4_EXPRESS) || defined(ADAFRUIT_PYGAMER_M4_EXPRESS)
 // TC2 is backlight, TC3 is Tone()
-  #define AUDIO_TC TC4
-  #define AUDIO_IRQn TC4_IRQn
-  #define AUDIO_Handler TC4_Handler
-  #define AUDIO_GCLK_ID TC4_GCLK_ID
-  #define AUDIO_TC_DMAC_ID_OVF TC4_DMAC_ID_OVF
+  #define AUDIO_TC TC5
+  #define AUDIO_IRQn TC5_IRQn
+  #define AUDIO_Handler TC5_Handler
+  #define AUDIO_GCLK_ID TC5_GCLK_ID
+  #define AUDIO_TC_DMAC_ID_OVF TC5_DMAC_ID_OVF
 #else
   #define AUDIO_TC TC2
   #define AUDIO_IRQn TC2_IRQn
