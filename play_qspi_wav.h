@@ -18,7 +18,7 @@ public:
     void stop(void);
 
 protected:
-    ::File wavfile;
+    Adafruit_SPIFlash_FAT::File wavfile;
     Adafruit_M0_Express_CircuitPython *_fs;
 };
 
