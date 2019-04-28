@@ -357,6 +357,8 @@ void AudioOutputI2S::update(void)
 
 // MCLK needs to be 48e6 / 1088 * 256 = 11.29411765 MHz -> 44.117647 kHz sample rate
 //
+
+#if !defined(__SAMD51__) // this is not used on samd51
 #if F_CPU == 96000000 || F_CPU == 48000000 || F_CPU == 24000000
   // PLL is at 96 MHz in these modes
   #define MCLK_MULT 2
@@ -399,6 +401,7 @@ void AudioOutputI2S::update(void)
   #define MCLK_SRC  3  // the PLL
 #else
   #define MCLK_SRC  0  // system clock
+#endif
 #endif
 #endif
 
