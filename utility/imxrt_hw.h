@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 /*
- (c) Frank b
+ (c) Frank B
 */
 
 #if defined(__IMXRT1052__) || defined(__IMXRT1062__)
@@ -37,7 +37,7 @@
 #include <Arduino.h>
 #include <imxrt.h>
 
-void set_audioClock(int nfact, int32_t nmult, uint32_t ndiv); // sets PLL4
+void set_audioClock(int nfact, int32_t nmult, uint32_t ndiv,  bool force = false); // sets PLL4
 
 #endif
 
