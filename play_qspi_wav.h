@@ -7,7 +7,7 @@
 
 #include <Adafruit_SPIFlash.h>
 #include <Adafruit_SPIFlash_FatFs.h>
-#include "Adafruit_QSPI_GD25Q.h"
+#include "Adafruit_QSPI_Flash.h"
 
 class AudioPlayQspiWav : public AudioPlaySdWav
 {
