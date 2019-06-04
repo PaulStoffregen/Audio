@@ -131,7 +131,7 @@ void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
       case PIN_A2: ADC1Channel = ADC_Channel0; break;
       case PIN_A3: ADC1Channel = ADC_Channel1; break;
    }
-#elif defined(_VARIANT_PYGAMER_M4_)
+#elif defined(_VARIANT_PYGAMER_M4_) || defined(_VARIANT_PYGAMER_ADVANCE_M4_)
    // no pins can connect to ADC1
 #elif defined(_VARIANT_PYBADGE_M4_)
    // no pins can connect to ADC1

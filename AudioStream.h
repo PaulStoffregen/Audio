@@ -47,7 +47,7 @@
 #define SOFTWARE_Handler EVSYS_4_Handler
 
 //TODO: lets try to find an unused timer instead of hardcoding
-#if defined(ADAFRUIT_PYBADGE_M4_EXPRESS) || defined(ADAFRUIT_PYGAMER_M4_EXPRESS)
+#if defined(ADAFRUIT_PYBADGE_M4_EXPRESS) || defined(ADAFRUIT_PYGAMER_M4_EXPRESS) || defined(ADAFRUIT_PYGAMER_ADVANCE_M4_EXPRESS)
 // TC2 is backlight, TC3 is Tone()
   #define AUDIO_TC TC5
   #define AUDIO_IRQn TC5_IRQn
