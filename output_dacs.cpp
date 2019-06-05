@@ -75,7 +75,7 @@ void AudioOutputAnalogStereo::begin(void)
 	}
 	
 	//TODO: on SAMD51 lets find an unused timer and use that
-	GCLK->PCHCTRL[AUDIO_GCLK_ID].reg = GCLK_PCHCTRL_GEN_GCLK0_Val | (1 << GCLK_PCHCTRL_CHEN_Pos);
+	GCLK->PCHCTRL[AUDIO_GCLK_ID].reg = GCLK_PCHCTRL_GEN_GCLK2_Val | (1 << GCLK_PCHCTRL_CHEN_Pos);
 	AUDIO_TC->COUNT8.WAVE.reg = TC_WAVE_WAVEGEN_NFRQ;
 	
 	AUDIO_TC->COUNT8.CTRLA.reg &= ~TC_CTRLA_ENABLE;
