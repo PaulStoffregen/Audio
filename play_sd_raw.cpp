@@ -25,6 +25,7 @@
  */
 
 #include <Arduino.h>
+#include "Audio.h"
 #include "play_sd_raw.h"
 #include "spi_interrupt.h"
 
@@ -45,9 +46,12 @@ bool AudioPlaySdRaw::play(const char *filename)
 #else
 	AudioStartUsingSPI();
 #endif
-	__disable_irq();
+	/* disable interrupts with lower priority than SDHC DMA */
+	const uint32_t last_pri { __get_BASEPRI() };
+	const uint8_t sdhc_pri { NVIC_GET_PRIORITY(IRQ_SDHC) };
+	__set_BASEPRI((sdhc_pri / 16U + 1U) * 16U);
 	rawfile = SD.open(filename);
-	__enable_irq();
+	__set_BASEPRI(last_pri);
 	if (!rawfile) {
 		//Serial.println("unable to open file");
 		#if defined(HAS_KINETIS_SDHC)
