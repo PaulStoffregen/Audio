@@ -25,6 +25,7 @@
 //
 // For connection using I2S master mode (WM8731 in slave mode, with MCLK):
 //  https://forum.pjrc.com/threads/53854?p=198733&viewfull=1#post198733
+//  https://forum.pjrc.com/threads/55334?p=201494&viewfull=1#post201494
 //
 // This example code is in the public domain.
 

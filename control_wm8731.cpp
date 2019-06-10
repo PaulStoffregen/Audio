@@ -47,8 +47,11 @@ bool AudioControlWM8731::enable(void)
 {
 	Wire.begin();
 	delay(5);
-	//write(WM8731_REG_RESET, 0);
-
+#if 1
+	if (!write(WM8731_REG_RESET, 0)) {
+		return false; // no WM8731 chip responding
+	}
+#endif
 	write(WM8731_REG_INTERFACE, 0x02); // I2S, 16 bit, MCLK slave
 	write(WM8731_REG_SAMPLING, 0x20);  // 256*Fs, 44.1 kHz, MCLK/1
 
@@ -74,14 +77,31 @@ bool AudioControlWM8731::enable(void)
 	return true;
 }
 
+// WM8731 has flaky I2C communication, especially when MCLK has ringing,
+// overshoot or other high-speed signal quality issues.  Chips like
+// Teensy 3.6 with very high bandwidth I/O pins should be used with
+// caution.  A resistor or low-pass circuit may be needed.
+//   https://forum.pjrc.com/threads/55334?p=201494&viewfull=1#post201494
 
 bool AudioControlWM8731::write(unsigned int reg, unsigned int val)
 {
-	Wire.beginTransmission(WM8731_I2C_ADDR);
-	Wire.write((reg << 1) | ((val >> 8) & 1));
-	Wire.write(val & 0xFF);
-	Wire.endTransmission();
-	return true;
+	int attempt=0;
+	while (1) {
+		attempt++;
+		Wire.beginTransmission(WM8731_I2C_ADDR);
+		Wire.write((reg << 1) | ((val >> 8) & 1));
+		Wire.write(val & 0xFF);
+		int status = Wire.endTransmission();
+		if (status == 0) {
+			//Serial.printf("WM8731 write ok, %d tries\n", attempt);
+			return true;
+		}
+		if (attempt >= 12) {
+			//Serial.printf("WM8731 write failed, %d tries\n", attempt);
+			return false;
+		}
+		delayMicroseconds(80);
+	}
 }
 
 bool AudioControlWM8731::volumeInteger(unsigned int n)
