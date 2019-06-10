@@ -24,33 +24,33 @@
  * THE SOFTWARE.
  */
 /*
- (c) Frank b
+ (c) Frank B
 */
 
 #if defined(__IMXRT1052__) || defined(__IMXRT1062__)
 #include "imxrt_hw.h"
 
-//#define CCM_ANALOG_PLL_AUDIO_LOCK	((uint32_t)(1<<31))
-
 PROGMEM
-void set_audioClock(int nfact, int32_t nmult, uint32_t ndiv) // sets PLL4
+void set_audioClock(int nfact, int32_t nmult, uint32_t ndiv, bool force = false) // sets PLL4
 {
-	if (CCM_ANALOG_PLL_AUDIO & CCM_ANALOG_PLL_AUDIO_ENABLE) return;
+	if (!force && (CCM_ANALOG_PLL_AUDIO & CCM_ANALOG_PLL_AUDIO_ENABLE)) return;
 
-	CCM_ANALOG_PLL_AUDIO = 0;
-	//CCM_ANALOG_PLL_AUDIO |= CCM_ANALOG_PLL_AUDIO_BYPASS;
-	CCM_ANALOG_PLL_AUDIO |= CCM_ANALOG_PLL_AUDIO_ENABLE
+	CCM_ANALOG_PLL_AUDIO = CCM_ANALOG_PLL_AUDIO_BYPASS | CCM_ANALOG_PLL_AUDIO_ENABLE
 			     | CCM_ANALOG_PLL_AUDIO_POST_DIV_SELECT(2) // 2: 1/4; 1: 1/2; 0: 1/1
 			     | CCM_ANALOG_PLL_AUDIO_DIV_SELECT(nfact);
 
 	CCM_ANALOG_PLL_AUDIO_NUM   = nmult & CCM_ANALOG_PLL_AUDIO_NUM_MASK;
 	CCM_ANALOG_PLL_AUDIO_DENOM = ndiv & CCM_ANALOG_PLL_AUDIO_DENOM_MASK;
+	
+	CCM_ANALOG_PLL_AUDIO &= ~CCM_ANALOG_PLL_AUDIO_POWERDOWN;//Switch on PLL
 	while (!(CCM_ANALOG_PLL_AUDIO & CCM_ANALOG_PLL_AUDIO_LOCK)) {}; //Wait for pll-lock
-
+	
 	const int div_post_pll = 1; // other values: 2,4
 	CCM_ANALOG_MISC2 &= ~(CCM_ANALOG_MISC2_DIV_MSB | CCM_ANALOG_MISC2_DIV_LSB);
 	if(div_post_pll>1) CCM_ANALOG_MISC2 |= CCM_ANALOG_MISC2_DIV_LSB;
 	if(div_post_pll>3) CCM_ANALOG_MISC2 |= CCM_ANALOG_MISC2_DIV_MSB;
+	
+	CCM_ANALOG_PLL_AUDIO &= ~CCM_ANALOG_PLL_AUDIO_BYPASS;//Disable Bypass
 }
 
 #endif

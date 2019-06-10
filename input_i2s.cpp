@@ -67,7 +67,11 @@ void AudioInputI2S::begin(void)
 	I2S0_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE; // TX clock enable, because sync'd to TX
 #elif defined(__IMXRT1052__) || defined(__IMXRT1062__)
 
+#if defined(__IMXRT1062__)
+	CORE_PIN8_CONFIG  = 3;  //1:RX_DATA0
+#elif defined(__IMXRT1052__)
 	CORE_PIN7_CONFIG  = 3;  //1:RX_DATA0
+#endif
 	IOMUXC_SAI1_RX_DATA0_SELECT_INPUT = 2;
 	
 	dma.TCD->SADDR = (void *)((uint32_t)&I2S1_RDR0+2);

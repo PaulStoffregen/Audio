@@ -50,7 +50,12 @@ void AudioOutputI2S::begin(void)
 	block_right_1st = NULL;
 
 	config_i2s();
+	
+#if defined(__IMXRT1052__)
 	CORE_PIN6_CONFIG  = 3;  //1:TX_DATA0
+#elif defined(__IMXRT1062__)
+	CORE_PIN7_CONFIG  = 3;  //1:TX_DATA0	
+#endif		
 
 	dma.TCD->SADDR = i2s_tx_buffer;
 	dma.TCD->SOFF = 2;

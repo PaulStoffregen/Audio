@@ -87,7 +87,13 @@ void AudioOutputSPDIF::begin(void)
 	I2S0_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE | I2S_TCSR_FR;
 	dma.attachInterrupt(isr);
 #elif defined(__IMXRT1052__) || defined(__IMXRT1062__)
+
+#if defined(__IMXRT1052__)
 	CORE_PIN6_CONFIG  = 3;  //1:TX_DATA0
+#elif defined(__IMXRT1062__)
+	CORE_PIN7_CONFIG  = 3;  //1:TX_DATA0	
+#endif		
+	
 	const int nbytes_mlno = 2 * 4; // 8 Bytes per minor loop
 
 	dma.TCD->SADDR = SPDIF_tx_buffer;
