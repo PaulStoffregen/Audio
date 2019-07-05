@@ -37,6 +37,7 @@ public:
 	AudioInputPDM(void) : AudioStream(0, NULL) { begin(); }
 	virtual void update(void);
 	void begin(void);
+	uint8_t setGain(uint8_t); // cnd range 0 through 3; default=2; 0=highest sensitivity, 3=handle louder sounds
 protected:	
 	static bool update_responsibility;
 	static DMAChannel dma;

@@ -31,7 +31,7 @@
 #include "utility/dspinst.h"
 
 // Decrease this for more mic gain, increase for range to accommodate loud sounds
-#define RSHIFT  2
+// See new setGain() method - was: #define RSHIFT  2
 
 // Pulse Density Modulation (PDM) is a tech trade-off of questionable value.
 // The only advantage is your delta-sigma based ADC can be less expensive,
@@ -57,6 +57,7 @@ static uint32_t leftover[14];
 audio_block_t * AudioInputPDM::block_left = NULL;
 bool AudioInputPDM::update_responsibility = false;
 DMAChannel AudioInputPDM::dma(false);
+uint8_t myGain=2; // Gain
 
 // MCLK needs to be 48e6 / 1088 * 256 = 11.29411765 MHz -> 44.117647 kHz sample rate
 //
@@ -190,7 +191,12 @@ static int filter(const uint32_t *buf)
 		sum += table[data2 & 255];
 		table += 256;
 	} while (--count > 0);
-	return signed_saturate_rshift(sum, 16, RSHIFT);
+	switch(myGain) {
+	  case 0 : return signed_saturate(sum, 16);
+	  case 1 : return signed_saturate_rshift(sum, 16, 1);
+	  case 2 : return signed_saturate_rshift(sum, 16, 2);	// cnd - was signed_saturate_rshift(sum, 16, RSHIFT);
+	  default: return signed_saturate_rshift(sum, 16, 3);
+	}
 }
 
 static int filter(const uint32_t *buf1, unsigned int n, const uint32_t *buf2)
@@ -297,6 +303,12 @@ void AudioInputPDM::update(void)
 		transmit(out_left, 0);
 		release(out_left);
 	}
+}
+
+uint8_t AudioInputPDM::setGain(uint8_t newgain) // cnd range 0 through 3; default=2; 0=highest sensitivity, 3=handle louder sounds
+{
+    myGain=newgain;
+    return myGain;
 }
 
 const int16_t enormous_pdm_filter_table[16384] = {
