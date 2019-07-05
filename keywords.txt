@@ -86,6 +86,7 @@ isPlaying	KEYWORD2
 positionMillis	KEYWORD2
 lengthMillis	KEYWORD2
 gain	KEYWORD2
+setGain	KEYWORD2
 fadeIn	KEYWORD2
 fadeOut	KEYWORD2
 noteOn	KEYWORD2
