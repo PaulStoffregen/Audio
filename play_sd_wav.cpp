@@ -28,9 +28,12 @@
 #include <Arduino.h>
 #endif
 
-
 #include "play_sd_wav.h"
 #include "spi_interrupt.h"
+
+// File system object.
+extern SdFat SD;
+
 
 #define STATE_DIRECT_8BIT_MONO		0  // playing mono at native sample rate
 #define STATE_DIRECT_8BIT_STEREO	1  // playing stereo at native sample rate
@@ -332,14 +335,17 @@ start:
 
 	  // playing mono at native sample rate
 	  case STATE_DIRECT_8BIT_MONO:
-		return false;
+	    //Serial.println("8 bit mono");
+	    return false;
 
 	  // playing stereo at native sample rate
 	  case STATE_DIRECT_8BIT_STEREO:
-		return false;
+	    //Serial.println("8 bit stereo");
+	    return false;
 
 	  // playing mono at native sample rate
 	  case STATE_DIRECT_16BIT_MONO:
+	    Serial.println("16 bit mono");
 		if (size > data_length) size = data_length;
 		data_length -= size;
 		while (1) {
@@ -373,6 +379,7 @@ start:
 
 	  // playing stereo at native sample rate
 	  case STATE_DIRECT_16BIT_STEREO:
+	        //Serial.println("16 bit stereo");
 		if (size > data_length) size = data_length;
 		data_length -= size;
 		if (leftover_bytes) {
@@ -424,18 +431,22 @@ start:
 
 	  // playing mono, converting sample rate
 	  case STATE_CONVERT_8BIT_MONO :
+	    //Serial.println("convert 8 bit mono");
 		return false;
 
 	  // playing stereo, converting sample rate
 	  case STATE_CONVERT_8BIT_STEREO:
+	    //Serial.println("convert 8 bit stereo");
 		return false;
 
 	  // playing mono, converting sample rate
 	  case STATE_CONVERT_16BIT_MONO:
+	    //Serial.println("convert 16 bit mono");
 		return false;
 
 	  // playing stereo, converting sample rate
 	  case STATE_CONVERT_16BIT_STEREO:
+	    //Serial.println("convert 16 bit stereo");
 		return false;
 
 	  // ignore any extra data after playing

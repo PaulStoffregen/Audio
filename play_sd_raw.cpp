@@ -31,6 +31,11 @@
 #include "play_sd_raw.h"
 #include "spi_interrupt.h"
 
+
+// File system object.
+extern SdFat SD;
+
+
 void AudioPlaySdRaw::begin(void)
 {
 	playing = false;

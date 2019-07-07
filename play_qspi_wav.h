@@ -5,21 +5,22 @@
 #include "AudioStream.h"
 #include "play_sd_wav.h"
 
+#include <SPI.h>
+#include <SdFat.h>
 #include <Adafruit_SPIFlash.h>
-#include <Adafruit_SPIFlash_FatFs.h>
-#include "Adafruit_QSPI_Flash.h"
+
 
 class AudioPlayQspiWav : public AudioPlaySdWav
 {
 public:
     bool play(const char *filename);
-    void useFilesystem(Adafruit_M0_Express_CircuitPython *fs){ _fs = fs; }
+    void useFilesystem(FatFileSystem *fs){ _fs = fs; }
     void update(void);
     void stop(void);
 
 protected:
-    Adafruit_SPIFlash_FAT::File wavfile;
-    Adafruit_M0_Express_CircuitPython *_fs;
+    File wavfile;
+    FatFileSystem *_fs;
 };
 
 #endif
