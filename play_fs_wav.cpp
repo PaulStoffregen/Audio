@@ -28,7 +28,7 @@
 #include <Arduino.h>
 #endif
 
-#include "play_sd_wav.h"
+#include "play_fs_wav.h"
 #include "spi_interrupt.h"
 
 // File system object.
@@ -49,7 +49,7 @@ extern SdFat SD;
 #define STATE_PARSE4			11 // ignoring unknown chunk
 #define STATE_STOP			12
 
-void AudioPlaySdWav::begin(void)
+void AudioPlayFSWav::begin(void)
 {
 	state = STATE_STOP;
 	state_play = STATE_STOP;
@@ -65,17 +65,14 @@ void AudioPlaySdWav::begin(void)
 }
 
 
-bool AudioPlaySdWav::play(const char *filename)
+bool AudioPlayFSWav::play(File wavfile)
 {
 	stop();
-#if defined(HAS_KINETIS_SDHC)	
+        #if defined(HAS_KINETIS_SDHC)	
 	if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStartUsingSPI();
-#else 	
+        #else 	
 	AudioStartUsingSPI();
-#endif
-	__disable_irq();
-	wavfile = SD.open(filename);
-	__enable_irq();
+        #endif
 	if (!wavfile) {
 	#if defined(HAS_KINETIS_SDHC)	
 		if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
@@ -84,6 +81,7 @@ bool AudioPlaySdWav::play(const char *filename)
 	#endif			
 		return false;
 	}
+	_wavfile = wavfile;
 	buffer_length = 0;
 	buffer_offset = 0;
 	state_play = STATE_STOP;
@@ -93,7 +91,7 @@ bool AudioPlaySdWav::play(const char *filename)
 	return true;
 }
 
-void AudioPlaySdWav::stop(void)
+void AudioPlayFSWav::stop(void)
 {
 	__disable_irq();
 	if (state != STATE_STOP) {
@@ -105,7 +103,7 @@ void AudioPlaySdWav::stop(void)
 		__enable_irq();
 		if (b1) release(b1);
 		if (b2) release(b2);
-		wavfile.close();
+		_wavfile.close();
 	#if defined(HAS_KINETIS_SDHC)	
 		if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
 	#else 	
@@ -117,7 +115,7 @@ void AudioPlaySdWav::stop(void)
 }
 
 
-void AudioPlaySdWav::update(void)
+void AudioPlayFSWav::update(void)
 {
 	int32_t n;
 
@@ -152,10 +150,10 @@ void AudioPlaySdWav::update(void)
 	}
 
 	// we only get to this point when buffer[512] is empty
-	if (state != STATE_STOP && wavfile.available()) {
+	if (state != STATE_STOP && _wavfile.available()) {
 		// we can read more data from the file...
 		readagain:
-		buffer_length = wavfile.read(buffer, 512);
+		buffer_length = _wavfile.read(buffer, 512);
 		if (buffer_length == 0) goto end;
 		buffer_offset = 0;
 		bool parsing = (state >= 8);
@@ -170,7 +168,7 @@ void AudioPlaySdWav::update(void)
 		}
 	}
 end:	// end of file reached or other reason to stop
-	wavfile.close();
+	_wavfile.close();
 #if defined(HAS_KINETIS_SDHC)	
 	if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
 #else 	
@@ -208,7 +206,7 @@ cleanup:
 // https://ccrma.stanford.edu/courses/422/projects/WaveFormat/
 
 // Consume already buffered data.  Returns true if audio transmitted.
-bool AudioPlaySdWav::consume(uint32_t size)
+bool AudioPlayFSWav::consume(uint32_t size)
 {
 	uint32_t len;
 	uint8_t lsb, msb;
@@ -489,7 +487,7 @@ start:
 #define B2M_22050 (uint32_t)((double)4294967296000.0 / AUDIO_SAMPLE_RATE_EXACT * 2.0)
 #define B2M_11025 (uint32_t)((double)4294967296000.0 / AUDIO_SAMPLE_RATE_EXACT * 4.0)
 
-bool AudioPlaySdWav::parse_format(void)
+bool AudioPlayFSWav::parse_format(void)
 {
 	uint8_t num = 0;
 	uint16_t format;
@@ -552,13 +550,13 @@ bool AudioPlaySdWav::parse_format(void)
 }
 
 
-bool AudioPlaySdWav::isPlaying(void)
+bool AudioPlayFSWav::isPlaying(void)
 {
 	uint8_t s = *(volatile uint8_t *)&state;
 	return (s < 8);
 }
 
-uint32_t AudioPlaySdWav::positionMillis(void)
+uint32_t AudioPlayFSWav::positionMillis(void)
 {
 	uint8_t s = *(volatile uint8_t *)&state;
 	if (s >= 8) return 0;
@@ -570,7 +568,7 @@ uint32_t AudioPlaySdWav::positionMillis(void)
 }
 
 
-uint32_t AudioPlaySdWav::lengthMillis(void)
+uint32_t AudioPlayFSWav::lengthMillis(void)
 {
 	uint8_t s = *(volatile uint8_t *)&state;
 	if (s >= 8) return 0;

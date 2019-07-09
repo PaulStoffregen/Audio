@@ -24,19 +24,19 @@
  * THE SOFTWARE.
  */
 
-#ifndef play_sd_wav_h_
-#define play_sd_wav_h_
+#ifndef play_fs_wav_h_
+#define play_fs_wav_h_
 
 #include "Arduino.h"
 #include "AudioStream.h"
 #include "SdFat.h"
 
-class AudioPlaySdWav : public AudioStream
+class AudioPlayFSWav : public AudioStream
 {
 public:
-	AudioPlaySdWav(void) : AudioStream(0, NULL) { begin(); }
+	AudioPlayFSWav(void) : AudioStream(0, NULL) { begin(); }
 	void begin(void);
-	virtual bool play(const char *filename);
+	virtual bool play(File wavfile);
 	virtual void stop(void);
 	bool isPlaying(void);
 	uint32_t positionMillis(void);
@@ -62,7 +62,7 @@ protected:
 	uint8_t leftover_bytes;
 
 private:
-	File wavfile;
+	File _wavfile;
 };
 
 #endif

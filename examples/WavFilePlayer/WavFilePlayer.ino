@@ -1,4 +1,4 @@
-// Simple WAV file player example
+// Simple WAV file player example for SD or QSPI flash storage
 //
 // Three types of output may be used, by configuring the code below.
 //
@@ -26,13 +26,11 @@
 // This example code is in the public domain.
 
 #include <Audio.h>
-#include <Wire.h>
-#include <SPI.h>
 #include <SdFat.h>
-#include <SerialFlash.h>
-#include <play_sd_wav.h>
+#include <Adafruit_SPIFlash.h>
+#include <play_fs_wav.h>
 
-AudioPlaySdWav           playWav1;
+AudioPlayFSWav           playWav1;
 // Use one of these 3 output types: Digital I2S, Digital S/PDIF, or Analog DAC
 //AudioOutputI2S           audioOutput;
 //AudioOutputSPDIF       audioOutput;
@@ -41,32 +39,22 @@ AudioConnection          patchCord1(playWav1, 0, audioOutput, 1);
 AudioConnection          patchCord2(playWav1, 1, audioOutput, 0);
 //AudioControlSGTL5000     sgtl5000_1;
 
-SdFat SD;
 
 // Use these with the PyGamer
 #if defined(ADAFRUIT_PYGAMER_M4_EXPRESS)
   #define SDCARD_CS_PIN    4
   #define SPEAKER_ENABLE   51
+  Adafruit_FlashTransport_QSPI flashTransport(PIN_QSPI_SCK, PIN_QSPI_CS, PIN_QSPI_IO0, PIN_QSPI_IO1, PIN_QSPI_IO2, PIN_QSPI_IO3);
 #elif defined(ADAFRUIT_PYPORTAL)
   #define SDCARD_CS_PIN    32
   #define SPEAKER_ENABLE   50
+  Adafruit_FlashTransport_QSPI flashTransport(PIN_QSPI_SCK, PIN_QSPI_CS, PIN_QSPI_IO0, PIN_QSPI_IO1, PIN_QSPI_IO2, PIN_QSPI_IO3);
 #endif
 
-
-// Use these with the Teensy Audio Shield
-//#define SDCARD_CS_PIN    10
-//#define SDCARD_MOSI_PIN  7
-//#define SDCARD_SCK_PIN   14
-
-// Use these with the Teensy 3.5 & 3.6 SD card
-//#define SDCARD_CS_PIN    BUILTIN_SDCARD
-//#define SDCARD_MOSI_PIN  11  // not actually used
-//#define SDCARD_SCK_PIN   13  // not actually used
-
-// Use these for the SD+Wiz820 or other adaptors
-//#define SDCARD_CS_PIN    4
-//#define SDCARD_MOSI_PIN  11
-//#define SDCARD_SCK_PIN   13
+Adafruit_SPIFlash flash(&flashTransport);
+FatFileSystem QSPIFS;
+SdFat SD;
+bool SDOK=false, QSPIOK=false;
 
 void setup() {
   Serial.begin(9600);
@@ -89,26 +77,40 @@ void setup() {
   //sgtl5000_1.enable();
   //sgtl5000_1.volume(0.5);
 
-  //SPI.setMOSI(SDCARD_MOSI_PIN);
-  //SPI.setSCK(SDCARD_SCK_PIN);
+  SDOK = false;
   if (!(SD.begin(SDCARD_CS_PIN))) {
-    // stop here, but print a message repetitively
-    while (1) {
-      Serial.println("Unable to access the SD card");
-      delay(500);
-    }
+    Serial.println("Unable to access the SD card");
+  } else {
+    Serial.println("SD card OK!");
+    SDOK = true;
   }
-  Serial.println("SD card OK!");
+  
+  QSPIOK = false;
+  if (!flash.begin()) {
+    Serial.println("Error, failed to initialize flash chip!");
+  } else if (!QSPIFS.begin(&flash)) {
+    Serial.println("Failed to mount QSPI filesystem!");
+    Serial.println("Was CircuitPython loaded on the board first to create the filesystem?");
+  } else {
+    Serial.println("QSPI OK!");
+    QSPIOK = true;
+  }
 }
 
 void playFile(const char *filename)
 {
-  Serial.print("Playing file: ");
-  Serial.println(filename);
+  Serial.print("Playing file: "); Serial.println(filename);
 
+  File f;
+  
+  if (SDOK) {
+    f = SD.open(filename);
+  } else if (QSPIOK) {
+    f = QSPIFS.open(filename);
+  }  
   // Start playing the file.  This sketch continues to
   // run while the file plays.
-  if (!playWav1.play(filename)) { 
+  if (!playWav1.play(f)) { 
     Serial.println("Failed to play");
     return;
   }
