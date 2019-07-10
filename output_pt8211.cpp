@@ -75,7 +75,11 @@ void AudioOutputPT8211::begin(void)
 
 #elif defined(__IMXRT1052__) || defined(__IMXRT1062__)
 
+#if defined(__IMXRT1052__)
 	CORE_PIN6_CONFIG  = 3;  //1:TX_DATA0
+#elif defined(__IMXRT1062__)
+	CORE_PIN7_CONFIG  = 3;  //1:TX_DATA0	
+#endif
 
 	dma.TCD->SADDR = i2s_tx_buffer;
 	dma.TCD->SOFF = 2;
