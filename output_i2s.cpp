@@ -504,19 +504,14 @@ void AudioOutputI2Sslave::begin(void)
 
 void AudioOutputI2Sslave::config_i2s(void)
 {
-#if defined(KINETISK)
+	SIM_SCGC6 |= SIM_SCGC6_I2S;
+	SIM_SCGC7 |= SIM_SCGC7_DMA;
+	SIM_SCGC6 |= SIM_SCGC6_DMAMUX;
+
 	// if either transmitter or receiver is enabled, do nothing
 	if (I2S0_TCSR & I2S_TCSR_TE) return;
 	if (I2S0_RCSR & I2S_RCSR_RE) return;
 
-	SIM_SCGC6 |= SIM_SCGC6_I2S;
-	SIM_SCGC7 |= SIM_SCGC7_DMA;
-	SIM_SCGC6 |= SIM_SCGC6_DMAMUX;
-	// configure pin mux for 3 clock signals
-
-	CORE_PIN23_CONFIG = PORT_PCR_MUX(6); // pin 23, PTC2, I2S0_TX_FS (LRCLK)
-	CORE_PIN9_CONFIG  = PORT_PCR_MUX(6); // pin  9, PTC3, I2S0_TX_BCLK
-	CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK
 	// Select input clock 0
 	// Configure to input the bit-clock from pin, bypasses the MCLK divider
 	I2S0_MCR = I2S_MCR_MICS(0);
@@ -543,6 +538,11 @@ void AudioOutputI2Sslave::config_i2s(void)
 		| I2S_RCR4_FSE | I2S_RCR4_FSP | I2S_RCR4_FSD;
 
 	I2S0_RCR5 = I2S_RCR5_WNW(31) | I2S_RCR5_W0W(31) | I2S_RCR5_FBT(31);
+
+	// configure pin mux for 3 clock signals
+	CORE_PIN23_CONFIG = PORT_PCR_MUX(6); // pin 23, PTC2, I2S0_TX_FS (LRCLK)
+	CORE_PIN9_CONFIG  = PORT_PCR_MUX(6); // pin  9, PTC3, I2S0_TX_BCLK
+	CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK
 
 #elif 0 && (defined(__IMXRT1052__) || defined(__IMXRT1062__) )
 
