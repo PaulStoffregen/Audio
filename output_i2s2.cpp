@@ -72,7 +72,7 @@ void AudioOutputI2S2::begin(void)
 
 void AudioOutputI2S2::isr(void)
 {
-	int16_t *dest, *dc;
+	int16_t *dest;
 	audio_block_t *blockL, *blockR;
 	uint32_t saddr, offsetL, offsetR;
 
