@@ -125,7 +125,7 @@ static void memcpy_tdm_tx(uint32_t *dest, const uint32_t *src1, const uint32_t *
 
 void AudioOutputTDM::isr(void)
 {
-	uint32_t *dest, *dc;
+	uint32_t *dest;
 	const uint32_t *src1, *src2;
 	uint32_t i, saddr;
 
@@ -141,7 +141,11 @@ void AudioOutputTDM::isr(void)
 		dest = tdm_tx_buffer;
 	}
 	if (update_responsibility) AudioStream::update_all();
-	dc = dest;
+
+	#if IMXRT_CACHE_ENABLED >= 2
+	uint32_t *dc = dest;
+	#endif
+	
 	for (i=0; i < 16; i += 2) {
 		src1 = block_input[i] ? (uint32_t *)(block_input[i]->data) : zeros;
 		src2 = block_input[i+1] ? (uint32_t *)(block_input[i+1]->data) : zeros;
