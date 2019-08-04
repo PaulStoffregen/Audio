@@ -83,6 +83,7 @@ AudioSynthKarplusStrong	KEYWORD2
 AudioSynthSimpleDrum	KEYWORD2
 AudioSynthWavetable	KEYWORD2
 isPlaying	KEYWORD2
+offsetMillis2byte   KEYWORD2
 positionMillis	KEYWORD2
 lengthMillis	KEYWORD2
 gain	KEYWORD2

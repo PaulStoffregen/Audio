@@ -87,6 +87,8 @@ void playFile(const char *filename)
   // Start playing the file.  This sketch continues to
   // run while the file plays.
   playWav1.play(filename);
+  // Start playing the file with 60 sec offset.
+  //playWav1.play(filename, 60000);
 
   // A brief delay for the library read WAV info
   delay(5);
@@ -112,4 +114,3 @@ void loop() {
   playFile("SDTEST4.WAV");
   delay(1500);
 }
-

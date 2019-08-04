@@ -59,7 +59,7 @@ void AudioPlaySdWav::begin(void)
 }
 
 
-bool AudioPlaySdWav::play(const char *filename)
+bool AudioPlaySdWav::play(const char *filename, uint32_t offset)
 {
 	stop();
 #if defined(HAS_KINETIS_SDHC)	
@@ -84,6 +84,10 @@ bool AudioPlaySdWav::play(const char *filename)
 	data_length = 20;
 	header_offset = 0;
 	state = STATE_PARSE1;
+	//could use play_offset as identifier but used bool to be clear
+	if (offset == 0) didSkip = true;
+	else didSkip = false;
+	play_offset = offset;
 	return true;
 }
 
@@ -312,6 +316,21 @@ start:
 			// TODO: verify offset in file is an even number
 			// as required by WAV format.  abort if odd.  Code
 			// below will depend upon this and fail if not even.
+			// added
+			if (didSkip == false) {
+				//skip by using millis input
+				file_offset = offsetMillis2byte(play_offset);
+				wavfile.seek(file_offset);
+				//skip by using bytes input
+				//to skip by using bytes input, uncomment below
+				//wavfile.seek(play_offset);
+				data_length = 8;
+				header_offset = 8;
+				state = STATE_PARSE3;
+				didSkip = true;
+				goto start;
+			}
+
 			leftover_bytes = 0;
 			state = state_play;
 			if (state & 1) {
@@ -572,13 +591,25 @@ bool AudioPlaySdWav::isPlaying(void)
 	return (s < 8);
 }
 
+uint32_t AudioPlaySdWav::offsetMillis2byte(uint32_t offset_length)
+{
+	// convert millis input to bytes with b2m and AUDIO_BLOCK_SAMPLES.
+	// to avoid wrong offset length(odd number),
+	// offset_length is scaled down by AUDIO_BLOCK_SAMPLES, converted, and scaled up again.
+	uint32_t b2m = *(volatile uint32_t *)&bytes2millis;
+	uint32_t offset_bytes = (uint32_t)(double)(offset_length * 4294967296.0 / (AUDIO_BLOCK_SAMPLES * b2m));
+	offset_bytes *= AUDIO_BLOCK_SAMPLES;
+	return offset_bytes;
+}
+
 uint32_t AudioPlaySdWav::positionMillis(void)
 {
 	uint8_t s = *(volatile uint8_t *)&state;
 	if (s >= 8) return 0;
 	uint32_t tlength = *(volatile uint32_t *)&total_length;
 	uint32_t dlength = *(volatile uint32_t *)&data_length;
-	uint32_t offset = tlength - dlength;
+	// added file_offset to get precise current location
+	uint32_t offset = tlength - dlength + file_offset;
 	uint32_t b2m = *(volatile uint32_t *)&bytes2millis;
 	return ((uint64_t)offset * b2m) >> 32;
 }
@@ -592,9 +623,4 @@ uint32_t AudioPlaySdWav::lengthMillis(void)
 	uint32_t b2m = *(volatile uint32_t *)&bytes2millis;
 	return ((uint64_t)tlength * b2m) >> 32;
 }
-
-
-
-
-
 

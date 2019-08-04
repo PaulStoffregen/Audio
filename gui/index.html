@@ -1592,9 +1592,10 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		<tr class=odd><td align=center>Out 1</td><td>Right Channel Output</td></tr>
 	</table>
 	<h3>Functions</h3>
-	<p class=func><span class=keyword>play</span>(filename);</p>
+	<p class=func><span class=keyword>play</span>(filename, <i>(optional)offset</i>);</p>
 	<p class=desc>Begin playing a WAV file.  If a file is already playing,
 		it is stopped and this file starts playing from the beginning.
+		Offset input can be set with milliseconds. Default value is 0.
 	</p>
 	<p class=func><span class=keyword>stop</span>();</p>
 	<p class=desc>Stop playing.  If not playing, this function has no effect.
