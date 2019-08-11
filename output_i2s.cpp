@@ -38,9 +38,8 @@ bool AudioOutputI2S::update_responsibility = false;
 DMAChannel AudioOutputI2S::dma(false);
 DMAMEM __attribute__((aligned(32))) static uint32_t i2s_tx_buffer[AUDIO_BLOCK_SAMPLES];
 
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
+#if defined(__IMXRT1062__)
 #include "utility/imxrt_hw.h"
-
 
 void AudioOutputI2S::begin(void)
 {
@@ -51,11 +50,7 @@ void AudioOutputI2S::begin(void)
 
 	config_i2s();
 	
-#if defined(__IMXRT1052__)
-	CORE_PIN6_CONFIG  = 3;  //1:TX_DATA0
-#elif defined(__IMXRT1062__)
 	CORE_PIN7_CONFIG  = 3;  //1:TX_DATA0	
-#endif		
 
 	dma.TCD->SADDR = i2s_tx_buffer;
 	dma.TCD->SOFF = 2;
@@ -117,7 +112,7 @@ void AudioOutputI2S::begin(void)
 
 void AudioOutputI2S::isr(void)
 {
-#if defined(KINETISK) || defined(__IMXRT1052__) || defined(__IMXRT1062__)
+#if defined(KINETISK) || defined(__IMXRT1062__)
 	int16_t *dest;
 	audio_block_t *blockL, *blockR;
 	uint32_t saddr, offsetL, offsetR;
@@ -154,10 +149,8 @@ void AudioOutputI2S::isr(void)
 		memset(dest,0,AUDIO_BLOCK_SAMPLES * 2);
 	}
 
-	#if IMXRT_CACHE_ENABLED >= 2		
 	arm_dcache_flush_delete(dest, sizeof(i2s_tx_buffer) / 2 );
-	#endif
-	
+
 	if (offsetL < AUDIO_BLOCK_SAMPLES) {
 		AudioOutputI2S::block_left_offset = offsetL;
 	} else {
@@ -386,7 +379,8 @@ void AudioOutputI2S::config_i2s(void)
 	CORE_PIN23_CONFIG = PORT_PCR_MUX(6); // pin 23, PTC2, I2S0_TX_FS (LRCLK)
 	CORE_PIN9_CONFIG  = PORT_PCR_MUX(6); // pin  9, PTC3, I2S0_TX_BCLK
 	CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK
-#elif ( defined(__IMXRT1052__) || defined(__IMXRT1062__) )
+
+#elif defined(__IMXRT1062__)
 
 	CCM_CCGR5 |= CCM_CCGR5_SAI1(CCM_CCGR_ON);
 //PLL:
@@ -408,8 +402,10 @@ void AudioOutputI2S::config_i2s(void)
 		   | CCM_CS1CDR_SAI1_CLK_PRED(n1-1) // &0x07
 		   | CCM_CS1CDR_SAI1_CLK_PODF(n2-1); // &0x3f
 
-	IOMUXC_GPR_GPR1 = (IOMUXC_GPR_GPR1 & ~(IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL_MASK))
-			| (IOMUXC_GPR_GPR1_SAI1_MCLK_DIR | IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL(0));	//Select MCLK
+	// Select MCLK
+	IOMUXC_GPR_GPR1 = (IOMUXC_GPR_GPR1
+		& ~(IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL_MASK))
+		| (IOMUXC_GPR_GPR1_SAI1_MCLK_DIR | IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL(0));
 
 	// if either transmitter or receiver is enabled, do nothing
 	if (I2S1_TCSR & I2S_TCSR_TE) return;
@@ -418,8 +414,6 @@ void AudioOutputI2S::config_i2s(void)
 	CORE_PIN23_CONFIG = 3;  //1:MCLK
 	CORE_PIN21_CONFIG = 3;  //1:RX_BCLK
 	CORE_PIN20_CONFIG = 3;  //1:RX_SYNC
-//	CORE_PIN6_CONFIG  = 3;  //1:TX_DATA0
-//	CORE_PIN7_CONFIG  = 3;  //1:RX_DATA0
 
 	int rsync = 0;
 	int tsync = 1;
@@ -476,20 +470,15 @@ void AudioOutputI2Sslave::begin(void)
 	I2S0_TCSR = I2S_TCSR_SR;
 	I2S0_TCSR = I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
 
-#elif 0 && ( defined(__IMXRT1052__) || defined(__IMXRT1062__) )
-#if defined(SAI1)
-	CORE_PIN6_CONFIG  = 3;  //1:TX_DATA0
-	//CORE_PIN7_CONFIG  = 3;  //1:RX_DATA0
-#elif defined(SAI2)
-	CORE_PIN2_CONFIG  = 2;  //2:TX_DATA0
-	//CORE_PIN33_CONFIG = 2;  //2:RX_DATA0
-#endif
+#elif defined(__IMXRT1062__)
+	CORE_PIN7_CONFIG  = 3;  //1:TX_DATA0
+	//CORE_PIN2_CONFIG  = 2;  //2:TX_DATA0
 	dma.TCD->SADDR = i2s_tx_buffer;
 	dma.TCD->SOFF = 2;
 	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
 	dma.TCD->NBYTES_MLNO = 2;
 	dma.TCD->SLAST = -sizeof(i2s_tx_buffer);
-	dma.TCD->DADDR = (void *)&i2s->TX.DR16[1];
+	dma.TCD->DADDR = (void *)((uint32_t)&I2S1_TDR1 + 2);
 	dma.TCD->DOFF = 0;
 	dma.TCD->CITER_ELINKNO = sizeof(i2s_tx_buffer) / 2;
 	dma.TCD->DLASTSGA = 0;
@@ -504,6 +493,7 @@ void AudioOutputI2Sslave::begin(void)
 
 void AudioOutputI2Sslave::config_i2s(void)
 {
+#if defined(KINETISK)
 	SIM_SCGC6 |= SIM_SCGC6_I2S;
 	SIM_SCGC7 |= SIM_SCGC7_DMA;
 	SIM_SCGC6 |= SIM_SCGC6_DMAMUX;
@@ -544,73 +534,38 @@ void AudioOutputI2Sslave::config_i2s(void)
 	CORE_PIN9_CONFIG  = PORT_PCR_MUX(6); // pin  9, PTC3, I2S0_TX_BCLK
 	CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK
 
-#elif 0 && (defined(__IMXRT1052__) || defined(__IMXRT1062__) )
+#elif defined(__IMXRT1062__)
 
-  #if defined(SAI1)
-	i2s = ((I2S_STRUCT *)0x40384000);
 	// if either transmitter or receiver is enabled, do nothing
-	if (i2s->TX.CSR & I2S_TCSR_TE) return;
-	if (i2s->RX.CSR & I2S_RCSR_RE) return;
+	if (I2S1_TCSR & I2S_TCSR_TE) return;
+	if (I2S1_RCSR & I2S_RCSR_RE) return;
 
 	CCM_CCGR5 |= CCM_CCGR5_SAI1(CCM_CCGR_ON);
-/*
-	CCM_CSCMR1 = (CCM_CSCMR1 & ~(CCM_CSCMR1_SAI1_CLK_SEL_MASK))
-		   | CCM_CSCMR1_SAI1_CLK_SEL(2); // &0x03 // (0,1,2): PLL3PFD0, PLL5, PLL4
-	CCM_CS1CDR = (CCM_CS1CDR & ~(CCM_CS1CDR_SAI1_CLK_PRED_MASK | CCM_CS1CDR_SAI1_CLK_PODF_MASK))
-		   | CCM_CS1CDR_SAI1_CLK_PRED(n1-1) // &0x07
-		   | CCM_CS1CDR_SAI1_CLK_PODF(n2-1); // &0x3f
-*/
-//TODO:
-	IOMUXC_GPR_GPR1 = (IOMUXC_GPR_GPR1 & ~(IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL_MASK | ((uint32_t)(1<<20)) ))
-			| (IOMUXC_GPR_GPR1_SAI1_MCLK_DIR | IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL(0));	//Select MCLK
-
+	//Select MCLK
+	IOMUXC_GPR_GPR1 = (IOMUXC_GPR_GPR1
+		& ~(IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL_MASK | ((uint32_t)(1<<20)) ))
+		| (IOMUXC_GPR_GPR1_SAI1_MCLK_DIR | IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL(0));
 	CORE_PIN23_CONFIG = 3;  //1:MCLK
 	CORE_PIN21_CONFIG = 3;  //1:RX_BCLK
 	CORE_PIN20_CONFIG = 3;  //1:RX_SYNC
-	int rsync = 0;
-	int tsync = 1;
-  #elif defined(SAI2)
-	i2s = ((I2S_STRUCT *)0x40388000);
-	if (i2s->TX.CSR & I2S_TCSR_TE) return;
-	if (i2s->RX.CSR & I2S_RCSR_RE) return;
-
-	CCM_CCGR5 |= CCM_CCGR5_SAI2(CCM_CCGR_ON);
-/*
-	CCM_CSCMR1 = (CCM_CSCMR1 & ~(CCM_CSCMR1_SAI2_CLK_SEL_MASK))
-		   | CCM_CSCMR1_SAI2_CLK_SEL(2); // &0x03 // (0,1,2): PLL3PFD0, PLL5, PLL4,
-	CCM_CS2CDR = (CCM_CS2CDR & ~(CCM_CS2CDR_SAI2_CLK_PRED_MASK | CCM_CS2CDR_SAI2_CLK_PODF_MASK))
-		   | CCM_CS2CDR_SAI2_CLK_PRED(n1-1) | CCM_CS2CDR_SAI2_CLK_PODF(n2-1);
-*/
-//TODO:
-
-	IOMUXC_GPR_GPR1 = (IOMUXC_GPR_GPR1 & ~(IOMUXC_GPR_GPR1_SAI2_MCLK3_SEL_MASK | ((uint32_t)(1<<19)) ))
-			/*| (IOMUXC_GPR_GPR1_SAI2_MCLK_DIR*/ | IOMUXC_GPR_GPR1_SAI2_MCLK3_SEL(0);	//Select MCLK
-
-	CORE_PIN5_CONFIG  = 2;  //2:MCLK
-	CORE_PIN4_CONFIG  = 2;  //2:TX_BCLK
-	CORE_PIN3_CONFIG  = 2;  //2:TX_SYNC
-	int rsync = 1;
-	int tsync = 0;
-
-  #endif
 
 	// configure transmitter
-	i2s->TX.MR = 0;
-	i2s->TX.CR1 = I2S_TCR1_RFW(1);  // watermark at half fifo size
-	i2s->TX.CR2 = I2S_TCR2_SYNC(tsync) | I2S_TCR2_BCP;
-	i2s->TX.CR3 = I2S_TCR3_TCE;
-	i2s->TX.CR4 = I2S_TCR4_FRSZ(1) | I2S_TCR4_SYWD(31) | I2S_TCR4_MF
-		    | I2S_TCR4_FSE | I2S_TCR4_FSP;
-	i2s->TX.CR5 = I2S_TCR5_WNW(31) | I2S_TCR5_W0W(31) | I2S_TCR5_FBT(31);
+	I2S1_TMR = 0;
+	I2S1_TCR1 = I2S_TCR1_RFW(1);  // watermark at half fifo size
+	I2S1_TCR2 = I2S_TCR2_SYNC(1) | I2S_TCR2_BCP;
+	I2S1_TCR3 = I2S_TCR3_TCE;
+	I2S1_TCR4 = I2S_TCR4_FRSZ(1) | I2S_TCR4_SYWD(31) | I2S_TCR4_MF
+		| I2S_TCR4_FSE | I2S_TCR4_FSP;
+	I2S1_TCR5 = I2S_TCR5_WNW(31) | I2S_TCR5_W0W(31) | I2S_TCR5_FBT(31);
 
 	// configure receiver
-	i2s->RX.MR = 0;
-	i2s->RX.CR1 = I2S_RCR1_RFW(1);
-	i2s->RX.CR2 = I2S_RCR2_SYNC(rsync) | I2S_TCR2_BCP;
-	i2s->RX.CR3 = I2S_RCR3_RCE;
-	i2s->RX.CR4 = I2S_RCR4_FRSZ(1) | I2S_RCR4_SYWD(31) | I2S_RCR4_MF
-		    | I2S_RCR4_FSE | I2S_RCR4_FSP | I2S_RCR4_FSD;
-	i2s->RX.CR5 = I2S_RCR5_WNW(31) | I2S_RCR5_W0W(31) | I2S_RCR5_FBT(31);
+	I2S1_RMR = 0;
+	I2S1_RCR1 = I2S_RCR1_RFW(1);
+	I2S1_RCR2 = I2S_RCR2_SYNC(0) | I2S_TCR2_BCP;
+	I2S1_RCR3 = I2S_RCR3_RCE;
+	I2S1_RCR4 = I2S_RCR4_FRSZ(1) | I2S_RCR4_SYWD(31) | I2S_RCR4_MF
+		| I2S_RCR4_FSE | I2S_RCR4_FSP | I2S_RCR4_FSD;
+	I2S1_RCR5 = I2S_RCR5_WNW(31) | I2S_RCR5_W0W(31) | I2S_RCR5_FBT(31);
 
 #endif
 }
