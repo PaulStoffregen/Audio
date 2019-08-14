@@ -40,6 +40,7 @@ DMAMEM __attribute__((aligned(32))) static uint32_t i2s_tx_buffer[AUDIO_BLOCK_SA
 
 #if defined(__IMXRT1062__)
 #include "utility/imxrt_hw.h"
+#endif
 
 void AudioOutputI2S::begin(void)
 {
@@ -49,8 +50,28 @@ void AudioOutputI2S::begin(void)
 	block_right_1st = NULL;
 
 	config_i2s();
-	
-	CORE_PIN7_CONFIG  = 3;  //1:TX_DATA0	
+
+#if defined(KINETISK)
+	CORE_PIN22_CONFIG = PORT_PCR_MUX(6); // pin 22, PTC1, I2S0_TXD0
+
+	dma.TCD->SADDR = i2s_tx_buffer;
+	dma.TCD->SOFF = 2;
+	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
+	dma.TCD->NBYTES_MLNO = 2;
+	dma.TCD->SLAST = -sizeof(i2s_tx_buffer);
+	dma.TCD->DADDR = (void *)((uint32_t)&I2S0_TDR0 + 2);
+	dma.TCD->DOFF = 0;
+	dma.TCD->CITER_ELINKNO = sizeof(i2s_tx_buffer) / 2;
+	dma.TCD->DLASTSGA = 0;
+	dma.TCD->BITER_ELINKNO = sizeof(i2s_tx_buffer) / 2;
+	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
+	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_TX);
+
+	I2S0_TCSR = I2S_TCSR_SR;
+	I2S0_TCSR = I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
+
+#elif defined(__IMXRT1062__)
+	CORE_PIN7_CONFIG  = 3;  //1:TX_DATA0
 
 	dma.TCD->SADDR = i2s_tx_buffer;
 	dma.TCD->SOFF = 2;
@@ -65,50 +86,14 @@ void AudioOutputI2S::begin(void)
 	dma.TCD->DADDR = (void *)((uint32_t)&I2S1_TDR0 + 2);
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI1_TX);
 
-	I2S1_RCSR |= I2S_RCSR_RE;
-	I2S1_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
-
+	I2S1_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE;
+	I2S1_TCSR = I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
+#endif
 	update_responsibility = update_setup();
 	dma.attachInterrupt(isr);
 	dma.enable();
 }
 
-#endif
-
-#if defined(KINETISK)
-void AudioOutputI2S::begin(void)
-{
-	dma.begin(true); // Allocate the DMA channel first
-
-	block_left_1st = NULL;
-	block_right_1st = NULL;
-
-	// TODO: should we set & clear the I2S_TCSR_SR bit here?
-	config_i2s();
-	CORE_PIN22_CONFIG = PORT_PCR_MUX(6); // pin 22, PTC1, I2S0_TXD0
-
-	dma.TCD->SADDR = i2s_tx_buffer;
-	dma.TCD->SOFF = 2;
-	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
-	dma.TCD->NBYTES_MLNO = 2;
-	dma.TCD->SLAST = -sizeof(i2s_tx_buffer);
-	dma.TCD->DADDR = (void *)((uint32_t)&I2S0_TDR0 + 2);
-	dma.TCD->DOFF = 0;
-	dma.TCD->CITER_ELINKNO = sizeof(i2s_tx_buffer) / 2;
-	dma.TCD->DLASTSGA = 0;
-	dma.TCD->BITER_ELINKNO = sizeof(i2s_tx_buffer) / 2;
-	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
-
-	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_TX);
-	update_responsibility = update_setup();
-	dma.enable();
-
-
-	I2S0_TCSR = I2S_TCSR_SR;
-	I2S0_TCSR = I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
-	dma.attachInterrupt(isr);
-}
-#endif
 
 void AudioOutputI2S::isr(void)
 {
@@ -383,6 +368,10 @@ void AudioOutputI2S::config_i2s(void)
 #elif defined(__IMXRT1062__)
 
 	CCM_CCGR5 |= CCM_CCGR5_SAI1(CCM_CCGR_ON);
+
+	// if either transmitter or receiver is enabled, do nothing
+	if (I2S1_TCSR & I2S_TCSR_TE) return;
+	if (I2S1_RCSR & I2S_RCSR_RE) return;
 //PLL:
 	int fs = AUDIO_SAMPLE_RATE_EXACT;
 	// PLL between 27*24 = 648MHz und 54*24=1296MHz
@@ -407,10 +396,6 @@ void AudioOutputI2S::config_i2s(void)
 		& ~(IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL_MASK))
 		| (IOMUXC_GPR_GPR1_SAI1_MCLK_DIR | IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL(0));
 
-	// if either transmitter or receiver is enabled, do nothing
-	if (I2S1_TCSR & I2S_TCSR_TE) return;
-	if (I2S1_RCSR & I2S_RCSR_RE) return;
-
 	CORE_PIN23_CONFIG = 3;  //1:MCLK
 	CORE_PIN21_CONFIG = 3;  //1:RX_BCLK
 	CORE_PIN20_CONFIG = 3;  //1:RX_SYNC
@@ -424,7 +409,8 @@ void AudioOutputI2S::config_i2s(void)
 	I2S1_TCR2 = I2S_TCR2_SYNC(tsync) | I2S_TCR2_BCP // sync=0; tx is async;
 		    | (I2S_TCR2_BCD | I2S_TCR2_DIV((1)) | I2S_TCR2_MSEL(1));
 	I2S1_TCR3 = I2S_TCR3_TCE;
-	I2S1_TCR4 = I2S_TCR4_FRSZ((2-1)) | I2S_TCR4_SYWD((32-1)) | I2S_TCR4_MF | I2S_TCR4_FSD | I2S_TCR4_FSE | I2S_TCR4_FSP;
+	I2S1_TCR4 = I2S_TCR4_FRSZ((2-1)) | I2S_TCR4_SYWD((32-1)) | I2S_TCR4_MF
+		    | I2S_TCR4_FSD | I2S_TCR4_FSE | I2S_TCR4_FSP;
 	I2S1_TCR5 = I2S_TCR5_WNW((32-1)) | I2S_TCR5_W0W((32-1)) | I2S_TCR5_FBT((32-1));
 
 	I2S1_RMR = 0;
@@ -433,7 +419,8 @@ void AudioOutputI2S::config_i2s(void)
 	I2S1_RCR2 = I2S_RCR2_SYNC(rsync) | I2S_RCR2_BCP  // sync=0; rx is async;
 		    | (I2S_RCR2_BCD | I2S_RCR2_DIV((1)) | I2S_RCR2_MSEL(1));
 	I2S1_RCR3 = I2S_RCR3_RCE;
-	I2S1_RCR4 = I2S_RCR4_FRSZ((2-1)) | I2S_RCR4_SYWD((32-1)) | I2S_RCR4_MF | I2S_RCR4_FSE | I2S_RCR4_FSP | I2S_RCR4_FSD;
+	I2S1_RCR4 = I2S_RCR4_FRSZ((2-1)) | I2S_RCR4_SYWD((32-1)) | I2S_RCR4_MF
+		    | I2S_RCR4_FSE | I2S_RCR4_FSP | I2S_RCR4_FSD;
 	I2S1_RCR5 = I2S_RCR5_WNW((32-1)) | I2S_RCR5_W0W((32-1)) | I2S_RCR5_FBT((32-1));
 
 #endif
