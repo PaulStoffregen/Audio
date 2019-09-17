@@ -78,6 +78,11 @@
 //       then un-mute the DACs.
 //    9. Normal operation begins.
 
+// Some people have found their CS42448 goes into a strange mode where VQ is 1.25V
+// instead of the normal 2.5V.  Apparently there is a workaround for this problem
+// which involves writing to an undocumented bit.  Details here:
+// https://forum.pjrc.com/threads/41371?p=215881&viewfull=1#post215881
+
 static const uint8_t default_config[] = {
 	0xF4, // CS42448_Functional_Mode = slave mode, MCLK 25.6 MHz max
 	0x76, // CS42448_Interface_Formats = TDM mode
