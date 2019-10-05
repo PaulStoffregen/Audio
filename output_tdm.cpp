@@ -91,8 +91,8 @@ void AudioOutputTDM::begin(void)
 	update_responsibility = update_setup();
 	dma.enable();
 
-	I2S1_RCSR |= I2S_RCSR_RE;
-	I2S1_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
+	I2S1_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE;
+	I2S1_TCSR = I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
 
 #endif
 	dma.attachInterrupt(isr);
@@ -271,6 +271,10 @@ void AudioOutputTDM::config_tdm(void)
 
 #elif defined(__IMXRT1062__)
 	CCM_CCGR5 |= CCM_CCGR5_SAI1(CCM_CCGR_ON);
+
+	// if either transmitter or receiver is enabled, do nothing
+	if (I2S1_TCSR & I2S_TCSR_TE) return;
+	if (I2S1_RCSR & I2S_RCSR_RE) return;
 //PLL:
 	int fs = AUDIO_SAMPLE_RATE_EXACT;
 	// PLL between 27*24 = 648MHz und 54*24=1296MHz
