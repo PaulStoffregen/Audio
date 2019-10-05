@@ -72,8 +72,8 @@ void AudioOutputTDM::begin(void)
 
 	I2S0_TCSR = I2S_TCSR_SR;
 	I2S0_TCSR = I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
-#elif defined(__IMXRT1052__) || defined(__IMXRT1062__)
-	CORE_PIN6_CONFIG  = 3;  //1:TX_DATA0
+#elif defined(__IMXRT1062__)
+	CORE_PIN7_CONFIG  = 3;  //1:TX_DATA0
 
 	dma.TCD->SADDR = tdm_tx_buffer;
 	dma.TCD->SOFF = 4;
@@ -269,7 +269,7 @@ void AudioOutputTDM::config_tdm(void)
 	CORE_PIN9_CONFIG  = PORT_PCR_MUX(6); // pin  9, PTC3, I2S0_TX_BCLK  - 11.2 MHz
 	CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK - 22.5 MHz
 
-#elif defined(__IMXRT1052__) || defined(__IMXRT1062__)
+#elif defined(__IMXRT1062__)
 	CCM_CCGR5 |= CCM_CCGR5_SAI1(CCM_CCGR_ON);
 //PLL:
 	int fs = AUDIO_SAMPLE_RATE_EXACT;
