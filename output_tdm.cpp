@@ -299,10 +299,6 @@ void AudioOutputTDM::config_tdm(void)
 	IOMUXC_GPR_GPR1 = (IOMUXC_GPR_GPR1 & ~(IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL_MASK))
 			| (IOMUXC_GPR_GPR1_SAI1_MCLK_DIR | IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL(0));	//Select MCLK
 
-	// if either transmitter or receiver is enabled, do nothing
-	if (I2S1_TCSR & I2S_TCSR_TE) return;
-	if (I2S1_RCSR & I2S_RCSR_RE) return;
-
 	// configure transmitter
 	int rsync = 0;
 	int tsync = 1;
