@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
+#if defined(__IMXRT1062__)
 #include <Arduino.h>
 #include "output_i2s2.h"
 #include "memcpy_audio.h"
@@ -209,11 +209,9 @@ void AudioOutputI2S2::config_i2s(void)
 	if (I2S2_TCSR & I2S_TCSR_TE) return;
 	if (I2S2_RCSR & I2S_RCSR_RE) return;
 
-	CORE_PIN5_CONFIG  = 2;  //2:MCLK
+	CORE_PIN33_CONFIG = 2;  //2:MCLK
 	CORE_PIN4_CONFIG  = 2;  //2:TX_BCLK
 	CORE_PIN3_CONFIG  = 2;  //2:TX_SYNC
-//	CORE_PIN2_CONFIG  = 2;  //2:TX_DATA0
-//	CORE_PIN33_CONFIG = 2;  //2:RX_DATA0
 
 	int rsync = 1;
 	int tsync = 0;

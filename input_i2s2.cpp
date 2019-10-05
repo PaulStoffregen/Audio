@@ -25,7 +25,7 @@
  */
 
 
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
+#if defined(__IMXRT1062__)
 #include <Arduino.h>
 #include "input_i2s2.h"
 #include "output_i2s2.h"
@@ -48,7 +48,7 @@ void AudioInputI2S2::begin(void)
 	// TODO: should we set & clear the I2S_RCSR_SR bit here?
 	AudioOutputI2S2::config_i2s();
 
-	CORE_PIN33_CONFIG = 2;  //2:RX_DATA0
+	CORE_PIN5_CONFIG = 2;  //2:RX_DATA0
 	IOMUXC_SAI2_RX_DATA0_SELECT_INPUT = 0;
 
 	dma.TCD->SADDR = (void *)((uint32_t)&I2S2_RDR0+2);
