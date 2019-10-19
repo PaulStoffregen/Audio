@@ -148,6 +148,9 @@ public:
 		phase_increment = freq * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT);
 		if (phase_increment > 0x7FFE0000u) phase_increment = 0x7FFE0000;
 	}
+	void restart() {
+		phase_accumulator = 0;
+	}
 	void amplitude(float n) {	// 0 to 1.0
 		if (n < 0) {
 			n = 0;
