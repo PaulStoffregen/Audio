@@ -155,11 +155,7 @@ void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
       case PIN_A11: ADC1Channel = ADC_Channel0; break;
       case PIN_A12: ADC1Channel = ADC_Channel1; break;
    }
-#elif defined(_VARIANT_TRELLIS_M4_)
-   // no pins can connect to ADC1
-#elif defined(_VARIANT_HALLOWING_M4_)
-   // no pins can connect to ADC1
-#elif defined(_VARIANT_MONSTER_M4SK_)
+#elif defined(_VARIANT_PYPORTAL_M4_) || defined(_VARIANT_MONSTER_M4SK_) || defined(_VARIANT_HALLOWING_M4_) || defined(_VARIANT_TRELLIS_M4_) || defined(_VARIANT_PYPORTAL_M4_TITANO_)
    // no pins can connect to ADC1
 #else
 #error The Adafruit audio library is compatible with M4 parts only
