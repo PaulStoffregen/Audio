@@ -49,6 +49,10 @@ AudioConnection          patchCord2(playWav1, 1, audioOutput, 0);
   #define SDCARD_CS_PIN    32
   #define SPEAKER_ENABLE   50
   Adafruit_FlashTransport_QSPI flashTransport(PIN_QSPI_SCK, PIN_QSPI_CS, PIN_QSPI_IO0, PIN_QSPI_IO1, PIN_QSPI_IO2, PIN_QSPI_IO3);
+#elif defined(ADAFRUIT_MONSTER_M4SK_EXPRESS)
+  #define SDCARD_CS_PIN    3
+  #define SPEAKER_ENABLE   20
+  Adafruit_FlashTransport_QSPI flashTransport(PIN_QSPI_SCK, PIN_QSPI_CS, PIN_QSPI_IO0, PIN_QSPI_IO1, PIN_QSPI_IO2, PIN_QSPI_IO3);
 #endif
 
 Adafruit_SPIFlash flash(&flashTransport);

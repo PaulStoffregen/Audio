@@ -343,7 +343,7 @@ start:
 
 	  // playing mono at native sample rate
 	  case STATE_DIRECT_16BIT_MONO:
-	    Serial.println("16 bit mono");
+	    //Serial.println("16 bit mono");
 		if (size > data_length) size = data_length;
 		data_length -= size;
 		while (1) {
