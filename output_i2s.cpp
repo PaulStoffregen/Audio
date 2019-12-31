@@ -73,7 +73,6 @@ void AudioOutputI2S::begin(void)
 
 #elif defined(__IMXRT1062__)
 	CORE_PIN7_CONFIG  = 3;  //1:TX_DATA0
-
 	dma.TCD->SADDR = i2s_tx_buffer;
 	dma.TCD->SOFF = 2;
 	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
@@ -440,7 +439,6 @@ void AudioOutputI2Sslave::begin(void)
 
 	dma.begin(true); // Allocate the DMA channel first
 
-	//pinMode(2, OUTPUT);
 	block_left_1st = NULL;
 	block_right_1st = NULL;
 
@@ -460,27 +458,31 @@ void AudioOutputI2Sslave::begin(void)
 	dma.TCD->BITER_ELINKNO = sizeof(i2s_tx_buffer) / 2;
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_TX);
+	dma.enable();
+
 	I2S0_TCSR = I2S_TCSR_SR;
 	I2S0_TCSR = I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
 
 #elif defined(__IMXRT1062__)
 	CORE_PIN7_CONFIG  = 3;  //1:TX_DATA0
-	//CORE_PIN2_CONFIG  = 2;  //2:TX_DATA0
 	dma.TCD->SADDR = i2s_tx_buffer;
 	dma.TCD->SOFF = 2;
 	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
 	dma.TCD->NBYTES_MLNO = 2;
 	dma.TCD->SLAST = -sizeof(i2s_tx_buffer);
-	dma.TCD->DADDR = (void *)((uint32_t)&I2S1_TDR1 + 2);
 	dma.TCD->DOFF = 0;
 	dma.TCD->CITER_ELINKNO = sizeof(i2s_tx_buffer) / 2;
 	dma.TCD->DLASTSGA = 0;
 	dma.TCD->BITER_ELINKNO = sizeof(i2s_tx_buffer) / 2;
-	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI2_TX);
+	dma.TCD->DADDR = (void *)((uint32_t)&I2S1_TDR0 + 2);
+	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI1_TX);
+	dma.enable();
+
+	I2S1_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE;
+	I2S1_TCSR = I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
 #endif
 
 	update_responsibility = update_setup();
-	dma.enable();
 	dma.attachInterrupt(isr);
 }
 
@@ -529,18 +531,18 @@ void AudioOutputI2Sslave::config_i2s(void)
 
 #elif defined(__IMXRT1062__)
 
+	CCM_CCGR5 |= CCM_CCGR5_SAI1(CCM_CCGR_ON);
+
 	// if either transmitter or receiver is enabled, do nothing
 	if (I2S1_TCSR & I2S_TCSR_TE) return;
 	if (I2S1_RCSR & I2S_RCSR_RE) return;
 
-	CCM_CCGR5 |= CCM_CCGR5_SAI1(CCM_CCGR_ON);
-	//Select MCLK
-	IOMUXC_GPR_GPR1 = (IOMUXC_GPR_GPR1
-		& ~(IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL_MASK | ((uint32_t)(1<<20)) ))
-		| (IOMUXC_GPR_GPR1_SAI1_MCLK_DIR | IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL(0));
-	CORE_PIN23_CONFIG = 3;  //1:MCLK
-	CORE_PIN21_CONFIG = 3;  //1:RX_BCLK
-	CORE_PIN20_CONFIG = 3;  //1:RX_SYNC
+	// not using MCLK in slave mode - hope that's ok?
+	//CORE_PIN23_CONFIG = 3;  // AD_B1_09  ALT3=SAI1_MCLK
+	CORE_PIN21_CONFIG = 3;  // AD_B1_11  ALT3=SAI1_RX_BCLK
+	CORE_PIN20_CONFIG = 3;  // AD_B1_10  ALT3=SAI1_RX_SYNC
+	IOMUXC_SAI1_RX_BCLK_SELECT_INPUT = 1; // 1=GPIO_AD_B1_11_ALT3, page 868
+	IOMUXC_SAI1_RX_SYNC_SELECT_INPUT = 1; // 1=GPIO_AD_B1_10_ALT3, page 872
 
 	// configure transmitter
 	I2S1_TMR = 0;
@@ -548,7 +550,7 @@ void AudioOutputI2Sslave::config_i2s(void)
 	I2S1_TCR2 = I2S_TCR2_SYNC(1) | I2S_TCR2_BCP;
 	I2S1_TCR3 = I2S_TCR3_TCE;
 	I2S1_TCR4 = I2S_TCR4_FRSZ(1) | I2S_TCR4_SYWD(31) | I2S_TCR4_MF
-		| I2S_TCR4_FSE | I2S_TCR4_FSP;
+		| I2S_TCR4_FSE | I2S_TCR4_FSP | I2S_RCR4_FSD;
 	I2S1_TCR5 = I2S_TCR5_WNW(31) | I2S_TCR5_W0W(31) | I2S_TCR5_FBT(31);
 
 	// configure receiver
@@ -557,7 +559,7 @@ void AudioOutputI2Sslave::config_i2s(void)
 	I2S1_RCR2 = I2S_RCR2_SYNC(0) | I2S_TCR2_BCP;
 	I2S1_RCR3 = I2S_RCR3_RCE;
 	I2S1_RCR4 = I2S_RCR4_FRSZ(1) | I2S_RCR4_SYWD(31) | I2S_RCR4_MF
-		| I2S_RCR4_FSE | I2S_RCR4_FSP | I2S_RCR4_FSD;
+		| I2S_RCR4_FSE | I2S_RCR4_FSP;
 	I2S1_RCR5 = I2S_RCR5_WNW(31) | I2S_RCR5_W0W(31) | I2S_RCR5_FBT(31);
 
 #endif
