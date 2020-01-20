@@ -66,4 +66,4 @@ USB Audio: Bi-Directional Stereo Streaming to a PC
 BSD license, check license.txt for more information. All text above must be included in any redistribution
 
 ## Installation
-To install, use the Arduino Library Manager and search for 'Adafruit 10DOF' and install the library
+To install, use the Arduino Library Manager and search for 'Adafruit Audio' and install the library
