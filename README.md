@@ -63,8 +63,5 @@ USB Audio: Bi-Directional Stereo Streaming to a PC
 
 ![Inputs](/gui/img/usbtype_audio_in.png)      ![Outputs](/gui/img/usbtype_audio_out.png)
 
-
-
-
-
-
+## Installation
+To install, use the Arduino Library Manager and search for 'Audio - Adafruit Fork' and install the library
