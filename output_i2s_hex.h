@@ -24,52 +24,42 @@
  * THE SOFTWARE.
  */
 
-#ifndef output_i2s_h_
-#define output_i2s_h_
+#ifndef output_i2s_hex_h_
+#define output_i2s_hex_h_
 
 #include "Arduino.h"
 #include "AudioStream.h"
 #include "DMAChannel.h"
 
-class AudioOutputI2S : public AudioStream
+class AudioOutputI2SHex : public AudioStream
 {
 public:
-	AudioOutputI2S(void) : AudioStream(2, inputQueueArray) { begin(); }
+	AudioOutputI2SHex(void) : AudioStream(6, inputQueueArray) { begin(); }
 	virtual void update(void);
 	void begin(void);
-	friend class AudioInputI2S;
-#if defined(__IMXRT1062__)
-	friend class AudioOutputI2SQuad;
-	friend class AudioInputI2SQuad;
-	friend class AudioOutputI2SHex;
-	friend class AudioInputI2SHex;
-#endif
-protected:
-	AudioOutputI2S(int dummy): AudioStream(2, inputQueueArray) {} // to be used only inside AudioOutputI2Sslave !!
-	static void config_i2s(void);
-	static audio_block_t *block_left_1st;
-	static audio_block_t *block_right_1st;
+private:
+	static audio_block_t *block_ch1_1st;
+	static audio_block_t *block_ch2_1st;
+	static audio_block_t *block_ch3_1st;
+	static audio_block_t *block_ch4_1st;
+	static audio_block_t *block_ch5_1st;
+	static audio_block_t *block_ch6_1st;
 	static bool update_responsibility;
 	static DMAChannel dma;
 	static void isr(void);
-private:
-	static audio_block_t *block_left_2nd;
-	static audio_block_t *block_right_2nd;
-	static uint16_t block_left_offset;
-	static uint16_t block_right_offset;
-	audio_block_t *inputQueueArray[2];
-};
-
-
-class AudioOutputI2Sslave : public AudioOutputI2S
-{
-public:
-	AudioOutputI2Sslave(void) : AudioOutputI2S(0) { begin(); } ;
-	void begin(void);
-	friend class AudioInputI2Sslave;
-	friend void dma_ch0_isr(void);
-protected:
-	static void config_i2s(void);
+	static audio_block_t *block_ch1_2nd;
+	static audio_block_t *block_ch2_2nd;
+	static audio_block_t *block_ch3_2nd;
+	static audio_block_t *block_ch4_2nd;
+	static audio_block_t *block_ch5_2nd;
+	static audio_block_t *block_ch6_2nd;
+	static uint16_t ch1_offset;
+	static uint16_t ch2_offset;
+	static uint16_t ch3_offset;
+	static uint16_t ch4_offset;
+	static uint16_t ch5_offset;
+	static uint16_t ch6_offset;
+	audio_block_t *inputQueueArray[6];
 };
 
 #endif
