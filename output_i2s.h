@@ -38,6 +38,10 @@ public:
 	virtual void update(void);
 	void begin(void);
 	friend class AudioInputI2S;
+#if defined(__IMXRT1062__)
+	friend class AudioOutputI2SQuad;
+	friend class AudioInputI2SQuad;
+#endif
 protected:
 	AudioOutputI2S(int dummy): AudioStream(2, inputQueueArray) {} // to be used only inside AudioOutputI2Sslave !!
 	static void config_i2s(void);
