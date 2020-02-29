@@ -12,6 +12,7 @@ AudioOutputI2S	KEYWORD2
 AudioOutputI2S2	KEYWORD2
 AudioOutputI2SQuad	KEYWORD2
 AudioOutputI2SHex	KEYWORD2
+AudioOutputI2SOct	KEYWORD2
 AudioOutputI2Sslave	KEYWORD2
 AudioOutputSPDIF	KEYWORD2
 AudioOutputSPDIF2	KEYWORD2

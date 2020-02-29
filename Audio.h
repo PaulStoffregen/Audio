@@ -103,6 +103,7 @@
 #include "output_i2s2.h"
 #include "output_i2s_quad.h"
 #include "output_i2s_hex.h"
+#include "output_i2s_oct.h"
 #include "output_mqs.h"
 #include "output_pwm.h"
 #include "output_spdif.h"
