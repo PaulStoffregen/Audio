@@ -24,40 +24,33 @@
  * THE SOFTWARE.
  */
 
-#ifndef record_queue_h_
-#define record_queue_h_
+#ifndef _input_i2s_oct_h_
+#define _input_i2s_oct_h_
 
 #include "Arduino.h"
 #include "AudioStream.h"
+#include "DMAChannel.h"
 
-class AudioRecordQueue : public AudioStream
+class AudioInputI2SOct : public AudioStream
 {
-private:
-#if defined(__IMXRT1062__) || defined(__MK66FX1M0__) || defined(__MK64FX512__)
-	static const int max_buffers = 209;
-#else
-	static const int max_buffers = 53;
-#endif
 public:
-	AudioRecordQueue(void) : AudioStream(1, inputQueueArray),
-		userblock(NULL), head(0), tail(0), enabled(0) { }
-	void begin(void) {
-		clear();
-		enabled = 1;
-	}
-	int available(void);
-	void clear(void);
-	int16_t * readBuffer(void);
-	void freeBuffer(void);
-	void end(void) {
-		enabled = 0;
-	}
+	AudioInputI2SOct(void) : AudioStream(0, NULL) { begin(); }
 	virtual void update(void);
+	void begin(void);
 private:
-	audio_block_t *inputQueueArray[1];
-	audio_block_t * volatile queue[max_buffers];
-	audio_block_t *userblock;
-	volatile uint8_t head, tail, enabled;
+	static bool update_responsibility;
+	static DMAChannel dma;
+	static void isr(void);
+	static audio_block_t *block_ch1;
+	static audio_block_t *block_ch2;
+	static audio_block_t *block_ch3;
+	static audio_block_t *block_ch4;
+	static audio_block_t *block_ch5;
+	static audio_block_t *block_ch6;
+	static audio_block_t *block_ch7;
+	static audio_block_t *block_ch8;
+	static uint16_t block_offset;
 };
+
 
 #endif

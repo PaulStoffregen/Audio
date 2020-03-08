@@ -24,40 +24,48 @@
  * THE SOFTWARE.
  */
 
-#ifndef record_queue_h_
-#define record_queue_h_
+#ifndef output_i2s_oct_h_
+#define output_i2s_oct_h_
 
 #include "Arduino.h"
 #include "AudioStream.h"
+#include "DMAChannel.h"
 
-class AudioRecordQueue : public AudioStream
+class AudioOutputI2SOct : public AudioStream
 {
-private:
-#if defined(__IMXRT1062__) || defined(__MK66FX1M0__) || defined(__MK64FX512__)
-	static const int max_buffers = 209;
-#else
-	static const int max_buffers = 53;
-#endif
 public:
-	AudioRecordQueue(void) : AudioStream(1, inputQueueArray),
-		userblock(NULL), head(0), tail(0), enabled(0) { }
-	void begin(void) {
-		clear();
-		enabled = 1;
-	}
-	int available(void);
-	void clear(void);
-	int16_t * readBuffer(void);
-	void freeBuffer(void);
-	void end(void) {
-		enabled = 0;
-	}
+	AudioOutputI2SOct(void) : AudioStream(8, inputQueueArray) { begin(); }
 	virtual void update(void);
+	void begin(void);
 private:
-	audio_block_t *inputQueueArray[1];
-	audio_block_t * volatile queue[max_buffers];
-	audio_block_t *userblock;
-	volatile uint8_t head, tail, enabled;
+	static audio_block_t *block_ch1_1st;
+	static audio_block_t *block_ch2_1st;
+	static audio_block_t *block_ch3_1st;
+	static audio_block_t *block_ch4_1st;
+	static audio_block_t *block_ch5_1st;
+	static audio_block_t *block_ch6_1st;
+	static audio_block_t *block_ch7_1st;
+	static audio_block_t *block_ch8_1st;
+	static bool update_responsibility;
+	static DMAChannel dma;
+	static void isr(void);
+	static audio_block_t *block_ch1_2nd;
+	static audio_block_t *block_ch2_2nd;
+	static audio_block_t *block_ch3_2nd;
+	static audio_block_t *block_ch4_2nd;
+	static audio_block_t *block_ch5_2nd;
+	static audio_block_t *block_ch6_2nd;
+	static audio_block_t *block_ch7_2nd;
+	static audio_block_t *block_ch8_2nd;
+	static uint16_t ch1_offset;
+	static uint16_t ch2_offset;
+	static uint16_t ch3_offset;
+	static uint16_t ch4_offset;
+	static uint16_t ch5_offset;
+	static uint16_t ch6_offset;
+	static uint16_t ch7_offset;
+	static uint16_t ch8_offset;
+	audio_block_t *inputQueueArray[8];
 };
 
 #endif

@@ -27,7 +27,7 @@
  (c) Frank B
 */
 
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
+#if defined(__IMXRT1062__)
 
 #ifndef imxr_hw_h_
 #define imxr_hw_h_

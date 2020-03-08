@@ -30,7 +30,10 @@
 #include "AudioStream.h"
 #include "utility/dspinst.h"
 
-#if defined(__MK66FX1M0__)
+#if defined(__IMXRT1062__)
+  // 4.00 second maximum on Teensy 4.0
+  #define DELAY_QUEUE_SIZE  (176512 / AUDIO_BLOCK_SAMPLES)
+#elif defined(__MK66FX1M0__)
   // 2.41 second maximum on Teensy 3.6
   #define DELAY_QUEUE_SIZE  (106496 / AUDIO_BLOCK_SAMPLES)
 #elif defined(__MK64FX512__)

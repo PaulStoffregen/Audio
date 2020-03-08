@@ -72,8 +72,8 @@ void AudioOutputTDM::begin(void)
 
 	I2S0_TCSR = I2S_TCSR_SR;
 	I2S0_TCSR = I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
-#elif defined(__IMXRT1052__) || defined(__IMXRT1062__)
-	CORE_PIN6_CONFIG  = 3;  //1:TX_DATA0
+#elif defined(__IMXRT1062__)
+	CORE_PIN7_CONFIG  = 3;  //1:TX_DATA0
 
 	dma.TCD->SADDR = tdm_tx_buffer;
 	dma.TCD->SOFF = 4;
@@ -91,8 +91,8 @@ void AudioOutputTDM::begin(void)
 	update_responsibility = update_setup();
 	dma.enable();
 
-	I2S1_RCSR |= I2S_RCSR_RE;
-	I2S1_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
+	I2S1_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE;
+	I2S1_TCSR = I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
 
 #endif
 	dma.attachInterrupt(isr);
@@ -125,7 +125,7 @@ static void memcpy_tdm_tx(uint32_t *dest, const uint32_t *src1, const uint32_t *
 
 void AudioOutputTDM::isr(void)
 {
-	uint32_t *dest, *dc;
+	uint32_t *dest;
 	const uint32_t *src1, *src2;
 	uint32_t i, saddr;
 
@@ -141,7 +141,11 @@ void AudioOutputTDM::isr(void)
 		dest = tdm_tx_buffer;
 	}
 	if (update_responsibility) AudioStream::update_all();
-	dc = dest;
+
+	#if IMXRT_CACHE_ENABLED >= 2
+	uint32_t *dc = dest;
+	#endif
+	
 	for (i=0; i < 16; i += 2) {
 		src1 = block_input[i] ? (uint32_t *)(block_input[i]->data) : zeros;
 		src2 = block_input[i+1] ? (uint32_t *)(block_input[i+1]->data) : zeros;
@@ -205,12 +209,17 @@ void AudioOutputTDM::update(void)
   #define MCLK_MULT 2
   #define MCLK_DIV  17
 #elif F_CPU == 216000000
-  #define MCLK_MULT 16
-  #define MCLK_DIV  153
-  #define MCLK_SRC  0
+  #define MCLK_MULT 12
+  #define MCLK_DIV  17
+  #define MCLK_SRC  1
 #elif F_CPU == 240000000
-  #define MCLK_MULT 8
+  #define MCLK_MULT 2
   #define MCLK_DIV  85
+  #define MCLK_SRC  0
+#elif F_CPU == 256000000
+  #define MCLK_MULT 12
+  #define MCLK_DIV  17
+  #define MCLK_SRC  1
 #else
   #error "This CPU Clock Speed is not supported by the Audio library";
 #endif
@@ -265,8 +274,12 @@ void AudioOutputTDM::config_tdm(void)
 	CORE_PIN9_CONFIG  = PORT_PCR_MUX(6); // pin  9, PTC3, I2S0_TX_BCLK  - 11.2 MHz
 	CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK - 22.5 MHz
 
-#elif defined(__IMXRT1052__) || defined(__IMXRT1062__)
+#elif defined(__IMXRT1062__)
 	CCM_CCGR5 |= CCM_CCGR5_SAI1(CCM_CCGR_ON);
+
+	// if either transmitter or receiver is enabled, do nothing
+	if (I2S1_TCSR & I2S_TCSR_TE) return;
+	if (I2S1_RCSR & I2S_RCSR_RE) return;
 //PLL:
 	int fs = AUDIO_SAMPLE_RATE_EXACT;
 	// PLL between 27*24 = 648MHz und 54*24=1296MHz
@@ -290,10 +303,6 @@ void AudioOutputTDM::config_tdm(void)
 
 	IOMUXC_GPR_GPR1 = (IOMUXC_GPR_GPR1 & ~(IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL_MASK))
 			| (IOMUXC_GPR_GPR1_SAI1_MCLK_DIR | IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL(0));	//Select MCLK
-
-	// if either transmitter or receiver is enabled, do nothing
-	if (I2S1_TCSR & I2S_TCSR_TE) return;
-	if (I2S1_RCSR & I2S_RCSR_RE) return;
 
 	// configure transmitter
 	int rsync = 0;

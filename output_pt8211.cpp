@@ -71,8 +71,11 @@ void AudioOutputPT8211::begin(void)
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
 
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_TX);
+	update_responsibility = update_setup();
+	dma.attachInterrupt(isr);
+	dma.enable();
 	I2S0_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE | I2S_TCSR_FR;
-
+	return;
 #elif defined(__IMXRT1052__) || defined(__IMXRT1062__)
 
 #if defined(__IMXRT1052__)
@@ -96,10 +99,12 @@ void AudioOutputPT8211::begin(void)
 
 	I2S1_RCSR |= I2S_RCSR_RE;
 	I2S1_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
-#endif
+
 	update_responsibility = update_setup();
 	dma.attachInterrupt(isr);
 	dma.enable();
+	return;
+#endif	
 }
 
 void AudioOutputPT8211::isr(void)
@@ -429,12 +434,17 @@ void AudioOutputPT8211::update(void)
   #define MCLK_MULT 1
   #define MCLK_DIV  17
 #elif F_CPU == 216000000
-  #define MCLK_MULT 8
-  #define MCLK_DIV  153
-  #define MCLK_SRC  0
+  #define MCLK_MULT 12
+  #define MCLK_DIV  17
+  #define MCLK_SRC  1
 #elif F_CPU == 240000000
-  #define MCLK_MULT 4
+  #define MCLK_MULT 2
   #define MCLK_DIV  85
+  #define MCLK_SRC  0
+#elif F_CPU == 256000000
+  #define MCLK_MULT 12
+  #define MCLK_DIV  17
+  #define MCLK_SRC  1
 #elif F_CPU == 16000000
   #define MCLK_MULT 12
   #define MCLK_DIV  17

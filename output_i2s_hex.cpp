@@ -25,35 +25,38 @@
  */
 
 #include <Arduino.h>
-#include "output_i2s_quad.h"
+#include "output_i2s_hex.h"
 #include "output_i2s.h"
 #include "memcpy_audio.h"
 
-#if defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__) || defined(__IMXRT1062__)
-
 #if defined(__IMXRT1062__)
 #include "utility/imxrt_hw.h"
-#endif
 
-audio_block_t * AudioOutputI2SQuad::block_ch1_1st = NULL;
-audio_block_t * AudioOutputI2SQuad::block_ch2_1st = NULL;
-audio_block_t * AudioOutputI2SQuad::block_ch3_1st = NULL;
-audio_block_t * AudioOutputI2SQuad::block_ch4_1st = NULL;
-audio_block_t * AudioOutputI2SQuad::block_ch1_2nd = NULL;
-audio_block_t * AudioOutputI2SQuad::block_ch2_2nd = NULL;
-audio_block_t * AudioOutputI2SQuad::block_ch3_2nd = NULL;
-audio_block_t * AudioOutputI2SQuad::block_ch4_2nd = NULL;
-uint16_t  AudioOutputI2SQuad::ch1_offset = 0;
-uint16_t  AudioOutputI2SQuad::ch2_offset = 0;
-uint16_t  AudioOutputI2SQuad::ch3_offset = 0;
-uint16_t  AudioOutputI2SQuad::ch4_offset = 0;
-bool AudioOutputI2SQuad::update_responsibility = false;
-DMAMEM __attribute__((aligned(32))) static uint32_t i2s_tx_buffer[AUDIO_BLOCK_SAMPLES*2];
-DMAChannel AudioOutputI2SQuad::dma(false);
+audio_block_t * AudioOutputI2SHex::block_ch1_1st = NULL;
+audio_block_t * AudioOutputI2SHex::block_ch2_1st = NULL;
+audio_block_t * AudioOutputI2SHex::block_ch3_1st = NULL;
+audio_block_t * AudioOutputI2SHex::block_ch4_1st = NULL;
+audio_block_t * AudioOutputI2SHex::block_ch5_1st = NULL;
+audio_block_t * AudioOutputI2SHex::block_ch6_1st = NULL;
+audio_block_t * AudioOutputI2SHex::block_ch1_2nd = NULL;
+audio_block_t * AudioOutputI2SHex::block_ch2_2nd = NULL;
+audio_block_t * AudioOutputI2SHex::block_ch3_2nd = NULL;
+audio_block_t * AudioOutputI2SHex::block_ch4_2nd = NULL;
+audio_block_t * AudioOutputI2SHex::block_ch5_2nd = NULL;
+audio_block_t * AudioOutputI2SHex::block_ch6_2nd = NULL;
+uint16_t  AudioOutputI2SHex::ch1_offset = 0;
+uint16_t  AudioOutputI2SHex::ch2_offset = 0;
+uint16_t  AudioOutputI2SHex::ch3_offset = 0;
+uint16_t  AudioOutputI2SHex::ch4_offset = 0;
+uint16_t  AudioOutputI2SHex::ch5_offset = 0;
+uint16_t  AudioOutputI2SHex::ch6_offset = 0;
+bool AudioOutputI2SHex::update_responsibility = false;
+DMAMEM __attribute__((aligned(32))) static uint32_t i2s_tx_buffer[AUDIO_BLOCK_SAMPLES*3];
+DMAChannel AudioOutputI2SHex::dma(false);
 
 static const uint32_t zerodata[AUDIO_BLOCK_SAMPLES/4] = {0};
 
-void AudioOutputI2SQuad::begin(void)
+void AudioOutputI2SHex::begin(void)
 {
 	dma.begin(true); // Allocate the DMA channel first
 
@@ -61,47 +64,21 @@ void AudioOutputI2SQuad::begin(void)
 	block_ch2_1st = NULL;
 	block_ch3_1st = NULL;
 	block_ch4_1st = NULL;
+	block_ch5_1st = NULL;
+	block_ch6_1st = NULL;
 
-#if defined(KINETISK)
-	// TODO: can we call normal config_i2s, and then just enable the extra output?
-	config_i2s();
-	CORE_PIN22_CONFIG = PORT_PCR_MUX(6); // pin 22, PTC1, I2S0_TXD0 -> ch1 & ch2
-	CORE_PIN15_CONFIG = PORT_PCR_MUX(6); // pin 15, PTC0, I2S0_TXD1 -> ch3 & ch4
-
-	dma.TCD->SADDR = i2s_tx_buffer;
-	dma.TCD->SOFF = 2;
-	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1) | DMA_TCD_ATTR_DMOD(3);
-	dma.TCD->NBYTES_MLNO = 4;
-	dma.TCD->SLAST = -sizeof(i2s_tx_buffer);
-	dma.TCD->DADDR = &I2S0_TDR0;
-	dma.TCD->DOFF = 4;
-	dma.TCD->CITER_ELINKNO = sizeof(i2s_tx_buffer) / 4;
-	dma.TCD->DLASTSGA = 0;
-	dma.TCD->BITER_ELINKNO = sizeof(i2s_tx_buffer) / 4;
-	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
-	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_TX);
-	update_responsibility = update_setup();
-	dma.enable();
-
-	I2S0_TCSR = I2S_TCSR_SR;
-	I2S0_TCSR = I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
-	dma.attachInterrupt(isr);
-
-#elif defined(__IMXRT1062__)
 	const int pinoffset = 0; // TODO: make this configurable...
 	memset(i2s_tx_buffer, 0, sizeof(i2s_tx_buffer));
 	AudioOutputI2S::config_i2s();
-	I2S1_TCR3 = I2S_TCR3_TCE_2CH << pinoffset;
+	I2S1_TCR3 = I2S_TCR3_TCE_3CH << pinoffset;
 	switch (pinoffset) {
 	  case 0:
 		CORE_PIN7_CONFIG  = 3;
 		CORE_PIN32_CONFIG = 3;
+		CORE_PIN9_CONFIG  = 3;
 		break;
 	  case 1:
 		CORE_PIN32_CONFIG = 3;
-		CORE_PIN9_CONFIG  = 3;
-		break;
-	  case 2:
 		CORE_PIN9_CONFIG  = 3;
 		CORE_PIN6_CONFIG  = 3;
 	}
@@ -109,29 +86,28 @@ void AudioOutputI2SQuad::begin(void)
 	dma.TCD->SOFF = 2;
 	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
 	dma.TCD->NBYTES_MLOFFYES = DMA_TCD_NBYTES_DMLOE |
-		DMA_TCD_NBYTES_MLOFFYES_MLOFF(-8) |
-		DMA_TCD_NBYTES_MLOFFYES_NBYTES(4);
+		DMA_TCD_NBYTES_MLOFFYES_MLOFF(-12) |
+		DMA_TCD_NBYTES_MLOFFYES_NBYTES(6);
 	dma.TCD->SLAST = -sizeof(i2s_tx_buffer);
 	dma.TCD->DADDR = (void *)((uint32_t)&I2S1_TDR0 + 2 + pinoffset * 4);
 	dma.TCD->DOFF = 4;
 	dma.TCD->CITER_ELINKNO = AUDIO_BLOCK_SAMPLES * 2;
-	dma.TCD->DLASTSGA = -8;
+	dma.TCD->DLASTSGA = -12;
 	dma.TCD->BITER_ELINKNO = AUDIO_BLOCK_SAMPLES * 2;
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI1_TX);
 	dma.enable();
 	I2S1_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE;
 	I2S1_TCSR = I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
-	I2S1_TCR3 = I2S_TCR3_TCE_2CH << pinoffset;
+	I2S1_TCR3 = I2S_TCR3_TCE_3CH << pinoffset;
 	update_responsibility = update_setup();
 	dma.attachInterrupt(isr);
-#endif
 }
 
-void AudioOutputI2SQuad::isr(void)
+void AudioOutputI2SHex::isr(void)
 {
 	uint32_t saddr;
-	const int16_t *src1, *src2, *src3, *src4;
+	const int16_t *src1, *src2, *src3, *src4, *src5, *src6;
 	const int16_t *zeros = (const int16_t *)zerodata;
 	int16_t *dest;
 
@@ -140,7 +116,7 @@ void AudioOutputI2SQuad::isr(void)
 	if (saddr < (uint32_t)i2s_tx_buffer + sizeof(i2s_tx_buffer) / 2) {
 		// DMA is transmitting the first half of the buffer
 		// so we must fill the second half
-		dest = (int16_t *)&i2s_tx_buffer[AUDIO_BLOCK_SAMPLES];
+		dest = (int16_t *)((uint32_t)i2s_tx_buffer + sizeof(i2s_tx_buffer) / 2);
 		if (update_responsibility) update_all();
 	} else {
 		dest = (int16_t *)i2s_tx_buffer;
@@ -150,18 +126,23 @@ void AudioOutputI2SQuad::isr(void)
 	src2 = (block_ch2_1st) ? block_ch2_1st->data + ch2_offset : zeros;
 	src3 = (block_ch3_1st) ? block_ch3_1st->data + ch3_offset : zeros;
 	src4 = (block_ch4_1st) ? block_ch4_1st->data + ch4_offset : zeros;
-
-#if 1
+	src5 = (block_ch5_1st) ? block_ch5_1st->data + ch5_offset : zeros;
+	src6 = (block_ch6_1st) ? block_ch6_1st->data + ch6_offset : zeros;
+#if 0
+	// TODO: optimized 6 channel copy...
 	memcpy_tointerleaveQuad(dest, src1, src2, src3, src4);
 #else
+	int16_t *p=dest;
 	for (int i=0; i < AUDIO_BLOCK_SAMPLES/2; i++) {
-		*dest++ = *src1++;
-		*dest++ = *src3++;
-		*dest++ = *src2++;
-		*dest++ = *src4++;
+		*p++ = *src1++;
+		*p++ = *src3++;
+		*p++ = *src5++;
+		*p++ = *src2++;
+		*p++ = *src4++;
+		*p++ = *src6++;
 	}
 #endif
-	arm_dcache_flush_delete(dest, sizeof(i2s_tx_buffer) / 2 );
+	arm_dcache_flush_delete(dest, sizeof(i2s_tx_buffer) / 2);
 
 	if (block_ch1_1st) {
 		if (ch1_offset == 0) {
@@ -203,10 +184,30 @@ void AudioOutputI2SQuad::isr(void)
 			block_ch4_2nd = NULL;
 		}
 	}
+	if (block_ch5_1st) {
+		if (ch5_offset == 0) {
+			ch5_offset = AUDIO_BLOCK_SAMPLES/2;
+		} else {
+			ch5_offset = 0;
+			release(block_ch5_1st);
+			block_ch5_1st = block_ch5_2nd;
+			block_ch5_2nd = NULL;
+		}
+	}
+	if (block_ch6_1st) {
+		if (ch6_offset == 0) {
+			ch6_offset = AUDIO_BLOCK_SAMPLES/2;
+		} else {
+			ch6_offset = 0;
+			release(block_ch6_1st);
+			block_ch6_1st = block_ch6_2nd;
+			block_ch6_2nd = NULL;
+		}
+	}
 }
 
 
-void AudioOutputI2SQuad::update(void)
+void AudioOutputI2SHex::update(void)
 {
 	audio_block_t *block, *tmp;
 
@@ -286,111 +287,54 @@ void AudioOutputI2SQuad::update(void)
 			release(tmp);
 		}
 	}
+	block = receiveReadOnly(4); // channel 5
+	if (block) {
+		__disable_irq();
+		if (block_ch5_1st == NULL) {
+			block_ch5_1st = block;
+			ch5_offset = 0;
+			__enable_irq();
+		} else if (block_ch5_2nd == NULL) {
+			block_ch5_2nd = block;
+			__enable_irq();
+		} else {
+			tmp = block_ch5_1st;
+			block_ch5_1st = block_ch5_2nd;
+			block_ch5_2nd = block;
+			ch5_offset = 0;
+			__enable_irq();
+			release(tmp);
+		}
+	}
+	block = receiveReadOnly(5); // channel 6
+	if (block) {
+		__disable_irq();
+		if (block_ch6_1st == NULL) {
+			block_ch6_1st = block;
+			ch6_offset = 0;
+			__enable_irq();
+		} else if (block_ch6_2nd == NULL) {
+			block_ch6_2nd = block;
+			__enable_irq();
+		} else {
+			tmp = block_ch6_1st;
+			block_ch6_1st = block_ch6_2nd;
+			block_ch6_2nd = block;
+			ch6_offset = 0;
+			__enable_irq();
+			release(tmp);
+		}
+	}
 }
-
-#if defined(KINETISK)
-// MCLK needs to be 48e6 / 1088 * 256 = 11.29411765 MHz -> 44.117647 kHz sample rate
-//
-#if F_CPU == 96000000 || F_CPU == 48000000 || F_CPU == 24000000
-  // PLL is at 96 MHz in these modes
-  #define MCLK_MULT 2
-  #define MCLK_DIV  17
-#elif F_CPU == 72000000
-  #define MCLK_MULT 8
-  #define MCLK_DIV  51
-#elif F_CPU == 120000000
-  #define MCLK_MULT 8
-  #define MCLK_DIV  85
-#elif F_CPU == 144000000
-  #define MCLK_MULT 4
-  #define MCLK_DIV  51
-#elif F_CPU == 168000000
-  #define MCLK_MULT 8
-  #define MCLK_DIV  119
-#elif F_CPU == 180000000
-  #define MCLK_MULT 16
-  #define MCLK_DIV  255
-  #define MCLK_SRC  0
-#elif F_CPU == 192000000
-  #define MCLK_MULT 1
-  #define MCLK_DIV  17
-#elif F_CPU == 216000000
-  #define MCLK_MULT 12
-  #define MCLK_DIV  17
-  #define MCLK_SRC  1
-#elif F_CPU == 240000000
-  #define MCLK_MULT 2
-  #define MCLK_DIV  85
-  #define MCLK_SRC  0
-#elif F_CPU == 256000000
-  #define MCLK_MULT 12
-  #define MCLK_DIV  17
-  #define MCLK_SRC  1
-#elif F_CPU == 16000000
-  #define MCLK_MULT 12
-  #define MCLK_DIV  17
-#else
-  #error "This CPU Clock Speed is not supported by the Audio library";
-#endif
-
-#ifndef MCLK_SRC
-#if F_CPU >= 20000000
-  #define MCLK_SRC  3  // the PLL
-#else
-  #define MCLK_SRC  0  // system clock
-#endif
-#endif
-
-void AudioOutputI2SQuad::config_i2s(void)
-{
-	SIM_SCGC6 |= SIM_SCGC6_I2S;
-	SIM_SCGC7 |= SIM_SCGC7_DMA;
-	SIM_SCGC6 |= SIM_SCGC6_DMAMUX;
-
-	// if either transmitter or receiver is enabled, do nothing
-	if (I2S0_TCSR & I2S_TCSR_TE) return;
-	if (I2S0_RCSR & I2S_RCSR_RE) return;
-
-	// enable MCLK output
-	I2S0_MCR = I2S_MCR_MICS(MCLK_SRC) | I2S_MCR_MOE;
-	while (I2S0_MCR & I2S_MCR_DUF) ;
-	I2S0_MDR = I2S_MDR_FRACT((MCLK_MULT-1)) | I2S_MDR_DIVIDE((MCLK_DIV-1));
-
-	// configure transmitter
-	I2S0_TMR = 0;
-	I2S0_TCR1 = I2S_TCR1_TFW(1);  // watermark at half fifo size
-	I2S0_TCR2 = I2S_TCR2_SYNC(0) | I2S_TCR2_BCP | I2S_TCR2_MSEL(1)
-		| I2S_TCR2_BCD | I2S_TCR2_DIV(3);
-	I2S0_TCR3 = I2S_TCR3_TCE_2CH;
-	I2S0_TCR4 = I2S_TCR4_FRSZ(1) | I2S_TCR4_SYWD(15) | I2S_TCR4_MF
-		| I2S_TCR4_FSE | I2S_TCR4_FSP | I2S_TCR4_FSD;
-	I2S0_TCR5 = I2S_TCR5_WNW(15) | I2S_TCR5_W0W(15) | I2S_TCR5_FBT(15);
-
-	// configure receiver (sync'd to transmitter clocks)
-	I2S0_RMR = 0;
-	I2S0_RCR1 = I2S_RCR1_RFW(1);
-	I2S0_RCR2 = I2S_RCR2_SYNC(1) | I2S_TCR2_BCP | I2S_RCR2_MSEL(1)
-		| I2S_RCR2_BCD | I2S_RCR2_DIV(3);
-	I2S0_RCR3 = I2S_RCR3_RCE_2CH;
-	I2S0_RCR4 = I2S_RCR4_FRSZ(1) | I2S_RCR4_SYWD(15) | I2S_RCR4_MF
-		| I2S_RCR4_FSE | I2S_RCR4_FSP | I2S_RCR4_FSD;
-	I2S0_RCR5 = I2S_RCR5_WNW(15) | I2S_RCR5_W0W(15) | I2S_RCR5_FBT(15);
-
-	// configure pin mux for 3 clock signals
-	CORE_PIN23_CONFIG = PORT_PCR_MUX(6); // pin 23, PTC2, I2S0_TX_FS (LRCLK)
-	CORE_PIN9_CONFIG  = PORT_PCR_MUX(6); // pin  9, PTC3, I2S0_TX_BCLK
-	CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK
-}
-#endif // KINETISK
 
 
 #else // not supported
 
-void AudioOutputI2SQuad::begin(void)
+void AudioOutputI2SHex::begin(void)
 {
 }
 
-void AudioOutputI2SQuad::update(void)
+void AudioOutputI2SHex::update(void)
 {
 	audio_block_t *block;
 
@@ -401,6 +345,10 @@ void AudioOutputI2SQuad::update(void)
 	block = receiveReadOnly(2);
 	if (block) release(block);
 	block = receiveReadOnly(3);
+	if (block) release(block);
+	block = receiveReadOnly(4);
+	if (block) release(block);
+	block = receiveReadOnly(5);
 	if (block) release(block);
 }
 

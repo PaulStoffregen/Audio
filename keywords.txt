@@ -3,6 +3,8 @@ AudioConnection	KEYWORD2
 AudioInputI2S	KEYWORD2
 AudioInputI2S2	KEYWORD2
 AudioInputI2SQuad	KEYWORD2
+AudioInputI2SHex	KEYWORD2
+AudioInputI2SOct	KEYWORD2
 AudioInputI2Sslave	KEYWORD2
 AudioInputTDM	KEYWORD2
 AudioInputTDM2	KEYWORD2
@@ -11,6 +13,8 @@ AudioInputUSB	KEYWORD2
 AudioOutputI2S	KEYWORD2
 AudioOutputI2S2	KEYWORD2
 AudioOutputI2SQuad	KEYWORD2
+AudioOutputI2SHex	KEYWORD2
+AudioOutputI2SOct	KEYWORD2
 AudioOutputI2Sslave	KEYWORD2
 AudioOutputSPDIF	KEYWORD2
 AudioOutputSPDIF2	KEYWORD2

@@ -11,17 +11,17 @@
 //
 // Recommended connections:
 //
-//    Mikroe   Teensy 3.1
-//    ------   ----------
-//     SCK         9
-//     MISO       13
-//     MOSI       22
-//     ADCL       23  (yes, ADCL & DACL connect together)
-//     DACL       23
-//     SDA        18
-//     SCL        19
-//     3.3V      +3.3V
-//     GND        GND
+//    MikroE   Teensy 3   Teensy 4
+//    ------   --------   --------
+//     SCK         9         21
+//     MISO       13          8
+//     MOSI       22          7
+//     ADCL       23         20    (yes, ADCL & DACL connect together)
+//     DACL       23         20
+//     SDA        18         18
+//     SCL        19         19
+//     3.3V      +3.3V      +3.3V
+//     GND        GND        GND
 //
 // For connection using I2S master mode (WM8731 in slave mode, with MCLK):
 //  https://forum.pjrc.com/threads/53854?p=198733&viewfull=1#post198733
@@ -50,6 +50,7 @@ AudioControlWM8731master wm8731m1;       //xy=292,379
 
 
 void setup() {
+  delay(1000); // allow the WM7831 extra time to power up
   wm8731m1.enable();
 
   AudioMemory(15);

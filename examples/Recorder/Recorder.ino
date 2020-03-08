@@ -162,7 +162,7 @@ void continueRecording() {
     memcpy(buffer+256, queue1.readBuffer(), 256);
     queue1.freeBuffer();
     // write all 512 bytes to the SD card
-    elapsedMicros usec = 0;
+    //elapsedMicros usec = 0;
     frec.write(buffer, 512);
     // Uncomment these lines to see how long SD writes
     // are taking.  A pair of audio blocks arrives every
