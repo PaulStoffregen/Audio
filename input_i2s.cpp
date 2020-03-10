@@ -99,7 +99,6 @@ void AudioInputI2S::isr(void)
 
 #if defined(KINETISK) || defined(__IMXRT1062__)
 	daddr = (uint32_t)(dma.TCD->DADDR);
-#endif
 	dma.clearInterrupt();
 	//Serial.println("isr");
 
@@ -123,17 +122,16 @@ void AudioInputI2S::isr(void)
 			dest_left = &(left->data[offset]);
 			dest_right = &(right->data[offset]);
 			AudioInputI2S::block_offset = offset + AUDIO_BLOCK_SAMPLES/2;
-
+			#if IMXRT_CACHE_ENABLED >=1
+			arm_dcache_delete(src, sizeof(i2s_rx_buffer) / 2);
+			#endif
 			do {
-				//Serial.println(*src);
-				//n = *src++;
-				//*dest_left++ = (int16_t)n;
-				//*dest_right++ = (int16_t)(n >> 16);
 				*dest_left++ = *src++;
 				*dest_right++ = *src++;
 			} while (src < end);
 		}
 	}
+#endif
 }
 
 
