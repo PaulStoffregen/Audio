@@ -10,6 +10,7 @@ AudioInputTDM	KEYWORD2
 AudioInputTDM2	KEYWORD2
 AudioInputPDM	KEYWORD2
 AudioInputUSB	KEYWORD2
+AudioInputSPDIF3	KEYWORD2
 AudioOutputI2S	KEYWORD2
 AudioOutputI2S2	KEYWORD2
 AudioOutputI2SQuad	KEYWORD2
@@ -107,6 +108,7 @@ setHighShelf	KEYWORD2
 muteOutput	KEYWORD2
 unmuteOutput	KEYWORD2
 muteInput	KEYWORD2
+pllLocked	KEYWORD2
 unmuteInput	KEYWORD2
 enableDither	KEYWORD2
 disableDither	KEYWORD2
