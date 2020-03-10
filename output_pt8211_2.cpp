@@ -46,7 +46,7 @@ bool AudioOutputPT8211_2::update_responsibility = false;
 #endif
 DMAChannel AudioOutputPT8211_2::dma(false);
 
-PROGMEM
+FLASHMEM
 void AudioOutputPT8211_2::begin(void)
 {
 	dma.begin(true); // Allocate the DMA channel first
@@ -378,7 +378,7 @@ void AudioOutputPT8211_2::update(void)
 	}
 }
 
-PROGMEM
+FLASHMEM
 void AudioOutputPT8211_2::config_i2s(void)
 {
 

@@ -51,7 +51,7 @@ static uint32_t SPDIF_tx_buffer[AUDIO_BLOCK_SAMPLES * 4]; //2 KB
 
 uint32_t  AudioOutputSPDIF2::vucp = VUCP_VALID;
 
-PROGMEM
+FLASHMEM
 void AudioOutputSPDIF2::begin(void)
 {
 
@@ -269,7 +269,7 @@ void AudioOutputSPDIF2::update(void)
 
 }
 
-PROGMEM
+FLASHMEM
 void AudioOutputSPDIF2::config_SPDIF(void)
 {
 	CCM_CCGR5 |= CCM_CCGR5_SAI2(CCM_CCGR_ON);

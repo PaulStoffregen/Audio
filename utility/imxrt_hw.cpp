@@ -30,7 +30,7 @@
 #if defined(__IMXRT1052__) || defined(__IMXRT1062__)
 #include "imxrt_hw.h"
 
-PROGMEM
+FLASHMEM
 void set_audioClock(int nfact, int32_t nmult, uint32_t ndiv, bool force) // sets PLL4
 {
 	if (!force && (CCM_ANALOG_PLL_AUDIO & CCM_ANALOG_PLL_AUDIO_ENABLE)) return;
