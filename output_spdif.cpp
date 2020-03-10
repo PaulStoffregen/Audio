@@ -53,7 +53,7 @@ uint32_t  AudioOutputSPDIF::vucp = VUCP_VALID;
 
 #endif
 
-PROGMEM
+FLASHMEM
 void AudioOutputSPDIF::begin(void)
 {
 
@@ -354,7 +354,7 @@ void AudioOutputSPDIF::update(void)
 #endif
 #endif
 
-PROGMEM
+FLASHMEM
 void AudioOutputSPDIF::config_SPDIF(void)
 {
 #if defined(KINETISK)
