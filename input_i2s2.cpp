@@ -102,12 +102,10 @@ void AudioInputI2S2::isr(void)
 			dest_left = &(left->data[offset]);
 			dest_right = &(right->data[offset]);
 			AudioInputI2S2::block_offset = offset + AUDIO_BLOCK_SAMPLES/2;
-
+			#if IMXRT_CACHE_ENABLED >=1
+			arm_dcache_delete(src, sizeof(i2s_rx_buffer) / 2);
+			#endif
 			do {
-				//Serial.println(*src);
-				//n = *src++;
-				//*dest_left++ = (int16_t)n;
-				//*dest_right++ = (int16_t)(n >> 16);
 				*dest_left++ = *src++;
 				*dest_right++ = *src++;
 			} while (src < end);
