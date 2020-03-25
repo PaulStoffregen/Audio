@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#if defined (__ARM_ARCH_7EM__)
 #pragma once
 
 #include "Arduino.h"
@@ -200,4 +201,4 @@ private:
 	volatile int32_t mod_pitch_offset_init = 0;
 	volatile int32_t mod_pitch_offset_scnd = 0;
 };
-
+#endif

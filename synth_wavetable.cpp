@@ -24,6 +24,8 @@
  * THE SOFTWARE.
  */
 
+#if defined (__ARM_ARCH_7EM__)
+
 #include <Arduino.h>
 #include "synth_wavetable.h"
 #include <dspinst.h>
@@ -421,3 +423,4 @@ void AudioSynthWavetable::update(void) {
 	transmit(block);
 	release(block);
 }
+#endif
