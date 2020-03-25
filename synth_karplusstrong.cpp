@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#if defined (__ARM_ARCH_7EM__)
 #include <Arduino.h>
 #include "synth_karplusstrong.h"
 
@@ -87,3 +88,4 @@ void AudioSynthKarplusStrong::update(void)
 
 uint32_t AudioSynthKarplusStrong::seed = 1;
 
+#endif

@@ -23,6 +23,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+ 
+#if defined (__ARM_ARCH_7EM__)
 
 #ifndef synth_karplusstrong_h_
 #define synth_karplusstrong_h_
@@ -63,4 +65,5 @@ private:
 	int16_t buffer[536]; // TODO: dynamically use audio memory blocks
 };
 
+#endif
 #endif
