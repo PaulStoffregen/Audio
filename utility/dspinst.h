@@ -351,6 +351,7 @@ static inline void clr_q_psr(void)
        "msr APSR_nzcvq,%0\n" : [t] "=&r" (t)::"cc");
 }
 
+#if defined (__ARM_ARCH_7EM__)
 // Multiply two S.31 fractional integers, and return the 32 most significant
 // bits after a shift left by the constant z.
 // This comes from rockbox.org
@@ -366,5 +367,11 @@ static inline int32_t FRACMUL_SHL(int32_t x, int32_t y, int z)
            [c] "Mr" ((z) + 1), [d] "Mr" (31 - (z)));
     return t;
 }
+#else
+static inline int32_t FRACMUL_SHL(int32_t x, int32_t y, int z)
+{
+    return (int32_t) (((int64_t)x * y) >> (31 - z));
+}
+#endif
 
 #endif
