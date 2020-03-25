@@ -40,6 +40,7 @@ DMAMEM __attribute__((aligned(32)))
 static uint32_t SPDIF_tx_buffer[AUDIO_BLOCK_SAMPLES * 4]; //2 KB
 
 
+#if defined (__ARM_ARCH_7EM__)
 #if defined(KINETISK) || defined(__IMXRT1052__) || defined(__IMXRT1062__)
 
 #define PREAMBLE_B  (0xE8) //11101000
@@ -436,13 +437,11 @@ void AudioOutputSPDIF::config_SPDIF(void)
 	CORE_PIN23_CONFIG = 3;  //1:MCLK	11.43MHz
 	CORE_PIN21_CONFIG = 3;  //1:RX_BCLK	5.6 MHz
 	CORE_PIN20_CONFIG = 3;  //1:RX_SYNC	44.1 KHz
-//	CORE_PIN6_CONFIG  = 3;  //1:TX_DATA0
-//	CORE_PIN7_CONFIG  = 3;  //1:RX_DATA0
 #endif
 
 #endif
 }
-
+#endif
 
 #if defined(KINETISL)
 
