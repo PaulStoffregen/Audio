@@ -194,6 +194,7 @@ static inline uint32_t pack_16x16(int32_t a, int32_t b)
 }
 */
 
+
 // computes (((a[31:16] + b[31:16]) << 16) | (a[15:0 + b[15:0]))  (saturates)
 static inline uint32_t signed_add_16_and_16(uint32_t a, uint32_t b) __attribute__((always_inline, unused));
 static inline uint32_t signed_add_16_and_16(uint32_t a, uint32_t b)
@@ -231,6 +232,7 @@ static inline int32_t signed_halving_subtract_16_and_16(int32_t a, int32_t b)
 }
 
 // computes (sum + ((a[31:0] * b[15:0]) >> 16))
+#if defined (__ARM_ARCH_7EM__)
 static inline int32_t signed_multiply_accumulate_32x16b(int32_t sum, int32_t a, uint32_t b) __attribute__((always_inline, unused));
 static inline int32_t signed_multiply_accumulate_32x16b(int32_t sum, int32_t a, uint32_t b)
 {
@@ -238,8 +240,10 @@ static inline int32_t signed_multiply_accumulate_32x16b(int32_t sum, int32_t a, 
 	asm volatile("smlawb %0, %2, %3, %1" : "=r" (out) : "r" (sum), "r" (a), "r" (b));
 	return out;
 }
+#endif
 
 // computes (sum + ((a[31:0] * b[31:16]) >> 16))
+#if defined (__ARM_ARCH_7EM__)
 static inline int32_t signed_multiply_accumulate_32x16t(int32_t sum, int32_t a, uint32_t b) __attribute__((always_inline, unused));
 static inline int32_t signed_multiply_accumulate_32x16t(int32_t sum, int32_t a, uint32_t b)
 {
@@ -247,6 +251,7 @@ static inline int32_t signed_multiply_accumulate_32x16t(int32_t sum, int32_t a, 
 	asm volatile("smlawt %0, %2, %3, %1" : "=r" (out) : "r" (sum), "r" (a), "r" (b));
 	return out;
 }
+#endif
 
 // computes logical and, forces compiler to allocate register and use single cycle instruction
 static inline uint32_t logical_and(uint32_t a, uint32_t b) __attribute__((always_inline, unused));
@@ -297,6 +302,7 @@ static inline int32_t multiply_16bx16b(uint32_t a, uint32_t b)
 	return out;
 }
 
+#if defined (__ARM_ARCH_7EM__)
 // computes ((a[15:0] * b[31:16])
 static inline int32_t multiply_16bx16t(uint32_t a, uint32_t b) __attribute__((always_inline, unused));
 static inline int32_t multiply_16bx16t(uint32_t a, uint32_t b)
@@ -305,6 +311,7 @@ static inline int32_t multiply_16bx16t(uint32_t a, uint32_t b)
 	asm volatile("smulbt %0, %1, %2" : "=r" (out) : "r" (a), "r" (b));
 	return out;
 }
+#endif
 
 // computes ((a[31:16] * b[15:0])
 static inline int32_t multiply_16tx16b(uint32_t a, uint32_t b) __attribute__((always_inline, unused));
@@ -315,6 +322,7 @@ static inline int32_t multiply_16tx16b(uint32_t a, uint32_t b)
 	return out;
 }
 
+#if defined (__ARM_ARCH_7EM__)
 // computes ((a[31:16] * b[31:16])
 static inline int32_t multiply_16tx16t(uint32_t a, uint32_t b) __attribute__((always_inline, unused));
 static inline int32_t multiply_16tx16t(uint32_t a, uint32_t b)
@@ -323,6 +331,7 @@ static inline int32_t multiply_16tx16t(uint32_t a, uint32_t b)
 	asm volatile("smultt %0, %1, %2" : "=r" (out) : "r" (a), "r" (b));
 	return out;
 }
+#endif
 
 // computes (a - b), result saturated to 32 bit integer range
 static inline int32_t substract_32_saturate(uint32_t a, uint32_t b) __attribute__((always_inline, unused));
