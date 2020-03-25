@@ -26,6 +26,8 @@
 
 //Adapted to PT8211, Frank Bösing.
 
+#if defined (__ARM_ARCH_7EM__)
+
 #ifndef output_pt8211_h_
 #define output_pt8211_h_
 
@@ -64,7 +66,5 @@ private:
 	audio_block_t *inputQueueArray[2];
 };
 
-
-
-
+#endif
 #endif

@@ -26,6 +26,7 @@
 
 //Adapted to PT8211, Frank Bösing, Ben-Rheinland
 
+#if defined (__ARM_ARCH_7EM__)
 
 #include <Arduino.h>
 #include "output_pt8211.h"
@@ -555,3 +556,4 @@ void AudioOutputPT8211::config_i2s(void)
 
 #endif
 }
+#endif
