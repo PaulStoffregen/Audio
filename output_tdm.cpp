@@ -23,6 +23,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+ 
+#if defined(__IMXRT1062__)
 
 #include <Arduino.h>
 #include "output_tdm.h"
@@ -329,6 +331,7 @@ void AudioOutputTDM::config_tdm(void)
 	CORE_PIN23_CONFIG = 3;  //1:MCLK
 	CORE_PIN21_CONFIG = 3;  //1:RX_BCLK
 	CORE_PIN20_CONFIG = 3;  //1:RX_SYNC
+#endif
 #endif
 }
 

@@ -23,6 +23,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+ 
+#if defined(__IMXRT1062__)
 
 #ifndef output_tdm_h_
 #define output_tdm_h_
@@ -48,5 +50,7 @@ private:
 	audio_block_t *inputQueueArray[16];
 };
 
+
+#endif
 
 #endif
