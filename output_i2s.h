@@ -45,6 +45,7 @@ public:
 	friend class AudioInputI2SHex;
 	friend class AudioOutputI2SOct;
 	friend class AudioInputI2SOct;
+
 #endif
 protected:
 	AudioOutputI2S(int dummy): AudioStream(2, inputQueueArray) {} // to be used only inside AudioOutputI2Sslave !!
@@ -69,6 +70,7 @@ public:
 	AudioOutputI2Sslave(void) : AudioOutputI2S(0) { begin(); } ;
 	void begin(void);
 	friend class AudioInputI2Sslave;
+	friend class AudioInputI2SOctslave;
 	friend void dma_ch0_isr(void);
 protected:
 	static void config_i2s(void);
