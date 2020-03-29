@@ -531,7 +531,7 @@ bool AudioControlSGTL5000::enable(void)
 	delay(400);
 	write(CHIP_LINE_OUT_VOL, 0x1D1D); // default approx 1.3 volts peak-to-peak
 	write(CHIP_CLK_CTRL, 0x0004);  // 44.1 kHz, 256*Fs
-	write(CHIP_I2S_CTRL, 0x0130); // SCLK=32*Fs, 16bit, I2S format
+	write(CHIP_I2S_CTRL, 0x0030); // SCLK=64*Fs, 16bit, I2S format
 	// default signal routing is ok?
 	write(CHIP_SSS_CTRL, 0x0010); // ADC->I2S, I2S->DAC
 	write(CHIP_ADCDAC_CTRL, 0x0000); // disable dac mute
