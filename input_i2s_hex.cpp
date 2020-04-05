@@ -112,7 +112,7 @@ void AudioInputI2SHex::isr(void)
 	if (block_ch1) {
 		offset = block_offset;
 		if (offset <= AUDIO_BLOCK_SAMPLES/2) {
-			arm_dcache_delete(src, sizeof(i2s_rx_buffer) / 2);
+			arm_dcache_delete((void*)src, sizeof(i2s_rx_buffer) / 2);
 			block_offset = offset + AUDIO_BLOCK_SAMPLES/2;
 			dest1 = &(block_ch1->data[offset]);
 			dest2 = &(block_ch2->data[offset]);

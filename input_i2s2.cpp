@@ -30,7 +30,7 @@
 #include "input_i2s2.h"
 #include "output_i2s2.h"
 
-static uint32_t i2s2_rx_buffer[AUDIO_BLOCK_SAMPLES];
+DMAMEM __attribute__((aligned(32))) static uint32_t i2s2_rx_buffer[AUDIO_BLOCK_SAMPLES];
 audio_block_t * AudioInputI2S2::block_left = NULL;
 audio_block_t * AudioInputI2S2::block_right = NULL;
 uint16_t AudioInputI2S2::block_offset = 0;
