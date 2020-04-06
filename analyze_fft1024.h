@@ -30,6 +30,7 @@
 #include "Arduino.h"
 #include "AudioStream.h"
 #include "arm_math.h"
+#include <arm_const_structs.h>
 
 // windows.c
 extern "C" {
@@ -51,7 +52,7 @@ class AudioAnalyzeFFT1024 : public AudioStream
 public:
 	AudioAnalyzeFFT1024() : AudioStream(1, inputQueueArray),
 	  window(AudioWindowHanning1024), state(0), outputflag(false) {
-		arm_cfft_radix4_init_q15(&fft_inst, 1024, 0, 1);
+		fft_inst = &arm_cfft_sR_q15_len1024;
 	}
 	bool available() {
 		if (outputflag == true) {
@@ -97,7 +98,7 @@ private:
 	//uint8_t naverage;
 	volatile bool outputflag;
 	audio_block_t *inputQueueArray[1];
-	arm_cfft_radix4_instance_q15 fft_inst;
+	const arm_cfft_instance_q15 *fft_inst;
 };
 
 #endif
