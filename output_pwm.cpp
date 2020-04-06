@@ -213,7 +213,7 @@ extern uint8_t analog_write_res;
 extern const struct _pwm_pin_info_struct pwm_pin_info[];
 audio_block_t * AudioOutputPWM::block = NULL;
 DMAMEM __attribute__((aligned(32))) static uint16_t pwm_tx_buffer[2][AUDIO_BLOCK_SAMPLES * 2];
-DMAChannel AudioOutputPWM::dma[2](false);
+DMAChannel AudioOutputPWM::dma[2];
 _audio_info_flexpwm AudioOutputPWM::apins[2];
 
 FLASHMEM
