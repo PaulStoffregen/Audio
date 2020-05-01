@@ -122,7 +122,7 @@ void AudioInputI2S::isr(void)
 			dest_left = &(left->data[offset]);
 			dest_right = &(right->data[offset]);
 			AudioInputI2S::block_offset = offset + AUDIO_BLOCK_SAMPLES/2;
-			arm_dcache_delete(src, sizeof(i2s_rx_buffer) / 2);
+			arm_dcache_delete((void*)src, sizeof(i2s_rx_buffer) / 2);
 			do {
 				*dest_left++ = *src++;
 				*dest_right++ = *src++;
