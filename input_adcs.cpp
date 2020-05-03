@@ -33,8 +33,8 @@
 
 #define COEF_HPF_DCBLOCK    (1048300<<10)  // DC Removal filter coefficient in S1.30
 
-DMAMEM static uint16_t left_buffer[AUDIO_BLOCK_SAMPLES];
-DMAMEM static uint16_t right_buffer[AUDIO_BLOCK_SAMPLES];
+DMAMEM __attribute__((aligned(32))) static uint16_t left_buffer[AUDIO_BLOCK_SAMPLES];
+DMAMEM __attribute__((aligned(32))) static uint16_t right_buffer[AUDIO_BLOCK_SAMPLES];
 audio_block_t * AudioInputAnalogStereo::block_left = NULL;
 audio_block_t * AudioInputAnalogStereo::block_right = NULL;
 uint16_t AudioInputAnalogStereo::offset_left = 0;
