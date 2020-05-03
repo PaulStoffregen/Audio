@@ -30,7 +30,7 @@
 
 #if defined(__MK64FX512__) || defined(__MK66FX1M0__)
 
-DMAMEM static uint32_t dac_buffer[AUDIO_BLOCK_SAMPLES*2];
+DMAMEM __attribute__((aligned(32))) static uint32_t dac_buffer[AUDIO_BLOCK_SAMPLES*2];
 audio_block_t * AudioOutputAnalogStereo::block_left_1st = NULL;
 audio_block_t * AudioOutputAnalogStereo::block_left_2nd = NULL;
 audio_block_t * AudioOutputAnalogStereo::block_right_1st = NULL;
