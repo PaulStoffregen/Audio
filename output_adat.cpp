@@ -56,7 +56,7 @@ uint16_t  AudioOutputADAT::ch8_offset = 0;
 bool AudioOutputADAT::update_responsibility = false;
 //uint32_t  AudioOutputADAT::vucp = VUCP_VALID;
 
-DMAMEM static uint32_t ADAT_tx_buffer[AUDIO_BLOCK_SAMPLES * 8]; //4 KB, AUDIO_BLOCK_SAMPLES is usually 128
+DMAMEM __attribute__((aligned(32))) static uint32_t ADAT_tx_buffer[AUDIO_BLOCK_SAMPLES * 8]; //4 KB, AUDIO_BLOCK_SAMPLES is usually 128
 
 DMAChannel AudioOutputADAT::dma(false);
 
