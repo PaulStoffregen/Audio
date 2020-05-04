@@ -303,23 +303,22 @@ void AudioInputAnalog::init(uint8_t pin)
 	//       linear interpolation is supposed to resample it to exactly 4X
 	//       the sample rate, so we avoid artifacts boundaries between captures
 	const int comp1 = ((float)F_BUS_ACTUAL) / (AUDIO_SAMPLE_RATE_EXACT * 4.0f) / 2.0f + 0.5f;
-	TMR3_ENBL &= ~(1<<3);
-	TMR3_SCTRL3 = TMR_SCTRL_OEN | TMR_SCTRL_FORCE;
-	TMR3_CSCTRL3 = TMR_CSCTRL_CL1(1) | TMR_CSCTRL_TCF1EN;
-	TMR3_CNTR3 = 0;
-	TMR3_LOAD3 = 0;
-	TMR3_COMP13 = comp1;
-	TMR3_CMPLD13 = comp1;
-	TMR3_CTRL3 = TMR_CTRL_CM(1) | TMR_CTRL_PCS(8) | TMR_CTRL_LENGTH | TMR_CTRL_OUTMODE(3);
-	TMR3_DMA3 = TMR_DMA_CMPLD1DE;
-	CORE_PIN15_CONFIG = 1 ; // GPIO_AD_B1_03, ALT1 = QTIMER3_TIMER3, page 495
-	TMR3_CNTR3 = 0;
-	TMR3_ENBL |= (1<<3);
+	TMR4_ENBL &= ~(1<<3);
+	TMR4_SCTRL3 = TMR_SCTRL_OEN | TMR_SCTRL_FORCE;
+	TMR4_CSCTRL3 = TMR_CSCTRL_CL1(1) | TMR_CSCTRL_TCF1EN;
+	TMR4_CNTR3 = 0;
+	TMR4_LOAD3 = 0;
+	TMR4_COMP13 = comp1;
+	TMR4_CMPLD13 = comp1;
+	TMR4_CTRL3 = TMR_CTRL_CM(1) | TMR_CTRL_PCS(8) | TMR_CTRL_LENGTH | TMR_CTRL_OUTMODE(3);
+	TMR4_DMA3 = TMR_DMA_CMPLD1DE;
+	TMR4_CNTR3 = 0;
+	TMR4_ENBL |= (1<<3);
 
 	// connect the timer output the ADC_ETC input
 	const int trigger = 4; // 0-3 for ADC1, 4-7 for ADC2
 	CCM_CCGR2 |= CCM_CCGR2_XBAR1(CCM_CCGR_ON);
-	xbar_connect(XBARA1_IN_QTIMER3_TIMER3, XBARA1_OUT_ADC_ETC_TRIG00 + trigger);
+	xbar_connect(XBARA1_IN_QTIMER4_TIMER3, XBARA1_OUT_ADC_ETC_TRIG00 + trigger);
 
 	// turn on ADC_ETC and configure to receive trigger
 	if (ADC_ETC_CTRL & (ADC_ETC_CTRL_SOFTRST | ADC_ETC_CTRL_TSC_BYPASS)) {
