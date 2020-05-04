@@ -37,7 +37,6 @@ public:
         AudioInputAnalog() : AudioStream(0, NULL) { init(A2); }
         AudioInputAnalog(uint8_t pin) : AudioStream(0, NULL) { init(pin); }
         virtual void update(void);
-        friend void dma_ch9_isr(void);
 private:
         static audio_block_t *block_left;
         static uint16_t block_offset;
