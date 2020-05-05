@@ -30,7 +30,7 @@
 #include "input_i2s.h"
 #include "output_i2s.h"
 
-static uint32_t i2s_rx_buffer[AUDIO_BLOCK_SAMPLES];
+DMAMEM __attribute__((aligned(32))) static uint32_t i2s_rx_buffer[AUDIO_BLOCK_SAMPLES];
 audio_block_t * AudioInputI2S::block_left = NULL;
 audio_block_t * AudioInputI2S::block_right = NULL;
 uint16_t AudioInputI2S::block_offset = 0;
@@ -122,9 +122,7 @@ void AudioInputI2S::isr(void)
 			dest_left = &(left->data[offset]);
 			dest_right = &(right->data[offset]);
 			AudioInputI2S::block_offset = offset + AUDIO_BLOCK_SAMPLES/2;
-			#if IMXRT_CACHE_ENABLED >=1
-			arm_dcache_delete(src, sizeof(i2s_rx_buffer) / 2);
-			#endif
+			arm_dcache_delete((void*)src, sizeof(i2s_rx_buffer) / 2);
 			do {
 				*dest_left++ = *src++;
 				*dest_right++ = *src++;

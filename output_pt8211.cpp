@@ -40,9 +40,9 @@ uint16_t  AudioOutputPT8211::block_left_offset = 0;
 uint16_t  AudioOutputPT8211::block_right_offset = 0;
 bool AudioOutputPT8211::update_responsibility = false;
 #if defined(AUDIO_PT8211_OVERSAMPLING)
-	static uint32_t i2s_tx_buffer[AUDIO_BLOCK_SAMPLES*4];
+DMAMEM __attribute__((aligned(32))) static uint32_t i2s_tx_buffer[AUDIO_BLOCK_SAMPLES*4];
 #else
-	static uint32_t i2s_tx_buffer[AUDIO_BLOCK_SAMPLES];
+DMAMEM __attribute__((aligned(32))) static uint32_t i2s_tx_buffer[AUDIO_BLOCK_SAMPLES];
 #endif
 DMAChannel AudioOutputPT8211::dma(false);
 
