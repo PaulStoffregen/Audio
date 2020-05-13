@@ -24,12 +24,14 @@
  * THE SOFTWARE.
  */
 
-#if defined(KINETISK)
  
 #include <Arduino.h>
 #include "input_adc.h"
-#include "utility/pdb.h"
 #include "utility/dspinst.h"
+
+#if defined(KINETISK)
+
+#include "utility/pdb.h"
 
 #define COEF_HPF_DCBLOCK    (1048300<<10)  // DC Removal filter coefficient in S1.30
 
