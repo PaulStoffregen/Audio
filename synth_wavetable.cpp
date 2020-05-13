@@ -26,7 +26,7 @@
 
 #include <Arduino.h>
 #include "synth_wavetable.h"
-#include <dspinst.h>
+#include <utility/dspinst.h>
 #include <SerialFlash.h>
 
 //#define TIME_TEST_ON
