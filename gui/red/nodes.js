@@ -663,12 +663,14 @@ RED.nodes = (function() {
 				for (var w1=0;w1<n.wires.length;w1++) {
 					var wires = (n.wires[w1] instanceof Array)?n.wires[w1]:[n.wires[w1]];
 					for (var w2=0;w2<wires.length;w2++) {
-						var parts = wires[w2].split(":");
-						if (parts.length == 2 && parts[0] in node_map) {
-							var dst = node_map[parts[0]];
-							var link = {source:n,sourcePort:w1,target:dst,targetPort:parts[1]};
-							addLink(link);
-							new_links.push(link);
+						if (wires[w2] != null) {
+							var parts = wires[w2].split(":");
+							if (parts.length == 2 && parts[0] in node_map) {
+								var dst = node_map[parts[0]];
+								var link = {source:n,sourcePort:w1,target:dst,targetPort:parts[1]};
+								addLink(link);
+								new_links.push(link);
+							}
 						}
 					}
 				}
