@@ -203,6 +203,24 @@ void AudioOutputPWM::update(void)
 
 #elif defined(__IMXRT1062__)
 
+
+#if 1
+
+// Frank says this should be disabled for non-beta release
+// https://forum.pjrc.com/threads/60532-Teensy-4-1-Beta-Test?p=239244&viewfull=1#post239244
+
+void AudioOutputPWM::begin(void)
+{
+}
+
+void AudioOutputPWM::update(void)
+{
+	audio_block_t *block;
+	block = receiveReadOnly();
+	if (block) release(block);
+}
+
+#else
 /*
 * by Frank B
 */
@@ -401,3 +419,5 @@ void AudioOutputPWM::update(void)
 	__enable_irq();
 }
 #endif
+
+#endif // __IMXRT1062__
