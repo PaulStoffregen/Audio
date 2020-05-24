@@ -348,9 +348,9 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioInputI2SQuad","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_quad","inputs":0,"outputs":4,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputI2SHex","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_hex","inputs":0,"outputs":6,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputI2SOct","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_oct","inputs":0,"outputs":8,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioInputI2Sslave","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2sslave","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputI2Sslave","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2sslave","inputs":0,"outputs":2,"category":"input-function","color":"#F7D8F0","icon":"arrow-in.png"}},
 		{"type":"AudioInputI2S2","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s2","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioInputSPDIF3","data":{"defaults":{"name":{"value":"new"}},"shortName":"spdif","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputSPDIF3","data":{"defaults":{"name":{"value":"new"}},"shortName":"spdif3","inputs":0,"outputs":2,"category":"input-function","color":"#F7D8F0","icon":"arrow-in.png"}},
 		{"type":"AsyncAudioInputSPDIF3","data":{"defaults":{"name":{"value":"new"}},"shortName":"spdif_async","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputAnalog","data":{"defaults":{"name":{"value":"new"}},"shortName":"adc","inputs":0,"outputs":1,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputAnalogStereo","data":{"defaults":{"name":{"value":"new"}},"shortName":"adcs","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -363,7 +363,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioOutputI2SQuad","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_quad","inputs":4,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputI2SHex","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_hex","inputs":6,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputI2SOct","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_oct","inputs":8,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioOutputI2Sslave","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2sslave","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputI2Sslave","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2sslave","inputs":2,"outputs":0,"category":"output-function","color":"#F7D8F0","icon":"arrow-in.png"}},
 		{"type":"AudioOutputI2S2","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s2","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputSPDIF","data":{"defaults":{"name":{"value":"new"}},"shortName":"spdif","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputSPDIF2","data":{"defaults":{"name":{"value":"new"}},"shortName":"spdif2","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -478,6 +478,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		<li><a href="https://www.pjrc.com/store/teensy3_audio.html">STGL5000</a>
 		<li><a href="https://forum.pjrc.com/threads/42665-New-Audio-Board!-TI-TLV320AIC3206">TLV320AIC3206</a>
 		<li><a href="https://forum.pjrc.com/threads/32276-HiFi-Audio-CODEC-Module-AK4558-evaluation-board-in-a-square-inch-PCB">AK4558</a>
+		<li>WM8731
 		</ul>
 	</p>
 	<p>Compatible ADC Chips:
@@ -734,6 +735,105 @@ span.mainfunction {color: #993300; font-weight: bolder}
 </script>
 
 
+<script type="text/x-red" data-help-name="AudioInputSPDIF3">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Receive S/PDIF digital audio, at the rate of the external digital audio source.</p>
+	<p><span style="color:red">This input is incompatible with most other inputs and outputs</span>
+		which run at a speed controlled by Teensy's internal sample rate.</p>
+	</div>
+	<h3>Boards Supported</h3>
+	<ul>
+	<li>Teensy 4.0
+	<li>Teensy 4.1
+	</ul>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Left Channel</td></tr>
+		<tr class=odd><td align=center>Out 1</td><td>Right Channel</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>pllLocked</span>();</p>
+	<p class=desc>Returns true if the S/PDIF phase locked loop is tracking
+		the sample rate of incoming digital audio data.
+	</p>
+	<p class=func><span class=keyword>sampleRate</span>();</p>
+	<p class=desc>Returns the sample rate of incoming data, if the PLL has locked,
+		or returns 0 if the audio sample rate is unknown.
+	</p>
+	<h3>Hardware</h3>
+	<p>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>T4.x<br>Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>15</td><td>S/PDIF Data</td><td>Output</td></tr>
+	</table>
+	</p>
+	<h3>Examples</h3>
+	<!--<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughAsyncSpdif
+	</p>-->
+	<h3>Notes</h3>
+	<p>This input tries to force the entire audio library to run at the
+		sample rate of the incoming data.  It usually can not be combined
+		with most other inputs and outputs which run at specific speeds.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioInputSPDIF3">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AsyncAudioInputSPDIF3">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Receive S/PDIF digital audio and resample to Teensy's audio sample rate.</p>
+	</div>
+	<h3>Boards Supported</h3>
+	<ul>
+	<li>Teensy 4.0
+	<li>Teensy 4.1
+	</ul>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Left Channel</td></tr>
+		<tr class=odd><td align=center>Out 1</td><td>Right Channel</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>getBufferedTime</span>();</p>
+	<p class=desc>TODO: documentation needed here (and what units does the returned value use?)
+	</p>
+	<p class=func><span class=keyword>getInputFrequency</span>();</p>
+	<p class=desc>TODO: documentation needed here
+	</p>
+	<p class=func><span class=keyword>isLocked</span>();</p>
+	<p class=desc>Returns true if the S/PDIF phase locked loop is tracking
+		the sample rate of incoming digital audio data.
+	</p>
+	<p class=func><span class=keyword>getTargetLantency</span>();</p>
+	<p class=desc>TODO: documentation needed here (and what units does the returned value use?)
+	</p>
+	<h3>Hardware</h3>
+	<p>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>T4.x<br>Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>15</td><td>S/PDIF Data</td><td>Output</td></tr>
+	</table>
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughAsyncSpdif
+	</p>
+	<h3>Notes</h3>
+	<p>TODO: document optional instance parameters.... (dither, noiseshaping, attenuation, minHalfFilterLength) </p>
+</script>
+<script type="text/x-red" data-template-name="AsyncAudioInputSPDIF3">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
 <script type="text/x-red" data-help-name="AudioInputAnalog">
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
@@ -875,6 +975,8 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<div class=tooltipinfo>
 	<p>Receive 16 bit stereo audio from an I2S device using I2S slave mode
 		(where the ADC or codec chip, not Teensy, controls audio timing).</p>
+	<p><span style="color:red">This input is incompatible with most other inputs and outputs</span>
+		which run at a speed controlled by Teensy's internal sample rate.</p>
 	</div>
 	<h3>Boards Supported</h3>
 	<ul>
@@ -968,7 +1070,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		<a href="https://forum.pjrc.com/threads/42894">Invensense ICS-52000 microphones</a>.
 		</p>
 	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>T3.x<br>Pin</th><th>T4.0<br>Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=top><th>T3.x<br>Pin</th><th>T4.x<br>Pin</th><th>Signal</th><th>Direction</th></tr>
 		<tr class=odd><td align=center>9</td><td align=center>21</td><td>BCLK</td><td>Output, 11.3 MHz</td></tr>
 		<tr class=odd><td align=center>11</td><td align=center>23</td><td>MCLK</td><td>Output, 22.6 MHz</td></tr>
 		<tr class=odd><td align=center>13</td><td align=center>8</td><td>RX</td><td>Input, 11.3 Mbit/sec</td></tr>
@@ -990,6 +1092,64 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		memory.</p>
 </script>
 <script type="text/x-red" data-template-name="AudioInputTDM">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioInputTDM2">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Receive a 256 bit Time Division Multiplexed frame containing
+		many audio channels, using the I2S2 port.</p>
+	</div>
+	<h3>Boards Supported</h3>
+	<ul>
+	<li>Teensy 4.0
+	<li>Teensy 4.1
+	</ul>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Bits 0 to 15</td></tr>
+		<tr class=odd><td align=center>Out 1</td><td>Bits 16 to 31</td></tr>
+		<tr class=odd><td align=center>Out 2</td><td>Bits 32 to 47</td></tr>
+		<tr class=odd><td align=center>Out 3</td><td>Bits 48 to 63</td></tr>
+		<tr class=odd><td align=center>Out 4</td><td>Bits 64 to 79</td></tr>
+		<tr class=odd><td align=center>Out 5</td><td>Bits 80 to 95</td></tr>
+		<tr class=odd><td align=center>Out 6</td><td>Bits 96 to 111</td></tr>
+		<tr class=odd><td align=center>Out 7</td><td>Bits 112 to 127</td></tr>
+		<tr class=odd><td align=center>Out 8</td><td>Bits 128 to 143</td></tr>
+		<tr class=odd><td align=center>Out 9</td><td>Bits 144 to 159</td></tr>
+		<tr class=odd><td align=center>Out 10</td><td>Bits 160 to 175</td></tr>
+		<tr class=odd><td align=center>Out 11</td><td>Bits 176 to 191</td></tr>
+		<tr class=odd><td align=center>Out 12</td><td>Bits 192 to 207</td></tr>
+		<tr class=odd><td align=center>Out 13</td><td>Bits 208 to 223</td></tr>
+		<tr class=odd><td align=center>Out 14</td><td>Bits 224 to 239</td></tr>
+		<tr class=odd><td align=center>Out 15</td><td>Bits 240 to 255</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from the TDM hardware to its 16 output ports.</p>
+	<h3>Hardware</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Teensy<br>4.x Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>4</td><td>BCLK</td><td>Output, 11.3 MHz</td></tr>
+		<tr class=odd><td align=center>33</td><td>MCLK</td><td>Output, 22.6 MHz</td></tr>
+		<tr class=odd><td align=center>5</td><td>RX</td><td>Input, 11.3 Mbit/sec</td></tr>
+		<tr class=odd><td align=center>3</td><td>FS</td><td>Output</td></tr>
+	</table>
+	<!--<h3>Examples</h3>-->
+	<h3>Notes</h3>
+	<p>When used with TDM devices which transmit 32 bit audio, the
+		even numbered channels will contain the useful upper 16
+		bits of audio data.</p>
+	<p>AudioMemory should be at least 16.  Even if most channels are
+		unused, this TDM object will need to allocate 16 blocks of
+		memory.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioInputTDM2">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1133,7 +1293,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>The I2S signals are used in "master" mode, where Teensy creates
 		all 3 clock signals and controls all data timing.</p>
 	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>T3.x<br>Pin</th><th>T4.0<br>Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=top><th>T3.x<br>Pin</th><th>T4.x<br>Pin</th><th>Signal</th><th>Direction</th></tr>
 		<tr class=odd><td align=center>9</td><td align=center>21</td><td>BCLK</td><td>Output</td></tr>
 		<tr class=odd><td align=center>11</td><td align=center>23</td><td>MCLK</td><td>Output</td></tr>
 		<tr class=odd><td align=center>22</td><td align=center>7</td><td>TX</td><td>Output</td></tr>
@@ -1347,12 +1507,49 @@ span.mainfunction {color: #993300; font-weight: bolder}
 </script>
 
 
-
+<script type="text/x-red" data-help-name="AudioOutputI2S2">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Transmit 16 bit stereo audio to an I2S device, using I2S master mode, on the I2S2 port.</p>
+	</div>
+	<h3>Boards Supported</h3>
+	<ul>
+	<li>Teensy 4.0
+	<li>Teensy 4.1
+	</ul>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Left Channel</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Right Channel</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from its 2 input ports to the I2S hardware.</p>
+	<h3>Hardware</h3>
+	<p>The I2S signals are used in "master" mode, where Teensy creates
+		all 3 clock signals and controls all data timing.</p>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>T4.x<br>Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>4</td><td>BCLK</td><td>Output</td></tr>
+		<tr class=odd><td align=center>33</td><td>MCLK</td><td>Output</td></tr>
+		<tr class=odd><td align=center>2</td><td>TX</td><td>Output</td></tr>
+		<tr class=odd><td align=center>3</td><td>LRCLK</td><td>Output</td></tr>
+	</table>
+	<h3>Examples</h3>
+	<h3>Notes</h3>
+</script>
+<script type="text/x-red" data-template-name="AudioOutputI2S2">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
 
 <script type="text/x-red" data-help-name="AudioOutputSPDIF">
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
-	<p>Transmit 16 bit stereo audio as Digital S/PDIF.</p>
+	<p>Transmit 16 bit stereo audio as Digital S/PDIF by use of the I2S port.</p>
 	<p align=center><img src="img/spdif_proto.jpg"></p>
 	</div>
 	<h3>Boards Supported</h3>
@@ -1372,13 +1569,13 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<h3>Functions</h3>
 	<p>This object has no functions to call from the Arduino sketch.  It
 		simply streams data from its 2 input ports S/PDIF encoded digital
-		audio on pin 22.</p>
+		audio on pin 22 (Teensy 3.x) or pin 7 (Teensy 4.x).</p>
 	<h3>Hardware</h3>
 	<p>The S/PDIF output signal can be used to drive an optical TOSLINK
 		cable, or a standard (usually orange) RCA jack.</p>
 	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Pin</th><th>Signal</th><th>Direction</th></tr>
-		<tr class=odd><td align=center>22</td><td>S/PDIF</td><td>Output</td></tr>
+		<tr class=top><th>Teensy<br>3.x Pin</th><th>Teensy<br>4.x Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>22</td><td align=center>7</td><td>S/PDIF</td><td>Output</td></tr>
 	</table>
 	<p>For optical TOSLINK output, this
 		<a href="https://www.oshpark.com/shared_projects/KcDBKHta" target="_blank">OSH Park board</a>
@@ -1404,6 +1601,106 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioOutputSPDIF">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioOutputSPDIF2">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Transmit 16 bit stereo audio as Digital S/PDIF by use of the I2S2 port.</p>
+	</div>
+	<h3>Boards Supported</h3>
+	<ul>
+	<li>Teensy 4.0
+	<li>Teensy 4.1
+	</ul>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Left Channel</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Right Channel</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from its 2 input ports S/PDIF encoded digital
+		audio on pin 2 (Teensy 4.x).</p>
+	<h3>Hardware</h3>
+	<p>The S/PDIF output signal can be used to drive an optical TOSLINK
+		cable, or a standard (usually orange) RCA jack.</p>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Teensy<br>4.x Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>2</td><td>S/PDIF</td><td>Output</td></tr>
+	</table>
+	<h3>Examples</h3>
+	<p>The AudioOutputSPDIF object can be used in place of the AudioOutputI2S object,
+	<p>used in nearly all the examples.  The WavFilePlayer shows how to substitute
+		output objects for different hardware types.
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; WavFilePlayer
+	</p>
+	<h3>Credits</h3>
+	<p><a href="https://github.com/FrankBoesing" target="_blank">Frank Boesing</a>
+		developed the AudioOutputSPDIF code.  The original
+		<a href="https://forum.pjrc.com/threads/28639-S-pdif" target="_blank">forum disussion</a>
+		included valuable input and code from "kpc".
+	<h3>Notes</h3>
+	<p>S/PDIF output uses the I2S2 hardware.  This object can not be used
+		together with any of the I2S2 objects, because it requires the I2S2
+		hardware with different internal settings.</p>
+	</p>
+</script>
+<script type="text/x-red" data-template-name="AudioOutputSPDIF2">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioOutputSPDIF3">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Transmit 16 bit stereo audio as Digital S/PDIF by use of the native S/PDIF port.</p>
+	</div>
+	<h3>Boards Supported</h3>
+	<ul>
+	<li>Teensy 4.0
+	<li>Teensy 4.1
+	</ul>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Left Channel</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Right Channel</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from its 2 input ports S/PDIF encoded digital
+		audio on pin 14 (Teensy 4.x).</p>
+	<h3>Hardware</h3>
+	<p>The S/PDIF output signal can be used to drive an optical TOSLINK
+		cable, or a standard (usually orange) RCA jack.</p>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Teensy<br>4.x Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>14</td><td>S/PDIF</td><td>Output</td></tr>
+	</table>
+	<h3>Examples</h3>
+	<p>The AudioOutputSPDIF object can be used in place of the AudioOutputI2S object,
+	<p>used in nearly all the examples.  The WavFilePlayer shows how to substitute
+		output objects for different hardware types.
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; WavFilePlayer
+	</p>
+	<h3>Credits</h3>
+	<p><a href="https://github.com/FrankBoesing" target="_blank">Frank Boesing</a>
+		developed the AudioOutputSPDIF3 code.
+	<h3>Notes</h3>
+	<p>Native S/PDIF hardware is used, which is more efficient that use of I2S ports.</p>
+	</p>
+</script>
+<script type="text/x-red" data-template-name="AudioOutputSPDIF3">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1437,10 +1734,10 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		oversampling and filtering is automatically used to improve quality.</p>
 	<h3>Hardware</h3>
 	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Pin</th><th>Signal</th><th>Direction</th></tr>
-		<tr class=odd><td align=center>9</td><td>BCK</td><td>Output</td></tr>
-		<tr class=odd><td align=center>22</td><td>DIN</td><td>Output</td></tr>
-		<tr class=odd><td align=center>23</td><td>FS</td><td>Output</td></tr>
+		<tr class=top><th>Teensy<br>3.x Pin</th><th>Teensy<br>4.x Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>9</td><td align=center>21</td><td>BCK</td><td>Output</td></tr>
+		<tr class=odd><td align=center>22</td><td align=center>7</td><td>DIN</td><td>Output</td></tr>
+		<tr class=odd><td align=center>23</td><td align=center>20</td><td>FS</td><td>Output</td></tr>
 	</table>
 	<p>More information can be found in the PT8211 datasheet.
 		</p>
@@ -1456,6 +1753,52 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioOutputPT8211">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioOutputPT8211_2">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Transmit 16 bit stereo audio to a low-cost PT8211 DAC chip, using the I2S2 port.  4X oversampling
+		and filtering are automatically used to improve output quality.</p>
+	</div>
+	<h3>Boards Supported</h3>
+	<ul>
+	<li>Teensy 4.0
+	<li>Teensy 4.1
+	</ul>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Left Channel</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Right Channel</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from its 2 input ports to a PT8211 chip.  4X
+		oversampling and filtering is automatically used to improve quality.</p>
+	<h3>Hardware</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Teensy<br>4.x Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>4</td><td>BCK</td><td>Output</td></tr>
+		<tr class=odd><td align=center>2</td><td>DIN</td><td>Output</td></tr>
+		<tr class=odd><td align=center>3</td><td>FS</td><td>Output</td></tr>
+	</table>
+	<p>More information can be found in the PT8211 datasheet.
+		</p>
+	<h3>Examples</h3>
+	<h3>Credits</h3>
+	<p>Frank Boesing and Benjamin developed this PT8211 object.  Details can be
+		found on this
+		<a href="https://forum.pjrc.com/threads/29284-Dual-channel-16bit-dac-PT8211/page3" target="_blank">forum disussion</a>.
+	<h3>Notes</h3>
+	<p>
+	</p>
+</script>
+<script type="text/x-red" data-template-name="AudioOutputPT8211_2">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1577,7 +1920,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 <script type="text/x-red" data-help-name="AudioOutputPWM">
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
-	<p>Transmit audio using Teensy 3.1's PWM pins.  Two pins are
+	<p>Transmit audio using Teensy 3's PWM pins.  Two pins are
 		used for coarse and fine pulses, to be combined by scaled
 		resistors.</p>
 	</div>
@@ -1632,11 +1975,50 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</div>
 </script>
 
+<script type="text/x-red" data-help-name="AudioOutputMQS">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Transmit 16 bit stereo audio using Medium Quality Sound pulses, usually better than PWM,
+		but not as good as a proper DAC or the audio shield.</p>
+	</div>
+	<h3>Boards Supported</h3>
+	<ul>
+	<li>Teensy 4.0
+	<li>Teensy 4.1
+	</ul>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Left Channel</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Right Channel</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from its 2 input ports to generate output pulses.</p>
+	<h3>Hardware</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>T4.x<br>Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>12</td><td>Left</td><td>Output</td></tr>
+		<tr class=odd><td align=center>10</td><td>Right</td><td>Output</td></tr>
+	</table>
+	<h3>Examples</h3>
+	<h3>Notes</h3>
+	<p>TODO: can this really be used together with other inputs and outputs?</p>
+</script>
+<script type="text/x-red" data-template-name="AudioOutputMQS">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
 <script type="text/x-red" data-help-name="AudioOutputI2Sslave">
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
 	<p>Transmit 16 bit stereo audio to an I2S device using I2S slave mode
 		(where the DAC or codec chip, not Teensy, controls audio timing).</p>
+	<p><span style="color:red">This input is incompatible with most other inputs and outputs</span>
+		which run at a speed controlled by Teensy's internal sample rate.</p>
 	</div>
 	<h3>Boards Supported</h3>
 	<ul>
@@ -1727,7 +2109,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		CS42448 Circuit Board</a>.
 		</p>
 	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>T3.x<br>Pin</th><th>T4.0<br>Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=top><th>T3.x<br>Pin</th><th>T4.x<br>Pin</th><th>Signal</th><th>Direction</th></tr>
 		<tr class=odd><td align=center>9</td><td align=center>21</td><td>BCLK</td><td>Output, 11.3 MHz</td></tr>
 		<tr class=odd><td align=center>11</td><td align=center>23</td><td>MCLK</td><td>Output, 22.6 MHz</td></tr>
 		<tr class=odd><td align=center>22</td><td align=center>7</td><td>TX</td><td>Output, 11.3 Mbit/sec</td></tr>
@@ -1745,6 +2127,60 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		even numbered channels are used for the top 16 bits.</p>
 </script>
 <script type="text/x-red" data-template-name="AudioOutputTDM">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioOutputTDM2">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Transmit a 256 bit Time Division Multiplexed frame containing
+		many audio channels, using the I2S2 port.</p>
+	</div>
+	<h3>Boards Supported</h3>
+	<ul>
+	<li>Teensy 4.0
+	<li>Teensy 4.1
+	</ul>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Bits 0 to 15</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Bits 16 to 31</td></tr>
+		<tr class=odd><td align=center>In 2</td><td>Bits 32 to 47</td></tr>
+		<tr class=odd><td align=center>In 3</td><td>Bits 48 to 63</td></tr>
+		<tr class=odd><td align=center>In 4</td><td>Bits 64 to 79</td></tr>
+		<tr class=odd><td align=center>In 5</td><td>Bits 80 to 95</td></tr>
+		<tr class=odd><td align=center>In 6</td><td>Bits 96 to 111</td></tr>
+		<tr class=odd><td align=center>In 7</td><td>Bits 112 to 127</td></tr>
+		<tr class=odd><td align=center>In 8</td><td>Bits 128 to 143</td></tr>
+		<tr class=odd><td align=center>In 9</td><td>Bits 144 to 159</td></tr>
+		<tr class=odd><td align=center>In 10</td><td>Bits 160 to 175</td></tr>
+		<tr class=odd><td align=center>In 11</td><td>Bits 176 to 191</td></tr>
+		<tr class=odd><td align=center>In 12</td><td>Bits 192 to 207</td></tr>
+		<tr class=odd><td align=center>In 13</td><td>Bits 208 to 223</td></tr>
+		<tr class=odd><td align=center>In 14</td><td>Bits 224 to 239</td></tr>
+		<tr class=odd><td align=center>In 15</td><td>Bits 240 to 255</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from its 16 input ports to the TDM hardware.</p>
+	<h3>Hardware</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Teensy<br>4.x Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>4</td><td>BCLK</td><td>Output, 11.3 MHz</td></tr>
+		<tr class=odd><td align=center>33</td><td>MCLK</td><td>Output, 22.6 MHz</td></tr>
+		<tr class=odd><td align=center>2</td><td>TX</td><td>Output, 11.3 Mbit/sec</td></tr>
+		<tr class=odd><td align=center>3</td><td>WS</td><td>Output</td></tr>
+	</table>
+	<!--<h3>Examples</h3>-->
+	<h3>Notes</h3>
+	<p>When used with TDM devices which receive 32 bit audio, the
+		even numbered channels are used for the top 16 bits.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioOutputTDM2">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
