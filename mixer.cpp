@@ -131,6 +131,34 @@ void AudioMixer4::update(void)
 	}
 }
 
+
+void AudioMixer8::update(void)
+{
+	audio_block_t *in, *out=NULL;
+	unsigned int channel;
+
+	for (channel=0; channel < nchan; channel++) {
+		if (!out) {
+			out = receiveWritable(channel);
+			if (out) {
+				int32_t mult = multiplier[channel];
+				if (mult != MULTI_UNITYGAIN) applyGain(out->data, mult);
+			}
+		} else {
+			in = receiveReadOnly(channel);
+			if (in) {
+				applyGainThenAdd(out->data, in->data, multiplier[channel]);
+				release(in);
+			}
+		}
+	}
+	if (out) {
+		transmit(out);
+		release(out);
+	}
+}
+
+
 void AudioAmplifier::update(void)
 {
 	audio_block_t *block;
