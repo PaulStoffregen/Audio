@@ -1131,6 +1131,17 @@ RED.view = (function() {
 				   //node.append("rect").attr("class", "node-gradient-top").attr("rx", 6).attr("ry", 6).attr("height",30).attr("stroke","none").attr("fill","url(#gradient-top)").style("pointer-events","none");
 				   //node.append("rect").attr("class", "node-gradient-bottom").attr("rx", 6).attr("ry", 6).attr("height",30).attr("stroke","none").attr("fill","url(#gradient-bottom)").style("pointer-events","none");
 
+					if (d.requirementError) {
+
+						var icon_group = node.append("g")
+							.attr("class","node_icon_group")
+							.attr("x",0).attr("y",0);
+
+						var icon = icon_group.append("image")
+							.attr("xlink:href","icons/error.png")
+							.attr("x",10).attr("y",-16);
+					}
+
 					if (d._def.icon) {
 
 						var icon_group = node.append("g")
