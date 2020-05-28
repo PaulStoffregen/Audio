@@ -1024,14 +1024,16 @@ RED.view = (function() {
 							if (n2 != d && n2.requirements != null ) {
 								n2.requirements.forEach(function(r2) {
 									if (r["resource"] == r2["resource"]) {
-										if (r["shareable"] == false) {
+										if (r["shareable"] == false || r2["shareable"] == false) {
 											console.log("Conflict: shareable '"+r["resource"]+"'  "+d.name+" and "+n2.name);
 											d.requirementError = true;
+											r2.requirementError = true;
 										}
 										else
 										if (r["setting"] != r2["setting"]) {
 											console.log("Conflict: "+ d.name + " setting['"+r["setting"]+"'] and "+n2.name+" setting['"+r2["setting"]+"']");
 											d.requirementError = true;
+											r2.requirementError = true;
 										}
 									}
 								});
