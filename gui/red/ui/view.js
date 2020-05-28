@@ -596,7 +596,7 @@ RED.view = (function() {
 				moving_set.push({n:nn});
 				updateSelection();
 				redraw();
-
+				redraw(); //there is no other way to mark _all_ errors on conflicts :(
 				if (nn._def.autoedit) {
 					RED.editor.edit(nn);
 				}
@@ -1009,40 +1009,6 @@ RED.view = (function() {
 					//l = (typeof l === "function" ? l.call(d) : l)||"";
 					var l = d.name ? d.name : d.id;
 
-
-					/**********************************************************************/
-					//Add requirements
-					d.requirementError = false;
-					d.requirements = new Array();
-					requirements.forEach(function(r) {
-						if (r.type == d.type) d.requirements.push(r);
-					});
-
-					//check for conflicts with other nodes:
-					d.requirements.forEach(function(r) {
-						RED.nodes.eachNode(function (n2) {
-							if (n2 != d && n2.requirements != null ) {
-								n2.requirements.forEach(function(r2) {
-									if (r["resource"] == r2["resource"]) {
-										if (r["shareable"] == false || r2["shareable"] == false) {
-											console.log("Conflict: shareable '"+r["resource"]+"'  "+d.name+" and "+n2.name);
-											d.requirementError = true;
-											n2.requirementError = true;
-										}
-										else
-										if (r["setting"] != r2["setting"]) {
-											console.log("Conflict: "+ d.name + " setting['"+r["setting"]+"'] and "+n2.name+" setting['"+r2["setting"]+"']");
-											d.requirementError = true;
-											n2.requirementError = true;
-										}
-									}
-								});
-							}
-						});
-					});
-
-					/**********************************************************************/
-
 					d.w = Math.max(node_width,calculateTextWidth(l)+(d._def.inputs>0?7:0) );
 					d.h = Math.max(node_height,(Math.max(d.outputs,d._def.inputs)||0) * 15);
 
@@ -1260,7 +1226,41 @@ RED.view = (function() {
 			});
 
 			node.each(function(d,i) {
-					if (d.dirty) {
+
+					/**********************************************************************/
+					//Add requirements
+					d.requirementError = false;
+					d.requirements = new Array();
+					requirements.forEach(function(r) {
+						if (r.type == d.type) d.requirements.push(r);
+					});
+
+					//check for conflicts with other nodes:
+					d.requirements.forEach(function(r) {
+						RED.nodes.eachNode(function (n2) {
+							if (n2 != d && n2.requirements != null ) {
+								n2.requirements.forEach(function(r2) {
+									if (r["resource"] == r2["resource"]) {
+										if (r["shareable"] == false || r2["shareable"] == false) {
+											console.log("Conflict: shareable '"+r["resource"]+"'  "+d.name+" and "+n2.name);
+											d.requirementError = true;
+											n2.requirementError = true;
+										}
+										else
+										if (r["setting"] != r2["setting"]) {
+											console.log("Conflict: "+ d.name + " setting['"+r["setting"]+"'] and "+n2.name+" setting['"+r2["setting"]+"']");
+											d.requirementError = true;
+											n2.requirementError = true;
+										}
+									}
+								});
+							}
+						});
+					});
+
+					/**********************************************************************/
+
+					if (d.dirty || d.requirementError != undefined) {
 						//if (d.x < -50) deleteSelection();  // Delete nodes if dragged back to palette
 						if (d.resize) {
 							//var l = d._def.label;
