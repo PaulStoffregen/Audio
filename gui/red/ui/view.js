@@ -1027,13 +1027,13 @@ RED.view = (function() {
 										if (r["shareable"] == false || r2["shareable"] == false) {
 											console.log("Conflict: shareable '"+r["resource"]+"'  "+d.name+" and "+n2.name);
 											d.requirementError = true;
-											r2.requirementError = true;
+											n2.requirementError = true;
 										}
 										else
 										if (r["setting"] != r2["setting"]) {
 											console.log("Conflict: "+ d.name + " setting['"+r["setting"]+"'] and "+n2.name+" setting['"+r2["setting"]+"']");
 											d.requirementError = true;
-											r2.requirementError = true;
+											n2.requirementError = true;
 										}
 									}
 								});
@@ -1267,6 +1267,7 @@ RED.view = (function() {
 					//node.append("path").attr("class","node_error").attr("d","M 3,-3 l 10,0 l -5,-8 z");
 					//node.append("image").attr("class","node_error hidden").attr("xlink:href","icons/node-error.png").attr("x",0).attr("y",-6).attr("width",10).attr("height",9);
 					//node.append("image").attr("class","node_changed hidden").attr("xlink:href","icons/node-changed.png").attr("x",12).attr("y",-6).attr("width",10).attr("height",10);
+					node.append("image").attr("class","node_reqerror hidden").attr("xlink:href","icons/error.png").attr("x",0).attr("y",-12).attr("width",20).attr("height",20);
 			});
 
 			node.each(function(d,i) {
@@ -1354,6 +1355,10 @@ RED.view = (function() {
 							y = (y+13*i)-5;
 							port.attr("y",y)
 						});
+
+						thisNode.selectAll(".node_reqerror")
+							.attr("x",function(d){return d.w-25-(d.changed?13:0)})
+							.classed("hidden",function(d) { return !d.requirementError; });
 
 						thisNode.selectAll(".node_icon").attr("y",function(d){return (d.h-d3.select(this).attr("height"))/2;});
 						thisNode.selectAll(".node_icon_shade").attr("height",function(d){return d.h;});
