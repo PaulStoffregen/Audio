@@ -1513,8 +1513,6 @@ RED.view = (function() {
 		}
 	}
 
-	function conflict(a) { alert(a); }
-
 	function doSort (arr) {
 		arr.sort(function (a, b) {
 			var nameA = a.name ? a.name : a.id;
