@@ -1057,7 +1057,6 @@ RED.view = (function() {
 							.on("touchstart",nodeButtonClicked)
 					}
 
-
 					var mainRect = node.append("rect")
 						.attr("class", "node")
 						.classed("node_unknown",function(d) { return d.type == "unknown"; })
@@ -1228,7 +1227,6 @@ RED.view = (function() {
 					node.append("image").attr("class","node_reqerror hidden").attr("xlink:href","icons/error.png").attr("x",0).attr("y",-12).attr("width",20).attr("height",20);
 			});
 
-
 			node.each(function(d,i) {
 
 					/**********************************************************************/
@@ -1262,13 +1260,10 @@ RED.view = (function() {
 											d.requirementError = true;
 										}
 									}
-
 								});
-
 							}
 						});
 					});
-
 
 					/**********************************************************************/
 
