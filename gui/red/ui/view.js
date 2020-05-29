@@ -1012,6 +1012,8 @@ RED.view = (function() {
 					d.w = Math.max(node_width,calculateTextWidth(l)+(d._def.inputs>0?7:0) );
 					d.h = Math.max(node_height,(Math.max(d.outputs,d._def.inputs)||0) * 15);
 
+					node.append("dfn").attr("class", "tooltip").append("span").attr("role","tooltip");
+
 					if (d._def.badge) {
 						var badge = node.append("svg:g").attr("class","node_badge_group");
 						var badgeRect = badge.append("rect").attr("class","node_badge").attr("rx",5).attr("ry",5).attr("width",40).attr("height",15);
@@ -1241,6 +1243,7 @@ RED.view = (function() {
 					/**********************************************************************/
 					//Add requirements
 					d.requirementError = false;
+					d.conflicts = new Array();
 					d.requirements = new Array();
 					requirements.forEach(function(r) {
 						if (r.type == d.type) d.requirements.push(r);
@@ -1252,16 +1255,20 @@ RED.view = (function() {
 							if (n2 != d && n2.requirements != null ) {
 								n2.requirements.forEach(function(r2) {
 									if (r["resource"] == r2["resource"]) {
-										if (r["shareable"] == false || r2["shareable"] == false) {
-											console.log("Conflict: shareable '"+r["resource"]+"'  "+d.name+" and "+n2.name);
+										if (r["shareable"] == false ) {
+											var msg = "Conflict: shareable '"+r["resource"]+"'  "+d.name+" and "+n2.name;
+											console.log(msg);
+											msg = n2.name + " uses " + r["resource"] + ", too";
+											d.conflicts.push(msg);
 											d.requirementError = true;
-											n2.requirementError = true;
 										}
-										else
+										//else
 										if (r["setting"] != r2["setting"]) {
-											console.log("Conflict: "+ d.name + " setting['"+r["setting"]+"'] and "+n2.name+" setting['"+r2["setting"]+"']");
+											var msg = "Conflict: "+ d.name + " setting['"+r["setting"]+"'] and "+n2.name+" setting['"+r2["setting"]+"']";
+											console.log(msg);
+											msg = n2.name + " has different settings: " + r["setting"] + " ./. " + r2["setting"];
+											d.conflicts.push(msg);
 											d.requirementError = true;
-											n2.requirementError = true;
 										}
 									}
 								});
@@ -1356,9 +1363,16 @@ RED.view = (function() {
 							port.attr("y",y)
 						});
 
+
 						thisNode.selectAll(".node_reqerror")
 							.attr("x",function(d){return d.w-25-(d.changed?13:0)})
-							.classed("hidden",function(d) { return !d.requirementError; });
+							.classed("hidden",function(d){ return !d.requirementError; })
+							.on("click", function(){RED.notify(
+
+								'Conflicts:<ul><li>'+d.conflicts.join('</li><li>')+'</li></ul>'
+
+								)});
+
 
 						thisNode.selectAll(".node_icon").attr("y",function(d){return (d.h-d3.select(this).attr("height"))/2;});
 						thisNode.selectAll(".node_icon_shade").attr("height",function(d){return d.h;});
