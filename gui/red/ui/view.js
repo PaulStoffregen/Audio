@@ -596,7 +596,6 @@ RED.view = (function() {
 				moving_set.push({n:nn});
 				updateSelection();
 				redraw();
-				redraw(); //there is no other way to mark _all_ errors on conflicts :(
 				if (nn._def.autoedit) {
 					RED.editor.edit(nn);
 				}
@@ -991,6 +990,45 @@ RED.view = (function() {
 		resetMouseVars();
 	}
 
+	
+	function checkRequirements(d) {
+		//Add requirements
+		d.requirementError = false;
+		d.conflicts = new Array();
+		d.requirements = new Array();
+		requirements.forEach(function(r) {
+			if (r.type == d.type) d.requirements.push(r);
+		});
+
+		//check for conflicts with other nodes:
+		d.requirements.forEach(function(r) {
+			RED.nodes.eachNode(function (n2) {
+				if (n2 != d && n2.requirements != null ) {
+					n2.requirements.forEach(function(r2) {
+						if (r["resource"] == r2["resource"]) {
+							if (r["shareable"] == false ) {
+								var msg = "Conflict: shareable '"+r["resource"]+"'  "+d.name+" and "+n2.name;
+								console.log(msg);
+								msg = n2.name + " uses " + r["resource"] + ", too";
+								d.conflicts.push(msg);
+								d.requirementError = true;
+							}
+							//else
+							if (r["setting"] != r2["setting"]) {
+								var msg = "Conflict: "+ d.name + " setting['"+r["setting"]+"'] and "+n2.name+" setting['"+r2["setting"]+"']";
+								console.log(msg);
+								msg = n2.name + " has different settings: " + r["setting"] + " ./. " + r2["setting"];
+								d.conflicts.push(msg);
+								d.requirementError = true;
+							}
+						}
+					});
+				}
+			});
+		});		
+	}
+	
+
 	function redraw() {
 		vis.attr("transform","scale("+scaleFactor+")");
 		outer.attr("width", space_width*scaleFactor).attr("height", space_height*scaleFactor);
@@ -1011,9 +1049,9 @@ RED.view = (function() {
 
 					d.w = Math.max(node_width,calculateTextWidth(l)+(d._def.inputs>0?7:0) );
 					d.h = Math.max(node_height,(Math.max(d.outputs,d._def.inputs)||0) * 15);
-
-					node.append("dfn").attr("class", "tooltip").append("span").attr("role","tooltip");
-
+					
+					checkRequirements(d);
+					
 					if (d._def.badge) {
 						var badge = node.append("svg:g").attr("class","node_badge_group");
 						var badgeRect = badge.append("rect").attr("class","node_badge").attr("rx",5).attr("ry",5).attr("width",40).attr("height",15);
@@ -1098,17 +1136,6 @@ RED.view = (function() {
 
 				   //node.append("rect").attr("class", "node-gradient-top").attr("rx", 6).attr("ry", 6).attr("height",30).attr("stroke","none").attr("fill","url(#gradient-top)").style("pointer-events","none");
 				   //node.append("rect").attr("class", "node-gradient-bottom").attr("rx", 6).attr("ry", 6).attr("height",30).attr("stroke","none").attr("fill","url(#gradient-bottom)").style("pointer-events","none");
-
-					if (d.requirementError) {
-
-						var icon_group = node.append("g")
-							.attr("class","node_icon_group")
-							.attr("x",0).attr("y",0);
-
-						var icon = icon_group.append("image")
-							.attr("xlink:href","icons/error.png")
-							.attr("x",10).attr("y",-16);
-					}
 
 					if (d._def.icon) {
 
@@ -1240,43 +1267,7 @@ RED.view = (function() {
 
 			node.each(function(d,i) {
 
-					/**********************************************************************/
-					//Add requirements
-					d.requirementError = false;
-					d.conflicts = new Array();
-					d.requirements = new Array();
-					requirements.forEach(function(r) {
-						if (r.type == d.type) d.requirements.push(r);
-					});
-
-					//check for conflicts with other nodes:
-					d.requirements.forEach(function(r) {
-						RED.nodes.eachNode(function (n2) {
-							if (n2 != d && n2.requirements != null ) {
-								n2.requirements.forEach(function(r2) {
-									if (r["resource"] == r2["resource"]) {
-										if (r["shareable"] == false ) {
-											var msg = "Conflict: shareable '"+r["resource"]+"'  "+d.name+" and "+n2.name;
-											console.log(msg);
-											msg = n2.name + " uses " + r["resource"] + ", too";
-											d.conflicts.push(msg);
-											d.requirementError = true;
-										}
-										//else
-										if (r["setting"] != r2["setting"]) {
-											var msg = "Conflict: "+ d.name + " setting['"+r["setting"]+"'] and "+n2.name+" setting['"+r2["setting"]+"']";
-											console.log(msg);
-											msg = n2.name + " has different settings: " + r["setting"] + " ./. " + r2["setting"];
-											d.conflicts.push(msg);
-											d.requirementError = true;
-										}
-									}
-								});
-							}
-						});
-					});
-
-					/**********************************************************************/
+					checkRequirements(d);
 
 					if (d.dirty || d.requirementError != undefined) {
 						//if (d.x < -50) deleteSelection();  // Delete nodes if dragged back to palette
@@ -1889,7 +1880,7 @@ RED.view = (function() {
 		showWorkspace: function(id) {
 			workspace_tabs.activateTab(id);
 		},
-		redraw:redraw,
+		redraw: redraw,
 		dirty: function(d) {
 			if (d == null) {
 				return dirty;
