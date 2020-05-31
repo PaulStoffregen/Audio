@@ -51,6 +51,8 @@ public:
 	double getInputFrequency() const;
 	bool isLocked() const;
 	double getTargetLantency() const;
+	double getAttenuation() const;
+	int32_t getHalfFilterLength() const;
 protected:	
 	static DMAChannel dma;
 	static void isr(void);
@@ -84,10 +86,10 @@ private:
 	
 	volatile double _bufferedTime;
 	volatile double _lastValidInputFrequ;
-	double _inputFrequency;
+	double _inputFrequency=0.;
 	double _targetLatencyS;	//target latency [seconds]
-	const double _blockDuration=AUDIO_BLOCK_SAMPLES/AUDIO_SAMPLE_RATE; //[seconds] 
-	const double _maxLatency=2.*_blockDuration;
+	const double _blockDuration=AUDIO_BLOCK_SAMPLES/AUDIO_SAMPLE_RATE_EXACT; //[seconds] 
+	double _maxLatency=2.*_blockDuration;
 
 #ifdef DEBUG_SPDIF_IN
 	static volatile bool bufferOverflow;

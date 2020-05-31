@@ -36,6 +36,7 @@ namespace {
 	#define SPDIF_RX_BUFFER_LENGTH AUDIO_BLOCK_SAMPLES
 	const int32_t bufferLength=8*AUDIO_BLOCK_SAMPLES;
 	const uint16_t noSamplerPerIsr=SPDIF_RX_BUFFER_LENGTH/4;
+	const float toFloatAudio= 1.f/pow(2., 23.);
 }
 volatile bool AsyncAudioInputSPDIF3::resetResampler=true;
 
@@ -199,14 +200,13 @@ void AsyncAudioInputSPDIF3::isr(void)
 		#endif
 		float *destR = &(bufferR[buffer_offset]);
 		float *destL = &(bufferL[buffer_offset]);
-		const float factor= pow(2., 23.)+1;
 		do {			
 			int32_t n=(*src) & 0x800000 ? (*src)|0xFF800000  : (*src) & 0xFFFFFF;
-			*destL++ = (float)(n)/factor;
+			*destL++ = (float)(n)*toFloatAudio;
 			++src;
 
 			n=(*src) & 0x800000 ? (*src)|0xFF800000  : (*src) & 0xFFFFFF;
-			*destR++ = (float)(n)/factor;
+			*destR++ = (float)(n)*toFloatAudio;
 			++src;
 		} while (src < end);
 		buffer_offset=(buffer_offset+SPDIF_RX_BUFFER_LENGTH/4)%bufferLength;
@@ -280,8 +280,9 @@ void AsyncAudioInputSPDIF3::configure(){
 			if (abs(frequDiff) > 0.01 || !_resampler.initialized()){
 				//the new sample frequency differs from the last one -> configure the _resampler again
 				_inputFrequency=inputF;		
-				const int32_t targetLatency=round(_targetLatencyS*inputF);
 				_targetLatencyS=max(0.001,(noSamplerPerIsr*3./2./_inputFrequency));
+				_maxLatency=max(2.*_blockDuration, 2*noSamplerPerIsr/_inputFrequency);
+				const int32_t targetLatency=round(_targetLatencyS*inputF);
 				__disable_irq();
 				resample_offset =  targetLatency <= buffer_offset ? buffer_offset - targetLatency : bufferLength -(targetLatency-buffer_offset);
 				__enable_irq();
@@ -402,14 +403,21 @@ void AsyncAudioInputSPDIF3::update(void)
 double AsyncAudioInputSPDIF3::getInputFrequency() const{
 	__disable_irq();
 	double f=_lastValidInputFrequ;
+	bool l=locked;
 	__enable_irq();
-	return f;
+	return l ? f : 0.;
 }
 double AsyncAudioInputSPDIF3::getTargetLantency() const {
 	__disable_irq();
 	double l=_targetLatencyS;
 	__enable_irq();
 	return l ;
+}
+double AsyncAudioInputSPDIF3::getAttenuation() const{
+	return _resampler.getAttenuation();
+}
+int32_t AsyncAudioInputSPDIF3::getHalfFilterLength() const{
+	return _resampler.getHalfFilterLength();
 }
 void AsyncAudioInputSPDIF3::config_spdifIn(){
 	//CCM Clock Gating Register 5, imxrt1060_rev1.pdf page 1145
