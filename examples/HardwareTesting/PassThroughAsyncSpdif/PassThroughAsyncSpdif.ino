@@ -1,7 +1,7 @@
 
 #include <Audio.h>
 
-AsyncAudioInputSPDIF3     spdifIn(true, true, 100, 20);	//dither = true, noiseshaping = true, anti-aliasing attenuation=100dB, minimum resampling filter length=20
+AsyncAudioInputSPDIF3     spdifIn(false, false, 100, 20);	//dither = false, noiseshaping = false, anti-aliasing attenuation=100dB, minimum resampling filter length=20
 AudioOutputSPDIF3   spdifOut;
 
 AudioConnection          patchCord1(spdifIn, 0, spdifOut, 0);
