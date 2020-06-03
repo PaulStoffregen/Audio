@@ -34,6 +34,7 @@ public:
 	virtual void update(void);
 	void begin(void);
 	friend class AudioInputSPDIF3;
+	friend class AsyncAudioInputSPDIF3;
 	static void mute_PCM(const bool mute);
 	static bool pll_locked(void);
 protected:

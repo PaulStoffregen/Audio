@@ -208,7 +208,7 @@ class Resampler {
         float* _endOfBuffer[MAX_NO_CHANNELS];
 
         int32_t _overSamplingFactor;
-        int32_t _halfFilterLength=0;
+        int32_t _halfFilterLength;
         int32_t _filterLength;     
         bool _initialized=false;  
         

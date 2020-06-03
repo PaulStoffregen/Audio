@@ -143,6 +143,7 @@ void Resampler::configure(float fs, float newFs, float attenuation, int32_t minH
     // Serial.println(fs);
     if (fs<=0. || newFs <=0.){
 		_attenuation=0;
+		_halfFilterLength=0;
         _initialized=false;
         return;
     }

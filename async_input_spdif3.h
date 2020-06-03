@@ -49,7 +49,7 @@ public:
 	void stop();
 	double getBufferedTime() const;
 	double getInputFrequency() const;
-	bool isLocked() const;
+	static bool isLocked();
 	double getTargetLantency() const;
 	double getAttenuation() const;
 	int32_t getHalfFilterLength() const;
@@ -69,15 +69,6 @@ private:
     static volatile uint32_t microsLast;
 	//====================
 
-	// spdif lock-changed interrupt
-	static volatile bool locked;
-	static volatile bool lockChanged;
-	static volatile bool resetResampler;
-  	static void spdif_interrupt();
-	#ifdef MEASURE_FREQ
-	static FrequencyMeasurement frequMeasure;	
-	#endif
-	//=============================
 	float _attenuation;
 	int32_t _minHalfFilterLength;
 	Resampler _resampler;
