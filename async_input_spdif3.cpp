@@ -64,7 +64,7 @@ AsyncAudioInputSPDIF3::~AsyncAudioInputSPDIF3(){
 	delete quantizer[1];
 }
 
-PROGMEM
+FLASHMEM
 AsyncAudioInputSPDIF3::AsyncAudioInputSPDIF3(bool dither, bool noiseshaping,float attenuation, int32_t minHalfFilterLength, int32_t maxHalfFilterLength):
 	AudioStream(0, NULL),
 	_resampler(attenuation, minHalfFilterLength, maxHalfFilterLength)
@@ -76,7 +76,7 @@ AsyncAudioInputSPDIF3::AsyncAudioInputSPDIF3(bool dither, bool noiseshaping,floa
 	quantizer[1]->configure(noiseshaping, dither, factor);
 	begin();
 	}
-PROGMEM
+FLASHMEM
 void AsyncAudioInputSPDIF3::begin()
 {
 	
