@@ -1,7 +1,7 @@
 
 #include <Audio.h>
 
-AsyncAudioInputSPDIF3     spdifIn(false, false, 100, 20);	//dither = false, noiseshaping = false, anti-aliasing attenuation=100dB, minimum resampling filter length=20
+AsyncAudioInputSPDIF3     spdifIn(false, false, 100, 20, 80);	//dither = true, noiseshaping = true, anti-aliasing attenuation=100dB, minimum half resampling filter length=20, maximum half resampling filter length=80
 AudioOutputSPDIF3   spdifOut;
 
 AudioConnection          patchCord1(spdifIn, 0, spdifOut, 0);
@@ -30,7 +30,9 @@ void loop() {
   
   Serial.print("resampling goup delay [milli seconds]: ");
   Serial.println(spdifIn.getHalfFilterLength()/inputFrequency*1e3,2);
- 
+  
+  Serial.print("half filter length: ");
+  Serial.println(spdifIn.getHalfFilterLength()); 
   
   double pUsageIn=spdifIn.processorUsage(); 
   Serial.print("processor usage [%]: ");

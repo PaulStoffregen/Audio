@@ -65,9 +65,10 @@ AsyncAudioInputSPDIF3::~AsyncAudioInputSPDIF3(){
 }
 
 PROGMEM
-AsyncAudioInputSPDIF3::AsyncAudioInputSPDIF3(bool dither, bool noiseshaping,float attenuation, int32_t minHalfFilterLength) : AudioStream(0, NULL) {
-	_attenuation=attenuation;
-	_minHalfFilterLength=minHalfFilterLength;
+AsyncAudioInputSPDIF3::AsyncAudioInputSPDIF3(bool dither, bool noiseshaping,float attenuation, int32_t minHalfFilterLength, int32_t maxHalfFilterLength):
+	AudioStream(0, NULL),
+	_resampler(attenuation, minHalfFilterLength, maxHalfFilterLength)
+	{
 	const float factor = powf(2, 15)-1.f; // to 16 bit audio
 	quantizer[0]=new Quantizer(AUDIO_SAMPLE_RATE_EXACT);
 	quantizer[0]->configure(noiseshaping, dither, factor);
@@ -251,7 +252,7 @@ void AsyncAudioInputSPDIF3::configure(){
 			__disable_irq();
 			resample_offset =  targetLatency <= buffer_offset ? buffer_offset - targetLatency : bufferLength -(targetLatency-buffer_offset);
 			__enable_irq();
-			_resampler.configure(inputF, AUDIO_SAMPLE_RATE_EXACT, _attenuation, _minHalfFilterLength);
+			_resampler.configure(inputF, AUDIO_SAMPLE_RATE_EXACT);
 	#ifdef DEBUG_SPDIF_IN
 			Serial.print("_maxLatency: ");
 			Serial.println(_maxLatency);
