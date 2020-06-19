@@ -24,8 +24,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef effect_fade_h_
-#define effect_fade_h_
+#ifndef effect_rectifier_h_
+#define effect_rectifier_h_
 
 #include "Arduino.h"
 #include "AudioStream.h"

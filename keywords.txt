@@ -59,6 +59,7 @@ AudioEffectMidSide	KEYWORD2
 AudioEffectWaveshaper	KEYWORD2
 AudioEffectGranular	KEYWORD2
 AudioEffectDigitalCombine	KEYWORD2
+AudioEffectRectifier	KEYWORD2
 AudioFilterBiquad	KEYWORD2
 AudioFilterFIR	KEYWORD2
 AudioFilterStateVariable	KEYWORD2
