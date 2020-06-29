@@ -168,8 +168,8 @@ void AudioOutputAnalog::begin(void)
 {
 	dma1.begin(true); // Allocate the DMA channels first
 
-	delay(2500);
-	Serial.println("AudioOutputAnalog begin");
+	//delay(2500);
+	//Serial.println("AudioOutputAnalog begin");
 	delay(10);
 
 	SIM_SCGC6 |= SIM_SCGC6_DAC0;
