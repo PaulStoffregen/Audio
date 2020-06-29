@@ -113,7 +113,9 @@ void AudioOutputPT8211::isr(void)
 	audio_block_t *blockL, *blockR;
 	uint32_t saddr, offsetL, offsetR;
 
+#if defined(KINETISK) || defined(__IMXRT1062__)
 	saddr = (uint32_t)(dma.TCD->SADDR);
+#endif
 	dma.clearInterrupt();
 	if (saddr < (uint32_t)i2s_tx_buffer + sizeof(i2s_tx_buffer) / 2) {
 		// DMA is transmitting the first half of the buffer

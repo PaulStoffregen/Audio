@@ -131,7 +131,9 @@ void AudioOutputTDM::isr(void)
 	const uint32_t *src1, *src2;
 	uint32_t i, saddr;
 
+#if defined(KINETISK) || defined(__IMXRT1062__)
 	saddr = (uint32_t)(dma.TCD->SADDR);
+#endif
 	dma.clearInterrupt();
 	if (saddr < (uint32_t)tdm_tx_buffer + sizeof(tdm_tx_buffer) / 2) {
 		// DMA is transmitting the first half of the buffer
