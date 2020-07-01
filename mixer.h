@@ -72,7 +72,7 @@ class AudioMixerX : public AudioStream
 #if defined(__ARM_ARCH_7EM__)
 #define MULTI_UNITYGAIN 65536
 public:
-	AudioMixer4(void) : AudioStream(N, inputQueueArray) {
+	AudioMixerX(void) : AudioStream(N, inputQueueArray) {
 		for (int i=0; i<N; i++) multiplier[i] = MULTI_UNITYGAIN;
 	}
 	void update(void)
@@ -156,7 +156,7 @@ private:
 #elif defined(KINETISL)
 #define MULTI_UNITYGAIN 256
 public:
-	AudioMixer4(void) : AudioStream(N, inputQueueArray) {
+	AudioMixerX(void) : AudioStream(N, inputQueueArray) {
 		for (int i=0; i<N; i++) multiplier[i] = MULTI_UNITYGAIN;
 	}
 	virtual void update(void);
