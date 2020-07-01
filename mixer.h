@@ -194,8 +194,6 @@ public:
 			} while (dst < end);
 		}
 	}
-
-#endif
 private:
 	int16_t multiplier[N];
 	audio_block_t *inputQueueArray[N];
