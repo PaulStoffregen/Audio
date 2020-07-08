@@ -18,13 +18,15 @@
 RED.palette = (function() {
 
 	var exclusion = ['config','unknown','deprecated'];
-	var core = ['input', 'output', 'mixer', 'play', 'record', 'synth', 'effect', 'filter', 'analyze'];
+	var core = ['tabs', 'input', 'output', 'mixer', 'play', 'record', 'synth', 'effect', 'filter', 'analyze'];
 	
-	function createCategoryContainer(category){
+	function createCategoryContainer(category, displayStyle){ // displayStyle can be set to none to collapse all categories at start
+		if (!displayStyle)
+			displayStyle = "block";
 
 		$("#palette-container").append('<div class="palette-category">'+
-			'<div id="header-'+category+'" class="palette-header"><i class="expanded icon-chevron-down"></i><span>'+category+'</span></div>'+
-			'<div class="palette-content" id="palette-base-category-'+category+'">'+
+			'<div id="header-'+category+'" class="palette-header"><i class="expaded icon-chevron-down"></i><span>'+category+'</span></div>'+
+			'<div class="palette-content" id="palette-base-category-'+category+'" style="display: '+displayStyle+';">'+
 			  '<div id="palette-'+category+'-input"></div>'+
 			  '<div id="palette-'+category+'-output"></div>'+
 			  '<div id="palette-'+category+'-function"></div>'+
@@ -70,6 +72,11 @@ RED.palette = (function() {
 			  portOut.className = "palette_port palette_port_output";
 			  d.appendChild(portOut);
 		  }
+
+		  var reqError = document.createElement("div");
+		  reqError.className = "palette_req_error hidden";
+
+		  d.appendChild(reqError);
 		  
 		  if (def.inputs > 0) {
 			  var portIn = document.createElement("div");
@@ -91,8 +98,9 @@ RED.palette = (function() {
 		  setTooltipContent('', nt, d);
 
 		  $(d).click(function() {
+			  	console.warn("palette node click:" + d.type);
 				RED.nodes.selectNode(d.type);
-			  RED.sidebar.info.setHelpContent('', d.type);
+			  	RED.sidebar.info.setHelpContent('', d.type);
 		  });
 		  $(d).draggable({
 			  helper: 'clone',

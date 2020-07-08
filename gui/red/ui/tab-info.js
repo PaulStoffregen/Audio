@@ -23,8 +23,10 @@ RED.sidebar.info = (function() {
 	content.style.paddingRight = "4px";
 
 	RED.sidebar.addTab("info",content);
-	$("#tab-info").html("<h3>Welcome</h3><p>The Audio System Design Tool lets you easily draw a system to process 16 bit, 44.1 kHz streaming audio while your Arduino sketch also runs.</p><p>Export will generate code to copy into the Arduino editor, to implement your system.</p><p>Most objects provide simple functions you can call from setup() or loop() to control your audio project!</p><h3>Offline Use</h3><p>This tool does not use a server.  A stand-alone copy is provided with the Teensy Audio Library, in the gui folder.</p><h3>Credits</h3><p>Special thanks to Nicholas O'Leary, Dave Conway-Jones and IBM.</p><p>Without their work on the open source <a href=\"http://nodered.org/\" target=\"_blank\">Node-RED</a> project, this graphical design tool would not have been possible!</p>");
-
+	
+	var standardHelpText = "<h3>Welcome</h3><p>The Audio System Design Tool lets you easily draw a system to process 16 bit, 44.1 kHz streaming audio while your Arduino sketch also runs.</p><p>Export will generate code to copy into the Arduino editor, to implement your system.</p><p>Most objects provide simple functions you can call from setup() or loop() to control your audio project!</p><h3>Offline Use</h3><p>This tool does not use a server.  A stand-alone copy is provided with the Teensy Audio Library, in the gui folder.</p><h3>Credits</h3><p>Special thanks to Nicholas O'Leary, Dave Conway-Jones and IBM.</p><p>Without their work on the open source <a href=\"http://nodered.org/\" target=\"_blank\">Node-RED</a> project, this graphical design tool would not have been possible!</p>";
+	$("#tab-info").html(standardHelpText);
+	
 	function jsonFilter(key,value) {
 		if (key === "") {
 			return value;
@@ -90,7 +92,17 @@ RED.sidebar.info = (function() {
 		prefix = prefix == "" ? "<h3>" + key + "</h3>" : prefix;
 		if (!server) {
 			data = $("script[data-help-name|='" + key + "']").html();
-			$("#tab-info").html(prefix + '<div class="node-help">' + data + '</div>');
+			if (data)
+				$("#tab-info").html(prefix + '<div class="node-help">' + data + '</div>');
+			else
+			{
+				if (RED.nodes.isClass(key))
+				{
+					$("#tab-info").html(prefix + '<div class="node-help">' + getClassHelpContent(key) + '</div>');
+				}
+				else
+					$("#tab-info").html(prefix + '<div class="node-help">no help available</div>');
+			}
 		} else {
 			$.get( "resources/help/" + key + ".html", function( data ) {
 				$("#tab-info").html(prefix + '<h2>' + key + '</h2><div class="node-help">' + data + '</div>');
@@ -99,11 +111,62 @@ RED.sidebar.info = (function() {
 			});
 		}
 	}
+	function getClassHelpContent(className)
+	{
+		var wsId = RED.nodes.getWorkspaceIdFromClassName(className);
+		var htmlCode = "<h3>Summary</h3>";
+		htmlCode += "<p>" + RED.nodes.getClassComments(wsId) + "</p>";
+		htmlCode += "<h3>Audio Connections</h3>";
+		htmlCode += "<table class=doc align=center cellpadding=3>";
+		htmlCode += "<tr class=top><th>Port</th><th>Purpose</th></tr>"
+		
+		var classIOs = RED.nodes.getClassIOportsSorted(wsId);
+		
+		for (var i = 0; i < classIOs.inputs.length; i++)
+		{
+			htmlCode += "<tr class=odd><td align=center>In" + i + "</td><td>" + classIOs.inputs[i].name + "</td></tr>";
+		}
+		for (var i = 0; i < classIOs.outputs.length; i++)
+		{
+			htmlCode += "<tr class=odd><td align=center>Out" + i + "</td><td>" + classIOs.outputs[i].name + "</td></tr>";
+		}
+		return htmlCode;
+	}
+
+	function showSelection(items)
+	{
+		var firstType = items[0].n.type;
+		var sameType = true;
+		for (var i = 1; i < items.length; i++)
+		{
+			if (items[i].n.type != firstType)
+			{
+				sameType = false;
+				break;
+			}
+		}
+		var htmlCode = "<h3>Selection</h3>";
+		htmlCode += "<a class='btn btn-small' id='btn-export-selection' href='#'><i class='fa fa-copy'></i> Export</a>";
+		if (sameType)
+			htmlCode += "<a class='btn btn-small' id='btn-generate-array' href='#'><i class='fa fa-copy'></i> Generate array node</a>";
+		htmlCode += "<table class=doc align=center cellpadding=3>";
+		htmlCode += "<tr class=top><th>Type</th><th>Name</th><th>Id</th></tr>"
+		for (var i = 0; i < items.length; i++)
+		{
+			htmlCode += "<tr class=odd><td align=center>" + items[i].n.type + "</td><td>" + items[i].n.name + "</td><td>" + items[i].n.id + "</td></tr>"
+		}
+		htmlCode += "</table>";
+		$("#tab-info").html(htmlCode);
+		$('#btn-export-selection').click(function() { RED.view.showExportNodesDialog();	});
+		if (sameType)
+			$('#btn-generate-array').click(function() { RED.nodes.generateArrayNode(items);	});
+	}
 	
 	return {
 		refresh:refresh,
+		showSelection: showSelection,
 		clear: function() {
-			$("#tab-info").html("");
+			$("#tab-info").html(standardHelpText);
 		},
 		setHelpContent: setHelpContent
 	}

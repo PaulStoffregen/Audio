@@ -85,6 +85,7 @@ RED.tabs = (function() {
 		
 		return {
 			addTab: function(tab) {
+				console.log("tab added:" + tab.label)
 				tabs[tab.id] = tab;
 				var li = $("<li/>",{class:"red-ui-tab"}).appendTo(ul);
 				var link = $("<a/>",{href:"#"+tab.id, class:"red-ui-tab-label"}).appendTo(li);
@@ -105,6 +106,7 @@ RED.tabs = (function() {
 					options.onadd(tab);
 				}
 				link.attr("title",tab.label);
+
 				if (ul.find("li.red-ui-tab").size() == 1) {
 					activateTab(link);
 				}

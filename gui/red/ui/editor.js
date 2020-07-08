@@ -220,6 +220,7 @@ RED.editor = (function() {
 							editing_node.dirty = true;
 							validateNode(editing_node);
 							RED.view.redraw();
+							console.log("edit node saved!");
 						} else if (RED.view.state() == RED.state.EXPORT) {
 							if (/library/.test($( "#dialog" ).dialog("option","title"))) {
 								//TODO: move this to RED.library
@@ -269,6 +270,7 @@ RED.editor = (function() {
 				$( this ).dialog('option','width','500');
 				if (editing_node) {
 					RED.sidebar.info.refresh(editing_node);
+					console.log("edit node done!");
 				}
 				RED.sidebar.config.refresh();
 				editing_node = null;
@@ -457,7 +459,32 @@ RED.editor = (function() {
 		editing_node = node;
 		RED.view.state(RED.state.EDITING);
 		//$("#dialog-form").html(RED.view.getForm(node.type));
-		RED.view.getForm("dialog-form", node.type, function (d, f) {
+		//console.log("get form for type:" + node.type);
+		var editorType = "";
+		
+		console.log("showEditDialog"); // just to make it easier to find this function
+		
+		//if (node.type == "AudioMixerX") // Jannik add
+		//	editorType = "AudioMixerX"; // Jannik add
+		//else
+		//	editorType = "NodesGlobalEdit"; // Jannik add (this force use of global edit form, except for other defined above
+		
+		// Jannik add start
+		// (this method is better because then we can define special edit for some types)
+		// but we don't need to define for each new type we add, all those new types use
+		// global edit by default
+		var ifHaveOwnEditor = $("script[data-template-name|='" + node.type + "']");
+		//console.warn("ifHaveOwnEditor:" + Object.getOwnPropertyNames(ifHaveOwnEditor.length)); // see properties of object
+		//console.warn("ifHaveOwnEditor:" + ifHaveOwnEditor.length);
+		if (ifHaveOwnEditor.length != 0) 
+		{	editorType = node.type; console.log("use type editor:" + editorType);}
+		else
+		{	editorType = "NodesGlobalEdit"; console.log("use global editor");}
+		// Jannik add end
+		
+		//RED.view.getForm("dialog-form", node.type, function (d, f) {// Jannik remove
+		RED.view.getForm("dialog-form", editorType, function (d, f) { // Jannik add (because see above)
+			//console.log("node._def " + node._def.defaults);
 			prepareEditDialog(node,node._def,"node-input");
 			$( "#dialog" ).dialog("option","title","Edit "+node.type+" node").dialog( "open" );
 		});

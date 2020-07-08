@@ -19,10 +19,63 @@ RED.nodes = (function() {
 	var node_defs = {};
 	var nodes = [];
 	var configNodes = {};
-	var links = [];
-	//var defaultWorkspace;
+	var links = []; // link structure {source:,sourcePort:,target:,targetPort:};
+	var defaultWorkspace;
 	var workspaces = {};
+	var showWorkspaceToolbar = true;
 
+	/**
+	 * this creates a workspace object
+	 */
+	function createWorkspaceObject(id, label, inputs, outputs, _export) // export is a reserved word
+	{
+		return { type:"tab", id:id, label:label, inputs:inputs, outputs:outputs, export:_export};
+	}
+
+	var btnWworkspaceToolbar = $("#btn-workspace-toolbar");
+	btnWworkspaceToolbar.toggleClass("active", showWorkspaceToolbar);
+
+	$('#btn-moveWorkSpaceLeft').click(function() { moveWorkSpaceLeft(); });
+	$('#btn-moveWorkSpaceRight').click(function() {  });
+	function moveWorkSpaceLeft()
+	{
+		var index = getIndexOfCurrentWorkspace();
+		if (index == 0) return;
+
+		let wrapper=document.querySelector(".red-ui-tabs");
+		let children=wrapper.children;
+		
+		wrapper.insertBefore(children[index], children[index-1]); // this works but we also must update workspaces
+	}
+	function getIndexOfCurrentWorkspace()
+	{
+		var wsId = RED.view.getWorkspace();
+		var index = 0;
+		console.error("workspaces.length:"+workspaces.length+"\n"+Object.getOwnPropertyNames(workspaces));
+		for (i in workspaces) {
+			if (workspaces.hasOwnProperty(i)) {
+				if (workspaces[i].id == wsId)
+				{
+					console.error(Object.getOwnPropertyNames(workspaces[i]));
+					console.warn("found ws index:" + index);
+					return index;
+				}
+				else
+					index++;
+			}
+		}
+		
+		return -1;
+	}
+	$('#btn-workspace-toolbar').click(function() {
+		showWorkspaceToolbar = !showWorkspaceToolbar;
+		if (showWorkspaceToolbar)
+			$("#workspace-toolbar").show();
+		else
+			$("#workspace-toolbar").hide();
+		btnWworkspaceToolbar.toggleClass("active", showWorkspaceToolbar);
+		});
+		
 	function registerType(nt,def) {
 		node_defs[nt] = def;
 		// TODO: too tightly coupled into palette UI
@@ -38,7 +91,7 @@ RED.nodes = (function() {
 	function checkID(name) {
 		var i;
 		for (i=0;i<nodes.length;i++) {
-			console.log("checkID, nodes[i].id = " + nodes[i].id);
+			//console.log("checkID, nodes[i].id = " + nodes[i].id);
 			if (nodes[i].id == name) return true;
 		}
 /*
@@ -51,11 +104,49 @@ RED.nodes = (function() {
 */
 		return false;
 	}
+	function checkName(name, wsId) { // jannik add
+		var i;
+		for (i=0;i<nodes.length;i++) {
+			//console.log("checkID, nodes[i].id = " + nodes[i].id);
+			if (wsId && (wsId != nodes[i].z)) continue; // skip nodes that is not in current workspace
+			if (nodes[i].name == name) return true;
+		}
+/*
+		for (i in workspaces) {
+			if (workspaces.hasOwnProperty(i)) { }
+		}
+		for (i in configNodes) {
+			if (configNodes.hasOwnProperty(i)) { }
+		}
+*/
+		return false;
+	}
 
-	function createUniqueCppName(n) {
-		console.log("getUniqueCppName, n.type=" + n.type + ", n._def.shortName=" + n._def.shortName);
+	function createUniqueCppName(n, wsId) {
+		//console.log("getUniqueCppName, n.type=" + n.type + ", n.name=" + n.name + ", n._def.shortName=" + n._def.shortName);
+		var basename = n.name; //(n._def.shortName) ? n._def.shortName : n.type.replace(/^Analog/, "");
+
+		//console.log("getUniqueCppName, using basename=" + basename);
+		var count = 1;
+		var sep = /[0-9]$/.test(basename) ? "_" : ""; // expression checks if basename ends with a number, sep = seperator
+		var name;
+		while (1) {
+			name = basename + sep + count;
+			if (!checkName(name, wsId)) break;
+			count++;
+		}
+		//console.log("getUniqueCppName, unique name=" + name);
+		return name;
+	}
+	
+	function createUniqueCppId(n, workspaceName) {
+		//console.log("getUniqueCppId, n.type=" + n.type + ", n.name=" + n.name + ", n._def.shortName=" + n._def.shortName);
 		var basename = (n._def.shortName) ? n._def.shortName : n.type.replace(/^Analog/, "");
-		console.log("getUniqueCppName, using basename=" + basename);
+		
+		if (workspaceName)
+			basename = workspaceName + "_" + basename; // Jannik added
+
+		//console.log("getUniqueCppId, using basename=" + basename);
 		var count = 1;
 		var sep = /[0-9]$/.test(basename) ? "_" : "";
 		var name;
@@ -64,7 +155,7 @@ RED.nodes = (function() {
 			if (!checkID(name)) break;
 			count++;
 		}
-		console.log("getUniqueCppName, unique name=" + name);
+		//console.log("getUniqueCppId, unique id=" + name);
 		return name;
 	}
 
@@ -96,6 +187,11 @@ RED.nodes = (function() {
 		}
 	}
 	function addNode(n) {
+		if (n.type == "AudioMixerX")
+		{
+			if (!n.inputs)
+				n.inputs = n._def.inputs;
+		}
 		if (n._def.category == "config") {
 			configNodes[n.id] = n;
 			RED.sidebar.config.refresh();
@@ -326,6 +422,16 @@ RED.nodes = (function() {
 		}
 		return nns;
 	}
+	function getWorkspacesAsNodeSet() {
+		var nns = [];
+		var i;
+		for (i in workspaces) {
+			if (workspaces.hasOwnProperty(i)) {
+				nns.push(workspaces[i]);
+			}
+		}
+		return nns;
+	}
 
 	//TODO: rename this (createCompleteNodeSet)
 	function createCompleteNodeSet() {
@@ -472,6 +578,8 @@ RED.nodes = (function() {
 			var lines = raw.split("\n");
 			for (var i = 0; i < lines.length; i++) {
 				var line = lines[i].trim();
+				if (line.startsWith("//"))
+					line = line.substring(2).trim();
 
 				// we reached the setup or loop part ...
 				var pattSu = new RegExp(/\s*void\s*setup\s*\(\s*\).*/);
@@ -534,6 +642,36 @@ RED.nodes = (function() {
 			data: newNodes.length > 0 ? JSON.stringify(newNodes) : ""
 		};
 	}
+	
+	function createNewDefaultWorkspace() // Jannik Add function
+	{
+		defaultWorkspace = { type:"tab", id:"Main", label:"Main"};//, inputCount:"0", outputCount:"0" };
+		addWorkspace(defaultWorkspace);
+		RED.view.addWorkspace(defaultWorkspace);
+	}
+	function convertWorkspaceToNewVersion(nns, ws)
+	{
+		// TODO: fix so that getClassIOportCounts is only used on old versions, so that load time is increased
+		// but in order to do that wee need the workspace inputs and outputs to update when adding/removing workspace IO:s
+		// we could insert references to TabInputs/TabOutputs in workspace
+		// that would make some things go faster as well
+
+		if (ws.inputs != undefined && ws.outputs != undefined) // (no update from GUI yet) see above
+			console.warn("inputs && outputs is defined @ workspace load");
+		
+			var ws_export; //(cannot use var name export)
+		if (ws.export != undefined) {
+			//console.warn("export is defined"); // warn is more visible
+			ws_export = ws.export;
+		} else {
+			//console.error("export is undefined");// error is more visible
+			ws_export = true; // default value 
+		}
+
+		var cIOs = getClassIOportCounts(ws.id, nns);
+
+		return createWorkspaceObject(ws.id, ws.label, cIOs.inCount, cIOs.outCount, ws_export);
+	}
 
 	function importNodes(newNodesObj,createNewIds) {
 		try {
@@ -542,6 +680,7 @@ RED.nodes = (function() {
 			var newNodes;
 			if (typeof newNodesObj === "string") {
 				if (newNodesObj === "") {
+					createNewDefaultWorkspace();
 					return;
 				}
 				newNodes = JSON.parse(newNodesObj);
@@ -552,7 +691,7 @@ RED.nodes = (function() {
 			if (!$.isArray(newNodes)) {
 				newNodes = [newNodes];
 			}
-			var unknownTypes = [];
+/*			var unknownTypes = [];
 			for (i=0;i<newNodes.length;i++) {
 				n = newNodes[i];
 				// TODO: remove workspace in next release+1
@@ -570,17 +709,17 @@ RED.nodes = (function() {
 					}
 				}
 			}
-/*
+
 			if (unknownTypes.length > 0) {
 				var typeList = "<ul><li>"+unknownTypes.join("</li><li>")+"</li></ul>";
 				var type = "type"+(unknownTypes.length > 1?"s":"");
 				RED.notify("<strong>Imported unrecognised "+type+":</strong>"+typeList,"error",false,10000);
 				//"DO NOT DEPLOY while in this state.<br/>Either, add missing types to Node-RED, restart and then reload page,<br/>or delete unknown "+n.name+", rewire as required, and then deploy.","error");
 			}
-
-			for (i=0;i<newNodes.length;i++) {
+*/
+			for (i=0;i<newNodes.length;i++) { // load workspaces first
 				n = newNodes[i];
-				// TODO: remove workspace in next release+1
+				// TODO: not remove workspace because it's now used
 				if (n.type === "workspace" || n.type === "tab") {
 					if (n.type === "workspace") {
 						n.type = "tab";
@@ -588,16 +727,24 @@ RED.nodes = (function() {
 					if (defaultWorkspace == null) {
 						defaultWorkspace = n;
 					}
-					addWorkspace(n);
-					RED.view.addWorkspace(n);
+					var ws = convertWorkspaceToNewVersion(newNodes, n);
+					addWorkspace(ws);
+					RED.view.addWorkspace(ws); // final function is in tabs.js
+					console.warn("added new workspace lbl:" + n.label + ",inputs:" + n.inputs + ",outputs:" + n.outputs);
+
+					if (ws.inputs != 0 || ws.outputs != 0) // this adds workspaces that have inputs and/or outputs to the palette
+					{
+						var color = RED.classColor;
+						var data = $.parseJSON("{\"defaults\":{\"name\":{\"value\":\"new\"},\"id\":{\"value\":\"new\"}},\"shortName\":\"" + ws.label + "\",\"inputs\":" + ws.inputs + ",\"outputs\":" + ws.outputs + ",\"category\":\"tabs-function\",\"color\":\"" + color + "\",\"icon\":\"arrow-in.png\"}");
+						RED.nodes.registerType(ws.label, data);
+					}
 				}
 			}
 			if (defaultWorkspace == null) {
-				defaultWorkspace = { type:"tab", id:getID(), label:"Sheet 1" };
-				addWorkspace(defaultWorkspace);
-				RED.view.addWorkspace(defaultWorkspace);
+				console.log("no default workspace");
+				createNewDefaultWorkspace(); // jannik changed to function
 			}
-*/
+
 			var node_map = {};
 			var new_nodes = [];
 			var new_links = [];
@@ -621,15 +768,7 @@ RED.nodes = (function() {
 						}
 					} else {
 						var node = {x:n.x,y:n.y,z:n.z,type:0,wires:n.wires,changed:false};
-						if (createNewIds) {
-							node.z = RED.view.getWorkspace();
-							node.id = getID();
-						} else {
-							node.id = n.id;
-							if (node.z == null || !workspaces[node.z]) {
-								node.z = RED.view.getWorkspace();
-							}
-						}
+						//console.log("new node:" + n.name + ":" + n.id);
 						node.type = n.type;
 						node._def = def;
 						if (!node._def) {
@@ -641,15 +780,48 @@ RED.nodes = (function() {
 								outputs: n.outputs||n.wires.length
 							}
 						}
-						node.outputs = n.outputs||node._def.outputs;
 
-						for (var d2 in node._def.defaults) {
-							if (node._def.defaults.hasOwnProperty(d2)) {
-								node[d2] = n[d2];
+						if (createNewIds) {
+
+							node.name = n.name; // we set temporary
+							//console.log("@createNewIds srcnode: " + n.id + ":" + n.name);
+							if (n.z == RED.view.getWorkspace())
+							{
+								node.name = createUniqueCppName(node, n.z); // jannik add
+								//console.warn("make new name: n.name=" + node.name);
 							}
-						}
+							else
+							{
+								node.name = n.name;
+							
+								//console.log("keep name:" + n.name);
+							}
+							node.id = RED.nodes.cppId(node, RED.nodes.workspaces[RED.view.getWorkspace()].label); // jannik add
+							for (var d2 in node._def.defaults) {
+								if (node._def.defaults.hasOwnProperty(d2)) {
+									if (d2 == "name" || d2 == "id") continue;
+									node[d2] = n[d2];
+									//console.log("d2: " + d2);
+								}
+							}
 
-						node.name = getUniqueName(n);
+						} else {
+							node.name = n.name;
+							node.id = n.id;
+							if (node.z == null || !workspaces[node.z]) {
+								node.z = RED.view.getWorkspace(); // failsafe
+							}
+							
+
+							for (var d2 in node._def.defaults) {
+								if (node._def.defaults.hasOwnProperty(d2)) {
+									node[d2] = n[d2];
+									//console.log("d2: " + d2);
+								}
+							}	
+						}
+						
+						node.outputs = n.outputs||node._def.outputs;
 
 						addNode(node);
 						RED.editor.validateNode(node);
@@ -658,6 +830,7 @@ RED.nodes = (function() {
 					}
 				}
 			}
+			// adding the links (wires)
 			for (i=0;i<new_nodes.length;i++) {
 				n = new_nodes[i];
 				for (var w1=0;w1<n.wires.length;w1++) {
@@ -677,15 +850,345 @@ RED.nodes = (function() {
 				delete n.wires;
 			}
 			return [new_nodes,new_links];
-		} catch(error) {
+		} catch(error) { // this try catch is very bad when debugging because you have errors inside somewhere they are hard to find! 
+			createNewDefaultWorkspace();
 			//TODO: get this UI thing out of here! (see above as well)
-			RED.notify("<strong>Error</strong>: "+error,"error");
+			var newException = "<strong>import nodes Error</strong>: "+error.message + " " +  error.stack;
+			RED.notify(newException, "error");
+			throw newException;
 			return null;
 		}
 
 	}
+	/**
+		 * this function checks for !node.wires at beginning and returns if so.
+		 * @param {*} srcNode 
+		 * @param {*} cb is function pointer with following format cb(srcPortIndex,dstId,dstPortIndex);
+		 */
+	function eachwire(srcNode, cb) {
+		if (!srcNode.wires){ console.log("!node.wires: " + srcNode.type + ":" + srcNode.name); return;}
 
+		//if (srcNode.wires.length == 0) console.log("port.length == 0:" + srcNode.type + ":" + srcNode.name)
+
+		for (var pi=0; pi<srcNode.wires.length; pi++) // pi = port index
+		{
+			var port = srcNode.wires[pi];
+			if (!port){ /*console.log("!port(" + pi + "):" + n.type + ":" + n.name);*/ continue;} // failsafe
+			//if (port.length == 0) console.log("portWires.length == 0:"+n.type + ":" + n.name) // debug check
+			for (var pwi=0; pwi<port.length; pwi++) // pwi = port wire index
+			{
+				var wire = port[pwi];
+				if (!wire){ /*console.log("!wire(" + pwi + "):" + n.type + ":" + n.name);*/ continue;} // failsafe
+
+				var parts = wire.split(":");
+				if (parts.length != 2){ /*console.log("parts.length != 2 (" + pwi + "):" + n.type + ":" + n.name);*/ continue;} // failsafe
+				
+				var retVal = cb(pi,parts[0],parts[1]);
+
+				if (retVal) return retVal; // only abort/return if cb returns something, and return the value
+			}
+		}
+	}
+
+	function workspaceNameChanged(oldName, newName)
+	{
+		var changedCount = 0;
+		for (var ni=0;ni<nodes.length;ni++) {
+			if (nodes[ni].type == oldName)
+			{
+				nodes[ni].type = newName;
+				changedCount++;
+			}
+		}
+		RED.palette.remove(oldName);
+		node_defs[oldName] = undefined;
+
+		console.log("workspaceNameChanged:" + oldName + " to " + newName + " with " + changedCount + " objects changed");
+	}
+	function workspaceNameCheck(newName)
+	{
+		var i;
+		for (i in workspaces) {
+			if (workspaces.hasOwnProperty(i)) {
+				if (workspaces[i].label == newName)
+					return true;
+			}
+		}
+		/*for (var wsi=0; wsi < workspaces.length; wsi++)
+		{
+			if (workspaces[wsi].label == newName)
+				return true;
+		}*/
+		return false;
+	}
+
+	/**
+	 * this autogenerate a array-node from same-type selection
+	 * caller class is tab-info
+	 * @param {*} items is of type moving_set from view
+	 */
+	function generateArrayNode(items)
+	{
+		var cppString = "{";
+		var type = items[0].n.type;
+		var name = type.toLowerCase();
+		for (var i = 0; i < items.length ; i++)
+		{
+			cppString += items[i].n.name;
+			if (i < (items.length-1)) cppString += ",";
+		}
+		cppString += "}";
+		addNode({"id":"Main_Array_"+type+"_"+name ,
+				 "type":"Array",
+				 "name":type + " " + name + " " + cppString,
+				 "x":500,"y":55,"z":items[0].n.z,
+				 "wires":[],
+				 "_def":node_defs["Array"]});
+				 RED.view.redraw();
+	}
+	/**
+	 * Gets all TabInput and TabOutputs, and then sorting them vertically top->bottom (normal view)
+	 * @param {String} wsId workspace id, if this is not passed then all nodes is returned
+	 * @returns {tabOutNodes:outNodes, tabInNodes:inNodes}
+	 */
+	function getClassIOportsSorted(wsId, nns)
+	{
+		var inNodes = [];
+		var outNodes = [];
+		if (!nns)
+			nns = nodes;
+		for (var i = 0; i < nns.length; i++)
+		{
+			var node = nns[i];
+			if (wsId && (node.z != wsId)) continue;
+
+			if (node.type == "TabInput") inNodes.push(convertNode(node, true));
+			else if (node.type == "TabOutput") outNodes.push(convertNode(node, true));
+		}
+		inNodes.sort(function(a,b){ return (a.y - b.y); });
+		outNodes.sort(function(a,b){ return (a.y - b.y); });
+
+		return {outputs:outNodes, inputs:inNodes};
+	}
+	/**
+	 * Gets all TabInput and TabOutputs, and then sorting them vertically top->bottom (normal view)
+	 * @param {String} wsId workspace id, if this is not passed then all nodes is returned
+	 * @returns {outCount:outNodesCount, inCount:inNodesCount}
+	 */
+	function getClassIOportCounts(wsId, nns)
+	{
+		var inNodesCount = 0;
+		var outNodesCount = 0;
+		if (!nns)
+			nns = nodes;
+		for (var i = 0; i < nns.length; i++)
+		{
+			var node = nns[i];
+			if (wsId && (node.z != wsId)) continue;
+
+			if (node.type == "TabInput") inNodesCount++;
+			else if (node.type == "TabOutput") outNodesCount++;
+		}
+		return {outCount:outNodesCount, inCount:inNodesCount};
+	}
+	/**
+	 * Gets all TabInput or TabOutput belonging to a class, and then sorting them vertically top->bottom (normal view)
+	 * then the correct port-node based by index is returned
+	 * @param {String} wsId workspace id
+	 * @param {String} type "TabInput" or "TabOutput"
+	 * @returns {tabOutNodes:outNodes, tabInNodes:inNodes}
+	 */
+	function getClassIOportName(wsId, type, index) // this 
+	{
+		var retNodes = [];
+		if (!wsId) return
+		for (var i = 0; i < nodes.length; i++)
+		{
+			var node = nodes[i];
+			if (node.z != wsId) continue;
+			if (node.type == type) retNodes.push(node);
+		}
+		retNodes.sort(function(a,b){ return (a.y - b.y); }); // this could be avoided if the io nodes where automatically sorted by default
+		return retNodes[index].name;
+	}
+	function getClassComments(wsId)
+	{
+		var comment = "";
+		for (var i = 0; i < nodes.length; i++)
+		{
+			var node = nodes[i];
+			if (wsId && (node.z != wsId)) continue;
+
+			if (node.type != "ClassComment") continue;
+
+			comment += node.name;
+		}
+		return comment;
+	}
+
+	function printLinks()
+	{
+		// link structure {source:n,sourcePort:w1,target:dst,targetPort:parts[1]};
+		for (var i = 0; i < links.length; i++)
+		{
+			var link = links[i];
+			console.log("createCompleteNodeSet links["+i+"]: " + 
+				link.source.name + ":" + link.sourcePort + ", " + link.target.name + ":" + link.targetPort); // debug to see links contents
+		}
+	}
+	function isClass(type)
+	{
+		var wns = RED.nodes.getWorkspacesAsNodeSet();
+
+		for (var wsi = 0; wsi < wns.length; wsi++)
+		{
+			var ws = wns[wsi];
+			if (type == ws.label) return true;
+			//console.log(node.type  + "!="+ ws.label);
+		}
+		return false;
+	}
+	
+	function getWorkspaceIdFromClassName(type)
+	{
+		var wns = RED.nodes.getWorkspacesAsNodeSet();
+
+		for (var wsi = 0; wsi < wns.length; wsi++)
+		{
+			var ws = wns[wsi];
+			if (type == ws.label)  return ws.id;
+		}
+		return "";
+	}
+	
+	/**
+	 * This is used to find what is connected to a input-pin
+	 * @param {Array} nns array of all nodes
+	 * @param {String} wsId workspace id
+	 * @param {String} nId node id
+	 * @returns {*} as {node:n, srcPortIndex: srcPortIndex}
+	 */
+	function getWireInputSourceNode(nns, wsId, nId)
+	{
+		//console.log("try get WireInputSourceNode:" + wsId + ":" + nId);
+		for (var ni = 0; ni < nns.length; ni++)
+		{
+			var n = nns[ni];
+			if (n.z != wsId) continue; // workspace check
+
+			var retVal = RED.nodes.eachWire(n, function(srcPortIndex,dstId,dstPortIndex)
+			{
+				if (dstId == nId)
+				{
+					//console.log("we found the WireInputSourceNode! name:" + n.name + " ,id:"+ n.id + " ,portIndex:" + srcPortIndex);
+					//console.log("");
+					return {node:n, srcPortIndex: srcPortIndex};
+				}
+			});
+			if (retVal) return retVal;
+		}
+	}
+	
+	/**
+	 * the name say it all
+	 * @param {Array} tabIOnodes array of specific ClassPort nodes
+	 * @param {node} classNode as nodeType
+	 * @param {Number} portIndex
+	 * @returns {node} the TabInput or TabOutput node
+	 */
+	function getClassPortNode(tabIOnodes, classNode, portIndex)
+	{
+		var wsId = getWorkspaceIdFromClassName(classNode.type);
+		var currIndex = 0;
+		//console.log("getClassPortNode classNode:" + classNode.name + ", portType: " + portType + ", portIndex:" + portIndex);
+		for (var i = 0; i < tabIOnodes.length; i++)
+		{
+			var n = tabIOnodes[i];
+			if (n.z != wsId) continue;
+			if (currIndex == portIndex) // we found the port
+			{
+				//console.log("getClassPortNode found port:" + n.name);
+				return n;
+			}
+			currIndex++;
+		}
+		console.log("ERROR! could not find the class, portType:" + portType + " with portIndex:" + portIndex);
+	}
+	
+	function classOutputPortToCpp(nns, tabOutNodes, ac, classNode)
+	{
+		var outputNode = getClassPortNode(tabOutNodes, classNode, ac.srcPort);
+		if (!outputNode)
+		{
+			 console.log("could not getClassPortNode:" + classNode.name + ", ac.srcPort:" + ac.srcPort);
+			 return false;
+		} // abort
+
+		// if the portNode is found, next we get what is connected to that port inside the class
+		var newSrc = getWireInputSourceNode(nns, getWorkspaceIdFromClassName(classNode.type), outputNode.id); // this return type {node:n, srcPortIndex: srcPortIndex};
+
+		ac.srcName += "." + make_name(newSrc.node);
+		ac.srcPort = newSrc.srcPortIndex;
+
+		if (isClass(newSrc.node.type))
+		{
+			//console.log("isClass(" + newSrc.node.name + ")");
+
+			// call this function recursive until non class is found
+			if (!classOutputPortToCpp(nns, tabOutNodes, ac, newSrc.node))
+				return false; // failsafe
+		}
+		return true;
+	}
+
+	function classInputPortToCpp(tabInNodes, currRootName, ac, classNode)
+	{
+		var inputNode = getClassPortNode(tabInNodes, classNode, ac.dstPort);
+		if (!inputNode) return false; // abort
+
+		// here we need to go througt all wires of that virtual port
+		var retVal = RED.nodes.eachWire(inputNode, function(srcPortIndex,dstId,dstPortIndex)
+		{
+			var dst = RED.nodes.node(dstId);
+			//console.log("found dest:" + dst.name);
+			ac.dstPort = dstPortIndex;
+			ac.dstName = currRootName + "." + make_name(dst);
+
+			if (isClass(dst.type))
+			{
+				// call this function recursive until non class is found
+				classInputPortToCpp(tabInNodes, ac.dstName, ac, dst);
+			}
+			else
+			{
+				ac.appendToCppCode(); // this don't return anything, the result is in ac.cppCode
+			}					
+		});
+		return true;
+	}
+	function isNameDeclarationArray(name)
+	{
+		//console.warn("isNameDeclarationArray: " + name);
+		var startIndex = name.indexOf("[");
+		if (startIndex == -1) return undefined;
+		var endIndex = name.indexOf("]");
+		if (endIndex == -1){ console.log("isNameDeclarationArray: missing end ] in " + name); return undefined;}
+		var arrayDef = name.substring(startIndex,endIndex+1);
+		lenght = Number(name.substring(startIndex+1,endIndex));
+		name = name.replace(arrayDef, "[i]");
+		
+		console.log("NameDeclaration is Array:" + name);
+		
+		return {newName:name, arrayLenght:lenght};
+	}
+	function make_name(n) {
+		var name = (n.name ? n.name : n.id);
+		name = name.replace(" ", "_").replace("+", "_").replace("-", "_");
+		return name
+	}
 	return {
+		createWorkspaceObject:createWorkspaceObject,
+		createNewDefaultWorkspace: createNewDefaultWorkspace,
 		registerType: registerType,
 		getType: getType,
 		convertNode: convertNode,
@@ -714,6 +1217,9 @@ RED.nodes = (function() {
 				}
 			}
 		},
+		eachWire: eachwire,
+		workspaceNameChanged:workspaceNameChanged,
+		workspaceNameCheck:workspaceNameCheck,
 		node: getNode,
 		namedNode: getNodeByName,
 		cppToJSON: cppToJSON,
@@ -721,11 +1227,28 @@ RED.nodes = (function() {
 		refreshValidation: refreshValidation,
 		getAllFlowNodes: getAllFlowNodes,
 		createExportableNodeSet: createExportableNodeSet,
+		getWorkspacesAsNodeSet: getWorkspacesAsNodeSet,
 		createCompleteNodeSet: createCompleteNodeSet,
 		id: getID,
 		cppName: createUniqueCppName,
+		cppId: createUniqueCppId,
 		hasIO: checkForIO,
+		generateArrayNode:generateArrayNode,
+		isClass:isClass,
+		getClassComments:getClassComments,
+		getWorkspaceIdFromClassName:getWorkspaceIdFromClassName,
+
+		getClassPortNode:getClassPortNode,
+		getWireInputSourceNode:getWireInputSourceNode,
+		getClassIOportsSorted:getClassIOportsSorted,
+		getClassIOportName:getClassIOportName, // used by node port tooltip popup
+		classOutputPortToCpp:classOutputPortToCpp,
+		classInputPortToCpp:classInputPortToCpp,
+		isNameDeclarationArray:isNameDeclarationArray,
+		make_name:make_name,
+		showWorkspaceToolbar:showWorkspaceToolbar,
 		nodes: nodes, // TODO: exposed for d3 vis
+		workspaces:workspaces,
 		links: links  // TODO: exposed for d3 vis
 	};
 })();

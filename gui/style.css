@@ -36,7 +36,6 @@ body {
     font-size: 40px;
     color: #fff;
 }
-
 div.btn-group, a.btn {
     -webkit-user-select: none;
    -khtml-user-select: none;
@@ -240,6 +239,21 @@ a.brand img {
    height: 10px;
    border: 1px solid #999;
 }
+.palette_req_error {
+    position: absolute;
+    top:-10px;
+    left: 80px;
+    box-sizing: border-box;
+    cursor:pointer;
+     -moz-box-sizing: border-box;    
+    /*background:#d9d9d9;*/
+    background: url("icons/error.png");
+    background-size: 15px 15px;
+    border-radius: 3px;
+    width: 15px;
+    height: 15px;
+    /*border: 1px solid #999;*/
+ }
 .palette_port_output {
     left:105px;
 }
