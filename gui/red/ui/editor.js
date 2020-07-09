@@ -18,6 +18,17 @@ RED.editor = (function() {
 	var editing_node = null;
 	// TODO: should IMPORT/EXPORT get their own dialogs?
 
+	var aceLangTools = ace.require("ace/ext/language_tools");
+	var completions = []; // here we will append current workspace node names
+	//completions.push({ name:"test1", value:"testing1", meta: "code1" });
+	//completions.push({ name:"test2", value:"testing2", meta: "code2" }); 
+	completer= {
+		getCompletions: function(editor, session, pos, prefix, callback) {
+				callback(null, completions);
+			}
+	}
+	aceLangTools.addCompleter(completer);
+
 	function getCredentialsURL(nodeType, nodeID) {
 		var dashedType = nodeType.replace(/\s+/g, '-');
 		return  'credentials/' + dashedType + "/" + nodeID;
@@ -219,6 +230,11 @@ RED.editor = (function() {
 							}
 							editing_node.dirty = true;
 							validateNode(editing_node);
+							if (editing_node.type == "Function" || editing_node.type == "Variables")
+							{ 
+								var editor = ace.edit("aceEditor");
+								editing_node.comment = editor.getValue();
+							}
 							RED.view.redraw();
 							console.log("edit node saved!");
 						} else if (RED.view.state() == RED.state.EXPORT) {
@@ -314,7 +330,7 @@ RED.editor = (function() {
 	 * @param prefix - the prefix to use in the input element ids (node-input|node-config-input)
 	 */
 	function preparePropertyEditor(node,property,prefix) {
-		console.error("preparePropertyEditor:" + node.type + ":" + prefix+"-"+property);
+		//console.error("preparePropertyEditor:" + node.type + ":" + prefix+"-"+property);
 		var input = $("#"+prefix+"-"+property);
 		if (input.attr('type') === "checkbox") {
 			input.prop('checked',node[property]);
@@ -418,6 +434,21 @@ RED.editor = (function() {
 	 * @param prefix - the prefix to use in the input element ids (node-input|node-config-input)
 	 */
 	function prepareEditDialog(node,definition,prefix) {
+		if (node.type == "Function" || node.type == "Variables")
+		{ 
+			completions = RED.nodes.getWorkspaceNodesAsCompletions(node.z);
+			var editor = ace.edit("aceEditor");
+
+			//editor.setTheme("ace/theme/iplastic");
+			editor.session.setMode("ace/mode/c_cpp");
+			editor.setOptions({
+				enableBasicAutocompletion: true,
+				enableSnippets: true,
+				enableLiveAutocompletion: true
+			});
+			editor.setValue(node.comment);
+			editor.session.selection.clearSelection();
+		}
 		for (var d in definition.defaults) {
 			if (definition.defaults.hasOwnProperty(d)) {
 				if (definition.defaults[d].type) {
@@ -482,6 +513,8 @@ RED.editor = (function() {
 		else
 		{	editorType = "NodesGlobalEdit"; console.log("use global editor");}
 		// Jannik add end
+
+		editing_node = node;
 		
 		//RED.view.getForm("dialog-form", node.type, function (d, f) {// Jannik remove
 		RED.view.getForm("dialog-form", editorType, function (d, f) { // Jannik add (because see above)
@@ -682,6 +715,7 @@ RED.editor = (function() {
 		edit: showEditDialog,
 		editConfig: showEditConfigNodeDialog,
 		validateNode: validateNode,
-		updateNodeProperties: updateNodeProperties // TODO: only exposed for edit-undo
+		updateNodeProperties: updateNodeProperties, // TODO: only exposed for edit-undo
+		editing_node:editing_node
 	}
 })();

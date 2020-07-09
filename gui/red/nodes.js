@@ -854,7 +854,7 @@ RED.nodes = (function() {
 			createNewDefaultWorkspace();
 			//TODO: get this UI thing out of here! (see above as well)
 			var newException = "<strong>import nodes Error</strong>: "+error.message + " " +  error.stack;
-			RED.notify(newException, "error");
+			RED.notify(newException, "error",null,false,10000); // better timeout
 			throw newException;
 			return null;
 		}
@@ -1026,14 +1026,14 @@ RED.nodes = (function() {
 		return comment;
 	}
 
-	function printLinks()
+	function printLinks() // debug to see links contents
 	{
 		// link structure {source:n,sourcePort:w1,target:dst,targetPort:parts[1]};
 		for (var i = 0; i < links.length; i++)
 		{
 			var link = links[i];
 			console.log("createCompleteNodeSet links["+i+"]: " + 
-				link.source.name + ":" + link.sourcePort + ", " + link.target.name + ":" + link.targetPort); // debug to see links contents
+				link.source.name + ":" + link.sourcePort + ", " + link.target.name + ":" + link.targetPort); 
 		}
 	}
 	function isClass(type)
@@ -1181,12 +1181,37 @@ RED.nodes = (function() {
 		
 		return {newName:name, arrayLenght:lenght};
 	}
+	var AceAutoCompleteKeywords = null;
+	function getWorkspaceNodesAsCompletions(wsId) // this is used by ace editor for autocompletions
+	{
+		if (AceAutoCompleteKeywords == null) // if not allready loaded the data
+		{
+			var aackw_json = $("script[data-container-name|='AceAutoCompleteKeywordsMetadata']").html(); // this cannot happen globally because of the load order in html
+			//console.log(aackw_json);
+			var aackw_metaData = $.parseJSON(aackw_json);
+			AceAutoCompleteKeywords = aackw_metaData["AceAutoCompleteKeywords"];
+		}
+
+		var items = []; // here we will append current workspace node names
+		for (var i = 0; i < nodes.length; i++)
+		{
+			var n = nodes[i];
+			if (n.z != wsId) continue; // workspace filter
+			if (RED.isSpecialNode(n.type)) continue;
+			items.push({ name:n.name, value:n.name, meta: n.type });
+		}
+		AceAutoCompleteKeywords.forEach(function(kw) {
+			items.push(kw);
+		});
+		return items;
+	}
 	function make_name(n) {
 		var name = (n.name ? n.name : n.id);
 		name = name.replace(" ", "_").replace("+", "_").replace("-", "_");
 		return name
 	}
 	return {
+		getWorkspaceNodesAsCompletions:getWorkspaceNodesAsCompletions,
 		createWorkspaceObject:createWorkspaceObject,
 		createNewDefaultWorkspace: createNewDefaultWorkspace,
 		registerType: registerType,

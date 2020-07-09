@@ -891,6 +891,7 @@ var RED = (function() {
 	return {
 		addClassTabsToPalette:addClassTabsToPalette,
 		refreshClassNodes:refreshClassNodes,
+		isSpecialNode:isSpecialNode,
 		classColor:classColor
 	};
 })();
