@@ -371,12 +371,12 @@ span.mainfunction {color: #993300; font-weight: bolder}
 -->
 
 <script  type="text/x-red" data-container-name="DemoFlowA">
-	[{"type":"tab","id":"bfcf1914.f592c8","label":"VFO"},{"type":"tab","id":"146f0b11.7830b5","label":"LFO_A"},{"type":"tab","id":"4369d3c8.87448c","label":"LFO_B"},{"type":"tab","id":"7cf61098.c92b7","label":"Mixer16"},{"type":"tab","id":"f063b7c9.3ec2c8","label":"NoteGen"},{"type":"tab","id":"b7692de.cf719d","label":"SynthMain"},{"type":"tab","id":"45174b8a.24d454","label":"NodeArraySynthMain"},{"id":"VFOtuningA","type":"AudioSynthWaveformDc","name":"VFOtuningA","x":71.7500114440918,"y":435,"z":"b7692de.cf719d","wires":[["LFOmodMixA:2"]]},{"id":"VFOtuningB","type":"AudioSynthWaveformDc","name":"VFOtuningB","x":71.7500114440918,"y":474,"z":"b7692de.cf719d","wires":[["LFOmodMixB:2"]]},{"id":"InC","type":"TabInput","name":"InVFOfilter","x":74,"y":224,"z":"f063b7c9.3ec2c8","wires":[["VFOfilter:1"]]},{"id":"InB","type":"TabInput","name":"InVFO2","x":75,"y":185.25,"z":"f063b7c9.3ec2c8","wires":[["VFO2:0"]]},{"id":"InA","type":"TabInput","name":"In VFO1","x":75.75001525878906,"y":151.25,"z":"f063b7c9.3ec2c8","wires":[["VFO1:0"]]},{"id":"In","type":"TabInput","name":"modIn","x":80,"y":95,"z":"bfcf1914.f592c8","wires":[["VFO_sine:0","square:0","triangle:0","saw:0"]]},{"id":"LFO_A1","type":"LFO_A","name":"LFO_A1","x":87.7500114440918,"y":356,"z":"b7692de.cf719d","wires":[["LFOmodMixA:0","LFOmodMixB:0"]]},{"id":"LFO_B1","type":"LFO_B","name":"LFO_B1","x":87.7500114440918,"y":396,"z":"b7692de.cf719d","wires":[["LFOmodMixA:1","LFOmodMixB:1"]]},{"id":"PBend","type":"AudioSynthWaveformDc","name":"PBend","x":91.7500114440918,"y":514,"z":"b7692de.cf719d","wires":[["LFOmodMixA:3","LFOmodMixB:3"]]},{"id":"AlternativeMain_dc1","type":"AudioSynthWaveformDc","name":"dc1","x":95,"y":235,"z":"45174b8a.24d454","wires":[["AlternativeMain_mixer4_1:2"]]},{"id":"AlternativeMain_dc2","type":"AudioSynthWaveformDc","name":"dc2","x":95,"y":274,"z":"45174b8a.24d454","wires":[["AlternativeMain_mixer4_2:2"]]},{"id":"LFO_B2","type":"LFO_B","name":"LFO_B2","x":94.7500114440918,"y":606,"z":"b7692de.cf719d","wires":[["LFOfilterMixC:1"]]},{"id":"LFO_A2","type":"LFO_A","name":"LFO_A2","x":95.7500114440918,"y":568,"z":"b7692de.cf719d","wires":[["LFOfilterMixC:0"]]},{"id":"AlternativeMain_LFO_A1","type":"LFO_A","name":"LFO_A5","x":111,"y":156,"z":"45174b8a.24d454","wires":[["AlternativeMain_mixer4_1:0","AlternativeMain_mixer4_2:0"]]},{"id":"AlternativeMain_LFO_B1","type":"LFO_B","name":"LFO_B5","x":111,"y":196,"z":"45174b8a.24d454","wires":[["AlternativeMain_mixer4_1:1","AlternativeMain_mixer4_2:1"]]},{"id":"AlternativeMain_dc3","type":"AudioSynthWaveformDc","name":"dc3","x":115,"y":314,"z":"45174b8a.24d454","wires":[["AlternativeMain_mixer4_1:3","AlternativeMain_mixer4_2:3"]]},{"id":"AlternativeMain_LFO_B2","type":"LFO_B","name":"LFO_B3","x":118,"y":406,"z":"45174b8a.24d454","wires":[["AlternativeMain_MixerX3:1"]]},{"id":"AlternativeMain_LFO_A2","type":"LFO_A","name":"LFO_A3","x":119,"y":368,"z":"45174b8a.24d454","wires":[["AlternativeMain_MixerX3:0"]]},{"id":"Mixer16_TabInput10","type":"TabInput","name":"mixer09_12_in2","x":149,"y":429,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer9_12:1"]]},{"id":"Mixer16_TabInput16","type":"TabInput","name":"mixer13_16_in4","x":149,"y":627,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer13_16:3"]]},{"id":"Mixer16_TabInput11","type":"TabInput","name":"mixer09_12_in3","x":150,"y":462,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer9_12:2"]]},{"id":"Mixer16_TabInput12","type":"TabInput","name":"mixer09_12_in4","x":150,"y":495,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer9_12:3"]]},{"id":"Mixer16_TabInput5","type":"TabInput","name":"mixer05_08_in1","x":151,"y":264,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer5_8:0"]]},{"id":"Mixer16_TabInput7","type":"TabInput","name":"mixer05_08_in3","x":151,"y":330,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer5_8:2"]]},{"id":"Mixer16_TabInput15","type":"TabInput","name":"mixer13_16_in3","x":150,"y":594,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer13_16:2"]]},{"id":"Mixer16_TabInput2","type":"TabInput","name":"mixer01_04_in2","x":152,"y":165,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer1_4:1"]]},{"id":"Mixer16_TabInput13","type":"TabInput","name":"mixer13_16_in1","x":151,"y":528,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer13_16:0"]]},{"id":"Mixer16_TabInput6","type":"TabInput","name":"mixer05_08_in2","x":152,"y":297,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer5_8:1"]]},{"id":"Mixer16_TabInput14","type":"TabInput","name":"mixer13_16_in2","x":151,"y":561,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer13_16:1"]]},{"id":"Mixer16_TabInput1","type":"TabInput","name":"mixer01_04_in1","x":153,"y":132,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer1_4:0"]]},{"id":"Mixer16_TabInput3","type":"TabInput","name":"mixer01_04_in3","x":153,"y":198,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer1_4:2"]]},{"id":"Mixer16_TabInput4","type":"TabInput","name":"mixer01_04_in4","x":153,"y":231,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer1_4:3"]]},{"id":"Mixer16_TabInput8","type":"TabInput","name":"mixer05_08_in4","x":153,"y":363,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer5_8:3"]]},{"id":"Mixer16_TabInput9","type":"TabInput","name":"mixer09_12_in1","x":153,"y":396,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer9_12:0"]]},{"id":"pulseFilterDutyCycle","type":"AudioSynthWaveformDc","name":"pulseFilterDutyCycle","x":162,"y":218,"z":"146f0b11.7830b5","wires":[["pulseFilter:1"]]},{"id":"sampleholdMod","type":"AudioSynthWaveformModulated","name":"sampleholdMod","x":164,"y":188,"z":"4369d3c8.87448c","wires":[["LFO_B_MixerX1:1"]]},{"id":"VFO2","type":"VFO","name":"VFO2","x":194.3333740234375,"y":183.33334159851074,"z":"f063b7c9.3ec2c8","wires":[["Voice_waveMix:2"],["Voice_waveMix:3"]]},{"id":"sawMod","type":"AudioSynthWaveformModulated","name":"sawMod","x":196,"y":138,"z":"4369d3c8.87448c","wires":[["LFO_B_MixerX1:0"]]},{"id":"VFO1","type":"VFO","name":"VFO1","x":197.3333740234375,"y":150.33334159851074,"z":"f063b7c9.3ec2c8","wires":[["Voice_waveMix:0"],["Voice_waveMix:1"]]},{"id":"AlternativeSynthMain_sine1","type":"AudioSynthWaveformSine","name":"sine1","x":202,"y":577,"z":"45174b8a.24d454","wires":[["AlternativeSynthMain_VFO1:0"]]},{"id":"VFO_Comment1","type":"Comment","name":"\"kd5rxt-mark\" made the structure that i base this demoflow on","x":230,"y":371,"z":"bfcf1914.f592c8","wires":[]},{"id":"SynthMain_Comment1","type":"Comment","name":"\"kd5rxt-mark\" made the structure that i base this demoflow on1","x":232,"y":232,"z":"b7692de.cf719d","wires":[]},{"id":"NoteGen_Comment1","type":"Comment","name":"\"kd5rxt-mark\" made the structure that i base this demoflow on2","x":234,"y":415,"z":"f063b7c9.3ec2c8","wires":[]},{"id":"NodeArraySynthMain_Comment1","type":"Comment","name":"\"kd5rxt-mark\" made the structure that i base this demoflow on3","x":239,"y":61,"z":"45174b8a.24d454","wires":[]},{"id":"LFO_A_Comment1","type":"Comment","name":"\"kd5rxt-mark\" made the structure that i base this demoflow on4","x":256,"y":368,"z":"146f0b11.7830b5","wires":[]},{"id":"LFO_B_Comment1","type":"Comment","name":"\"kd5rxt-mark\" made the structure that i base this demoflow on5","x":262,"y":328,"z":"4369d3c8.87448c","wires":[]},{"id":"VFO_sine","type":"AudioSynthWaveformModulated","name":"sine","x":292,"y":56,"z":"bfcf1914.f592c8","wires":[["mix1:0"]]},{"id":"square","type":"AudioSynthWaveformModulated","name":"square","x":292,"y":91,"z":"bfcf1914.f592c8","wires":[["mix1:1"]]},{"id":"triangle","type":"AudioSynthWaveformModulated","name":"triangle","x":292,"y":126,"z":"bfcf1914.f592c8","wires":[["mix1:2"]]},{"id":"saw","type":"AudioSynthWaveformModulated","name":"saw","x":292,"y":161,"z":"bfcf1914.f592c8","wires":[["mix1:3"]]},{"id":"string","type":"AudioSynthKarplusStrong","name":"string","x":292,"y":196,"z":"bfcf1914.f592c8","wires":[["mix2:0"]]},{"id":"white","type":"AudioSynthNoiseWhite","name":"white","x":292,"y":231,"z":"bfcf1914.f592c8","wires":[["mix2:1"]]},{"id":"pink","type":"AudioSynthNoisePink","name":"pink","x":292,"y":266,"z":"bfcf1914.f592c8","wires":[["mix2:2"]]},{"id":"sweeper","type":"AudioSynthToneSweep","name":"sweeper","x":292,"y":301,"z":"bfcf1914.f592c8","wires":[["mix2:3"]]},{"id":"Voice_waveMix","type":"AudioMixer4","name":"waveMix","x":356.8333740234375,"y":168.08334350585938,"z":"f063b7c9.3ec2c8","wires":[["VFOenvelope:0","Voice_MixerX1:0"]]},{"id":"Mixer16_mixer5_8","type":"AudioMixer4","name":"mixer05_08","x":359,"y":313,"z":"7cf61098.c92b7","wires":[["Mixer16_mixerFinal:1"]]},{"id":"Mixer16_mixer1_4","type":"AudioMixer4","name":"mixer01_04","x":360,"y":181,"z":"7cf61098.c92b7","wires":[["Mixer16_mixerFinal:0"]]},{"id":"Mixer16_mixer13_16","type":"AudioMixer4","name":"mixer13_16","x":359,"y":579,"z":"7cf61098.c92b7","wires":[["Mixer16_mixerFinal:3"]]},{"id":"Mixer16_mixer9_12","type":"AudioMixer4","name":"mixer09_12","x":362,"y":445,"z":"7cf61098.c92b7","wires":[["Mixer16_mixerFinal:2"]]},{"id":"LFOmodMixA","type":"AudioMixer4","name":"LFOmodMixA","x":366.7500114440918,"y":433,"z":"b7692de.cf719d","wires":[["Main_Voice01:0","Main_Voice02:0","Main_Voice03:0","Main_Voice04:0","Main_Voice05:0","Main_Voice06:0","Main_Voice07:0","Main_Voice08:0","Main_Voice09:0","Main_Voice10:0","Main_Voice11:0","Main_Voice12:0","Main_Voice13:0","Main_Voice14:0","Main_Voice15:0","Main_Voice16:0"]]},{"id":"LFOmodMixB","type":"AudioMixer4","name":"LFOmodMixB","x":366.7500114440918,"y":504,"z":"b7692de.cf719d","wires":[["Main_Voice01:1","Main_Voice02:1","Main_Voice03:1","Main_Voice04:1","Main_Voice05:1","Main_Voice06:1","Main_Voice07:1","Main_Voice08:1","Main_Voice09:1","Main_Voice10:1","Main_Voice11:1","Main_Voice12:1","Main_Voice13:1","Main_Voice14:1","Main_Voice15:1","Main_Voice16:1"]]},{"id":"LFOfilterMixC","type":"AudioMixer4","name":"LFOfilterMixC","x":367.2500114440918,"y":575.75,"z":"b7692de.cf719d","wires":[["Main_Voice01:2","Main_Voice02:2","Main_Voice03:2","Main_Voice04:2","Main_Voice05:2","Main_Voice06:2","Main_Voice07:2","Main_Voice08:2","Main_Voice09:2","Main_Voice10:2","Main_Voice11:2","Main_Voice12:2","Main_Voice13:2","Main_Voice14:2","Main_Voice15:2","Main_Voice16:2"]]},{"id":"triangleFilter","type":"AudioSynthWaveformModulated","name":"triangleFilter","x":369.00001525878906,"y":250,"z":"146f0b11.7830b5","wires":[["filterMix:3"]]},{"id":"squareFilter","type":"AudioSynthWaveformModulated","name":"squareFilter","x":370,"y":174,"z":"146f0b11.7830b5","wires":[["filterMix:1"]]},{"id":"sineFilter","type":"AudioSynthWaveformModulated","name":"sineFilter","x":378,"y":136,"z":"146f0b11.7830b5","wires":[["filterMix:0"]]},{"id":"LFO_B_MixerX1","type":"AudioMixerX","name":"modMix","inputs":"2","x":378,"y":163,"z":"4369d3c8.87448c","wires":[["lfo_b_modMixOut:0"]]},{"id":"pulseFilter","type":"AudioSynthWaveformModulated","name":"pulseFilter","x":378,"y":212,"z":"146f0b11.7830b5","wires":[["filterMix:2"]]},{"id":"AlternativeSynthMain_VFO1","type":"VFO","name":"VFO3[16]","x":383,"y":580,"z":"45174b8a.24d454","wires":[["AlternativeSynthMain_MixerX1:0"],["AlternativeSynthMain_MixerX2:0"]]},{"id":"sgtl5000","type":"AudioControlSGTL5000","name":"sgtl5000","x":388.75,"y":152,"z":"b7692de.cf719d","wires":[]},{"id":"AlternativeMain_mixer4_1","type":"AudioMixer4","name":"LFOmodMixA1","x":390,"y":233,"z":"45174b8a.24d454","wires":[["AlternativeMain_Voice1:0"]]},{"id":"AlternativeMain_mixer4_2","type":"AudioMixer4","name":"LFOmodMixB1","x":390,"y":304,"z":"45174b8a.24d454","wires":[["AlternativeMain_Voice1:1"]]},{"id":"AlternativeMain_MixerX3","type":"AudioMixerX","name":"LFOfilterMixC1","inputs":"2","x":393,"y":380,"z":"45174b8a.24d454","wires":[["AlternativeMain_Voice1:2"]]},{"id":"LFO_B_ClassComment1","type":"ClassComment","name":"This is LFO with 2 modulators (saw,sampleHold)","x":397,"y":84,"z":"4369d3c8.87448c","wires":[]},{"id":"Mixer16_ClassComment1","type":"ClassComment","name":"This is a 16 input mixer that utilizes the old style mixer structure (4+1 4input mixers)","x":402,"y":83,"z":"7cf61098.c92b7","wires":[]},{"id":"Voice_ClassComment1","type":"ClassComment","name":"This is a voice with two VFO:s, envelope, vfo-filter","x":481,"y":78,"z":"f063b7c9.3ec2c8","wires":[]},{"id":"AlternativeMain_sgtl5000_1","type":"AudioControlSGTL5000","name":"sgtl5000_1","x":482,"y":166,"z":"45174b8a.24d454","wires":[]},{"id":"AlternativeSynthMain_Comment2","type":"Comment","name":"the only limit at the moment is that if two array exists at the same workspace they must be of same size.","x":510,"y":519,"z":"45174b8a.24d454","wires":[]},{"id":"LFO_A_ClassComment1","type":"ClassComment","name":"This is LFO with 4 modulated filter generators (sine,square,pulse,triangle)","x":512,"y":77,"z":"146f0b11.7830b5","wires":[]},{"id":"VFOenvelope","type":"AudioEffectEnvelope","name":"VFOenvelope","x":519.8333740234375,"y":199.08334350585938,"z":"f063b7c9.3ec2c8","wires":[["Voice_MixerX1:1"]]},{"id":"AlternativeSynthMain_MixerX1","type":"AudioMixerX","name":"mixFinalA","inputs":"1","x":531,"y":554,"z":"45174b8a.24d454","wires":[["AlternativeSynthMain_MixerX3:0"]]},{"id":"AlternativeSynthMain_MixerX2","type":"AudioMixerX","name":"mixFinalB","inputs":"1","x":531,"y":601,"z":"45174b8a.24d454","wires":[["AlternativeSynthMain_MixerX3:1"]]},{"id":"AlternativeSynthMain_Comment1","type":"Comment","name":"The following nodes down here, is to demonstrate that multiple outputs is allowed when using node array source.","x":539,"y":486,"z":"45174b8a.24d454","wires":[]},{"id":"mix1","type":"AudioMixer4","name":"mix1","x":542,"y":147,"z":"bfcf1914.f592c8","wires":[["vfo_mix1out:0"]]},{"id":"mix2","type":"AudioMixer4","name":"mix2","x":542,"y":220,"z":"bfcf1914.f592c8","wires":[["vfo_mix2out:0"]]},{"id":"AlternativeMain_ClassComment1","type":"ClassComment","name":"This is a alternative synth main that utilizes the new array structure","x":561,"y":110,"z":"45174b8a.24d454","wires":[]},{"id":"filterMix","type":"AudioMixer4","name":"filterMix","x":569,"y":193,"z":"146f0b11.7830b5","wires":[["lfo_a_filterMixOut:0"]]},{"id":"AlternativeMain_Voice1","type":"NoteGen","name":"voices[16]","x":569,"y":303,"z":"45174b8a.24d454","wires":[["AlternativeMain_MixerX1:0"]]},{"id":"Mixer16_mixerFinal","type":"AudioMixer4","name":"mixerFinal","x":581,"y":373,"z":"7cf61098.c92b7","wires":[["Mixer16_TabOutput:0"]]},{"id":"lfo_b_modMixOut","type":"TabOutput","name":"modMixOut","x":598,"y":162,"z":"4369d3c8.87448c","wires":[]},{"id":"SynthMain_ClassComment1","type":"ClassComment","name":"This is the main structure of the synth with 16 voices","x":638,"y":55,"z":"b7692de.cf719d","wires":[]},{"id":"Voice_MixerX1","type":"AudioMixerX","name":"VFOenvelopeMix","inputs":"2","x":696,"y":172,"z":"f063b7c9.3ec2c8","wires":[["VFOfilter:0","VFOfilterMix:0"]]},{"id":"vfo_mix2out","type":"TabOutput","name":"mix2out","x":699,"y":220,"z":"bfcf1914.f592c8","wires":[]},{"id":"Main_Array_NoteGen_notegen","type":"Array","name":"NoteGen notegen {voice01,voice02,voice03,voice04,voice05,voice06,voice07,voice08,voice09,voice10,voice11,voice12,voice13,voice14,voice15,voice16}","x":705,"y":96,"z":"b7692de.cf719d","wires":[]},{"id":"vfo_mix1out","type":"TabOutput","name":"mix1out","x":705,"y":146,"z":"bfcf1914.f592c8","wires":[]},{"id":"AlternativeSynthMain_MixerX3","type":"AudioMixerX","name":"mixFinalAB","inputs":"2","x":709,"y":575,"z":"45174b8a.24d454","wires":[[]]},{"id":"Main_Voice01","type":"NoteGen","name":"voice01","x":718.7500114440918,"y":145,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:0"]]},{"id":"Main_Voice02","type":"NoteGen","name":"voice02","x":718.7500114440918,"y":193,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:1"]]},{"id":"Main_Voice03","type":"NoteGen","name":"voice03","x":718.7500114440918,"y":241,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:2"]]},{"id":"Main_Voice04","type":"NoteGen","name":"voice04","x":718.7500114440918,"y":289,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:3"]]},{"id":"Main_Voice05","type":"NoteGen","name":"voice05","x":718.7500114440918,"y":337,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:4"]]},{"id":"Main_Voice06","type":"NoteGen","name":"voice06","x":718.7500114440918,"y":385,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:5"]]},{"id":"Main_Voice07","type":"NoteGen","name":"voice07","x":718.7500114440918,"y":433,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:6"]]},{"id":"Main_Voice08","type":"NoteGen","name":"voice08","x":718.7500114440918,"y":481,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:7"]]},{"id":"Main_Voice09","type":"NoteGen","name":"voice09","x":718.7500114440918,"y":529,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:8"]]},{"id":"Main_Voice10","type":"NoteGen","name":"voice10","x":718.7500114440918,"y":577,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:9"]]},{"id":"Main_Voice11","type":"NoteGen","name":"voice11","x":718.7500114440918,"y":625,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:10"]]},{"id":"Main_Voice12","type":"NoteGen","name":"voice12","x":718.7500114440918,"y":673,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:11"]]},{"id":"Main_Voice13","type":"NoteGen","name":"voice13","x":718.7500114440918,"y":721,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:12"]]},{"id":"Main_Voice14","type":"NoteGen","name":"voice14","x":718.7500114440918,"y":769,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:13"]]},{"id":"Main_Voice15","type":"NoteGen","name":"voice15","x":718.7500114440918,"y":817,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:14"]]},{"id":"Main_Voice16","type":"NoteGen","name":"voice16","x":718.7500114440918,"y":865,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:15"]]},{"id":"AlternativeMain_MixerX1","type":"AudioMixerX","name":"mixFinal","inputs":"1","x":722,"y":301,"z":"45174b8a.24d454","wires":[["AlternativeMain_amp1:0"]]},{"id":"lfo_a_filterMixOut","type":"TabOutput","name":"filterMixOut","x":727,"y":194,"z":"146f0b11.7830b5","wires":[]},{"id":"Mixer16_TabOutput","type":"TabOutput","name":"mixFinalOut","x":772,"y":374,"z":"7cf61098.c92b7","wires":[]},{"id":"VFO_ClassComment1","type":"ClassComment","name":"This is a VFO with modulated:(sine, square, triangle, saw) + string,whiteNoise,pinkNoise and sweeper","x":780,"y":66,"z":"bfcf1914.f592c8","wires":[]},{"id":"VFOfilter","type":"AudioFilterStateVariable","name":"VFOfilter","x":868.8333740234375,"y":209.08334350585938,"z":"f063b7c9.3ec2c8","wires":[["VFOfilterMix:1"],["VFOfilterMix:2"],["VFOfilterMix:3"]]},{"id":"AlternativeMain_amp1","type":"AudioAmplifier","name":"ampFinal","x":879,"y":299,"z":"45174b8a.24d454","wires":[["AlternativeMain_i2s2:0","AlternativeMain_i2s2:1"]]},{"id":"SynthMain_mixxFinal","type":"AudioMixerX","name":"mixxFinal","inputs":"16","x":997.7500114440918,"y":508,"z":"b7692de.cf719d","wires":[["SynthMain_ampFinal:0"]]},{"id":"VFOfilterMix","type":"AudioMixer4","name":"VFOfilterMix","x":1037.8333740234375,"y":190.08334350585938,"z":"f063b7c9.3ec2c8","wires":[["Out4:0"]]},{"id":"AlternativeMain_i2s2","type":"AudioOutputI2S","name":"i2s3","x":1047,"y":298,"z":"45174b8a.24d454","wires":[]},{"id":"SynthMain_ampFinal","type":"AudioAmplifier","name":"ampFinal1","x":1140.75,"y":508,"z":"b7692de.cf719d","wires":[["i2s2:1","i2s2:0"]]},{"id":"Main_Mixer16_1","type":"Mixer16","name":"Mixer16_TEST","x":1182,"y":259,"z":"b7692de.cf719d","wires":[[]]},{"id":"Out4","type":"TabOutput","name":"VFOfilterMixOut","x":1213.8333740234375,"y":190.08334350585938,"z":"f063b7c9.3ec2c8","wires":[]},{"id":"i2s2","type":"AudioOutputI2S","name":"i2s2","x":1308.75,"y":508,"z":"b7692de.cf719d","wires":[]}]
+	[{"type":"tab","id":"bfcf1914.f592c8","label":"VFO","inputs":1,"outputs":2,"export":true},{"type":"tab","id":"146f0b11.7830b5","label":"LFO_A","inputs":0,"outputs":1,"export":true},{"type":"tab","id":"4369d3c8.87448c","label":"LFO_B","inputs":0,"outputs":1,"export":true},{"type":"tab","id":"7cf61098.c92b7","label":"Mixer16","inputs":16,"outputs":1,"export":false},{"type":"tab","id":"f063b7c9.3ec2c8","label":"NoteGen","inputs":3,"outputs":1,"export":true},{"type":"tab","id":"b7692de.cf719d","label":"SynthMain","inputs":0,"outputs":0,"export":false},{"type":"tab","id":"45174b8a.24d454","label":"NodeArraySynthMain","inputs":0,"outputs":0,"export":true},{"type":"tab","id":"cc5eaf37.d224f","label":"MultOutArrayNodeEx","inputs":0,"outputs":0,"export":false},{"id":"VFOtuningA","type":"AudioSynthWaveformDc","name":"VFOtuningA","comment":"","x":71.7500114440918,"y":435,"z":"b7692de.cf719d","wires":[["LFOmodMixA:2"]]},{"id":"VFOtuningB","type":"AudioSynthWaveformDc","name":"VFOtuningB","x":71.7500114440918,"y":474,"z":"b7692de.cf719d","wires":[["LFOmodMixB:2"]]},{"id":"InC","type":"TabInput","name":"InVFOfilter","x":74,"y":224,"z":"f063b7c9.3ec2c8","wires":[["VFOfilter:1"]]},{"id":"InB","type":"TabInput","name":"InVFO2","x":75,"y":185.25,"z":"f063b7c9.3ec2c8","wires":[["VFO2:0"]]},{"id":"InA","type":"TabInput","name":"In VFO1","x":75.75001525878906,"y":151.25,"z":"f063b7c9.3ec2c8","wires":[["VFO1:0"]]},{"id":"In","type":"TabInput","name":"modIn","x":80,"y":95,"z":"bfcf1914.f592c8","wires":[["VFO_sine:0","square:0","triangle:0","saw:0"]]},{"id":"LFO_A1","type":"LFO_A","name":"LFO_A1","x":87.7500114440918,"y":356,"z":"b7692de.cf719d","wires":[["LFOmodMixA:0","LFOmodMixB:0"]]},{"id":"LFO_B1","type":"LFO_B","name":"LFO_B1","x":87.7500114440918,"y":396,"z":"b7692de.cf719d","wires":[["LFOmodMixA:1","LFOmodMixB:1"]]},{"id":"PBend","type":"AudioSynthWaveformDc","name":"PBend","x":91.7500114440918,"y":514,"z":"b7692de.cf719d","wires":[["LFOmodMixA:3","LFOmodMixB:3"]]},{"id":"AlternativeMain_dc1","type":"AudioSynthWaveformDc","name":"VFOtuningA","comment":"","x":95,"y":235,"z":"45174b8a.24d454","wires":[["AlternativeMain_mixer4_1:2"]]},{"id":"AlternativeMain_dc2","type":"AudioSynthWaveformDc","name":"VFOtuningB","comment":"","x":95,"y":274,"z":"45174b8a.24d454","wires":[["AlternativeMain_mixer4_2:2"]]},{"id":"LFO_B2","type":"LFO_B","name":"LFO_B2","x":94.7500114440918,"y":606,"z":"b7692de.cf719d","wires":[["LFOfilterMixC:1"]]},{"id":"LFO_A2","type":"LFO_A","name":"LFO_A2","x":95.7500114440918,"y":568,"z":"b7692de.cf719d","wires":[["LFOfilterMixC:0"]]},{"id":"AlternativeMain_LFO_A1","type":"LFO_A","name":"LFO_A1","x":111,"y":156,"z":"45174b8a.24d454","wires":[["AlternativeMain_mixer4_1:0","AlternativeMain_mixer4_2:0"]]},{"id":"AlternativeMain_LFO_B1","type":"LFO_B","name":"LFO_B1","x":111,"y":196,"z":"45174b8a.24d454","wires":[["AlternativeMain_mixer4_1:1","AlternativeMain_mixer4_2:1"]]},{"id":"AlternativeMain_dc3","type":"AudioSynthWaveformDc","name":"PBend","comment":"","x":115,"y":314,"z":"45174b8a.24d454","wires":[["AlternativeMain_mixer4_1:3","AlternativeMain_mixer4_2:3"]]},{"id":"AlternativeMain_LFO_B2","type":"LFO_B","name":"LFO_B2","x":118,"y":406,"z":"45174b8a.24d454","wires":[["AlternativeMain_MixerX3:1"]]},{"id":"AlternativeMain_LFO_A2","type":"LFO_A","name":"LFO_A2","x":119,"y":368,"z":"45174b8a.24d454","wires":[["AlternativeMain_MixerX3:0"]]},{"id":"MultOutArrayNodeEx_sine1","type":"AudioSynthWaveformSine","name":"sine1","x":125,"y":188,"z":"cc5eaf37.d224f","wires":[["MultOutArrayNodeEx_VFO1:0"]]},{"id":"Mixer16_TabInput10","type":"TabInput","name":"mixer09_12_in2","x":149,"y":429,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer9_12:1"]]},{"id":"Mixer16_TabInput16","type":"TabInput","name":"mixer13_16_in4","x":149,"y":627,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer13_16:3"]]},{"id":"Mixer16_TabInput11","type":"TabInput","name":"mixer09_12_in3","x":150,"y":462,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer9_12:2"]]},{"id":"Mixer16_TabInput12","type":"TabInput","name":"mixer09_12_in4","x":150,"y":495,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer9_12:3"]]},{"id":"Mixer16_TabInput5","type":"TabInput","name":"mixer05_08_in1","x":151,"y":264,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer5_8:0"]]},{"id":"Mixer16_TabInput7","type":"TabInput","name":"mixer05_08_in3","x":151,"y":330,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer5_8:2"]]},{"id":"Mixer16_TabInput15","type":"TabInput","name":"mixer13_16_in3","x":150,"y":594,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer13_16:2"]]},{"id":"Mixer16_TabInput2","type":"TabInput","name":"mixer01_04_in2","x":152,"y":165,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer1_4:1"]]},{"id":"Mixer16_TabInput13","type":"TabInput","name":"mixer13_16_in1","x":151,"y":528,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer13_16:0"]]},{"id":"Mixer16_TabInput6","type":"TabInput","name":"mixer05_08_in2","x":152,"y":297,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer5_8:1"]]},{"id":"Mixer16_TabInput14","type":"TabInput","name":"mixer13_16_in2","x":151,"y":561,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer13_16:1"]]},{"id":"Mixer16_TabInput1","type":"TabInput","name":"mixer01_04_in1","x":153,"y":132,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer1_4:0"]]},{"id":"Mixer16_TabInput3","type":"TabInput","name":"mixer01_04_in3","x":153,"y":198,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer1_4:2"]]},{"id":"Mixer16_TabInput4","type":"TabInput","name":"mixer01_04_in4","x":153,"y":231,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer1_4:3"]]},{"id":"Mixer16_TabInput8","type":"TabInput","name":"mixer05_08_in4","x":153,"y":363,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer5_8:3"]]},{"id":"Mixer16_TabInput9","type":"TabInput","name":"mixer09_12_in1","x":153,"y":396,"z":"7cf61098.c92b7","wires":[["Mixer16_mixer9_12:0"]]},{"id":"pulseFilterDutyCycle","type":"AudioSynthWaveformDc","name":"pulseFilterDutyCycle","x":162,"y":218,"z":"146f0b11.7830b5","wires":[["pulseFilter:1"]]},{"id":"sampleholdMod","type":"AudioSynthWaveformModulated","name":"sampleholdMod","comment":"","x":164,"y":188,"z":"4369d3c8.87448c","wires":[["LFO_B_MixerX1:1"]]},{"id":"VFO2","type":"VFO","name":"VFO2","x":194.3333740234375,"y":183.33334159851074,"z":"f063b7c9.3ec2c8","wires":[["Voice_waveMix:2"],["Voice_waveMix:3"]]},{"id":"sawMod","type":"AudioSynthWaveformModulated","name":"sawMod","x":196,"y":138,"z":"4369d3c8.87448c","wires":[["LFO_B_MixerX1:0"]]},{"id":"VFO1","type":"VFO","name":"VFO1","x":197.3333740234375,"y":150.33334159851074,"z":"f063b7c9.3ec2c8","wires":[["Voice_waveMix:0"],["Voice_waveMix:1"]]},{"id":"VFO_Comment1","type":"Comment","name":"\"kd5rxt-mark\" made the structure that i base this demoflow on","x":230,"y":371,"z":"bfcf1914.f592c8","wires":[]},{"id":"SynthMain_Comment1","type":"Comment","name":"\"kd5rxt-mark\" made the structure that i base this demoflow on1","x":232,"y":232,"z":"b7692de.cf719d","wires":[]},{"id":"NoteGen_Comment1","type":"Comment","name":"\"kd5rxt-mark\" made the structure that i base this demoflow on2","x":234,"y":415,"z":"f063b7c9.3ec2c8","wires":[]},{"id":"NodeArraySynthMain_Comment1","type":"Comment","name":"\"kd5rxt-mark\" made the structure that i base this demoflow on3","x":239,"y":61,"z":"45174b8a.24d454","wires":[]},{"id":"LFO_A_Comment1","type":"Comment","name":"\"kd5rxt-mark\" made the structure that i base this demoflow on4","x":256,"y":368,"z":"146f0b11.7830b5","wires":[]},{"id":"LFO_B_Comment1","type":"Comment","name":"\"kd5rxt-mark\" made the structure that i base this demoflow on5","x":262,"y":328,"z":"4369d3c8.87448c","wires":[]},{"id":"VFO_sine","type":"AudioSynthWaveformModulated","name":"sine","x":292,"y":56,"z":"bfcf1914.f592c8","wires":[["mix1:0"]]},{"id":"square","type":"AudioSynthWaveformModulated","name":"square","x":292,"y":91,"z":"bfcf1914.f592c8","wires":[["mix1:1"]]},{"id":"triangle","type":"AudioSynthWaveformModulated","name":"triangle","x":292,"y":126,"z":"bfcf1914.f592c8","wires":[["mix1:2"]]},{"id":"saw","type":"AudioSynthWaveformModulated","name":"saw","x":292,"y":161,"z":"bfcf1914.f592c8","wires":[["mix1:3"]]},{"id":"string","type":"AudioSynthKarplusStrong","name":"string","x":292,"y":196,"z":"bfcf1914.f592c8","wires":[["mix2:0"]]},{"id":"white","type":"AudioSynthNoiseWhite","name":"white","x":292,"y":231,"z":"bfcf1914.f592c8","wires":[["mix2:1"]]},{"id":"pink","type":"AudioSynthNoisePink","name":"pink","x":292,"y":266,"z":"bfcf1914.f592c8","wires":[["mix2:2"]]},{"id":"sweeper","type":"AudioSynthToneSweep","name":"sweeper","x":292,"y":301,"z":"bfcf1914.f592c8","wires":[["mix2:3"]]},{"id":"MultOutArrayNodeEx_VFO1","type":"VFO","name":"VFO3[16]","x":306,"y":191,"z":"cc5eaf37.d224f","wires":[["MultOutArrayNodeEx_MixerX1:0"],["MultOutArrayNodeEx_MixerX2:0"]]},{"id":"NoteGen_Comment2","type":"Comment","name":"the reason there is two outputs from the VFOs is just to show that multiple outputs can be used","comment":"","x":347,"y":359,"z":"f063b7c9.3ec2c8","wires":[]},{"id":"Voice_waveMix","type":"AudioMixer4","name":"waveMix","x":356.8333740234375,"y":168.08334350585938,"z":"f063b7c9.3ec2c8","wires":[["VFOenvelope:0","Voice_MixerX1:0"]]},{"id":"Mixer16_mixer5_8","type":"AudioMixer4","name":"mixer05_08","x":359,"y":313,"z":"7cf61098.c92b7","wires":[["Mixer16_mixerFinal:1"]]},{"id":"Mixer16_mixer1_4","type":"AudioMixer4","name":"mixer01_04","x":360,"y":181,"z":"7cf61098.c92b7","wires":[["Mixer16_mixerFinal:0"]]},{"id":"Mixer16_mixer13_16","type":"AudioMixer4","name":"mixer13_16","x":359,"y":579,"z":"7cf61098.c92b7","wires":[["Mixer16_mixerFinal:3"]]},{"id":"Mixer16_mixer9_12","type":"AudioMixer4","name":"mixer09_12","x":362,"y":445,"z":"7cf61098.c92b7","wires":[["Mixer16_mixerFinal:2"]]},{"id":"LFOmodMixA","type":"AudioMixer4","name":"LFOmodMixA","x":366.7500114440918,"y":433,"z":"b7692de.cf719d","wires":[["Main_Voice01:0","Main_Voice02:0","Main_Voice03:0","Main_Voice04:0","Main_Voice05:0","Main_Voice06:0","Main_Voice07:0","Main_Voice08:0","Main_Voice09:0","Main_Voice10:0","Main_Voice11:0","Main_Voice12:0","Main_Voice13:0","Main_Voice14:0","Main_Voice15:0","Main_Voice16:0"]]},{"id":"LFOmodMixB","type":"AudioMixer4","name":"LFOmodMixB","x":366.7500114440918,"y":504,"z":"b7692de.cf719d","wires":[["Main_Voice01:1","Main_Voice02:1","Main_Voice03:1","Main_Voice04:1","Main_Voice05:1","Main_Voice06:1","Main_Voice07:1","Main_Voice08:1","Main_Voice09:1","Main_Voice10:1","Main_Voice11:1","Main_Voice12:1","Main_Voice13:1","Main_Voice14:1","Main_Voice15:1","Main_Voice16:1"]]},{"id":"LFOfilterMixC","type":"AudioMixer4","name":"LFOfilterMixC","x":367.2500114440918,"y":575.75,"z":"b7692de.cf719d","wires":[["Main_Voice01:2","Main_Voice02:2","Main_Voice03:2","Main_Voice04:2","Main_Voice05:2","Main_Voice06:2","Main_Voice07:2","Main_Voice08:2","Main_Voice09:2","Main_Voice10:2","Main_Voice11:2","Main_Voice12:2","Main_Voice13:2","Main_Voice14:2","Main_Voice15:2","Main_Voice16:2"]]},{"id":"triangleFilter","type":"AudioSynthWaveformModulated","name":"triangleFilter","x":369.00001525878906,"y":250,"z":"146f0b11.7830b5","wires":[["filterMix:3"]]},{"id":"squareFilter","type":"AudioSynthWaveformModulated","name":"squareFilter","x":370,"y":174,"z":"146f0b11.7830b5","wires":[["filterMix:1"]]},{"id":"sineFilter","type":"AudioSynthWaveformModulated","name":"sineFilter","x":378,"y":136,"z":"146f0b11.7830b5","wires":[["filterMix:0"]]},{"id":"LFO_B_MixerX1","type":"AudioMixerX","name":"modMix","inputs":"2","outputs":1,"x":378,"y":163,"z":"4369d3c8.87448c","wires":[["lfo_b_modMixOut:0"]]},{"id":"pulseFilter","type":"AudioSynthWaveformModulated","name":"pulseFilter","x":378,"y":212,"z":"146f0b11.7830b5","wires":[["filterMix:2"]]},{"id":"sgtl5000","type":"AudioControlSGTL5000","name":"sgtl5000","x":388.75,"y":152,"z":"b7692de.cf719d","wires":[]},{"id":"AlternativeMain_mixer4_1","type":"AudioMixer4","name":"LFOmodMixA","comment":"","x":390,"y":233,"z":"45174b8a.24d454","wires":[["AlternativeMain_Voice1:0"]]},{"id":"AlternativeMain_mixer4_2","type":"AudioMixer4","name":"LFOmodMixB","comment":"","x":390,"y":304,"z":"45174b8a.24d454","wires":[["AlternativeMain_Voice1:1"]]},{"id":"AlternativeMain_MixerX3","type":"AudioMixerX","name":"LFOfilterMixC","inputs":"2","outputs":1,"comment":"","x":393,"y":380,"z":"45174b8a.24d454","wires":[["AlternativeMain_Voice1:2"]]},{"id":"LFO_B_ClassComment1","type":"ClassComment","name":"This is LFO with 2 modulators (saw,sampleHold)","x":397,"y":84,"z":"4369d3c8.87448c","wires":[]},{"id":"Mixer16_ClassComment1","type":"ClassComment","name":"This is a 16 input mixer that utilizes the old style mixer structure (4+1 4input mixers)","x":402,"y":83,"z":"7cf61098.c92b7","wires":[]},{"id":"MultOutArrayNodeEx_Comment1","type":"Comment","name":"the only limit at the moment is that if two array exists at the same workspace they must be of same size.","x":433,"y":130,"z":"cc5eaf37.d224f","wires":[]},{"id":"MultOutArrayNodeEx_MixerX1","type":"AudioMixerX","name":"mixFinalA","inputs":"1","outputs":1,"x":454,"y":165,"z":"cc5eaf37.d224f","wires":[["MultOutArrayNodeEx_MixerX3:0"]]},{"id":"MultOutArrayNodeEx_MixerX2","type":"AudioMixerX","name":"mixFinalB","inputs":"1","outputs":1,"x":454,"y":212,"z":"cc5eaf37.d224f","wires":[["MultOutArrayNodeEx_MixerX3:1"]]},{"id":"MultOutArrayNodeEx_Comment2","type":"Comment","name":"The following nodes down here, is to demonstrate that multiple outputs is allowed when using node array source.","x":462,"y":97,"z":"cc5eaf37.d224f","wires":[]},{"id":"Voice_ClassComment1","type":"ClassComment","name":"This is a voice with two VFO:s, envelope, vfo-filter","x":481,"y":78,"z":"f063b7c9.3ec2c8","wires":[]},{"id":"AlternativeMain_sgtl5000_1","type":"AudioControlSGTL5000","name":"sgtl5000_1","x":482,"y":166,"z":"45174b8a.24d454","wires":[]},{"id":"LFO_A_ClassComment1","type":"ClassComment","name":"This is LFO with 4 modulated filter generators (sine,square,pulse,triangle)","x":512,"y":77,"z":"146f0b11.7830b5","wires":[]},{"id":"VFOenvelope","type":"AudioEffectEnvelope","name":"VFOenvelope","x":519.8333740234375,"y":199.08334350585938,"z":"f063b7c9.3ec2c8","wires":[["Voice_MixerX1:1"]]},{"id":"mix1","type":"AudioMixer4","name":"mix1","x":542,"y":147,"z":"bfcf1914.f592c8","wires":[["vfo_mix1out:0"]]},{"id":"mix2","type":"AudioMixer4","name":"mix2","x":542,"y":220,"z":"bfcf1914.f592c8","wires":[["vfo_mix2out:0"]]},{"id":"AlternativeMain_ClassComment1","type":"ClassComment","name":"This is a alternative synth main that utilizes the new array structure","x":561,"y":110,"z":"45174b8a.24d454","wires":[]},{"id":"filterMix","type":"AudioMixer4","name":"filterMix","x":569,"y":193,"z":"146f0b11.7830b5","wires":[["lfo_a_filterMixOut:0"]]},{"id":"AlternativeMain_Voice1","type":"NoteGen","name":"voices[16]","x":569,"y":303,"z":"45174b8a.24d454","wires":[["AlternativeMain_MixerX1:0"]]},{"id":"LFO_B_code1","type":"Function","name":"begin function","comment":"void begin()\n{\n    sawMod.begin(WAVEFORM_SAWTOOTH);\n    sampleholdMod.begin(WAVEFORM_SAMPLE_HOLD);\n    modMix.gain(0, 0.5);\n    modMix.gain(1, 0.5);\n}","x":575,"y":248,"z":"4369d3c8.87448c","wires":[]},{"id":"Mixer16_mixerFinal","type":"AudioMixer4","name":"mixerFinal","x":581,"y":373,"z":"7cf61098.c92b7","wires":[["Mixer16_TabOutput:0"]]},{"id":"lfo_b_modMixOut","type":"TabOutput","name":"modMixOut","x":598,"y":162,"z":"4369d3c8.87448c","wires":[]},{"id":"MultOutArrayNodeEx_MixerX3","type":"AudioMixerX","name":"mixFinalAB","inputs":"2","outputs":1,"x":632,"y":186,"z":"cc5eaf37.d224f","wires":[[]]},{"id":"SynthMain_ClassComment1","type":"ClassComment","name":"This is the main structure of the synth with 16 voices","x":638,"y":55,"z":"b7692de.cf719d","wires":[]},{"id":"VFO_code1","type":"Function","name":"begin function","comment":"void begin()\n{\n    sine.begin(WAVEFORM_SINE);\n    square.begin(WAVEFORM_SQUARE);\n    triangle.begin(WAVEFORM_TRIANGLE);\n    saw.begin(WAVEFORM_SAWTOOTH);\n    string.noteOff(0);\n    white.amplitude(0);\n    pink.amplitude(0);\n    for (int i = 0; i < 4; i++)\n    {\n        mix1.gain(i, 0.125);\n        mix2.gain(i, 0.125);\n    }\n}","x":673,"y":313,"z":"bfcf1914.f592c8","wires":[]},{"id":"Voice_MixerX1","type":"AudioMixerX","name":"VFOenvelopeMix","inputs":"2","outputs":1,"x":696,"y":172,"z":"f063b7c9.3ec2c8","wires":[["VFOfilter:0","VFOfilterMix:0"]]},{"id":"vfo_mix2out","type":"TabOutput","name":"mix2out","x":699,"y":220,"z":"bfcf1914.f592c8","wires":[]},{"id":"NoteGen_code1","type":"Function","name":"begin function","comment":"void begin ()\n{\n    VFO1.begin();\n    VFO2.begin();\n    waveMix.gain(0, 0.25);\n    waveMix.gain(1, 0.25);\n    waveMix.gain(2, 0.25);\n    waveMix.gain(3, 0.25);\n    VFOenvelopeMix.gain(0, 0.5);\n    VFOenvelopeMix.gain(1, 0.5);\n    VFOfilterMix.gain(0, 0.25);\n    VFOfilterMix.gain(1, 0.25);\n    VFOfilterMix.gain(2, 0.25);\n    VFOfilterMix.gain(3, 0.25);\n}","x":703,"y":121,"z":"f063b7c9.3ec2c8","wires":[]},{"id":"Main_Array_NoteGen_notegen","type":"Array","name":"NoteGen notegen {voice01,voice02,voice03,voice04,voice05,voice06,voice07,voice08,voice09,voice10,voice11,voice12,voice13,voice14,voice15,voice16}","x":705,"y":96,"z":"b7692de.cf719d","wires":[]},{"id":"vfo_mix1out","type":"TabOutput","name":"mix1out","x":705,"y":146,"z":"bfcf1914.f592c8","wires":[]},{"id":"Main_Voice01","type":"NoteGen","name":"voice01","x":718.7500114440918,"y":145,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:0"]]},{"id":"Main_Voice02","type":"NoteGen","name":"voice02","x":718.7500114440918,"y":193,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:1"]]},{"id":"Main_Voice03","type":"NoteGen","name":"voice03","x":718.7500114440918,"y":241,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:2"]]},{"id":"Main_Voice04","type":"NoteGen","name":"voice04","x":718.7500114440918,"y":289,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:3"]]},{"id":"Main_Voice05","type":"NoteGen","name":"voice05","x":718.7500114440918,"y":337,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:4"]]},{"id":"Main_Voice06","type":"NoteGen","name":"voice06","x":718.7500114440918,"y":385,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:5"]]},{"id":"Main_Voice07","type":"NoteGen","name":"voice07","x":718.7500114440918,"y":433,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:6"]]},{"id":"Main_Voice08","type":"NoteGen","name":"voice08","x":718.7500114440918,"y":481,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:7"]]},{"id":"Main_Voice09","type":"NoteGen","name":"voice09","x":718.7500114440918,"y":529,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:8"]]},{"id":"Main_Voice10","type":"NoteGen","name":"voice10","x":718.7500114440918,"y":577,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:9"]]},{"id":"Main_Voice11","type":"NoteGen","name":"voice11","x":718.7500114440918,"y":625,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:10"]]},{"id":"Main_Voice12","type":"NoteGen","name":"voice12","x":718.7500114440918,"y":673,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:11"]]},{"id":"Main_Voice13","type":"NoteGen","name":"voice13","x":718.7500114440918,"y":721,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:12"]]},{"id":"Main_Voice14","type":"NoteGen","name":"voice14","x":718.7500114440918,"y":769,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:13"]]},{"id":"Main_Voice15","type":"NoteGen","name":"voice15","x":718.7500114440918,"y":817,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:14"]]},{"id":"Main_Voice16","type":"NoteGen","name":"voice16","x":718.7500114440918,"y":865,"z":"b7692de.cf719d","wires":[["SynthMain_mixxFinal:15"]]},{"id":"AlternativeMain_MixerX1","type":"AudioMixerX","name":"mixFinal","inputs":"1","outputs":1,"x":722,"y":301,"z":"45174b8a.24d454","wires":[["AlternativeMain_amp1:0"]]},{"id":"lfo_a_filterMixOut","type":"TabOutput","name":"filterMixOut","x":727,"y":194,"z":"146f0b11.7830b5","wires":[]},{"id":"LFO_A_code1","type":"Function","name":"begin function","comment":"void begin()\n{\n    sineFilter.begin(WAVEFORM_SINE);\n    squareFilter.begin(WAVEFORM_SQUARE);\n    pulseFilter.begin(WAVEFORM_PULSE);\n    triangleFilter.begin(WAVEFORM_TRIANGLE);\n    filterMix.gain(0, 0.25);\n    filterMix.gain(1, 0.25);\n    filterMix.gain(2, 0.25);\n    filterMix.gain(3, 0.25);\n}","x":741,"y":279,"z":"146f0b11.7830b5","wires":[]},{"id":"Mixer16_TabOutput","type":"TabOutput","name":"mixFinalOut","x":772,"y":374,"z":"7cf61098.c92b7","wires":[]},{"id":"VFO_ClassComment1","type":"ClassComment","name":"This is a VFO with modulated:(sine, square, triangle, saw) + string,whiteNoise,pinkNoise and sweeper","x":780,"y":66,"z":"bfcf1914.f592c8","wires":[]},{"id":"NodeArraySynthMain_code1","type":"Function","name":"begin function","comment":"void begin()\n{\n    LFO_A1.begin();\n    LFO_A2.begin();\n    LFO_B1.begin();\n    LFO_B2.begin();\n    for (int i = 0; i < 16; i++)\n    {\n        voices[i].begin();\n        mixFinal.gain(i, 1.0/16); // set equal gain\n    }\n    for (int i = 0; i < 4; i++)\n    {\n         LFOmodMixA.gain(i, 0.25);\n         LFOmodMixB.gain(i, 0.25);\n    }\n    LFOfilterMixC.gain(0, 0.5);\n    LFOfilterMixC.gain(1, 0.5);\n}","x":817,"y":176,"z":"45174b8a.24d454","wires":[]},{"id":"VFOfilter","type":"AudioFilterStateVariable","name":"VFOfilter","x":868.8333740234375,"y":209.08334350585938,"z":"f063b7c9.3ec2c8","wires":[["VFOfilterMix:1"],["VFOfilterMix:2"],["VFOfilterMix:3"]]},{"id":"AlternativeMain_amp1","type":"AudioAmplifier","name":"ampFinal","comment":"this is used for easier gain adj. of mixFinal","x":879,"y":299,"z":"45174b8a.24d454","wires":[["AlternativeMain_i2s2:0","AlternativeMain_i2s2:1"]]},{"id":"SynthMain_mixxFinal","type":"AudioMixerX","name":"mixxFinal","inputs":"16","outputs":1,"x":997.7500114440918,"y":508,"z":"b7692de.cf719d","wires":[["SynthMain_ampFinal:0"]]},{"id":"VFOfilterMix","type":"AudioMixer4","name":"VFOfilterMix","comment":"","x":1037.8333740234375,"y":190.08334350585938,"z":"f063b7c9.3ec2c8","wires":[["Out4:0"]]},{"id":"AlternativeMain_i2s2","type":"AudioOutputI2S","name":"i2s3","x":1044,"y":297,"z":"45174b8a.24d454","wires":[]},{"id":"SynthMain_ampFinal","type":"AudioAmplifier","name":"ampFinal1","x":1140.75,"y":508,"z":"b7692de.cf719d","wires":[["i2s2:1","i2s2:0"]]},{"id":"Main_Mixer16_1","type":"Mixer16","name":"Mixer16_TEST","x":1182,"y":259,"z":"b7692de.cf719d","wires":[[]]},{"id":"Out4","type":"TabOutput","name":"VFOfilterMixOut","x":1213.8333740234375,"y":190.08334350585938,"z":"f063b7c9.3ec2c8","wires":[]},{"id":"i2s2","type":"AudioOutputI2S","name":"i2s2","x":1308.75,"y":508,"z":"b7692de.cf719d","wires":[]}]
 
 </script>
 
 <script  type="text/x-red" data-container-name="DemoFlowB">
-	[{"type":"tab","id":"fe95d09d.ae21a","label":"NoteGen","inputs":3,"outputs":1,"export":true},{"type":"tab","id":"42bb1923.eaa838","label":"SynthMain","inputs":0,"outputs":0,"export":false},{"type":"tab","id":"aa948da6.d8a2b","label":"NodeArraySynthMain","inputs":0,"outputs":0,"export":false},{"type":"tab","id":"fd608df0.4cd85","label":"Mod","inputs":0,"outputs":0,"export":true},{"type":"tab","id":"3ed7083a.3969d8","label":"NodeArraySynthMain2","inputs":0,"outputs":0,"export":true},{"id":"TabInput2","type":"TabInput","name":"In VFO A","x":87.17860412597656,"y":245.25000762939453,"z":"fe95d09d.ae21a","wires":[["ce65bb5f.d7cc58:0","43fe3de2.7978d4:0","41187d99.c66374:0","15c08e2f.37ddd2:0"]]},{"id":"NodeArraySynthMain2_Mod","type":"Mod","name":"Mod","x":93,"y":274,"z":"3ed7083a.3969d8","wires":[["NodeArraySynthMain2_NoteGen1:0"],["NodeArraySynthMain2_NoteGen1:1"],["NodeArraySynthMain2_NoteGen1:2"]]},{"id":"2cfd28c8.e191b8","type":"TabInput","name":"In VFO B","x":99.17860412597656,"y":526.25,"z":"fe95d09d.ae21a","wires":[["67dd71d2.cf4b3:0","c2c08e67.ea9a7:0","510ec7e8.d5c6f8:0","fb6380d1.5f9dd:0"]]},{"id":"be2abc30.bdc5f","type":"AudioSynthWaveformDc","name":"LFOpulseModDutyCycle","x":115.50004196166992,"y":195.50000667572021,"z":"42bb1923.eaa838","wires":[["943e965c.dbbc98:1"]]},{"id":"d7cd720b.73f95","type":"TabInput","name":"In VFO filter","x":115.17860412597656,"y":827.2500019073486,"z":"fe95d09d.ae21a","wires":[["d478a0e0.8f389:1"]]},{"id":"30a22eaa.8e3a12","type":"AudioSynthWaveformDc","name":"LFOpulseFilterDutyCycle","x":116.50004196166992,"y":669.0000038146973,"z":"42bb1923.eaa838","wires":[["ee150c54.c830d:1"]]},{"id":"NodeArraySynthMain_dc1","type":"AudioSynthWaveformDc","name":"LFOpulseModDutyCycle","x":130,"y":217.77777099609375,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_waveformMod11:1"]]},{"id":"NodeArraySynthMain_dc2","type":"AudioSynthWaveformDc","name":"LFOpulseFilterDutyCycle","x":131,"y":691.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_waveformMod10:1"]]},{"id":"Mod_dc1","type":"AudioSynthWaveformDc","name":"LFOpulseModDutyCycle","x":167,"y":150,"z":"fd608df0.4cd85","wires":[["Mod_waveformMod11:1"]]},{"id":"Mod_dc2","type":"AudioSynthWaveformDc","name":"LFOpulseFilterDutyCycle","x":168,"y":623.499997138977,"z":"fd608df0.4cd85","wires":[["Mod_waveformMod10:1"]]},{"id":"54aad388.8078cc","type":"AudioSynthWaveformModulated","name":"LFOsawMod","x":210.00004196166992,"y":426.00000381469727,"z":"42bb1923.eaa838","wires":[["Main_MixerX2:0"]]},{"id":"36b02443.0dfa0c","type":"AudioSynthWaveformModulated","name":"LFOsampleholdMod","x":210.00004196166992,"y":461.00000381469727,"z":"42bb1923.eaa838","wires":[["Main_MixerX2:1"]]},{"id":"NodeArraySynthMain_Comment1","type":"Comment","name":"\"kd5rxt-mark\" made the structure that i base this demoflow on","x":221,"y":55,"z":"aa948da6.d8a2b","wires":[]},{"id":"SynthMain_Comment1","type":"Comment","name":"\"kd5rxt-mark\" made the structure that i base this demoflow on","x":221,"y":56,"z":"42bb1923.eaa838","wires":[]},{"id":"NodeArraySynthMain_waveformMod1","type":"AudioSynthWaveformModulated","name":"LFOsawMod","x":224.5,"y":448.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_MixerX1:0"]]},{"id":"NodeArraySynthMain_waveformMod2","type":"AudioSynthWaveformModulated","name":"LFOsampleholdMod","x":224.5,"y":483.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_MixerX1:1"]]},{"id":"NodeArraySynthMain2_Comment1","type":"Comment","name":"\"kd5rxt-mark\" made the structure that i base this demoflow on","x":232.2222137451172,"y":95.55555248260498,"z":"3ed7083a.3969d8","wires":[]},{"id":"NodeArraySynthMain2_NoteGen1","type":"NoteGen","name":"noteGen[16]","x":242.22222900390625,"y":273.22216796875,"z":"3ed7083a.3969d8","wires":[["NodeArraySynthMain2_MixerX1:0"]]},{"id":"Voice_Comment1","type":"Comment","name":"\"kd5rxt-mark\" made the structure that i base this demoflow on","x":245,"y":125,"z":"fe95d09d.ae21a","wires":[]},{"id":"Mod_waveformMod1","type":"AudioSynthWaveformModulated","name":"LFOsawMod","x":261.5,"y":380.49999713897705,"z":"fd608df0.4cd85","wires":[["Mod_MixerX1:0"]]},{"id":"Mod_waveformMod2","type":"AudioSynthWaveformModulated","name":"LFOsampleholdMod","x":261.5,"y":415.49999713897705,"z":"fd608df0.4cd85","wires":[["Mod_MixerX1:1"]]},{"id":"ce65bb5f.d7cc58","type":"AudioSynthWaveformModulated","name":"VFOsineA","x":289.17860412597656,"y":184.25000762939453,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX2:0"]]},{"id":"4b7c8023.9dba8","type":"AudioSynthWaveformModulated","name":"LFOsampleholdFilter","x":294.0000419616699,"y":780.0000038146973,"z":"42bb1923.eaa838","wires":[["Main_MixerX3:1"]]},{"id":"15c08e2f.37ddd2","type":"AudioSynthWaveformModulated","name":"VFOsawA","x":297.17860412597656,"y":286.25000762939453,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX2:3"]]},{"id":"f41b4d41.930de","type":"AudioSynthKarplusStrong","name":"VFOstringA","x":298.17860412597656,"y":320.25000762939453,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX2:4"]]},{"id":"43fe3de2.7978d4","type":"AudioSynthWaveformModulated","name":"VFOsquareA","x":300.17860412597656,"y":218.25000762939453,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX2:1"]]},{"id":"67dd71d2.cf4b3","type":"AudioSynthWaveformModulated","name":"VFOsineB","x":299.17860412597656,"y":482.25000762939453,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX3:0"]]},{"id":"c2c08e67.ea9a7","type":"AudioSynthWaveformModulated","name":"VFOsquareB","x":299.17860412597656,"y":517.2500076293945,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX3:1"]]},{"id":"510ec7e8.d5c6f8","type":"AudioSynthWaveformModulated","name":"VFOtriangleB","x":299.17860412597656,"y":552.2500076293945,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX3:2"]]},{"id":"fb6380d1.5f9dd","type":"AudioSynthWaveformModulated","name":"VFOsawB","x":299.17860412597656,"y":587.2500076293945,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX3:3"]]},{"id":"bd4f842e.87dca8","type":"AudioSynthKarplusStrong","name":"VFOstringB","x":299.17860412597656,"y":622.2500076293945,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX3:4"]]},{"id":"180d8864.797188","type":"AudioSynthNoisePink","name":"VFOpinkA","x":300.1786079406738,"y":387.24999618530273,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX2:6"]]},{"id":"755fb067.71cf9","type":"AudioSynthNoiseWhite","name":"VFOwhiteB","x":299.17860412597656,"y":657.2500076293945,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX3:5"]]},{"id":"84c0f09a.1c809","type":"AudioSynthNoisePink","name":"VFOpinkB","x":299.17860412597656,"y":692.2500076293945,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX3:6"]]},{"id":"7fd9951d.0d807c","type":"AudioSynthToneSweep","name":"VFOsweepB","x":299.17860412597656,"y":727.2500076293945,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX3:7"]]},{"id":"ddde6e78.2ddd1","type":"AudioSynthNoiseWhite","name":"VFOwhiteA","x":302.17860412597656,"y":354.25000762939453,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX2:5"]]},{"id":"41187d99.c66374","type":"AudioSynthWaveformModulated","name":"VFOtriangleA","x":304.17860412597656,"y":252.25000762939453,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX2:2"]]},{"id":"NodeArraySynthMain_waveformMod3","type":"AudioSynthWaveformModulated","name":"LFOsampleholdFilter","x":308.5,"y":802.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_MixerX2:1"]]},{"id":"96cb2aa6.9a9178","type":"AudioSynthToneSweep","name":"VFOsweepA","x":311.17860412597656,"y":420.25000762939453,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX2:7"]]},{"id":"33b47bd4.642a54","type":"AudioSynthWaveformModulated","name":"LFOtriangleFilter","x":314.0000419616699,"y":700.0000038146973,"z":"42bb1923.eaa838","wires":[["eaa54d90.e07e:3"]]},{"id":"69bc4d68.d0ec14","type":"AudioSynthWaveformModulated","name":"LFOsawFilter","x":316.0000419616699,"y":740.0000038146973,"z":"42bb1923.eaa838","wires":[["Main_MixerX3:0"]]},{"id":"9cbdbf6d.b6428","type":"AudioSynthWaveformModulated","name":"LFOtriangleMod","x":320.50004959106445,"y":228.0000057220459,"z":"42bb1923.eaa838","wires":[["250d51b4.6a5f1e:3"]]},{"id":"3229811a.40723e","type":"AudioSynthWaveformModulated","name":"LFOsquareMod","x":321.75004959106445,"y":155.5000057220459,"z":"42bb1923.eaa838","wires":[["250d51b4.6a5f1e:1"]]},{"id":"f024b964.e70ae8","type":"AudioSynthWaveformModulated","name":"LFOsineFilter","x":321.0000419616699,"y":593.0000038146973,"z":"42bb1923.eaa838","wires":[["eaa54d90.e07e:0"]]},{"id":"346af5ea.a399ba","type":"AudioSynthWaveformModulated","name":"LFOsquareFilter","x":321.0000419616699,"y":628.0000038146973,"z":"42bb1923.eaa838","wires":[["eaa54d90.e07e:1"]]},{"id":"ee150c54.c830d","type":"AudioSynthWaveformModulated","name":"LFOpulseFilter","x":321.0000419616699,"y":663.0000038146973,"z":"42bb1923.eaa838","wires":[["eaa54d90.e07e:2"]]},{"id":"943e965c.dbbc98","type":"AudioSynthWaveformModulated","name":"LFOpulseMod","x":323.00004959106445,"y":193.0000057220459,"z":"42bb1923.eaa838","wires":[["250d51b4.6a5f1e:2"]]},{"id":"8820b7d4.ecc168","type":"AudioSynthWaveformModulated","name":"LFOsineMod","x":330.25004959106445,"y":120.75000381469727,"z":"42bb1923.eaa838","wires":[["250d51b4.6a5f1e:0"]]},{"id":"NodeArraySynthMain_waveformMod4","type":"AudioSynthWaveformModulated","name":"LFOtriangleFilter","x":328.5,"y":722.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer2:3"]]},{"id":"NodeArraySynthMain_waveformMod5","type":"AudioSynthWaveformModulated","name":"LFOsawFilter","x":330.5,"y":762.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_MixerX2:0"]]},{"id":"NodeArraySynthMain_waveformMod6","type":"AudioSynthWaveformModulated","name":"LFOtriangleMod","x":335.00000762939453,"y":250.27777004241943,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer1:3"]]},{"id":"NodeArraySynthMain_waveformMod7","type":"AudioSynthWaveformModulated","name":"LFOsquareMod","x":336.25000762939453,"y":177.77777004241943,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer1:1"]]},{"id":"NodeArraySynthMain_waveformMod8","type":"AudioSynthWaveformModulated","name":"LFOsineFilter","x":335.5,"y":615.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer2:0"]]},{"id":"NodeArraySynthMain_waveformMod9","type":"AudioSynthWaveformModulated","name":"LFOsquareFilter","x":335.5,"y":650.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer2:1"]]},{"id":"NodeArraySynthMain_waveformMod10","type":"AudioSynthWaveformModulated","name":"LFOpulseFilter","x":335.5,"y":685.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer2:2"]]},{"id":"NodeArraySynthMain_waveformMod11","type":"AudioSynthWaveformModulated","name":"LFOpulseMod","x":337.50000762939453,"y":215.27777004241943,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer1:2"]]},{"id":"NodeArraySynthMain2_sgtl5000_1","type":"AudioControlSGTL5000","name":"sgtl5000_1","x":339.4682922363281,"y":177.8809356689453,"z":"3ed7083a.3969d8","wires":[]},{"id":"NodeArraySynthMain_waveformMod12","type":"AudioSynthWaveformModulated","name":"LFOsineMod","x":344.75000762939453,"y":143.0277681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer1:0"]]},{"id":"Mod_waveformMod3","type":"AudioSynthWaveformModulated","name":"LFOsampleholdFilter","x":345.5,"y":734.499997138977,"z":"fd608df0.4cd85","wires":[["Mod_MixerX2:1"]]},{"id":"Mod_waveformMod4","type":"AudioSynthWaveformModulated","name":"LFOtriangleFilter","x":365.5,"y":654.499997138977,"z":"fd608df0.4cd85","wires":[["Mod_mixer2:3"]]},{"id":"Mod_waveformMod5","type":"AudioSynthWaveformModulated","name":"LFOsawFilter","x":367.5,"y":694.499997138977,"z":"fd608df0.4cd85","wires":[["Mod_MixerX2:0"]]},{"id":"Mod_waveformMod6","type":"AudioSynthWaveformModulated","name":"LFOtriangleMod","x":372.00000762939453,"y":182.49999904632568,"z":"fd608df0.4cd85","wires":[["Mod_mixer1:3"]]},{"id":"Mod_waveformMod7","type":"AudioSynthWaveformModulated","name":"LFOsquareMod","x":373.25000762939453,"y":109.99999904632568,"z":"fd608df0.4cd85","wires":[["Mod_mixer1:1"]]},{"id":"Mod_waveformMod8","type":"AudioSynthWaveformModulated","name":"LFOsineFilter","x":372.5,"y":547.499997138977,"z":"fd608df0.4cd85","wires":[["Mod_mixer2:0"]]},{"id":"Mod_waveformMod9","type":"AudioSynthWaveformModulated","name":"LFOsquareFilter","x":372.5,"y":582.499997138977,"z":"fd608df0.4cd85","wires":[["Mod_mixer2:1"]]},{"id":"Mod_waveformMod10","type":"AudioSynthWaveformModulated","name":"LFOpulseFilter","x":372.5,"y":617.499997138977,"z":"fd608df0.4cd85","wires":[["Mod_mixer2:2"]]},{"id":"Mod_waveformMod11","type":"AudioSynthWaveformModulated","name":"LFOpulseMod","x":374.50000762939453,"y":147.49999904632568,"z":"fd608df0.4cd85","wires":[["Mod_mixer1:2"]]},{"id":"Mod_waveformMod12","type":"AudioSynthWaveformModulated","name":"LFOsineMod","x":381.75000762939453,"y":75.24999713897705,"z":"fd608df0.4cd85","wires":[["Mod_mixer1:0"]]},{"id":"NodeArraySynthMain2_MixerX1","type":"AudioMixerX","name":"mixFinal","inputs":1,"outputs":1,"x":393.22222900390625,"y":271.22216796875,"z":"3ed7083a.3969d8","wires":[["NodeArraySynthMain2_amp1:0"]]},{"id":"Main_MixerX2","type":"AudioMixerX","name":"LFOmodMix2","inputs":"2","outputs":1,"x":462.8888702392578,"y":439.88890743255615,"z":"42bb1923.eaa838","wires":[["72ed2133.b8b3b:1","1690539d.d4e1dc:1"]]},{"id":"fde8d778.1affb8","type":"AudioSynthWaveformDc","name":"VFOtuningA","x":469.0000419616699,"y":276.00000381469727,"z":"42bb1923.eaa838","wires":[["72ed2133.b8b3b:2"]]},{"id":"NodeArraySynthMain_MixerX1","type":"AudioMixerX","name":"LFOmodMix2","inputs":"2","outputs":1,"x":477.3888282775879,"y":462.1666717529297,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer3:1","NodeArraySynthMain_mixer4:1"]]},{"id":"64e9d27c.c260fc","type":"AudioSynthWaveformDc","name":"VFOtuningB","x":478.0000419616699,"y":511.00000381469727,"z":"42bb1923.eaa838","wires":[["1690539d.d4e1dc:2"]]},{"id":"NodeArraySynthMain_dc3","type":"AudioSynthWaveformDc","name":"VFOtuningA","x":483.5,"y":298.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer3:2"]]},{"id":"98234b8c.f770f8","type":"AudioSynthWaveformDc","name":"PBend","x":492.0000419616699,"y":361.00000381469727,"z":"42bb1923.eaa838","wires":[["72ed2133.b8b3b:3","1690539d.d4e1dc:3"]]},{"id":"NodeArraySynthMain_dc4","type":"AudioSynthWaveformDc","name":"VFOtuningB","x":492.5,"y":533.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer4:2"]]},{"id":"NodeArraySynthMain_dc5","type":"AudioSynthWaveformDc","name":"PBend","x":506.5,"y":383.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer3:3","NodeArraySynthMain_mixer4:3"]]},{"id":"Mod_MixerX1","type":"AudioMixerX","name":"LFOmodMix2","inputs":"2","outputs":1,"x":514.3888282775879,"y":394.38890075683594,"z":"fd608df0.4cd85","wires":[["Mod_mixer3:1","Mod_mixer4:1"]]},{"id":"250d51b4.6a5f1e","type":"AudioMixer4","name":"LFOmodMix1","x":517.5000495910645,"y":175.00000762939453,"z":"42bb1923.eaa838","wires":[["72ed2133.b8b3b:0","1690539d.d4e1dc:0"]]},{"id":"Mod_dc3","type":"AudioSynthWaveformDc","name":"VFOtuningA","x":520.5,"y":230.49999713897705,"z":"fd608df0.4cd85","wires":[["Mod_mixer3:2"]]},{"id":"Voice_MixerX3","type":"AudioMixerX","name":"waveMixB","inputs":"8","outputs":1,"x":525.8887901306152,"y":589.0000076293945,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX4:1"]]},{"id":"NodeArraySynthMain2_amp1","type":"AudioAmplifier","name":"ampFinal","x":528.2222290039062,"y":269.22216796875,"z":"3ed7083a.3969d8","wires":[["NodeArraySynthMain2_i2s1:0","NodeArraySynthMain2_i2s1:1"]]},{"id":"Mod_dc4","type":"AudioSynthWaveformDc","name":"VFOtuningB","x":529.5,"y":465.49999713897705,"z":"fd608df0.4cd85","wires":[["Mod_mixer4:2"]]},{"id":"NodeArraySynthMain_mixer1","type":"AudioMixer4","name":"LFOmodMix1","x":532.0000076293945,"y":197.27777194976807,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer3:0","NodeArraySynthMain_mixer4:0"]]},{"id":"Voice_MixerX2","type":"AudioMixerX","name":"waveMixA","inputs":"8","outputs":1,"x":532.8888778686523,"y":282.00001525878906,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX4:0"]]},{"id":"Mod_dc5","type":"AudioSynthWaveformDc","name":"PBend","x":543.5,"y":315.49999713897705,"z":"fd608df0.4cd85","wires":[["Mod_mixer3:3","Mod_mixer4:3"]]},{"id":"Main_MixerX3","type":"AudioMixerX","name":"LFOfilterMixB","inputs":"2","outputs":1,"x":549.888801574707,"y":765.889009475708,"z":"42bb1923.eaa838","wires":[["Main_MixerX4:1"]]},{"id":"eaa54d90.e07e","type":"AudioMixer4","name":"LFOfilterMixA","x":554.0000419616699,"y":646.0000038146973,"z":"42bb1923.eaa838","wires":[["Main_MixerX4:0"]]},{"id":"NodeArraySynthMain_MixerX2","type":"AudioMixerX","name":"LFOfilterMixB","inputs":"2","outputs":1,"x":564.3887596130371,"y":788.1667737960815,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_MixerX3:1"]]},{"id":"Mod_mixer1","type":"AudioMixer4","name":"LFOmodMix1","x":569.0000076293945,"y":129.50000095367432,"z":"fd608df0.4cd85","wires":[["Mod_mixer3:0","Mod_mixer4:0"]]},{"id":"NodeArraySynthMain_mixer2","type":"AudioMixer4","name":"LFOfilterMixA","x":568.5,"y":668.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_MixerX3:0"]]},{"id":"Mod_MixerX2","type":"AudioMixerX","name":"LFOfilterMixB","inputs":"2","outputs":1,"x":601.3887596130371,"y":720.3890027999878,"z":"fd608df0.4cd85","wires":[["Mod_MixerX3:1"]]},{"id":"Mod_mixer2","type":"AudioMixer4","name":"LFOfilterMixA","x":605.5,"y":600.499997138977,"z":"fd608df0.4cd85","wires":[["Mod_MixerX3:0"]]},{"id":"NodeArraySynthMain2_i2s1","type":"AudioOutputI2S","name":"i2s1","x":657.8255004882812,"y":270.6189880371094,"z":"3ed7083a.3969d8","wires":[]},{"id":"Voice_MixerX4","type":"AudioMixerX","name":"waveMixAB","inputs":"2","outputs":1,"x":694.8888931274414,"y":433.0000400543213,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX1:0","b34fca5c.a03b78:0"]]},{"id":"72ed2133.b8b3b","type":"AudioMixer4","name":"LFOmodMixA","x":787.0000419616699,"y":327.00000381469727,"z":"42bb1923.eaa838","wires":[["Main_Voice01:0","Main_Voice2:0","Main_Voice3:0","Main_Voice4:0","Main_Voice5:0","Main_Voice6:0","Main_Voice7:0","Main_Voice8:0","Main_Voice9:0","Main_Voice10:0","Main_Voice11:0","Main_Voice12:0","Main_Voice13:0","Main_Voice14:0","Main_Voice15:0","Main_Voice16:0"]]},{"id":"1690539d.d4e1dc","type":"AudioMixer4","name":"LFOmodMixB","x":796.0000419616699,"y":503.00000381469727,"z":"42bb1923.eaa838","wires":[["Main_Voice01:1","Main_Voice2:1","Main_Voice3:1","Main_Voice4:1","Main_Voice5:1","Main_Voice6:1","Main_Voice7:1","Main_Voice8:1","Main_Voice9:1","Main_Voice10:1","Main_Voice11:1","Main_Voice12:1","Main_Voice13:1","Main_Voice14:1","Main_Voice15:1","Main_Voice16:1"]]},{"id":"NodeArraySynthMain_mixer3","type":"AudioMixer4","name":"LFOmodMixA","x":801.5,"y":349.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_NoteGen1:0"]]},{"id":"Main_MixerX4","type":"AudioMixerX","name":"LFOmodMixC","inputs":"2","outputs":1,"x":803.8888359069824,"y":676.8889617919922,"z":"42bb1923.eaa838","wires":[["Main_Voice01:2","Main_Voice2:2","Main_Voice3:2","Main_Voice4:2","Main_Voice5:2","Main_Voice6:2","Main_Voice7:2","Main_Voice8:2","Main_Voice9:2","Main_Voice10:2","Main_Voice11:2","Main_Voice12:2","Main_Voice13:2","Main_Voice14:2","Main_Voice15:2","Main_Voice16:2"]]},{"id":"NodeArraySynthMain_mixer4","type":"AudioMixer4","name":"LFOmodMixB","x":810.5,"y":525.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_NoteGen1:1"]]},{"id":"NodeArraySynthMain_MixerX3","type":"AudioMixerX","name":"LFOmodMixC","inputs":"2","outputs":1,"x":818.3887939453125,"y":699.1667261123657,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_NoteGen1:2"]]},{"id":"Mod_mixer3","type":"AudioMixer4","name":"LFOmodMixA","x":838.5,"y":281.49999713897705,"z":"fd608df0.4cd85","wires":[["Mod_Out1:0"]]},{"id":"Mod_mixer4","type":"AudioMixer4","name":"LFOmodMixB","x":847.5,"y":457.49999713897705,"z":"fd608df0.4cd85","wires":[["Mod_Out2:0"]]},{"id":"Mod_MixerX3","type":"AudioMixerX","name":"LFOmodMixC","inputs":"2","outputs":1,"x":855.3887939453125,"y":631.388955116272,"z":"fd608df0.4cd85","wires":[["Mod_Out3:0"]]},{"id":"b34fca5c.a03b78","type":"AudioEffectEnvelope","name":"VFOenvelope","x":866.9286422729492,"y":476.25000190734863,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX1:1"]]},{"id":"sgtl5000_2","type":"AudioControlSGTL5000","name":"sgtl5000_2","x":986.7460632324219,"y":106.82538795471191,"z":"42bb1923.eaa838","wires":[]},{"id":"NodeArraySynthMain_NoteGen1","type":"NoteGen","name":"NoteGen[16]","x":1015.0000228881836,"y":524.6666450500488,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_MixerX4:0"]]},{"id":"NodeArraySynthMain_sgtl5000_1","type":"AudioControlSGTL5000","name":"sgtl5000_1","x":1028.2460899353027,"y":344.3254165649414,"z":"aa948da6.d8a2b","wires":[]},{"id":"Mod_Out1","type":"TabOutput","name":"LFOmodMixA_Out","comment":"new","x":1049,"y":281,"z":"fd608df0.4cd85","wires":[]},{"id":"Voice_MixerX1","type":"AudioMixerX","name":"VFOenvelopeMix","inputs":"2","outputs":1,"x":1048.8889236450195,"y":437.0000343322754,"z":"fe95d09d.ae21a","wires":[["d478a0e0.8f389:0","4338a901.49d828:0"]]},{"id":"Mod_Out2","type":"TabOutput","name":"LFOmodMixB_Out","comment":"new","x":1055,"y":458,"z":"fd608df0.4cd85","wires":[]},{"id":"Main_Array_NoteGen_notegen","type":"Array","name":"NoteGen notegens {voice01,voice02,voice03,voice04,voice05,voice06,voice07,voice08,voice09,voice10,voice11,voice12,voice13,voice14,voice15,voice16}","x":1059,"y":65,"z":"42bb1923.eaa838","wires":[]},{"id":"Mod_Out3","type":"TabOutput","name":"LFOmodMixC_Out","comment":"new","x":1064,"y":631,"z":"fd608df0.4cd85","wires":[]},{"id":"Main_Voice01","type":"NoteGen","name":"voice01","x":1131.00004196167,"y":144.00000381469727,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:0"]]},{"id":"Main_Voice2","type":"NoteGen","name":"voice02","x":1131.00004196167,"y":194.00000381469727,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:1"]]},{"id":"Main_Voice3","type":"NoteGen","name":"voice03","x":1131.00004196167,"y":242.00000381469727,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:2"]]},{"id":"Main_Voice4","type":"NoteGen","name":"voice04","x":1131.00004196167,"y":290.00000381469727,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:3"]]},{"id":"Main_Voice5","type":"NoteGen","name":"voice05","x":1131.00004196167,"y":338.00000381469727,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:4"]]},{"id":"Main_Voice6","type":"NoteGen","name":"voice06","x":1131.00004196167,"y":386.00000381469727,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:5"]]},{"id":"Main_Voice7","type":"NoteGen","name":"voice07","x":1131.00004196167,"y":434.00000381469727,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:6"]]},{"id":"Main_Voice8","type":"NoteGen","name":"voice08","x":1131.00004196167,"y":482.00000381469727,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:7"]]},{"id":"Main_Voice9","type":"NoteGen","name":"voice09","x":1131.00004196167,"y":530.0000038146973,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:8"]]},{"id":"Main_Voice10","type":"NoteGen","name":"voice10","x":1136.00004196167,"y":578.0000038146973,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:9"]]},{"id":"Main_Voice11","type":"NoteGen","name":"voice11","x":1136.00004196167,"y":626.0000038146973,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:10"]]},{"id":"Main_Voice12","type":"NoteGen","name":"voice12","x":1136.00004196167,"y":674.0000038146973,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:11"]]},{"id":"Main_Voice13","type":"NoteGen","name":"voice13","x":1136.00004196167,"y":722.0000038146973,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:12"]]},{"id":"Main_Voice14","type":"NoteGen","name":"voice14","x":1136.00004196167,"y":770.0000038146973,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:13"]]},{"id":"Main_Voice15","type":"NoteGen","name":"voice15","x":1136.00004196167,"y":818.0000038146973,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:14"]]},{"id":"Main_Voice16","type":"NoteGen","name":"voice16","x":1136.00004196167,"y":866.0000038146973,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:15"]]},{"id":"NodeArraySynthMain_MixerX4","type":"AudioMixerX","name":"MixerX4","inputs":1,"outputs":1,"x":1166.0000228881836,"y":522.6666450500488,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_amp1:0"]]},{"id":"d478a0e0.8f389","type":"AudioFilterStateVariable","name":"VFOfilter","x":1219.1787490844727,"y":490.250036239624,"z":"fe95d09d.ae21a","wires":[["4338a901.49d828:1"],["4338a901.49d828:2"],["4338a901.49d828:3"]]},{"id":"NodeArraySynthMain_amp1","type":"AudioAmplifier","name":"amp1","x":1301.0000228881836,"y":520.6666450500488,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_i2s1:0","NodeArraySynthMain_i2s1:1"]]},{"id":"Main_MixerX1","type":"AudioMixerX","name":"mixFinal","inputs":"16","outputs":1,"x":1382.8889999389648,"y":503.8889331817627,"z":"42bb1923.eaa838","wires":[["Main_amp1:0"]]},{"id":"4338a901.49d828","type":"AudioMixer4","name":"VFOfilterMix","x":1398.1787567138672,"y":472.25002670288086,"z":"fe95d09d.ae21a","wires":[["TabOutput1:0"]]},{"id":"NodeArraySynthMain_i2s1","type":"AudioOutputI2S","name":"i2s1","x":1430.6032943725586,"y":522.0634651184082,"z":"aa948da6.d8a2b","wires":[]},{"id":"Main_amp1","type":"AudioAmplifier","name":"ampFinal","x":1541.1111106872559,"y":503.88891220092773,"z":"42bb1923.eaa838","wires":[["i2s2:0","i2s2:1"]]},{"id":"TabOutput1","type":"TabOutput","name":"Out","x":1543.1786556243896,"y":472.2500286102295,"z":"fe95d09d.ae21a","wires":[]},{"id":"i2s2","type":"AudioOutputI2S","name":"i2s2","x":1696.7143630981445,"y":504.28572845458984,"z":"42bb1923.eaa838","wires":[]}]
+	[{"type":"tab","id":"fe95d09d.ae21a","label":"NoteGen","inputs":3,"outputs":1,"export":true},{"type":"tab","id":"42bb1923.eaa838","label":"SynthMain","inputs":0,"outputs":0,"export":false},{"type":"tab","id":"aa948da6.d8a2b","label":"NodeArraySynthMain","inputs":0,"outputs":0,"export":false},{"type":"tab","id":"fd608df0.4cd85","label":"Mod","inputs":0,"outputs":3,"export":true},{"type":"tab","id":"3ed7083a.3969d8","label":"NodeArraySynthMain2","inputs":0,"outputs":0,"export":true},{"id":"NodeArraySynthMain2_Mod","type":"Mod","name":"mod","x":87,"y":273,"z":"3ed7083a.3969d8","wires":[["NodeArraySynthMain2_NoteGen1:0"],["NodeArraySynthMain2_NoteGen1:1"],["NodeArraySynthMain2_NoteGen1:2"]]},{"id":"TabInput2","type":"TabInput","name":"In VFO A","x":87.17860412597656,"y":245.25000762939453,"z":"fe95d09d.ae21a","wires":[["ce65bb5f.d7cc58:0","43fe3de2.7978d4:0","41187d99.c66374:0","15c08e2f.37ddd2:0"]]},{"id":"2cfd28c8.e191b8","type":"TabInput","name":"In VFO B","x":99.17860412597656,"y":526.25,"z":"fe95d09d.ae21a","wires":[["67dd71d2.cf4b3:0","c2c08e67.ea9a7:0","510ec7e8.d5c6f8:0","fb6380d1.5f9dd:0"]]},{"id":"be2abc30.bdc5f","type":"AudioSynthWaveformDc","name":"LFOpulseModDutyCycle","x":115.50004196166992,"y":195.50000667572021,"z":"42bb1923.eaa838","wires":[["943e965c.dbbc98:1"]]},{"id":"d7cd720b.73f95","type":"TabInput","name":"In VFO filter","x":115.17860412597656,"y":827.2500019073486,"z":"fe95d09d.ae21a","wires":[["d478a0e0.8f389:1"]]},{"id":"30a22eaa.8e3a12","type":"AudioSynthWaveformDc","name":"LFOpulseFilterDutyCycle","x":116.50004196166992,"y":669.0000038146973,"z":"42bb1923.eaa838","wires":[["ee150c54.c830d:1"]]},{"id":"NodeArraySynthMain_dc1","type":"AudioSynthWaveformDc","name":"LFOpulseModDutyCycle","x":130,"y":217.77777099609375,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_waveformMod11:1"]]},{"id":"NodeArraySynthMain_dc2","type":"AudioSynthWaveformDc","name":"LFOpulseFilterDutyCycle","x":131,"y":691.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_waveformMod10:1"]]},{"id":"Mod_dc1","type":"AudioSynthWaveformDc","name":"LFOpulseModDutyCycle","x":167,"y":150,"z":"fd608df0.4cd85","wires":[["Mod_waveformMod11:1"]]},{"id":"Mod_dc2","type":"AudioSynthWaveformDc","name":"LFOpulseFilterDutyCycle","x":168,"y":623.499997138977,"z":"fd608df0.4cd85","wires":[["Mod_waveformMod10:1"]]},{"id":"54aad388.8078cc","type":"AudioSynthWaveformModulated","name":"LFOsawMod","x":210.00004196166992,"y":426.00000381469727,"z":"42bb1923.eaa838","wires":[["Main_MixerX2:0"]]},{"id":"36b02443.0dfa0c","type":"AudioSynthWaveformModulated","name":"LFOsampleholdMod","x":210.00004196166992,"y":461.00000381469727,"z":"42bb1923.eaa838","wires":[["Main_MixerX2:1"]]},{"id":"NodeArraySynthMain_Comment1","type":"Comment","name":"\"kd5rxt-mark\" made the structure that i base this demoflow on","x":221,"y":55,"z":"aa948da6.d8a2b","wires":[]},{"id":"SynthMain_Comment1","type":"Comment","name":"\"kd5rxt-mark\" made the structure that i base this demoflow on","x":221,"y":56,"z":"42bb1923.eaa838","wires":[]},{"id":"NodeArraySynthMain_waveformMod1","type":"AudioSynthWaveformModulated","name":"LFOsawMod","x":224.5,"y":448.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_MixerX1:0"]]},{"id":"NodeArraySynthMain_waveformMod2","type":"AudioSynthWaveformModulated","name":"LFOsampleholdMod","x":224.5,"y":483.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_MixerX1:1"]]},{"id":"NodeArraySynthMain2_Comment1","type":"Comment","name":"\"kd5rxt-mark\" made the structure that i base this demoflow on","x":232.2222137451172,"y":95.55555248260498,"z":"3ed7083a.3969d8","wires":[]},{"id":"NodeArraySynthMain2_NoteGen1","type":"NoteGen","name":"noteGen[16]","x":242.22222900390625,"y":273.22216796875,"z":"3ed7083a.3969d8","wires":[["NodeArraySynthMain2_MixerX1:0"]]},{"id":"Mod_waveformMod1","type":"AudioSynthWaveformModulated","name":"LFOsawMod","x":261.5,"y":380.49999713897705,"z":"fd608df0.4cd85","wires":[["Mod_MixerX1:0"]]},{"id":"Mod_waveformMod2","type":"AudioSynthWaveformModulated","name":"LFOsampleholdMod","x":261.5,"y":415.49999713897705,"z":"fd608df0.4cd85","wires":[["Mod_MixerX1:1"]]},{"id":"NodeArraySynthMain2_vars2","type":"Variables","name":"NoteGen count","comment":"const int NoteGenCount = 16;","x":273,"y":217,"z":"3ed7083a.3969d8","wires":[]},{"id":"ce65bb5f.d7cc58","type":"AudioSynthWaveformModulated","name":"VFOsineA","x":289.17860412597656,"y":184.25000762939453,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX2:0"]]},{"id":"Voice_Comment1","type":"Comment","name":"\"kd5rxt-mark\" made the structure that i base this demoflow on","x":290,"y":109,"z":"fe95d09d.ae21a","wires":[]},{"id":"4b7c8023.9dba8","type":"AudioSynthWaveformModulated","name":"LFOsampleholdFilter","x":294.0000419616699,"y":780.0000038146973,"z":"42bb1923.eaa838","wires":[["Main_MixerX3:1"]]},{"id":"15c08e2f.37ddd2","type":"AudioSynthWaveformModulated","name":"VFOsawA","x":297.17860412597656,"y":286.25000762939453,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX2:3"]]},{"id":"f41b4d41.930de","type":"AudioSynthKarplusStrong","name":"VFOstringA","x":298.17860412597656,"y":320.25000762939453,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX2:4"]]},{"id":"43fe3de2.7978d4","type":"AudioSynthWaveformModulated","name":"VFOsquareA","x":300.17860412597656,"y":218.25000762939453,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX2:1"]]},{"id":"67dd71d2.cf4b3","type":"AudioSynthWaveformModulated","name":"VFOsineB","x":299.17860412597656,"y":482.25000762939453,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX3:0"]]},{"id":"c2c08e67.ea9a7","type":"AudioSynthWaveformModulated","name":"VFOsquareB","x":299.17860412597656,"y":517.2500076293945,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX3:1"]]},{"id":"510ec7e8.d5c6f8","type":"AudioSynthWaveformModulated","name":"VFOtriangleB","x":299.17860412597656,"y":552.2500076293945,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX3:2"]]},{"id":"fb6380d1.5f9dd","type":"AudioSynthWaveformModulated","name":"VFOsawB","x":299.17860412597656,"y":587.2500076293945,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX3:3"]]},{"id":"bd4f842e.87dca8","type":"AudioSynthKarplusStrong","name":"VFOstringB","x":299.17860412597656,"y":622.2500076293945,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX3:4"]]},{"id":"180d8864.797188","type":"AudioSynthNoisePink","name":"VFOpinkA","x":300.1786079406738,"y":387.24999618530273,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX2:6"]]},{"id":"755fb067.71cf9","type":"AudioSynthNoiseWhite","name":"VFOwhiteB","x":299.17860412597656,"y":657.2500076293945,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX3:5"]]},{"id":"84c0f09a.1c809","type":"AudioSynthNoisePink","name":"VFOpinkB","x":299.17860412597656,"y":692.2500076293945,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX3:6"]]},{"id":"7fd9951d.0d807c","type":"AudioSynthToneSweep","name":"VFOsweepB","x":299.17860412597656,"y":727.2500076293945,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX3:7"]]},{"id":"ddde6e78.2ddd1","type":"AudioSynthNoiseWhite","name":"VFOwhiteA","x":302.17860412597656,"y":354.25000762939453,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX2:5"]]},{"id":"41187d99.c66374","type":"AudioSynthWaveformModulated","name":"VFOtriangleA","x":304.17860412597656,"y":252.25000762939453,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX2:2"]]},{"id":"NodeArraySynthMain_waveformMod3","type":"AudioSynthWaveformModulated","name":"LFOsampleholdFilter","x":308.5,"y":802.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_MixerX2:1"]]},{"id":"96cb2aa6.9a9178","type":"AudioSynthToneSweep","name":"VFOsweepA","x":311.17860412597656,"y":420.25000762939453,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX2:7"]]},{"id":"33b47bd4.642a54","type":"AudioSynthWaveformModulated","name":"LFOtriangleFilter","x":314.0000419616699,"y":700.0000038146973,"z":"42bb1923.eaa838","wires":[["eaa54d90.e07e:3"]]},{"id":"69bc4d68.d0ec14","type":"AudioSynthWaveformModulated","name":"LFOsawFilter","x":316.0000419616699,"y":740.0000038146973,"z":"42bb1923.eaa838","wires":[["Main_MixerX3:0"]]},{"id":"9cbdbf6d.b6428","type":"AudioSynthWaveformModulated","name":"LFOtriangleMod","x":320.50004959106445,"y":228.0000057220459,"z":"42bb1923.eaa838","wires":[["250d51b4.6a5f1e:3"]]},{"id":"3229811a.40723e","type":"AudioSynthWaveformModulated","name":"LFOsquareMod","x":321.75004959106445,"y":155.5000057220459,"z":"42bb1923.eaa838","wires":[["250d51b4.6a5f1e:1"]]},{"id":"f024b964.e70ae8","type":"AudioSynthWaveformModulated","name":"LFOsineFilter","x":321.0000419616699,"y":593.0000038146973,"z":"42bb1923.eaa838","wires":[["eaa54d90.e07e:0"]]},{"id":"346af5ea.a399ba","type":"AudioSynthWaveformModulated","name":"LFOsquareFilter","x":321.0000419616699,"y":628.0000038146973,"z":"42bb1923.eaa838","wires":[["eaa54d90.e07e:1"]]},{"id":"ee150c54.c830d","type":"AudioSynthWaveformModulated","name":"LFOpulseFilter","x":321.0000419616699,"y":663.0000038146973,"z":"42bb1923.eaa838","wires":[["eaa54d90.e07e:2"]]},{"id":"943e965c.dbbc98","type":"AudioSynthWaveformModulated","name":"LFOpulseMod","x":323.00004959106445,"y":193.0000057220459,"z":"42bb1923.eaa838","wires":[["250d51b4.6a5f1e:2"]]},{"id":"8820b7d4.ecc168","type":"AudioSynthWaveformModulated","name":"LFOsineMod","x":330.25004959106445,"y":120.75000381469727,"z":"42bb1923.eaa838","wires":[["250d51b4.6a5f1e:0"]]},{"id":"NodeArraySynthMain_waveformMod4","type":"AudioSynthWaveformModulated","name":"LFOtriangleFilter","x":328.5,"y":722.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer2:3"]]},{"id":"NodeArraySynthMain_waveformMod5","type":"AudioSynthWaveformModulated","name":"LFOsawFilter","x":330.5,"y":762.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_MixerX2:0"]]},{"id":"NodeArraySynthMain_waveformMod6","type":"AudioSynthWaveformModulated","name":"LFOtriangleMod","x":335.00000762939453,"y":250.27777004241943,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer1:3"]]},{"id":"NodeArraySynthMain_waveformMod7","type":"AudioSynthWaveformModulated","name":"LFOsquareMod","x":336.25000762939453,"y":177.77777004241943,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer1:1"]]},{"id":"NodeArraySynthMain_waveformMod8","type":"AudioSynthWaveformModulated","name":"LFOsineFilter","x":335.5,"y":615.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer2:0"]]},{"id":"NodeArraySynthMain_waveformMod9","type":"AudioSynthWaveformModulated","name":"LFOsquareFilter","x":335.5,"y":650.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer2:1"]]},{"id":"NodeArraySynthMain_waveformMod10","type":"AudioSynthWaveformModulated","name":"LFOpulseFilter","x":335.5,"y":685.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer2:2"]]},{"id":"NodeArraySynthMain_waveformMod11","type":"AudioSynthWaveformModulated","name":"LFOpulseMod","x":337.50000762939453,"y":215.27777004241943,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer1:2"]]},{"id":"NodeArraySynthMain2_sgtl5000_1","type":"AudioControlSGTL5000","name":"sgtl5000_1","x":339.4682922363281,"y":177.8809356689453,"z":"3ed7083a.3969d8","wires":[]},{"id":"NodeArraySynthMain_waveformMod12","type":"AudioSynthWaveformModulated","name":"LFOsineMod","x":344.75000762939453,"y":143.0277681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer1:0"]]},{"id":"Mod_waveformMod3","type":"AudioSynthWaveformModulated","name":"LFOsampleholdFilter","x":345.5,"y":734.499997138977,"z":"fd608df0.4cd85","wires":[["Mod_MixerX2:1"]]},{"id":"Mod_waveformMod4","type":"AudioSynthWaveformModulated","name":"LFOtriangleFilter","x":365.5,"y":654.499997138977,"z":"fd608df0.4cd85","wires":[["Mod_mixer2:3"]]},{"id":"Mod_waveformMod5","type":"AudioSynthWaveformModulated","name":"LFOsawFilter","x":367.5,"y":694.499997138977,"z":"fd608df0.4cd85","wires":[["Mod_MixerX2:0"]]},{"id":"Mod_waveformMod6","type":"AudioSynthWaveformModulated","name":"LFOtriangleMod","x":372.00000762939453,"y":182.49999904632568,"z":"fd608df0.4cd85","wires":[["Mod_mixer1:3"]]},{"id":"Mod_waveformMod7","type":"AudioSynthWaveformModulated","name":"LFOsquareMod","x":373.25000762939453,"y":109.99999904632568,"z":"fd608df0.4cd85","wires":[["Mod_mixer1:1"]]},{"id":"Mod_waveformMod8","type":"AudioSynthWaveformModulated","name":"LFOsineFilter","x":372.5,"y":547.499997138977,"z":"fd608df0.4cd85","wires":[["Mod_mixer2:0"]]},{"id":"Mod_waveformMod9","type":"AudioSynthWaveformModulated","name":"LFOsquareFilter","x":372.5,"y":582.499997138977,"z":"fd608df0.4cd85","wires":[["Mod_mixer2:1"]]},{"id":"Mod_waveformMod10","type":"AudioSynthWaveformModulated","name":"LFOpulseFilter","x":372.5,"y":617.499997138977,"z":"fd608df0.4cd85","wires":[["Mod_mixer2:2"]]},{"id":"Mod_waveformMod11","type":"AudioSynthWaveformModulated","name":"LFOpulseMod","x":374.50000762939453,"y":147.49999904632568,"z":"fd608df0.4cd85","wires":[["Mod_mixer1:2"]]},{"id":"Mod_waveformMod12","type":"AudioSynthWaveformModulated","name":"LFOsineMod","x":381.75000762939453,"y":75.24999713897705,"z":"fd608df0.4cd85","wires":[["Mod_mixer1:0"]]},{"id":"NodeArraySynthMain2_MixerX1","type":"AudioMixerX","name":"mixFinal","inputs":1,"outputs":1,"x":393.22222900390625,"y":271.22216796875,"z":"3ed7083a.3969d8","wires":[["NodeArraySynthMain2_amp1:0"]]},{"id":"Main_MixerX2","type":"AudioMixerX","name":"LFOmodMix2","inputs":"2","outputs":1,"x":462.8888702392578,"y":439.88890743255615,"z":"42bb1923.eaa838","wires":[["72ed2133.b8b3b:1","1690539d.d4e1dc:1"]]},{"id":"fde8d778.1affb8","type":"AudioSynthWaveformDc","name":"VFOtuningA","x":469.0000419616699,"y":276.00000381469727,"z":"42bb1923.eaa838","wires":[["72ed2133.b8b3b:2"]]},{"id":"NodeArraySynthMain_MixerX1","type":"AudioMixerX","name":"LFOmodMix2","inputs":"2","outputs":1,"x":477.3888282775879,"y":462.1666717529297,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer3:1","NodeArraySynthMain_mixer4:1"]]},{"id":"64e9d27c.c260fc","type":"AudioSynthWaveformDc","name":"VFOtuningB","x":478.0000419616699,"y":511.00000381469727,"z":"42bb1923.eaa838","wires":[["1690539d.d4e1dc:2"]]},{"id":"NodeArraySynthMain_dc3","type":"AudioSynthWaveformDc","name":"VFOtuningA","x":483.5,"y":298.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer3:2"]]},{"id":"98234b8c.f770f8","type":"AudioSynthWaveformDc","name":"PBend","x":492.0000419616699,"y":361.00000381469727,"z":"42bb1923.eaa838","wires":[["72ed2133.b8b3b:3","1690539d.d4e1dc:3"]]},{"id":"NodeArraySynthMain_dc4","type":"AudioSynthWaveformDc","name":"VFOtuningB","x":492.5,"y":533.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer4:2"]]},{"id":"NodeArraySynthMain_dc5","type":"AudioSynthWaveformDc","name":"PBend","x":506.5,"y":383.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer3:3","NodeArraySynthMain_mixer4:3"]]},{"id":"Mod_MixerX1","type":"AudioMixerX","name":"LFOmodMix2","inputs":"2","outputs":1,"x":514.3888282775879,"y":394.38890075683594,"z":"fd608df0.4cd85","wires":[["Mod_mixer3:1","Mod_mixer4:1"]]},{"id":"250d51b4.6a5f1e","type":"AudioMixer4","name":"LFOmodMix1","x":517.5000495910645,"y":175.00000762939453,"z":"42bb1923.eaa838","wires":[["72ed2133.b8b3b:0","1690539d.d4e1dc:0"]]},{"id":"Voice_MixerX2","type":"AudioMixerX","name":"waveMixA","inputs":"8","outputs":1,"comment":"","x":519.8888854980469,"y":284.00001525878906,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX4:0"]]},{"id":"Mod_dc3","type":"AudioSynthWaveformDc","name":"VFOtuningA","x":520.5,"y":230.49999713897705,"z":"fd608df0.4cd85","wires":[["Mod_mixer3:2"]]},{"id":"Voice_MixerX3","type":"AudioMixerX","name":"waveMixB","inputs":"8","outputs":1,"x":525.8887901306152,"y":589.0000076293945,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX4:1"]]},{"id":"NodeArraySynthMain2_amp1","type":"AudioAmplifier","name":"ampFinal","x":528.2222290039062,"y":269.22216796875,"z":"3ed7083a.3969d8","wires":[["NodeArraySynthMain2_i2s1:0","NodeArraySynthMain2_i2s1:1"]]},{"id":"Mod_dc4","type":"AudioSynthWaveformDc","name":"VFOtuningB","x":529.5,"y":465.49999713897705,"z":"fd608df0.4cd85","wires":[["Mod_mixer4:2"]]},{"id":"NodeArraySynthMain_mixer1","type":"AudioMixer4","name":"LFOmodMix1","x":532.0000076293945,"y":197.27777194976807,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_mixer3:0","NodeArraySynthMain_mixer4:0"]]},{"id":"Mod_dc5","type":"AudioSynthWaveformDc","name":"PBend","x":543.5,"y":315.49999713897705,"z":"fd608df0.4cd85","wires":[["Mod_mixer3:3","Mod_mixer4:3"]]},{"id":"Main_MixerX3","type":"AudioMixerX","name":"LFOfilterMixB","inputs":"2","outputs":1,"x":549.888801574707,"y":765.889009475708,"z":"42bb1923.eaa838","wires":[["Main_MixerX4:1"]]},{"id":"eaa54d90.e07e","type":"AudioMixer4","name":"LFOfilterMixA","x":554.0000419616699,"y":646.0000038146973,"z":"42bb1923.eaa838","wires":[["Main_MixerX4:0"]]},{"id":"NodeArraySynthMain_MixerX2","type":"AudioMixerX","name":"LFOfilterMixB","inputs":"2","outputs":1,"x":564.3887596130371,"y":788.1667737960815,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_MixerX3:1"]]},{"id":"Mod_mixer1","type":"AudioMixer4","name":"LFOmodMix1","x":569.0000076293945,"y":129.50000095367432,"z":"fd608df0.4cd85","wires":[["Mod_mixer3:0","Mod_mixer4:0"]]},{"id":"NodeArraySynthMain_mixer2","type":"AudioMixer4","name":"LFOfilterMixA","x":568.5,"y":668.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_MixerX3:0"]]},{"id":"Mod_MixerX2","type":"AudioMixerX","name":"LFOfilterMixB","inputs":"2","outputs":1,"x":601.3887596130371,"y":720.3890027999878,"z":"fd608df0.4cd85","wires":[["Mod_MixerX3:1"]]},{"id":"Mod_mixer2","type":"AudioMixer4","name":"LFOfilterMixA","x":605.5,"y":600.499997138977,"z":"fd608df0.4cd85","wires":[["Mod_MixerX3:0"]]},{"id":"NodeArraySynthMain2_code1","type":"Function","name":"begin function","comment":"void begin()\n{\n   mod.begin();\n   for (int i = 0; i < NoteGenCount ; i++)\n   {\n       noteGen[i].begin();\n       mixFinal.gain(i, 1.0/NoteGenCount );\n   }\n}","x":614,"y":95,"z":"3ed7083a.3969d8","wires":[]},{"id":"NodeArraySynthMain2_code2","type":"Function","name":"noteOn/Off sustainOn/Off","comment":"\nvoid noteOn(byte note, byte velocity)\n{\n    //digitalWrite(NOTE_PRESSED_STATE_LED, HIGH);\n    for (int i = 0; i < NoteGenCount ; i++) \n    {\n        if (noteGen[i].note == note) // first check if the note was played recently\n        {\n            noteGen[i].noteOn(note, velocity);\n            //digitalWrite(NOTE_OVERFLOWN_LED, LOW);\n            return; \n        }\n    }\n    for (int i = 0; i < NoteGenCount ; i++) // second see if there is any free \"spot\"\n    {\n        if (noteGen[i].isNotPlaying())\n        {\n            noteGen[i].noteOn(note, velocity);\n            //digitalWrite(NOTE_OVERFLOWN_LED, LOW);\n            return;\n        }\n    }\n    //digitalWrite(NOTE_OVERFLOWN_LED, HIGH);\n}\nvoid noteOff(byte note, byte velocity)\n{\n    //digitalWrite(NOTE_PRESSED_STATE_LED, LOW);\n    for (int i = 0; i < NoteGenCount ; i++)\n    {\n        if (noteGen[i].note == note)\n        {\n            noteGen[i].noteOff(velocity);\n            return;\n        }\n    }\n}\nvoid activateSustain()\n{\n    for (int i = 0; i < NoteGenCount ; i++)\n    {\n        noteGen[i].isSustain = 1;\n    }\n}\nvoid deactivateSustain()\n{\n    for (int i = 0; i < NoteGenCount ; i++)\n    {\n        noteGen[i].isSustain = 0;\n        if (!noteGen[i].isNoteOn)\n            noteGen[i].noteOff(0);\n    }\n}","x":631,"y":161,"z":"3ed7083a.3969d8","wires":[]},{"id":"NodeArraySynthMain2_i2s1","type":"AudioOutputI2S","name":"i2s_3","x":666.8255004882812,"y":269.6189880371094,"z":"3ed7083a.3969d8","wires":[]},{"id":"NoteGen_vars2","type":"Variables","name":"noteFreqs var","comment":"static const PROGMEM float noteFreqs[128] = {8.176, 8.662, 9.177, 9.723, 10.301, 10.913, 11.562, 12.25, 12.978, 13.75, 14.568, 15.434, 16.352, 17.324, 18.354, 19.445, 20.602, 21.827, 23.125, 24.5, 25.957, 27.5, 29.135, 30.868, 32.703, 34.648, 36.708, 38.891, 41.203, 43.654, 46.249, 48.999, 51.913, 55, 58.27, 61.735, 65.406, 69.296, 73.416, 77.782, 82.407, 87.307, 92.499, 97.999, 103.826, 110, 116.541, 123.471, 130.813, 138.591, 146.832, 155.563, 164.814, 174.614, 184.997, 195.998, 207.652, 220, 233.082, 246.942, 261.626, 277.183, 293.665, 311.127, 329.628, 349.228, 369.994, 391.995, 415.305, 440, 466.164, 493.883, 523.251, 554.365, 587.33, 622.254, 659.255, 698.456, 739.989, 783.991, 830.609, 880, 932.328, 987.767, 1046.502, 1108.731, 1174.659, 1244.508, 1318.51, 1396.913, 1479.978, 1567.982, 1661.219, 1760, 1864.655, 1975.533, 2093.005, 2217.461, 2349.318, 2489.016, 2637.02, 2793.826, 2959.955, 3135.963, 3322.438, 3520, 3729.31, 3951.066, 4186.009, 4434.922, 4698.636, 4978.032, 5274.041, 5587.652, 5919.911, 6271.927, 6644.875, 7040, 7458.62, 7902.133, 8372.018, 8869.844, 9397.273, 9956.063, 10548.08, 11175.3, 11839.82, 12543.85};","x":693,"y":112,"z":"fe95d09d.ae21a","wires":[]},{"id":"Voice_MixerX4","type":"AudioMixerX","name":"waveMixAB","inputs":"2","outputs":1,"x":694.8888931274414,"y":433.0000400543213,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX1:0","b34fca5c.a03b78:0"]]},{"id":"NoteGen_vars1","type":"Variables","name":"vars","comment":"byte note = 0;\nbyte isNoteOn = 0;\nbyte isSustain = 0;\nfloat newAmp = 0.0;\nbyte oscApitchMult = 64; // set at middle\nbyte oscBpitchMult = 64; // set at middle\nbyte oscCpitchMult = 64; // set at middle\nbyte oscDpitchMult = 64; // set at middle\n","x":700,"y":162,"z":"fe95d09d.ae21a","wires":[]},{"id":"72ed2133.b8b3b","type":"AudioMixer4","name":"LFOmodMixA","x":787.0000419616699,"y":327.00000381469727,"z":"42bb1923.eaa838","wires":[["Main_Voice01:0","Main_Voice2:0","Main_Voice3:0","Main_Voice4:0","Main_Voice5:0","Main_Voice6:0","Main_Voice7:0","Main_Voice8:0","Main_Voice9:0","Main_Voice10:0","Main_Voice11:0","Main_Voice12:0","Main_Voice13:0","Main_Voice14:0","Main_Voice15:0","Main_Voice16:0"]]},{"id":"1690539d.d4e1dc","type":"AudioMixer4","name":"LFOmodMixB","x":796.0000419616699,"y":503.00000381469727,"z":"42bb1923.eaa838","wires":[["Main_Voice01:1","Main_Voice2:1","Main_Voice3:1","Main_Voice4:1","Main_Voice5:1","Main_Voice6:1","Main_Voice7:1","Main_Voice8:1","Main_Voice9:1","Main_Voice10:1","Main_Voice11:1","Main_Voice12:1","Main_Voice13:1","Main_Voice14:1","Main_Voice15:1","Main_Voice16:1"]]},{"id":"NodeArraySynthMain_mixer3","type":"AudioMixer4","name":"LFOmodMixA","x":801.5,"y":349.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_NoteGen1:0"]]},{"id":"Main_MixerX4","type":"AudioMixerX","name":"LFOmodMixC","inputs":"2","outputs":1,"x":803.8888359069824,"y":676.8889617919922,"z":"42bb1923.eaa838","wires":[["Main_Voice01:2","Main_Voice2:2","Main_Voice3:2","Main_Voice4:2","Main_Voice5:2","Main_Voice6:2","Main_Voice7:2","Main_Voice8:2","Main_Voice9:2","Main_Voice10:2","Main_Voice11:2","Main_Voice12:2","Main_Voice13:2","Main_Voice14:2","Main_Voice15:2","Main_Voice16:2"]]},{"id":"NodeArraySynthMain_mixer4","type":"AudioMixer4","name":"LFOmodMixB","x":810.5,"y":525.2777681350708,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_NoteGen1:1"]]},{"id":"NodeArraySynthMain_MixerX3","type":"AudioMixerX","name":"LFOmodMixC","inputs":"2","outputs":1,"x":818.3887939453125,"y":699.1667261123657,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_NoteGen1:2"]]},{"id":"Mod_mixer3","type":"AudioMixer4","name":"LFOmodMixA","x":838.5,"y":281.49999713897705,"z":"fd608df0.4cd85","wires":[["Mod_Out1:0"]]},{"id":"Mod_mixer4","type":"AudioMixer4","name":"LFOmodMixB","x":847.5,"y":457.49999713897705,"z":"fd608df0.4cd85","wires":[["Mod_Out2:0"]]},{"id":"Mod_MixerX3","type":"AudioMixerX","name":"LFOmodMixC","inputs":"2","outputs":1,"x":855.3887939453125,"y":631.388955116272,"z":"fd608df0.4cd85","wires":[["Mod_Out3:0"]]},{"id":"b34fca5c.a03b78","type":"AudioEffectEnvelope","name":"VFOenvelope","x":866.9286422729492,"y":476.25000190734863,"z":"fe95d09d.ae21a","wires":[["Voice_MixerX1:1"]]},{"id":"NoteGen_Function1","type":"Function","name":"begin function","comment":"/**\n * this function inits the notegen\n */\nvoid begin()\n{\n    // init A part\n    VFOsineA.begin(WAVEFORM_SINE);\n    VFOsquareA.begin(WAVEFORM_SQUARE);\n    VFOtriabgleA.begin(WAVEFORM_TRIANGLE);\n    VFOsawA.begin(WAVEFORM_SAWTOOTH);\n    VFOstringA.noteOff(0);\n    VFOwhiteA.amplitude(0);\n    VFOpinkA.amplitude(0);\n    // init B part\n    VFOsineB.begin(WAVEFORM_SINE);\n    VFOsquareB.begin(WAVEFORM_SQUARE);\n    VFOtriabgleB.begin(WAVEFORM_TRIANGLE);\n    VFOsawB.begin(WAVEFORM_SAWTOOTH);\n    VFOstringB.noteOff(0);\n    VFOwhiteB.amplitude(0);\n    VFOpinkB.amplitude(0);\n    for (int i = 0; i < 8; i++)\n    {\n        waveMixA.gain(i, 0.125);\n        waveMixB.gain(i, 0.125);\n    }\n    waveMixAB.gain(0, 0.5);\n    waveMixAB.gain(1, 0.5);\n    for (int i = 0; i < 4; i++)\n    {\n        VFOfilterMix.gain(i, 0.25);\n    }\n}","x":872,"y":115,"z":"fe95d09d.ae21a","wires":[]},{"id":"NoteGen_Function2","type":"Function","name":"noteOn noteOff","comment":"void noteOn(byte Note, byte velocity)\n{\n    note = Note;\n    isNoteOn = 1;\n\n    newAmp = (float)velocity*(1.0f / 127.0f);\n      \n    VFOsineA.frequency(GetBendedFreq(oscApitchMult));\n    VFOsquareA.frequency(GetBendedFreq(oscBpitchMult));\n    VFOtriangleA.frequency(GetBendedFreq(oscCpitchMult));\n    VFOsawA.frequency(GetBendedFreq(oscDpitchMult));\n\n    VFOsineA.amplitude(newAmp);\n    VFOsquareA.amplitude(newAmp);\n    VFOtriangleA.amplitude(newAmp);\n    VFOsawA.amplitude(newAmp);\n\n    VFOenvelope.noteOn();\n}\nvoid noteOff(byte velocity)\n{\n    isNoteOn = 0;\n    if (!isSustain)\n    {\n        VFOenvelope.noteOff();\n    }\n}\nbool isNotPlaying()\n{\n    if (!env.isActive())\n        return true;\n    else\n        return false;\n}\nfloat GetBendedFreq(byte pitchMult)\n{\n    if (pitchMult < 64)\n        return noteFreqs[note - 12*(64-pitchMult)];\n    else if (pitchMult > 64)\n        return noteFreqs[note + 12*(pitchMult-64)];\n    else\n        return noteFreqs[note];\n}","x":872,"y":163,"z":"fe95d09d.ae21a","wires":[]},{"id":"Mod_code1","type":"Function","name":"begin function","comment":"void begin()\n{\n\n}","x":879,"y":108,"z":"fd608df0.4cd85","wires":[]},{"id":"sgtl5000_2","type":"AudioControlSGTL5000","name":"sgtl5000_2","x":986.7460632324219,"y":106.82538795471191,"z":"42bb1923.eaa838","wires":[]},{"id":"NodeArraySynthMain_NoteGen1","type":"NoteGen","name":"NoteGen[16]","x":1015.0000228881836,"y":524.6666450500488,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_MixerX4:0"]]},{"id":"NodeArraySynthMain_sgtl5000_1","type":"AudioControlSGTL5000","name":"sgtl5000_1","x":1028.2460899353027,"y":344.3254165649414,"z":"aa948da6.d8a2b","wires":[]},{"id":"Mod_Out1","type":"TabOutput","name":"LFOmodMixA_Out","comment":"new","x":1049,"y":281,"z":"fd608df0.4cd85","wires":[]},{"id":"Voice_MixerX1","type":"AudioMixerX","name":"VFOenvelopeMix","inputs":"2","outputs":1,"x":1048.8889236450195,"y":437.0000343322754,"z":"fe95d09d.ae21a","wires":[["d478a0e0.8f389:0","4338a901.49d828:0"]]},{"id":"Mod_Out2","type":"TabOutput","name":"LFOmodMixB_Out","comment":"new","x":1055,"y":458,"z":"fd608df0.4cd85","wires":[]},{"id":"Main_Array_NoteGen_notegen","type":"Array","name":"NoteGen notegens {voice01,voice02,voice03,voice04,voice05,voice06,voice07,voice08,voice09,voice10,voice11,voice12,voice13,voice14,voice15,voice16}","x":1059,"y":65,"z":"42bb1923.eaa838","wires":[]},{"id":"Mod_Out3","type":"TabOutput","name":"LFOmodMixC_Out","comment":"new","x":1064,"y":631,"z":"fd608df0.4cd85","wires":[]},{"id":"Main_Voice01","type":"NoteGen","name":"voice01","x":1131.00004196167,"y":144.00000381469727,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:0"]]},{"id":"Main_Voice2","type":"NoteGen","name":"voice02","x":1131.00004196167,"y":194.00000381469727,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:1"]]},{"id":"Main_Voice3","type":"NoteGen","name":"voice03","x":1131.00004196167,"y":242.00000381469727,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:2"]]},{"id":"Main_Voice4","type":"NoteGen","name":"voice04","x":1131.00004196167,"y":290.00000381469727,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:3"]]},{"id":"Main_Voice5","type":"NoteGen","name":"voice05","x":1131.00004196167,"y":338.00000381469727,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:4"]]},{"id":"Main_Voice6","type":"NoteGen","name":"voice06","x":1131.00004196167,"y":386.00000381469727,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:5"]]},{"id":"Main_Voice7","type":"NoteGen","name":"voice07","x":1131.00004196167,"y":434.00000381469727,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:6"]]},{"id":"Main_Voice8","type":"NoteGen","name":"voice08","x":1131.00004196167,"y":482.00000381469727,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:7"]]},{"id":"Main_Voice9","type":"NoteGen","name":"voice09","x":1131.00004196167,"y":530.0000038146973,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:8"]]},{"id":"Main_Voice10","type":"NoteGen","name":"voice10","x":1136.00004196167,"y":578.0000038146973,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:9"]]},{"id":"Main_Voice11","type":"NoteGen","name":"voice11","x":1136.00004196167,"y":626.0000038146973,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:10"]]},{"id":"Main_Voice12","type":"NoteGen","name":"voice12","x":1136.00004196167,"y":674.0000038146973,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:11"]]},{"id":"Main_Voice13","type":"NoteGen","name":"voice13","x":1136.00004196167,"y":722.0000038146973,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:12"]]},{"id":"Main_Voice14","type":"NoteGen","name":"voice14","x":1136.00004196167,"y":770.0000038146973,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:13"]]},{"id":"Main_Voice15","type":"NoteGen","name":"voice15","x":1136.00004196167,"y":818.0000038146973,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:14"]]},{"id":"Main_Voice16","type":"NoteGen","name":"voice16","x":1136.00004196167,"y":866.0000038146973,"z":"42bb1923.eaa838","wires":[["Main_MixerX1:15"]]},{"id":"NodeArraySynthMain_MixerX4","type":"AudioMixerX","name":"MixerX4","inputs":1,"outputs":1,"x":1166.0000228881836,"y":522.6666450500488,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_amp1:0"]]},{"id":"d478a0e0.8f389","type":"AudioFilterStateVariable","name":"VFOfilter","x":1219.1787490844727,"y":490.250036239624,"z":"fe95d09d.ae21a","wires":[["4338a901.49d828:1"],["4338a901.49d828:2"],["4338a901.49d828:3"]]},{"id":"NodeArraySynthMain_amp1","type":"AudioAmplifier","name":"amp1","x":1301.0000228881836,"y":520.6666450500488,"z":"aa948da6.d8a2b","wires":[["NodeArraySynthMain_i2s1:0","NodeArraySynthMain_i2s1:1"]]},{"id":"Main_MixerX1","type":"AudioMixerX","name":"mixFinal","inputs":"16","outputs":1,"x":1382.8889999389648,"y":503.8889331817627,"z":"42bb1923.eaa838","wires":[["Main_amp1:0"]]},{"id":"4338a901.49d828","type":"AudioMixer4","name":"VFOfilterMix","x":1398.1787567138672,"y":472.25002670288086,"z":"fe95d09d.ae21a","wires":[["TabOutput1:0"]]},{"id":"NodeArraySynthMain_i2s1","type":"AudioOutputI2S","name":"i2s_2","x":1430.6032943725586,"y":522.0634651184082,"z":"aa948da6.d8a2b","wires":[]},{"id":"Main_amp1","type":"AudioAmplifier","name":"ampFinal","x":1541.1111106872559,"y":503.88891220092773,"z":"42bb1923.eaa838","wires":[["i2s2:0","i2s2:1"]]},{"id":"TabOutput1","type":"TabOutput","name":"Out","x":1543.1786556243896,"y":472.2500286102295,"z":"fe95d09d.ae21a","wires":[]},{"id":"i2s2","type":"AudioOutputI2S","name":"i2s_1","x":1696.7143630981445,"y":504.28572845458984,"z":"42bb1923.eaa838","wires":[]}]
 
 </script>
 
@@ -495,100 +495,102 @@ span.mainfunction {color: #993300; font-weight: bolder}
 
 <script  type="text/x-red" data-container-name="NodeDefinitions">
 	{"nodes":[
-		{"type":"TabOutput","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":"new"}},"shortName":"Out","inputs":1,"outputs":0,"category":"tabs-function","color":"#cce6ff","icon":"arrow-in.png"}},
-		{"type":"TabInput","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":"new"}},"shortName":"In","inputs":0,"outputs":1,"category":"tabs-function","color":"#cce6ff","icon":"arrow-in.png", "align":"right"}},
-		{"type":"Array","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"}},"shortName":"Array","inputs":0,"outputs":0,"category":"tabs-function","color":"#aaffdd","icon":"range.png"}},
+		{"type":"TabOutput","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":""}},"shortName":"Out","inputs":1,"outputs":0,"category":"tabs-function","color":"#cce6ff","icon":"arrow-in.png"}},
+		{"type":"TabInput","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":""}},"shortName":"In","inputs":0,"outputs":1,"category":"tabs-function","color":"#cce6ff","icon":"arrow-in.png", "align":"right"}},
+		{"type":"Array","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":""}},"shortName":"Array","inputs":0,"outputs":0,"category":"tabs-function","color":"#aaffdd","icon":"range.png"}},
 		{"type":"AudioMixerX","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"inputs":{"value":"1"},"outputs":{"value":"1"},"comment":{"value":"new"}},"shortName":"MixerX","inputs":1,"outputs":1,"category":"mixer-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"ClassComment","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"}},"shortName":"ClassComment","inputs":0,"outputs":0,"category":"tabs-function","color":"#ccffcc","icon":"comment.png"}},
 		{"type":"Comment","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":""}},"shortName":"Comment","inputs":0,"outputs":0,"category":"tabs-function","color":"#ddffbb","icon":"comment.png"}},
+		{"type":"Function","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":""}},"shortName":"code","inputs":0,"outputs":0,"category":"tabs-function","color":"#ddffbb","icon":"function.png"}},
+		{"type":"Variables","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":""}},"shortName":"vars","inputs":0,"outputs":0,"category":"tabs-function","color":"#ddffbb","icon":"function.png"}},
 
-		{"type":"AudioInputI2S","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioInputI2SQuad","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_quad","inputs":0,"outputs":4,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioInputI2SHex","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_hex","inputs":0,"outputs":6,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioInputI2SOct","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_oct","inputs":0,"outputs":8,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioInputI2Sslave","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2sslave","inputs":0,"outputs":2,"category":"input-function","color":"#F7D8F0","icon":"arrow-in.png"}},
-		{"type":"AudioInputI2S2","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s2","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioInputSPDIF3","data":{"defaults":{"name":{"value":"new"}},"shortName":"spdif3","inputs":0,"outputs":2,"category":"input-function","color":"#F7D8F0","icon":"arrow-in.png"}},
-		{"type":"AsyncAudioInputSPDIF3","data":{"defaults":{"name":{"value":"new"}},"shortName":"spdif_async","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioInputAnalog","data":{"defaults":{"name":{"value":"new"}},"shortName":"adc","inputs":0,"outputs":1,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioInputAnalogStereo","data":{"defaults":{"name":{"value":"new"}},"shortName":"adcs","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioInputPDM","data":{"defaults":{"name":{"value":"new"}},"shortName":"pdm","inputs":0,"outputs":1,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioInputTDM","data":{"defaults":{"name":{"value":"new"}},"shortName":"tdm","inputs":0,"outputs":16,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioInputTDM2","data":{"defaults":{"name":{"value":"new"}},"shortName":"tdm2","inputs":0,"outputs":16,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioInputUSB","data":{"defaults":{"name":{"value":"new"}},"shortName":"usb","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputI2S","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"i2s","inputs":0,"outputs":2,"category":"input-i2s1-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputI2SQuad","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"i2s_quad","inputs":0,"outputs":4,"category":"input-i2s1-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputI2SHex","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"i2s_hex","inputs":0,"outputs":6,"category":"input-i2s1-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputI2SOct","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"i2s_oct","inputs":0,"outputs":8,"category":"input-i2s1-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputI2Sslave","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"i2sslave","inputs":0,"outputs":2,"category":"input-i2s1-function","color":"#F7D8F0","icon":"arrow-in.png"}},
+		{"type":"AudioInputI2S2","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"i2s2","inputs":0,"outputs":2,"category":"input-i2s2-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputSPDIF3","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"spdif3","inputs":0,"outputs":2,"category":"input-spdif-function","color":"#F7D8F0","icon":"arrow-in.png"}},
+		{"type":"AsyncAudioInputSPDIF3","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"spdif_async","inputs":0,"outputs":2,"category":"input-spdif-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputAnalog","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"adc","inputs":0,"outputs":1,"category":"input-adc-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputAnalogStereo","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"adcs","inputs":0,"outputs":2,"category":"input-adc-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputPDM","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"pdm","inputs":0,"outputs":1,"category":"input-other-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputTDM","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"tdm","inputs":0,"outputs":16,"category":"input-i2s1-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputTDM2","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"tdm2","inputs":0,"outputs":16,"category":"input-i2s2-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputUSB","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"usb","inputs":0,"outputs":2,"category":"input-other-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 
-		{"type":"AudioOutputI2S","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioOutputI2SQuad","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_quad","inputs":4,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioOutputI2SHex","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_hex","inputs":6,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioOutputI2SOct","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_oct","inputs":8,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioOutputI2Sslave","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2sslave","inputs":2,"outputs":0,"category":"output-function","color":"#F7D8F0","icon":"arrow-in.png"}},
-		{"type":"AudioOutputI2S2","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s2","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioOutputSPDIF","data":{"defaults":{"name":{"value":"new"}},"shortName":"spdif","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioOutputSPDIF2","data":{"defaults":{"name":{"value":"new"}},"shortName":"spdif2","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioOutputSPDIF3","data":{"defaults":{"name":{"value":"new"}},"shortName":"spdif3","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioOutputPT8211","data":{"defaults":{"name":{"value":"new"}},"shortName":"pt8211","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioOutputPT8211_2","data":{"defaults":{"name":{"value":"new"}},"shortName":"pt8211_2","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioOutputAnalog","data":{"defaults":{"name":{"value":"new"}},"shortName":"dac","inputs":1,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioOutputAnalogStereo","data":{"defaults":{"name":{"value":"new"}},"shortName":"dacs","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioOutputPWM","data":{"defaults":{"name":{"value":"new"}},"shortName":"pwm","inputs":1,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioOutputMQS","data":{"defaults":{"name":{"value":"new"}},"shortName":"mqs","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioOutputTDM","data":{"defaults":{"name":{"value":"new"}},"shortName":"tdm","inputs":16,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioOutputTDM2","data":{"defaults":{"name":{"value":"new"}},"shortName":"tdm2","inputs":16,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioOutputADAT","data":{"defaults":{"name":{"value":"new"}},"shortName":"adat","inputs":8,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioOutputUSB","data":{"defaults":{"name":{"value":"new"}},"shortName":"usb","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputI2S","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"i2s","inputs":2,"outputs":0,"category":"output-i2s1-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputI2SQuad","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"i2s_quad","inputs":4,"outputs":0,"category":"output-i2s1-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputI2SHex","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"i2s_hex","inputs":6,"outputs":0,"category":"output-i2s1-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputI2SOct","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"i2s_oct","inputs":8,"outputs":0,"category":"output-i2s1-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputI2Sslave","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"i2sslave","inputs":2,"outputs":0,"category":"output-i2s1-function","color":"#F7D8F0","icon":"arrow-in.png"}},
+		{"type":"AudioOutputI2S2","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"i2s2","inputs":2,"outputs":0,"category":"output-i2s2-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputSPDIF","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"spdif","inputs":2,"outputs":0,"category":"output-i2s1-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputSPDIF2","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"spdif2","inputs":2,"outputs":0,"category":"output-i2s2-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputSPDIF3","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"spdif3","inputs":2,"outputs":0,"category":"output-spdif-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputPT8211","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"pt8211","inputs":2,"outputs":0,"category":"output-i2s1-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputPT8211_2","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"pt8211_2","inputs":2,"outputs":0,"category":"output-i2s2-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputAnalog","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"dac","inputs":1,"outputs":0,"category":"output-adc-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputAnalogStereo","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"dacs","inputs":2,"outputs":0,"category":"output-adc-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputPWM","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"pwm","inputs":1,"outputs":0,"category":"output-other-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputMQS","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"mqs","inputs":2,"outputs":0,"category":"output-other-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputTDM","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"tdm","inputs":16,"outputs":0,"category":"output-i2s1-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputTDM2","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"tdm2","inputs":16,"outputs":0,"category":"output-i2s2-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputADAT","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"adat","inputs":8,"outputs":0,"category":"output-other-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputUSB","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"usb","inputs":2,"outputs":0,"category":"output-other-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 
-		{"type":"AudioAmplifier","data":{"defaults":{"name":{"value":"new"}},"shortName":"amp","inputs":1,"outputs":1,"category":"mixer-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioMixer4","data":{"defaults":{"name":{"value":"new"}},"shortName":"mixer","inputs":4,"outputs":1,"category":"mixer-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioPlayMemory","data":{"defaults":{"name":{"value":"new"}},"shortName":"playMem","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioPlaySdWav","data":{"defaults":{"name":{"value":"new"}},"shortName":"playSdWav","inputs":0,"outputs":2,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioPlaySdRaw","data":{"defaults":{"name":{"value":"new"}},"shortName":"playSdRaw","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioPlaySerialflashRaw","data":{"defaults":{"name":{"value":"new"}},"shortName":"playFlashRaw","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioPlayQueue","data":{"defaults":{"name":{"value":"new"}},"shortName":"queue","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioRecordQueue","data":{"defaults":{"name":{"value":"new"}},"shortName":"queue","inputs":1,"outputs":0,"category":"record-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioSynthWavetable","data":{"defaults":{"name":{"value":"new"}},"shortName":"wavetable","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioSynthSimpleDrum","data":{"defaults":{"name":{"value":"new"}},"shortName":"drum","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioSynthKarplusStrong","data":{"defaults":{"name":{"value":"new"}},"shortName":"string","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioSynthWaveformSine","data":{"defaults":{"name":{"value":"new"}},"shortName":"sine","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioSynthWaveformSineHires","data":{"defaults":{"name":{"value":"new"}},"shortName":"sine_hires","inputs":0,"outputs":2,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioSynthWaveformSineModulated","data":{"defaults":{"name":{"value":"new"}},"shortName":"sine_fm","inputs":1,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioSynthWaveform","data":{"defaults":{"name":{"value":"new"}},"shortName":"waveform","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioSynthWaveformModulated","data":{"defaults":{"name":{"value":"new"}},"shortName":"waveformMod","inputs":2,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioSynthWaveformPWM","data":{"defaults":{"name":{"value":"new"}},"shortName":"pwm","inputs":1,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioSynthToneSweep","data":{"defaults":{"name":{"value":"new"}},"shortName":"tonesweep","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioSynthWaveformDc","data":{"defaults":{"name":{"value":"new"}},"shortName":"dc","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioSynthNoiseWhite","data":{"defaults":{"name":{"value":"new"}},"shortName":"noise","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioSynthNoisePink","data":{"defaults":{"name":{"value":"new"}},"shortName":"pink","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioEffectFade","data":{"defaults":{"name":{"value":"new"}},"shortName":"fade","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioEffectChorus","data":{"defaults":{"name":{"value":"new"}},"shortName":"chorus","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioEffectFlange","data":{"defaults":{"name":{"value":"new"}},"shortName":"flange","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioEffectReverb","data":{"defaults":{"name":{"value":"new"}},"shortName":"reverb","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioEffectFreeverb","data":{"defaults":{"name":{"value":"new"}},"shortName":"freeverb","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioEffectFreeverbStereo","data":{"defaults":{"name":{"value":"new"}},"shortName":"freeverbs","inputs":1,"outputs":2,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioEffectEnvelope","data":{"defaults":{"name":{"value":"new"}},"shortName":"envelope","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioEffectMultiply","data":{"defaults":{"name":{"value":"new"}},"shortName":"multiply","inputs":2,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioEffectDelay","data":{"defaults":{"name":{"value":"new"}},"shortName":"delay","inputs":1,"outputs":8,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioEffectDelayExternal","data":{"defaults":{"name":{"value":"new"}},"shortName":"delayExt","inputs":1,"outputs":8,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioEffectBitcrusher","data":{"shortName":"bitcrusher","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioEffectMidSide","data":{"shortName":"midside","inputs":2,"outputs":2,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioEffectWaveshaper","data":{"shortName":"waveshape","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioEffectGranular","data":{"shortName":"granular","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioEffectDigitalCombine","data":{"shortName":"combine","inputs":2,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioFilterBiquad","data":{"defaults":{"name":{"value":"new"}},"shortName":"biquad","inputs":1,"outputs":1,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioFilterFIR","data":{"defaults":{"name":{"value":"new"}},"shortName":"fir","inputs":1,"outputs":1,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioFilterStateVariable","data":{"defaults":{"name":{"value":"new"}},"shortName":"filter","inputs":2,"outputs":3,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioAnalyzePeak","data":{"defaults":{"name":{"value":"new"}},"shortName":"peak","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioAnalyzeRMS","data":{"defaults":{"name":{"value":"new"}},"shortName":"rms","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioAnalyzeFFT256","data":{"defaults":{"name":{"value":"new"}},"shortName":"fft256","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioAnalyzeFFT1024","data":{"defaults":{"name":{"value":"new"}},"shortName":"fft1024","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioAnalyzeToneDetect","data":{"defaults":{"name":{"value":"new"}},"shortName":"tone","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioAnalyzeNoteFrequency","data":{"defaults":{"name":{"value":"new"}},"shortName":"notefreq","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioAnalyzePrint","data":{"defaults":{"name":{"value":"new"}},"shortName":"print","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioControlSGTL5000","data":{"defaults":{"name":{"value":"new"}},"shortName":"sgtl5000","inputs":0,"outputs":0,"category":"control-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioControlAK4558","data":{"defaults":{"name":{"value":"new"}},"shortName":"ak4558","inputs":0,"outputs":0,"category":"control-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioControlCS4272","data":{"defaults":{"name":{"value":"new"}},"shortName":"cs4272","inputs":0,"outputs":0,"category":"control-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioControlWM8731","data":{"defaults":{"name":{"value":"new"}},"shortName":"wm8731","inputs":0,"outputs":0,"category":"control-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioControlWM8731master","data":{"defaults":{"name":{"value":"new"}},"shortName":"wm8731m","inputs":0,"outputs":0,"category":"control-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioControlCS42448","data":{"defaults":{"name":{"value":"new"}},"shortName":"cs42448","inputs":0,"outputs":0,"category":"control-function","color":"#E6E0F8","icon":"arrow-in.png"}}
+		{"type":"AudioAmplifier","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"amp","inputs":1,"outputs":1,"category":"mixer-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioMixer4","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"mixer","inputs":4,"outputs":1,"category":"mixer-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioPlayMemory","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"playMem","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioPlaySdWav","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"playSdWav","inputs":0,"outputs":2,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioPlaySdRaw","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"playSdRaw","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioPlaySerialflashRaw","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"playFlashRaw","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioPlayQueue","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"queue","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioRecordQueue","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"queue","inputs":1,"outputs":0,"category":"record-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioSynthWavetable","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"wavetable","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioSynthSimpleDrum","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"drum","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioSynthKarplusStrong","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"string","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioSynthWaveformSine","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"sine","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioSynthWaveformSineHires","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"sine_hires","inputs":0,"outputs":2,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioSynthWaveformSineModulated","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"sine_fm","inputs":1,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioSynthWaveform","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"waveform","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioSynthWaveformModulated","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"waveformMod","inputs":2,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioSynthWaveformPWM","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"pwm","inputs":1,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioSynthToneSweep","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"tonesweep","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioSynthWaveformDc","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"dc","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioSynthNoiseWhite","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"noise","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioSynthNoisePink","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"pink","inputs":0,"outputs":1,"category":"synth-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectFade","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"fade","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectChorus","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"chorus","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectFlange","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"flange","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectReverb","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"reverb","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectFreeverb","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"freeverb","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectFreeverbStereo","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"freeverbs","inputs":1,"outputs":2,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectEnvelope","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"envelope","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectMultiply","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"multiply","inputs":2,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectDelay","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"delay","inputs":1,"outputs":8,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectDelayExternal","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"delayExt","inputs":1,"outputs":8,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectBitcrusher","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"bitcrusher","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectMidSide","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"midside","inputs":2,"outputs":2,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectWaveshaper","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"waveshape","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectGranular","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"granular","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectDigitalCombine","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"combine","inputs":2,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioFilterBiquad","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"biquad","inputs":1,"outputs":1,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioFilterFIR","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"fir","inputs":1,"outputs":1,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioFilterStateVariable","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"filter","inputs":2,"outputs":3,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioAnalyzePeak","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"peak","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioAnalyzeRMS","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"rms","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioAnalyzeFFT256","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"fft256","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioAnalyzeFFT1024","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"fft1024","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioAnalyzeToneDetect","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"tone","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioAnalyzeNoteFrequency","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"notefreq","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioAnalyzePrint","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"print","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioControlSGTL5000","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"sgtl5000","inputs":0,"outputs":0,"category":"control-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioControlAK4558","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"ak4558","inputs":0,"outputs":0,"category":"control-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioControlCS4272","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"cs4272","inputs":0,"outputs":0,"category":"control-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioControlWM8731","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"wm8731","inputs":0,"outputs":0,"category":"control-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioControlWM8731master","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"wm8731m","inputs":0,"outputs":0,"category":"control-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioControlCS42448","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"cs42448","inputs":0,"outputs":0,"category":"control-function","color":"#E6E0F8","icon":"arrow-in.png"}}
 	]}
 </script>
 
@@ -597,31 +599,14 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
 	</div>
-	<div class="form-row">
+	<div class="form-row hidden">
 		<label for="node-input-id"><i class="fa fa-tag"></i> Id</label>
 		<input type="text" id="node-input-id" placeholder="Id">
 	</div>
 	<div class="form-row">
-		<textarea style="font-family: monospace; font-size: 12px; background:rgb(226, 229, 255); padding-left: 0.5em;" class="input-block-level" id="node-input-comment" rows="12"></textarea>
-	</div>
-</script>
-
-<script type="text/x-red" data-template-name="AudioMixerX">
-	<div class="form-row">
-		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-		<input type="text" id="node-input-name" placeholder="Name">
-	</div>
-	<div class="form-row">
-		<label for="node-input-id"><i class="fa fa-tag"></i> Id</label>
-		<input type="text" id="node-input-id" placeholder="Id">
-	</div>
-	<div class="form-row">
-		<label for="node-input-inputs"><i class="fa fa-tag"></i> Inputs</label>
-		<input type="text" id="node-input-inputs" placeholder="Inputs">
-	</div>
-	<div class="form-row">
-		<label for="node-input-outputs"><i class="fa fa-tag"></i> Outputs</label>
-		<input type="text" id="node-input-outputs" placeholder="outputs">
+		<label for="node-input-comment"><i class="fa fa-tag"></i> Comment</label>
+		<input type="text" id="node-input-comment" placeholder="Comment">
+		<!--<textarea style="font-family: monospace; font-size: 12px; background:rgb(226, 229, 255); padding-left: 0.5em;" class="input-block-level" id="node-input-comment" rows="12"></textarea> -->
 	</div>
 </script>
 
@@ -636,6 +621,72 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<h3>Notes</h3>
 	<p></p>
 	<p></p>
+</script>
+
+<script type="text/x-red" data-help-name="Function">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>This used to make a Function, <br>
+		all function contents in the workspace is added at end of class seperated by newlines,  <br>
+		only the contents of the function is added, the name is only used in this tool.<br>
+		you can also write multiple functions together if you want.
+	</p>
+	<p> example of a complete function (the comment is optional):<br>
+		/**<br>
+		 * function description<br>
+		 * @param value1 desc of val1<br>
+		 * @param value2 desc of val2<br>
+		 * @return sum of values<br>
+		 */<br>
+		 int void sum(int value1, int value2) {<br>
+			return value1 + value2;<br>
+		 }<br>		 
+	</p>
+	</div>
+	
+	<h3>Notes</h3>
+	<p></p>
+	<p></p>
+</script>
+<script type="text/x-red" data-template-name="Function">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+	<div class="form-row">
+		<label for="node-input-comment"><i class="fa fa-tag"></i> Code contents:</label>
+		<textarea style="font-family: monospace; font-size: 12px; background:rgb(226, 229, 255); padding-left: 0.5em;" class="input-block-level" id="node-input-comment" rows="12"></textarea>
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="Variables">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>This used to define class variables/properties, <br>
+		the content is added after all node definitions.<br>
+		only the contents of the function is added, the name is only used in this tool.<br>
+		Multiple nodes of this type can be used, in the same workspace.<br>
+	</p>
+	<p> examples:<br>
+		int var1 = 0;<br>
+		float var2 = 0.0;<br>
+		bool test = false; <br>
+	</p>
+	</div>
+	
+	<h3>Notes</h3>
+	<p></p>
+	<p></p>
+</script>
+<script type="text/x-red" data-template-name="Variables">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+	<div class="form-row">
+		<label for="node-input-comment"><i class="fa fa-tag"></i> Variable contens:</label>
+		<textarea style="font-family: monospace; font-size: 12px; background:rgb(226, 229, 255); padding-left: 0.5em;" class="input-block-level" id="node-input-comment" rows="12"></textarea>
+	</div>
 </script>
 
 <script type="text/x-red" data-help-name="Comment">
@@ -734,6 +785,30 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>Signal clipping can occur when any channel has gain greater than 1.0,
 		or when multiple signals add together to greater than 1.0.</p>
 </script>
+<script type="text/x-red" data-template-name="AudioMixerX">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+	<div class="form-row">
+		<label for="node-input-id"><i class="fa fa-tag"></i> Id</label>
+		<input type="text" id="node-input-id" placeholder="Id">
+	</div>
+	<div class="form-row">
+		<label for="node-input-inputs"><i class="fa fa-tag"></i> Inputs</label>
+		<input type="text" id="node-input-inputs" placeholder="Inputs">
+	</div>
+	<!-- this is only for debugging of the output pins change so i choose MixerX because it's allready dynamic -->
+	<!-- <div class="form-row"> 
+		<label for="node-input-outputs"><i class="fa fa-tag"></i> Outputs</label>
+		<input type="text" id="node-input-outputs" placeholder="outputs">
+	</div> --> 
+	<div class="form-row">
+		<label for="node-input-comment"><i class="fa fa-tag"></i> Comment</label>
+		<input type="text" id="node-input-comment" placeholder="Comment">
+		<!--<textarea style="font-family: monospace; font-size: 12px; background:rgb(226, 229, 255); padding-left: 0.5em;" class="input-block-level" id="node-input-comment" rows="12"></textarea>-->
+	</div>
+</script>
 
 <script type="text/x-red" data-help-name="AudioInputI2S">
 	<h3>Summary</h3>
@@ -821,7 +896,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>I2S master objects can be used together with non-I2S input and output
 		objects, for simultaneous audio streaming on different hardware.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioInputI2S">
+<script type="text/x-red" data-template-name="_AudioInputI2S">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -881,7 +956,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>Normally, this object is used with two Audio Shield, which
 		are controlled separately by a pair "sgtl5000" object.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioInputI2SQuad">
+<script type="text/x-red" data-template-name="_AudioInputI2SQuad">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -933,7 +1008,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		quad channel I2S output, but may not be combined with others
 		which use the same physical pins.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioInputI2SHex">
+<script type="text/x-red" data-template-name="_AudioInputI2SHex">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -988,7 +1063,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		output, but may not be combined with others
 		which use the same physical pins.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioInputI2SOct">
+<script type="text/x-red" data-template-name="_AudioInputI2SOct">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1028,7 +1103,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<h3>Examples</h3>
 	<h3>Notes</h3>
 </script>
-<script type="text/x-red" data-template-name="AudioInputI2S2">
+<script type="text/x-red" data-template-name="_AudioInputI2S2">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1078,7 +1153,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		sample rate of the incoming data.  It usually can not be combined
 		with most other inputs and outputs which run at specific speeds.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioInputSPDIF3">
+<script type="text/x-red" data-template-name="_AudioInputSPDIF3">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1129,7 +1204,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<h3>Notes</h3>
 	<p>TODO: document optional instance parameters.... (dither, noiseshaping, attenuation, minHalfFilterLength) </p>
 </script>
-<script type="text/x-red" data-template-name="AsyncAudioInputSPDIF3">
+<script type="text/x-red" data-template-name="_AsyncAudioInputSPDIF3">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1197,7 +1272,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>TODO: actual noise measurements with different input circuitry
 		(it's not as quiet as the audio shield)</p>
 </script>
-<script type="text/x-red" data-template-name="AudioInputAnalog">
+<script type="text/x-red" data-template-name="_AudioInputAnalog">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1265,7 +1340,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>TODO: actual noise measurements with different input circuitry
 		(it's not as quiet as the audio shield)</p>
 </script>
-<script type="text/x-red" data-template-name="AudioInputAnalogStereo">
+<script type="text/x-red" data-template-name="_AudioInputAnalogStereo">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1321,7 +1396,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		and slave modes may not be mixed (both must be of the same type).
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioInputI2Sslave">
+<script type="text/x-red" data-template-name="_AudioInputI2Sslave">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1393,7 +1468,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		unused, this TDM object will need to allocate 16 blocks of
 		memory.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioInputTDM">
+<script type="text/x-red" data-template-name="_AudioInputTDM">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1451,7 +1526,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		unused, this TDM object will need to allocate 16 blocks of
 		memory.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioInputTDM2">
+<script type="text/x-red" data-template-name="_AudioInputTDM2">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1509,7 +1584,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		the filter computation.
 		</p>
 </script>
-<script type="text/x-red" data-template-name="AudioInputPDM">
+<script type="text/x-red" data-template-name="_AudioInputPDM">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1558,7 +1633,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		update.  At least one non-USB input or output object must be
 		present for the entire library to update properly.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioInputUSB">
+<script type="text/x-red" data-template-name="_AudioInputUSB">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1640,7 +1715,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		and slave modes may not be mixed (both must be of the same type).
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioOutputI2S">
+<script type="text/x-red" data-template-name="_AudioOutputI2S">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1698,7 +1773,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>Normally, this object is used with two Audio Shields, which
 		are controlled separately by a pair of "sgtl5000" objects.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioOutputI2SQuad">
+<script type="text/x-red" data-template-name="_AudioOutputI2SQuad">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1748,7 +1823,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		quad channel I2S input, but may not be combined with others
 		which use the same physical pins.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioOutputI2SHex">
+<script type="text/x-red" data-template-name="_AudioOutputI2SHex">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1801,7 +1876,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		input, but may not be combined with others
 		which use the same physical pins.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioOutputI2SOct">
+<script type="text/x-red" data-template-name="_AudioOutputI2SOct">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1841,7 +1916,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<h3>Examples</h3>
 	<h3>Notes</h3>
 </script>
-<script type="text/x-red" data-template-name="AudioOutputI2S2">
+<script type="text/x-red" data-template-name="_AudioOutputI2S2">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1902,7 +1977,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		hardware with different internal settings.</p>
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioOutputSPDIF">
+<script type="text/x-red" data-template-name="_AudioOutputSPDIF">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1954,7 +2029,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		hardware with different internal settings.</p>
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioOutputSPDIF2">
+<script type="text/x-red" data-template-name="_AudioOutputSPDIF2">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -2002,7 +2077,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>Native S/PDIF hardware is used, which is more efficient that use of I2S ports.</p>
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioOutputSPDIF3">
+<script type="text/x-red" data-template-name="_AudioOutputSPDIF3">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -2054,7 +2129,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioOutputPT8211">
+<script type="text/x-red" data-template-name="_AudioOutputPT8211">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -2100,7 +2175,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioOutputPT8211_2">
+<script type="text/x-red" data-template-name="_AudioOutputPT8211_2">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -2160,7 +2235,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		present on the 3.3V power can couple to the DAC output signal.
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioOutputAnalog">
+<script type="text/x-red" data-template-name="_AudioOutputAnalog">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -2212,7 +2287,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		present on the 3.3V power can couple to the DAC output signal.
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioOutputAnalogStereo">
+<script type="text/x-red" data-template-name="_AudioOutputAnalogStereo">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -2270,7 +2345,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		<a href="http://www.pjrc.com/store/teensy3_audio.html" target="_blank">audio shield</a>
 		should be used when higher quality signals are needed.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioOutputPWM">
+<script type="text/x-red" data-template-name="_AudioOutputPWM">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -2307,7 +2382,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<h3>Notes</h3>
 	<p>TODO: can this really be used together with other inputs and outputs?</p>
 </script>
-<script type="text/x-red" data-template-name="AudioOutputMQS">
+<script type="text/x-red" data-template-name="_AudioOutputMQS">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -2361,7 +2436,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		and slave modes may not be mixed (both must be of the same type).
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioOutputI2Sslave">
+<script type="text/x-red" data-template-name="_AudioOutputI2Sslave">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -2428,7 +2503,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>When used with TDM devices which receive 32 bit audio, the
 		even numbered channels are used for the top 16 bits.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioOutputTDM">
+<script type="text/x-red" data-template-name="_AudioOutputTDM">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -2482,7 +2557,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>When used with TDM devices which receive 32 bit audio, the
 		even numbered channels are used for the top 16 bits.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioOutputTDM2">
+<script type="text/x-red" data-template-name="_AudioOutputTDM2">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -2538,7 +2613,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>A <a href="https://www.youtube.com/watch?v=e5ov3q02zxo">Youtube video</a>
 		also demonstrates how it works.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioOutputADAT">
+<script type="text/x-red" data-template-name="_AudioOutputADAT">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -2587,7 +2662,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		can be enabled by editing usb_audio.cpp</a>.
 		Find and uncomment "#define MACOSX_ADAPTIVE_LIMIT".</p>
 </script>
-<script type="text/x-red" data-template-name="AudioOutputUSB">
+<script type="text/x-red" data-template-name="_AudioOutputUSB">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -2625,7 +2700,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		minimal overhead</p>
 	<p>Signal clipping can occur when any channel has gain greater than 1.0</p>
 </script>
-<script type="text/x-red" data-template-name="AudioAmplifier">
+<script type="text/x-red" data-template-name="_AudioAmplifier">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -2675,7 +2750,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		mixers, where the fifth mixer combines the outputs of the first 4.
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioMixer4">
+<script type="text/x-red" data-template-name="_AudioMixer4">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -2731,7 +2806,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>Polyphonic playback can be built by creating multiple
 		objects, with their output combined by mixers.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioPlayMemory">
+<script type="text/x-red" data-template-name="_AudioPlayMemory">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -2801,7 +2876,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</p>
 
 </script>
-<script type="text/x-red" data-template-name="AudioPlaySdWav">
+<script type="text/x-red" data-template-name="_AudioPlaySdWav">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -2856,7 +2931,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		dropouts or glitches.
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioPlaySdRaw">
+<script type="text/x-red" data-template-name="_AudioPlaySdRaw">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -2918,7 +2993,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		not play, use <b>File &gt; Examples &gt; SerialFlash &gt; ListFiles</b> to
 		check the exact file names stored in the flash memory chip.
 </script>
-<script type="text/x-red" data-template-name="AudioPlaySerialflashRaw">
+<script type="text/x-red" data-template-name="_AudioPlaySerialflashRaw">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -2967,7 +3042,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioPlayQueue">
+<script type="text/x-red" data-template-name="_AudioPlayQueue">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -3025,7 +3100,7 @@ The actual packets are taken
 		from the pool created by AudioMemory().
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioRecordQueue">
+<script type="text/x-red" data-template-name="_AudioRecordQueue">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -3089,7 +3164,7 @@ The actual packets are taken
 	<h3>Notes</h3>
 	<p></p>
 </script>
-<script type="text/x-red" data-template-name="AudioSynthWavetable">
+<script type="text/x-red" data-template-name="_AudioSynthWavetable">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -3134,7 +3209,7 @@ The actual packets are taken
 	<h3>Notes</h3>
 	<p></p>
 </script>
-<script type="text/x-red" data-template-name="AudioSynthSimpleDrum">
+<script type="text/x-red" data-template-name="_AudioSynthSimpleDrum">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -3169,7 +3244,7 @@ The actual packets are taken
 	<h3>Notes</h3>
 	<p></p>
 </script>
-<script type="text/x-red" data-template-name="AudioSynthKarplusStrong">
+<script type="text/x-red" data-template-name="_AudioSynthKarplusStrong">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -3213,7 +3288,7 @@ The actual packets are taken
 	<h3>Notes</h3>
 	<p></p>
 </script>
-<script type="text/x-red" data-template-name="AudioSynthWaveformSine">
+<script type="text/x-red" data-template-name="_AudioSynthWaveformSine">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -3254,7 +3329,7 @@ The actual packets are taken
 		a very accurate sine wave.  At least the upper 25 bits are believe
 		to be perfect.  This is mainly intended for testing 24 bit codec chips!</p>
 </script>
-<script type="text/x-red" data-template-name="AudioSynthWaveformSineHires">
+<script type="text/x-red" data-template-name="_AudioSynthWaveformSineHires">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -3300,7 +3375,7 @@ The actual packets are taken
 	<h3>Notes</h3>
 	<p></p>
 </script>
-<script type="text/x-red" data-template-name="AudioSynthWaveformSineModulated">
+<script type="text/x-red" data-template-name="_AudioSynthWaveformSineModulated">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -3378,7 +3453,7 @@ The actual packets are taken
 		</ul>
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioSynthWaveform">
+<script type="text/x-red" data-template-name="_AudioSynthWaveform">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -3464,7 +3539,7 @@ The actual packets are taken
 		to vary the Sample &amp; Hold waveform speed
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioSynthWaveformModulated">
+<script type="text/x-red" data-template-name="_AudioSynthWaveformModulated">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -3505,7 +3580,7 @@ The actual packets are taken
 		1 sample high followed by 65536 samples low (0.00153%).
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioSynthWaveformPWM">
+<script type="text/x-red" data-template-name="_AudioSynthWaveformPWM">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -3540,7 +3615,7 @@ The actual packets are taken
 	<p>Uses excessive CPU time.</p>
 	<p>The frequency actually changes in discrete steps every 128 samples (2.9 ms).</p>
 </script>
-<script type="text/x-red" data-template-name="AudioSynthToneSweep">
+<script type="text/x-red" data-template-name="_AudioSynthToneSweep">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -3584,7 +3659,7 @@ The actual packets are taken
 		to a pure digital stream of numerical values.  But the term is widely
 		understood in audio applications, so hopefully it's not too confusing?</p>
 </script>
-<script type="text/x-red" data-template-name="AudioSynthWaveformDc">
+<script type="text/x-red" data-template-name="_AudioSynthWaveformDc">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -3617,7 +3692,7 @@ The actual packets are taken
 		CPU time to generate random numbers.
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioSynthNoiseWhite">
+<script type="text/x-red" data-template-name="_AudioSynthNoiseWhite">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -3657,7 +3732,7 @@ The actual packets are taken
 		in a commercial product, you should give me one."
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioSynthNoisePink">
+<script type="text/x-red" data-template-name="_AudioSynthNoisePink">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -3703,7 +3778,7 @@ The actual packets are taken
 		at the same moment.
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioEffectFade">
+<script type="text/x-red" data-template-name="_AudioEffectFade">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -3754,7 +3829,7 @@ The actual packets are taken
 	<h3>Notes</h3>
 	<p>The longer the length of the chorus, the more memory blocks are used.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioEffectChorus">
+<script type="text/x-red" data-template-name="_AudioEffectChorus">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -3816,7 +3891,7 @@ int s_idx = 3*FLANGE_DELAY_LENGTH/4;<br>
 int s_depth = FLANGE_DELAY_LENGTH/8;<br>
 double s_freq = .0625;</p>
 </script>
-<script type="text/x-red" data-template-name="AudioEffectFlange">
+<script type="text/x-red" data-template-name="_AudioEffectFlange">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -3848,7 +3923,7 @@ double s_freq = .0625;</p>
 	<h3>Notes</h3>
 	<p>This effect may have distortion problems with the input signal is more than 0.5.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioEffectReverb">
+<script type="text/x-red" data-template-name="_AudioEffectReverb">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -3887,7 +3962,7 @@ double s_freq = .0625;</p>
 	<p>Freeverb mono consumes about 21% of the CPU time on Teensy 3.2 and
 		requires about 22K of RAM.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioEffectFreeverb">
+<script type="text/x-red" data-template-name="_AudioEffectFreeverb">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -3930,7 +4005,7 @@ double s_freq = .0625;</p>
 	<p>Teensy 3.2 does not have enough RAM to
 		run this effect while playing WAV file and implementing USB Serial.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioEffectFreeverbStereo">
+<script type="text/x-red" data-template-name="_AudioEffectFreeverbStereo">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -4012,7 +4087,7 @@ double s_freq = .0625;</p>
 	<p>To achieve the more common ADSR shape, simply
         set delay and hold to zero.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioEffectEnvelope">
+<script type="text/x-red" data-template-name="_AudioEffectEnvelope">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -4048,7 +4123,7 @@ double s_freq = .0625;</p>
 	<p>
     </p>
 </script>
-<script type="text/x-red" data-template-name="AudioEffectMultiply">
+<script type="text/x-red" data-template-name="_AudioEffectMultiply">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -4107,7 +4182,7 @@ double s_freq = .0625;</p>
 		<tr class=odd><td>Teensy 3.6</td><td align=center>2413.94 ms</td></tr>
 	</table>
 </script>
-<script type="text/x-red" data-template-name="AudioEffectDelay">
+<script type="text/x-red" data-template-name="_AudioEffectDelay">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -4224,7 +4299,7 @@ double s_freq = .0625;</p>
 		to make the chip work.
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioEffectDelayExternal">
+<script type="text/x-red" data-template-name="_AudioEffectDelayExternal">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -4271,7 +4346,7 @@ double s_freq = .0625;</p>
         at the same moment.
     </p>
 </script>
-<script type="text/x-red" data-template-name="AudioEffectBitcrusher">
+<script type="text/x-red" data-template-name="_AudioEffectBitcrusher">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -4313,7 +4388,7 @@ double s_freq = .0625;</p>
 	<p>Left = Mid+Side</p>
 	<p>Right = Mid-Side</p>
 </script>
-<script type="text/x-red" data-template-name="AudioEffectMidSide">
+<script type="text/x-red" data-template-name="_AudioEffectMidSide">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -4351,7 +4426,7 @@ double s_freq = .0625;</p>
 	<p><a href="https://github.com/dxinteractive/TeensyAudioWaveshaper">More information</a>
 		</p>
 </script>
-<script type="text/x-red" data-template-name="AudioEffectWaveshaper">
+<script type="text/x-red" data-template-name="_AudioEffectWaveshaper">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -4403,7 +4478,7 @@ double s_freq = .0625;</p>
 	<!--<h3>Notes</h3>
 	<p> </p>-->
 </script>
-<script type="text/x-red" data-template-name="AudioEffectGranular">
+<script type="text/x-red" data-template-name="_AudioEffectGranular">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -4440,7 +4515,7 @@ double s_freq = .0625;</p>
 	<!--<h3>Notes</h3>
 	<p> </p>-->
 </script>
-<script type="text/x-red" data-template-name="AudioEffectDigitalCombine">
+<script type="text/x-red" data-template-name="_AudioEffectDigitalCombine">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -4528,7 +4603,7 @@ double s_freq = .0625;</p>
 		filter should be used.
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioFilterBiquad">
+<script type="text/x-red" data-template-name="_AudioFilterBiquad">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -4592,7 +4667,7 @@ double s_freq = .0625;</p>
 		and add "const" to avoid consuming extra RAM.
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioFilterFIR">
+<script type="text/x-red" data-template-name="_AudioFilterFIR">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -4653,7 +4728,7 @@ double s_freq = .0625;</p>
 		object uses approximately 4% of the CPU time on Teensy 3.1.
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioFilterStateVariable">
+<script type="text/x-red" data-template-name="_AudioFilterStateVariable">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -4691,7 +4766,7 @@ double s_freq = .0625;</p>
 	<h3>Notes</h3>
 	<p></p>
 </script>
-<script type="text/x-red" data-template-name="AudioAnalyzePeak">
+<script type="text/x-red" data-template-name="_AudioAnalyzePeak">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -4723,7 +4798,7 @@ double s_freq = .0625;</p>
 	<h3>Notes</h3>
 	<p></p>
 </script>
-<script type="text/x-red" data-template-name="AudioAnalyzeRMS">
+<script type="text/x-red" data-template-name="_AudioAnalyzeRMS">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -4790,7 +4865,7 @@ double s_freq = .0625;</p>
 		</ul>
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioAnalyzeFFT256">
+<script type="text/x-red" data-template-name="_AudioAnalyzeFFT256">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -4861,7 +4936,7 @@ double s_freq = .0625;</p>
 		load more evenly over time....
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioAnalyzeFFT1024">
+<script type="text/x-red" data-template-name="_AudioAnalyzeFFT1024">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -4917,7 +4992,7 @@ double s_freq = .0625;</p>
 		change in future versions, for a single true each time the signal
 		is detected, and then false for the remainder of that interval.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioAnalyzeToneDetect">
+<script type="text/x-red" data-template-name="_AudioAnalyzeToneDetect">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -4974,7 +5049,7 @@ double s_freq = .0625;</p>
 		<a href="https://github.com/duff2013/AudioTuner">AudioTuner project</a>.
 		Additional details and documentation may be found there.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioAnalyzeNoteFrequency">
+<script type="text/x-red" data-template-name="_AudioAnalyzeNoteFrequency">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -5016,7 +5091,7 @@ double s_freq = .0625;</p>
 	<h3>Notes</h3>
 	<p>This object doesn't work very well and probably should not be used.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioAnalyzePrint">
+<script type="text/x-red" data-template-name="_AudioAnalyzePrint">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -5368,7 +5443,7 @@ value  frequency
 	<p>TODO: add example with two analogRead pots for bass and treble to demonstrate ramping.
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioControlSGTL5000">
+<script type="text/x-red" data-template-name="_AudioControlSGTL5000">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -5410,7 +5485,7 @@ value  frequency
 	<h3>Notes</h3>
 	<p></p>
 </script>
-<script type="text/x-red" data-template-name="AudioControlWM8731">
+<script type="text/x-red" data-template-name="_AudioControlWM8731">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -5454,7 +5529,7 @@ value  frequency
 		11.2896 MHz crystal should be used.
 	</p>
 </script>
-<script type="text/x-red" data-template-name="AudioControlWM8731master">
+<script type="text/x-red" data-template-name="_AudioControlWM8731master">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -5515,7 +5590,7 @@ value  frequency
 	<p>TODO: Implement ADC and DAC filters control.</p>
 	<p>TODO: Implement DAC level attenuator attack rate modifier.</p>
 </script>
-<script type="text/x-red" data-template-name="AudioControlAK4558">
+<script type="text/x-red" data-template-name="_AudioControlAK4558">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -5576,7 +5651,7 @@ value  frequency
 
 	<h3>Notes</h3>
 </script>
-<script type="text/x-red" data-template-name="AudioControlCS4272">
+<script type="text/x-red" data-template-name="_AudioControlCS4272">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -5619,7 +5694,7 @@ value  frequency
 	</div>
 	<h3>Notes</h3>
 </script>
-<script type="text/x-red" data-template-name="AudioControlCS42448">
+<script type="text/x-red" data-template-name="_AudioControlCS42448">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">

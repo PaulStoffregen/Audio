@@ -96,7 +96,7 @@ a.brand img {
 
 #palette {
    background: #f3f3f3;
-   width: 160px;
+   width: 165px;
    text-align: center;
    -webkit-user-select: none;
    -khtml-user-select: none;
@@ -168,23 +168,41 @@ a.brand img {
     box-shadow: none;
     -webkit-box-shadow: none;
 }
-
 .palette-category {
     border: 1px solid #999;
     border-radius: 3px;
     margin-bottom: 5px;
 }
+.palette-category-sub-cat {
+    margin: 5px;
+    /*margin-left: 3px;*/
+    width: 125px;
+    border: 1px solid #999;
+    border-radius: 3px;
+    /*margin-bottom: 5px;*/
+}
+.palette-sub-category-label {
+    padding-top: 3px;
+    text-decoration: underline solid red;
+}
 .palette-content {
     background: #fff;
     border-top: 1px solid #aaa;
+    padding-top: 3px;
     padding-bottom: 3px;
 }
-
 .palette-header {
-    background: #f3f3f3;
+    background: #f1f1f1;
     border-radius: 3px;
     cursor: pointer;
-    text-align: left;
+    text-align: center;
+    padding: 3px;
+}
+.palette-header-sub-cat {
+    background: #fafafa;
+    border-radius: 3px;
+    cursor: default;
+    text-align: center;
     padding: 3px;
 }
 .palette-header i {
@@ -207,9 +225,10 @@ a.brand img {
 .palette_label {
    line-height: 25px;
    text-align: center;
-
+   
 }
 .palette_node {
+    text-decoration: none;
    cursor:move;
    font-size:13px;
    background: #ddd;
@@ -241,7 +260,7 @@ a.brand img {
 }
 .palette_req_error {
     position: absolute;
-    top:-10px;
+    top:-8px;
     left: 80px;
     box-sizing: border-box;
     cursor:pointer;

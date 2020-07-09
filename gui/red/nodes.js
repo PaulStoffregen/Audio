@@ -231,8 +231,8 @@ RED.nodes = (function() {
 		var hasIO = false;
 		RED.nodes.eachNode(function (node) {
 
-			if ((node._def.category === "input-function") ||
-				(node._def.category === "output-function")) {
+			if (node._def.category.startsWith("input-") ||
+				node._def.category.startsWith("output-")) {
 				hasIO = true;
 			}
 		});

@@ -314,6 +314,7 @@ RED.editor = (function() {
 	 * @param prefix - the prefix to use in the input element ids (node-input|node-config-input)
 	 */
 	function preparePropertyEditor(node,property,prefix) {
+		console.error("preparePropertyEditor:" + node.type + ":" + prefix+"-"+property);
 		var input = $("#"+prefix+"-"+property);
 		if (input.attr('type') === "checkbox") {
 			input.prop('checked',node[property]);

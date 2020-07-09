@@ -166,6 +166,33 @@ var RED = (function() {
 			}).dialog("open");
 		}
 	}
+	/**
+	 * this take a multiline text, 
+	 * break it up into linearray, 
+	 * then each line is added to a new text + the incrementText added in front of every line
+	 * @param {*} text 
+	 * @param {*} incrementText 
+	 */
+	function incrementTextLines(text, incrementText)
+	{
+		var lines = text.split("\n");
+		var newText = "";
+		for (var i = 0; i < lines.length; i++)
+		{
+			newText += incrementText + lines[i] + "\n";
+		}
+		return newText;
+	}
+	function isSpecialNode(type)
+	{
+		if (type == "ClassComment") return true;
+		else if (type == "Comment") return true;
+		else if (type == "TabInput") return true;
+		else if (type == "TabOutput") return true;
+		else if (type == "Function") return true;
+		else if (type == "Variables") return true;
+		else return false;
+	}
 	$('#btn-deploy2').click(function() { save2(); });
 	function save2(force)
 	{
@@ -194,87 +221,74 @@ var RED = (function() {
 				+ "\n// GUItool: begin automatically generated code\n"
 				+ "// JSON string:\n"
 				+ "//" + JSON.stringify(nns) + "\n";
-			
-				
-				
-			for (var wsi=0; wsi < wns.length; wsi++)
+
+			for (var wsi=0; wsi < wns.length; wsi++) // workspaces
 			{
 				if (!wns[wsi].export) continue; // this skip export
 
+				// first go through special types
 				var classComment = "";
-
-				
-				for (var i=0; i<nns.length; i++) {
+				var classFunctions = "";
+				var classVars = "";
+				var arrayNode = undefined;
+				var foundArrayNode = false;
+				for (var i=0; i<nns.length; i++) { 
 					var n = nns[i];
 
-					if (n.z != wns[wsi].id) continue;
+					if (n.z != wns[wsi].id) continue; // workspace filter
 					if (n.type == "ClassComment")
 					{
 						//if (n.name == "TestMultiline")
 						//	RED.nodes.node(n.id).name = "Test\nMultiline";
 						classComment += " * " + n.name + "\n";
 					}
+					else if (n.type == "Function")
+					{
+						classFunctions += n.comment + "\n"; // we use comment field for function-data
+					}
+					else if (n.type == "Variables")
+					{
+						classVars += n.comment + "\n" // we use comment field for vars-data
+					}
+					else if (n.type == "Array" && !foundArrayNode) // this is special thingy that was before real-node, now it's obsolete, it only generates more code
+					{
+						var arrayNode = node.name.split(" ");
+						if (!arrayNode) continue;
+						if (arrayNode.length < 2 || arrayNode.length > 3) continue;
+						// we just save the array def. to later
+						if (arrayNode.length == 2)
+							arrayNode = {type:arrayNode[0], name:arrayNode[1], cppCode:"", objectCount:0, autoGenerate:true}; 
+						else // arrayNode[2] contains predefined array contents
+							arrayNode = {type:arrayNode[0], name:arrayNode[1], cppCode:arrayNode[2], objectCount:arrayNode[2].split(",").length, autoGenerate:false};
+
+						cpp += "    " + arrayNode.type + " ";
+						for (var j=arrayNode.type.length; j<32; j++) cpp += " ";
+						cpp += "*" + arrayNode.name +";\n";
+						
+						foundArrayNode = true; // only one can be defined at this beta test
+					}
 				}
 				if (classComment.length > 0)
 				{
 					cpp += "\n/**\n" + classComment + " */"; // newline not needed because it allready in beginning of class definer (check down)
 				}
+				cpp += "\nclass " + wns[wsi].label + "\n{\n public:\n";
 
-				cpp += "\nclass " + wns[wsi].label + "\n{\n"
-				+ "  public:\n";
-
-				//console.log("class>>>" + wns[wsi].label + "<<<"); // debug test
-			
 				//cpp += "// " + wns[i].id + ":" + wns[i].label + "\n"; // test 
-				var arrayNode = undefined;
-				// generate code for the array def. node, at the moment there can only be one
-				for (var i=0; i<nns.length; i++) {
-					var n = nns[i];
-
-					if (n.z != wns[wsi].id) continue; // workspace check
-
-					var node = RED.nodes.node(n.id);
-					if (!node) continue;
-					if (node.type != "Array") continue;
-					var arrayNode = node.name.split(" ");
-					if (!arrayNode) continue;
-					if (arrayNode.length < 2 || arrayNode.length > 3) continue;
-					// we just save the array def. to later
-					if (arrayNode.length == 2)
-						arrayNode = {type:arrayNode[0], name:arrayNode[1], cppCode:"", objectCount:0, autoGenerate:true}; 
-					else // arrayNode[2] contains predefined array contents
-						arrayNode = {type:arrayNode[0], name:arrayNode[1], cppCode:arrayNode[2], objectCount:arrayNode[2].split(",").length, autoGenerate:false};
-
-					cpp += "    " + arrayNode.type + " ";
-					for (var j=arrayNode.type.length; j<32; j++) cpp += " ";
-					cpp += "*" + arrayNode.name +";\n";
-					
-					break; // only one can be defined at this beta test
-
-					//for (var j=arrayNode[1].length; j<26; j++) cpp += " ";
-
-					//cpp += "//xy=" + n.x + "," + n.y + "," + n.z + "\n"; // now with JSON string at top xy not needed anymore
-				}
+				
 				// generate code for all audio processing nodes
 				for (var i=0; i<nns.length; i++) {
 					var n = nns[i];
 
-					if (n.z != wns[wsi].id) continue; // workspace check
+					if (n.z != wns[wsi].id) continue; // workspace filter
 
 					var node = RED.nodes.node(n.id);
 					if (!node) continue;
 					
-					if (n.type == "TabInput" || n.type == "TabOutput") continue; // now with JSON string at top place-holders not needed anymore
-					if (n.type == "Array") continue;
+					if(isSpecialNode(n.type)) continue;
 
 					if ((node.outputs <= 0) && (node._def.inputs <= 0)) continue;
-						
-					
-
-					//	cpp += "//  "; // comment out because this is just a placeholder for import
-					//else
-						cpp += "    "
-						
+					cpp += "    "
 					//console.log(">>>" + n.type +"<<<"); // debug test
 					var typeLength = n.type.length;
 					if (n.type == "AudioMixerX")
@@ -286,8 +300,7 @@ var RED = (function() {
 							var src = RED.nodes.getWireInputSourceNode(nns, n.z, n.id);
 							if (!src.node.name)
 							{
-								
-								console.error("!src.node:" + n.z + ":" + n.id);
+								console.error("!src.node:" + n.z + ":" + n.id); // failsafe only happens when no name is used for an node
 								continue;
 							}
 							var isArray = RED.nodes.isNameDeclarationArray(src.node.name);
@@ -327,8 +340,7 @@ var RED = (function() {
 					var node = RED.nodes.node(n.id);
 					if (node && node.outputs == 0 && node._def.inputs == 0) {
 
-						if (n.type == "Array") continue; // skip this, it's allready added above
-						if (n.type == "ClassComment" || n.type == "Comment") continue;
+						if(isSpecialNode(n.type)) continue;
 
 						cpp += "    " + n.type + " ";
 						for (var j=n.type.length; j<32; j++) cpp += " ";
@@ -341,9 +353,6 @@ var RED = (function() {
 				}
 				
 				// generate code for all connections (aka wires or links)
-				//var cordcount = 1;
-
-				
 				var ac = {
 					base: "        AudioConnection        patchCord",
 					arrayBase: "        patchCord[pci++] = new AudioConnection(",
@@ -364,7 +373,6 @@ var RED = (function() {
 						//if ((this.srcPort == 0) && (this.dstPort == 0))
 						//	this.cppCode	+= "\n" + this.base + this.count + "(" + this.srcName + ", " + this.dstName + ");"; // this could be used but it's generating code that looks more blurry
 						
-
 						if (this.dstRootIsArray)
 						{
 							this.cppCode	+= "    " + this.arrayBase + this.srcName + ", " + this.srcPort + ", " + this.dstName + ", " + this.dstPort + ");\n";
@@ -431,10 +439,7 @@ var RED = (function() {
 						ac.srcPort = pi;
 						ac.dstPort = dstPortIndex;
 
-						if (ac.checkIfSrcIsArray())
-						{
-
-						}
+						ac.checkIfSrcIsArray(); // we ignore the return value, there is no really use for it
 						if (RED.nodes.isClass(n.type)) // if source is class
 						{
 							//console.log("root src is class:" + ac.srcName);
@@ -442,13 +447,9 @@ var RED = (function() {
 							RED.nodes.classOutputPortToCpp(nns, tabNodes.outputs, ac, n);
 						}
 						
-						if (ac.checkIfDstIsArray())
-						{
-
-						}
+						ac.checkIfDstIsArray(); // we ignore the return value, there is no really use for it
 						if (RED.nodes.isClass(dst.type))
-						{
-							
+						{							
 							//console.log("dst is class:" + dst.name + " from:" + n.name);
 							//classInputPortToCpp(inNodes, ac.dstName , ac, dst); // debug;
 							RED.nodes.classInputPortToCpp(tabNodes.inputs, ac.dstName , ac, dst);
@@ -461,15 +462,13 @@ var RED = (function() {
 							cppArray += ac.cppCode;
 						else
 							cppPcs += ac.cppCode;
-						
 					});
-
 				}
-				//cpp += "    // total patchCordCount: " + ac.totalCount + " including array typed ones.\n";
 				cpp += "    AudioConnection ";
 				for (var j="AudioConnection".length; j<32; j++) cpp += " ";
 				cpp += "*patchCord[" + ac.totalCount + "]; // total patchCordCount:" + ac.totalCount + " including array typed ones.\n";
-				
+				if (classVars.trim().length > 0)
+					cpp += "\n" + incrementTextLines(classVars, "    ");
 				cpp+= "\n    " + wns[wsi].label + "() // constructor (this is called when class-object is created)\n    {\n";
 				cpp += "        int pci = 0; // used only for adding new patchcords\n\n"
 
@@ -491,6 +490,8 @@ var RED = (function() {
 					cpp += "        }\n";
 				}
 				cpp += "    }\n";
+				if (classFunctions.trim().length > 0)
+					cpp += "\n" + incrementTextLines(classFunctions, "    ");
 				cpp += "};\n"; // end of class
 			}
 			cpp += "// GUItool: end automatically generated code\n";

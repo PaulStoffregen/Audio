@@ -18,24 +18,60 @@
 RED.palette = (function() {
 
 	var exclusion = ['config','unknown','deprecated'];
-	var core = ['tabs', 'input', 'output', 'mixer', 'play', 'record', 'synth', 'effect', 'filter', 'analyze'];
+	var core =		   ['tabs',  'synth' , 'mixer', 'effect', 'input', 'output', 'play', 'record', 'filter', 'analyze'];
+	var displayStyle = ['block', 'block',  'block', 'block',  'none',  'none',   'none', 'none',   'none',   'none'];
+	var inCat = ['i2s1','i2s2','spdif','adc','other'];
+	var outCat = ['i2s1','i2s2','spdif','adc','other'];
+	//var outputCat = ['output-i2s1','output-i2s2','output-spdif','output-adc'];
 	
-	function createCategoryContainer(category, displayStyle){ // displayStyle can be set to none to collapse all categories at start
+	function createCategoryContainer(category, destContainer, displayStyle, isSubCat){ // displayStyle can be set to none to collapse all categories at start
 		if (!displayStyle)
-			displayStyle = "block";
+			displayStyle = "block"; // jannik add
+		if (!destContainer)
+			destContainer = "palette-container";
+		var palette_category = "palette-category";
+		var chevron = "";
+		var header = category;
+		var palette_header_class = "palette-header";
+		if (isSubCat)
+		{
+			palette_category += "-sub-cat";
+			header = header.substring(header.indexOf('-')+1);
+			palette_header_class += "-sub-cat";
+		}
+		else
+			chevron = '<i class="expaded icon-chevron-down"></i>';
 
-		$("#palette-container").append('<div class="palette-category">'+
-			'<div id="header-'+category+'" class="palette-header"><i class="expaded icon-chevron-down"></i><span>'+category+'</span></div>'+
+
+
+		$("#" + destContainer).append('<div class="' + palette_category + '">'+
+			'<div id="header-'+category+'" class="'+palette_header_class+'">'+chevron+'<span>'+header+'</span></div>'+
 			'<div class="palette-content" id="palette-base-category-'+category+'" style="display: '+displayStyle+';">'+
-			  '<div id="palette-'+category+'-input"></div>'+
-			  '<div id="palette-'+category+'-output"></div>'+
+			 // '<div id="palette-'+category+'-input" class="palette-sub-category"><div class="palette-sub-category-label">in</div></div>'+ // theese are never used
+			 // '<div id="palette-'+category+'-output" class="palette-sub-category"><div class="palette-sub-category-label">out</div></div>'+ // theese are never used
 			  '<div id="palette-'+category+'-function"></div>'+
 			'</div>'+
 			'</div>');
-		  
+			
+
 	}
-	
-	core.forEach(createCategoryContainer);
+	function doInit(categories, destContainer, display, catPreName, isSubCat)
+	{
+		if (!catPreName) catPreName = "";
+		for (var i = 0; i < categories.length; i++)
+		{
+			if (display)
+				createCategoryContainer(catPreName + categories[i],destContainer, display[i], isSubCat); 
+			else
+				createCategoryContainer(catPreName + categories[i],destContainer, null, isSubCat);
+		}
+	}
+	//core.forEach(createCategoryContainer);
+	doInit(core, "palette-container", displayStyle, null, false);
+	//doInit(inputCat,"palette-base-category-input");
+	//doInit(outputCat,"palette-base-category-output");
+	doInit(inCat,"palette-input-function", null, "input-", true);
+	doInit(outCat,"palette-output-function", null, "output-", true);
 	
 	function addNodeType(nt,def) {
 		
@@ -85,7 +121,7 @@ RED.palette = (function() {
 		  }
 		  
 		  if ($("#palette-base-category-"+category[0]).length === 0){
-			  createCategoryContainer(category[0]);
+			  createCategoryContainer(category[0], "palette-container");
 		  }
 		  
 		  if ($("#palette-"+def.category).length === 0) {          

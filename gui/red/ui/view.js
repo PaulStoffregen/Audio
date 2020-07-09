@@ -1537,7 +1537,7 @@ RED.view = (function() {
 					var nodeRect = d3.select(this);
 					
 					checkRequirements(d); // this is needed because it will execute on previus items
-					if (d.requirementError) console.warn("reqError on:" + d.name);
+					//if (d.requirementError) console.warn("reqError on:" + d.name);
 					if (d.dirty || d.requirementError != undefined) {
 						//if (d.x < -50) deleteSelection();  // Delete nodes if dragged back to palette
 						if (d.resize) {
@@ -1566,13 +1566,10 @@ RED.view = (function() {
 	function redraw_paletteNodesReqError(d)
 	{
 		var e1 = document.getElementById("palette_node_"+d.type);
-		var e2 = e1.getElementsByClassName("palette_req_error")[0];
-		//e2.removeEventListener("click", function(){RED.notify('Conflicts:<ul><li>'+d.conflicts.join('</li><li>')+'</li></ul>');});
+		var e2 = e1.getElementsByClassName("palette_req_error")[0]; // palette_req_error is using a style, where the position of the icon is defined
 		e2.addEventListener("click", 
 							function(){RED.notify('Conflicts:<ul><li>'+d.conflicts.join('</li><li>')+'</li></ul>',null,false, 5000);},
 							{once: true});
-		//e2.addEventListener("mouseover", function() {console.log("palette req error icon mouse over");});
-		//e2.addEventListener("mouseout", function() {console.log("palette req error icon mouse out");});
 		if (d.requirementError)
 			e2.classList.remove("hidden");
 		else
