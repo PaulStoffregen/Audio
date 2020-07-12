@@ -45,9 +45,8 @@ public:
 	///@param maxHalfFilterLength Can be used to restrict the maximum filter length at the cost of a lower attenuation
 	AsyncAudioInputSPDIF3(bool dither=true, bool noiseshaping=true,float attenuation=100, int32_t minHalfFilterLength=20, int32_t maxHalfFilterLength=80);
 	~AsyncAudioInputSPDIF3();
-	virtual void update(void);
 	void begin();
-	void stop();
+	virtual void update(void);
 	double getBufferedTime() const;
 	double getInputFrequency() const;
 	static bool isLocked();
