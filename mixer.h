@@ -219,8 +219,6 @@ public:
 				release(block);
 			}
 		}
-		digitalWrite(13, HIGH);
-		digitalWrite(13, LOW);
 	}
 	/**
 	 * shorthand for gain(0, value)
