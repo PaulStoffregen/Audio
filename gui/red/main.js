@@ -214,18 +214,17 @@ var RED = (function() {
 			nns.sort(function(a,b){ return (a.x + a.y/250) - (b.x + b.y/250); });
 			//console.log(JSON.stringify(nns)); // debug test
 
-			var wns = RED.nodes.getWorkspacesAsNodeSet();
-
 			var cpp = "#include <Audio.h>\n#include <Wire.h>\n"
 				+ "#include <SPI.h>\n#include <SD.h>\n#include <SerialFlash.h>\n\n"
 				+ "\n// GUItool: begin automatically generated code\n"
 				+ "// JSON string:\n"
 				+ "//" + JSON.stringify(nns) + "\n";
 
-			for (var wsi=0; wsi < wns.length; wsi++) // workspaces
+			for (var wsi=0; wsi < RED.nodes.workspaces.length; wsi++) // workspaces
 			{
-				if (!wns[wsi].export) continue; // this skip export
-
+				var ws = RED.nodes.workspaces[wsi];
+				if (!ws.export) continue; // this skip export
+				
 				// first go through special types
 				var classComment = "";
 				var classFunctions = "";
@@ -235,7 +234,7 @@ var RED = (function() {
 				for (var i=0; i<nns.length; i++) { 
 					var n = nns[i];
 
-					if (n.z != wns[wsi].id) continue; // workspace filter
+					if (n.z != ws.id) continue; // workspace filter
 					if (n.type == "ClassComment")
 					{
 						//if (n.name == "TestMultiline")
@@ -272,7 +271,7 @@ var RED = (function() {
 				{
 					cpp += "\n/**\n" + classComment + " */"; // newline not needed because it allready in beginning of class definer (check down)
 				}
-				cpp += "\nclass " + wns[wsi].label + "\n{\n public:\n";
+				cpp += "\nclass " + ws.label + "\n{\n public:\n";
 
 				//cpp += "// " + wns[i].id + ":" + wns[i].label + "\n"; // test 
 				
@@ -280,7 +279,7 @@ var RED = (function() {
 				for (var i=0; i<nns.length; i++) {
 					var n = nns[i];
 
-					if (n.z != wns[wsi].id) continue; // workspace filter
+					if (n.z != ws.id) continue; // workspace filter
 
 					var node = RED.nodes.node(n.id);
 					if (!node) continue;
@@ -291,7 +290,7 @@ var RED = (function() {
 					cpp += "    "
 					//console.log(">>>" + n.type +"<<<"); // debug test
 					var typeLength = n.type.length;
-					if (n.type == "AudioMixerX")
+					if (n.type == "AudioMixer")
 					{
 						var tmplDef = "";
 						if (n.inputs == 1) // special case 
@@ -305,7 +304,7 @@ var RED = (function() {
 							}
 							var isArray = RED.nodes.isNameDeclarationArray(src.node.name);
 							if (isArray) tmplDef = "<" + isArray.arrayLenght + ">";
-							console.log("special case AudioMixerX connected from array " + src.node.name + ", new AudioMixerX def:" + tmplDef);
+							console.log("special case AudioMixer connected from array " + src.node.name + ", new AudioMixer def:" + tmplDef);
 						}
 						else
 							tmplDef = "<" + n.inputs + ">";
@@ -335,7 +334,7 @@ var RED = (function() {
 				for (var i=0; i<nns.length; i++) {
 					var n = nns[i];
 
-					if (n.z != wns[wsi].id) continue;
+					if (n.z != ws.id) continue;
 
 					var node = RED.nodes.node(n.id);
 					if (node && node.outputs == 0 && node._def.inputs == 0) {
@@ -424,7 +423,7 @@ var RED = (function() {
 				{
 					var n = nns[i];
 
-					if (n.z != wns[wsi].id) continue; // workspace check
+					if (n.z != ws.id) continue; // workspace check
 					
 					RED.nodes.eachWire(n, function (pi, dstId, dstPortIndex)
 					{
@@ -469,7 +468,7 @@ var RED = (function() {
 				cpp += "*patchCord[" + ac.totalCount + "]; // total patchCordCount:" + ac.totalCount + " including array typed ones.\n";
 				if (classVars.trim().length > 0)
 					cpp += "\n" + incrementTextLines(classVars, "    ");
-				cpp+= "\n    " + wns[wsi].label + "() // constructor (this is called when class-object is created)\n    {\n";
+				cpp+= "\n    " + ws.label + "() // constructor (this is called when class-object is created)\n    {\n";
 				cpp += "        int pci = 0; // used only for adding new patchcords\n\n"
 
 				if (arrayNode) // if defined and found prev, add it now
@@ -596,108 +595,17 @@ var RED = (function() {
 	$('#btn-saveTofile').click(function() { saveAsFile(); });
 	function saveAsFile()
 	{
-		var nns = RED.nodes.createCompleteNodeSet();
-		var jsonString  = JSON.stringify(nns, null, 4);
-		download("TeensyAudioDesign.json", jsonString);
-	}
-	/**
-	 * function used by addClassTabsToPalette()
-	 */
-	function getClassNrOfInputs(nns, classUid)// Jannik add function
-	{
-		var count = 0;
-		for (var i = 0; i  < nns.length; i++)
+		try
 		{
-			var n = nns[i];
-			if (n.z == classUid)
-			{
-				if (n.type == "TabInput")
-				{
-					count++;
-					//console.log("TabInput:" + n.name);
-				}
-			}
-		}
-		return count;
-	}
-	/**
-	 * function used by addClassTabsToPalette()
-	 */
-	function getClassNrOfOutputs(nns, classUid)// Jannik add function
-	{
-		var count = 0;
-		for (var i = 0; i  < nns.length; i++)
+			var nns = RED.nodes.createCompleteNodeSet();
+			var jsonString  = JSON.stringify(nns, null, 4);
+			download("TeensyAudioDesign.json", jsonString);
+		}catch (err)
 		{
-			var n = nns[i];
-			if (n.z == classUid)
-			{
-				if (n.type == "TabOutput")
-				{
-					count++;
-					//console.log("TabOutput:" + n.name);
-				}
-			}
+
 		}
-		return count;
 	}
 	
-	function refreshClassNodes()// Jannik add function
-	{
-	   var nns = RED.nodes.createCompleteNodeSet();
-	   var wns = RED.nodes.getWorkspacesAsNodeSet(); // so that we can get class names
-	   nns.sort(function(a,b){ return (a.x/250 + a.y/250) - (b.x/250 + b.y/250); });
-
-	   for ( var wsi = 0; wsi < wns.length; wsi++)
-	   {
-		   var ws = wns[wsi];
-		   //console.log("ws.label:" + ws.label); // debug
-		   for ( var ni = 0; ni < nns.length; ni++)
-		   {
-			   var n = nns[ni];
-			   //console.log("n.type:" + n.type); // debug
-			   if (n.type == ws.label)
-			   {
-				   console.log("updating " + n.type);
-					var node = RED.nodes.node(n.id); // debug
-					node._def = RED.nodes.getType(n.type); // refresh type def
-					if (!node._def)
-					{
-						console.error("@refreshClassNodes: node._def is undefined!!!")
-						continue;
-					}
-					node._def.inputs = getClassNrOfInputs(nns, ws.id);
-					
-					node._def.outputs = getClassNrOfOutputs(nns, ws.id); // this dont really work directly
-					node.outputs = node._def.outputs; // this will update current
-
-					node.resize = true; // trigger redraw of ports
-			   }
-		   }
-	   }
-	}
-	function addClassTabsToPalette()// Jannik add function
-	{
-		var wns = RED.nodes.getWorkspacesAsNodeSet();
-		var nns = RED.nodes.createCompleteNodeSet();
-		// sort by horizontal position, plus slight vertical position,
-		// for well defined update order that follows signal flow
-		nns.sort(function(a,b){ return (a.x/250 + a.y/250) - (b.x/250 + b.y/250); });
-
-		for (var i=0; i < wns.length; i++)
-		{
-			var ws = wns[i];
-			var inputCount = getClassNrOfInputs(nns, ws.id);
-			var outputCount = getClassNrOfOutputs(nns, ws.id);
-
-			if ((inputCount == 0) && (outputCount == 0)) continue; // skip adding class with no IO
-
-			
-			//var data = $.parseJSON("{\"defaults\":{\"name\":{\"value\":\"new\"}},\"shortName\":\"" + ws.label + "\",\"inputs\":" + inputCount + ",\"outputs\":" + outputCount + ",\"category\":\"tabs-function\",\"color\":\"" + classColor + "\",\"icon\":\"arrow-in.png\"}");
-			var data = $.parseJSON("{\"defaults\":{\"name\":{\"value\":\"new\"},\"id\":{\"value\":\"new\"}},\"shortName\":\"" + ws.label + "\",\"inputs\":" + inputCount + ",\"outputs\":" + outputCount + ",\"category\":\"tabs-function\",\"color\":\"" + classColor + "\",\"icon\":\"arrow-in.png\"}");
-
-			RED.nodes.registerType(ws.label, data);
-		}
-	}
 	function getConfirmLoadDemoText(filename)
 	{
 		return "<p> You are going to replace your current flow</p>" +
@@ -802,8 +710,8 @@ var RED = (function() {
 			$(".palette-scroll").show();
 			$("#palette-search").show();
 			RED.storage.load();
-			addClassTabsToPalette();
-			refreshClassNodes();
+			RED.nodes.addClassTabsToPalette();
+			RED.nodes.refreshClassNodes();
 			RED.view.redraw();
 			
 			setTimeout(function() {
@@ -889,8 +797,6 @@ var RED = (function() {
 	});
 
 	return {
-		addClassTabsToPalette:addClassTabsToPalette,
-		refreshClassNodes:refreshClassNodes,
 		isSpecialNode:isSpecialNode,
 		classColor:classColor
 	};

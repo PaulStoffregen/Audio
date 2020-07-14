@@ -590,7 +590,7 @@ RED.view = (function() {
 				nn.type = selected_tool;
 				nn._def = RED.nodes.getType(nn.type);
 				
-				nn.id = RED.nodes.cppId(nn, RED.nodes.workspaces[activeWorkspace].label);  // jannik add/change
+				nn.id = RED.nodes.cppId(nn, RED.nodes.getWorkspace(activeWorkspace).label);  // jannik add/change
 				nn.name = (nn._def.shortName) ? nn._def.shortName : nn.type.replace(/^Analog/, "");// jannik add/change temp name
 				nn.name = RED.nodes.cppName(nn); // jannik add/change create unique name
 
@@ -2127,7 +2127,7 @@ RED.view = (function() {
 			}
 			data2 = $("<div/>").append("<p>" + portName + "</p></div>").html();
 		}
-		else if (nodeType == "AudioMixerX" && portType == "In")
+		else if (nodeType == "AudioMixer" && portType == "In")
 		{
 			data2 = $("<div/>").append("<p>" + portName + ": Input Signal #" + (Number(index) + 1) + "</p></div>").html();
 		}

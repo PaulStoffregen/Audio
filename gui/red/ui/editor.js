@@ -496,8 +496,8 @@ RED.editor = (function() {
 		
 		console.log("showEditDialog"); // just to make it easier to find this function
 		
-		//if (node.type == "AudioMixerX") // Jannik add
-		//	editorType = "AudioMixerX"; // Jannik add
+		//if (node.type == "AudioMixer") // Jannik add
+		//	editorType = "AudioMixer"; // Jannik add
 		//else
 		//	editorType = "NodesGlobalEdit"; // Jannik add (this force use of global edit form, except for other defined above
 		

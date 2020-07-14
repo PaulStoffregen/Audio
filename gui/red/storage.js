@@ -4,21 +4,37 @@
 
 RED.storage = (function() {
 	function update() {
-		RED.addClassTabsToPalette(); //Jannik
-		RED.refreshClassNodes(); //Jannik
+		RED.nodes.addClassTabsToPalette(); //Jannik
+		RED.nodes.refreshClassNodes(); //Jannik
 		
 		// TOOD: use setTimeout to limit the rate of changes?
-		// (Jannik say that is not needed because it never save often anyway)
+		// (Jannik say that is not needed because it's better to save often, not to loose any changes)
+		// it's only needed when we move objects with keyboard, 
+		// but then the save timeOut should be at keyboard move function not here.
+		// TODO: save when using keyboard to move nodes.
 		
 		if (localStorage)
 		{
 			var nns = RED.nodes.createCompleteNodeSet();
-			localStorage.setItem("audio_library_guitool", JSON.stringify(nns));
+			localStorage.setItem("audio_library_guitool",JSON.stringify(nns));
 			console.log("localStorage write");
 		}
 	}
+	function allStorage() {
+
+		var archive = [],
+			keys = Object.keys(localStorage),
+			i = 0, key;
+	
+		for (; key = keys[i]; i++) {
+			archive.push( key + '=' + localStorage.getItem(key));
+		}
+	
+		return archive;
+	}
 	function load() {
 		if (localStorage) {
+			console.warn(allStorage());
 			var data = localStorage.getItem("audio_library_guitool");
 			console.log("localStorage read: " );//+ data);
 			if (data)

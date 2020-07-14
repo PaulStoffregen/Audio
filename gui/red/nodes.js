@@ -21,7 +21,7 @@ RED.nodes = (function() {
 	var configNodes = {};
 	var links = []; // link structure {source:,sourcePort:,target:,targetPort:};
 	var defaultWorkspace;
-	var workspaces = {};
+	var workspaces = [];
 	var showWorkspaceToolbar = true;
 
 	/**
@@ -36,36 +36,43 @@ RED.nodes = (function() {
 	btnWworkspaceToolbar.toggleClass("active", showWorkspaceToolbar);
 
 	$('#btn-moveWorkSpaceLeft').click(function() { moveWorkSpaceLeft(); });
-	$('#btn-moveWorkSpaceRight').click(function() {  });
+	$('#btn-moveWorkSpaceRight').click(function() { moveWorkSpaceRight();  });
 	function moveWorkSpaceLeft()
 	{
-		var index = getIndexOfCurrentWorkspace();
+		var index = getWorkspaceIndex(RED.view.getWorkspace());
 		if (index == 0) return;
 
 		let wrapper=document.querySelector(".red-ui-tabs");
 		let children=wrapper.children;
 		
-		wrapper.insertBefore(children[index], children[index-1]); // this works but we also must update workspaces
+		wrapper.insertBefore(children[index], children[index-1]); // children[index] is inserted before children[index-1]
+		var wsTemp = workspaces[index-1];
+		workspaces[index-1] = workspaces[index];
+		workspaces[index] = wsTemp;
+		RED.storage.update();
 	}
-	function getIndexOfCurrentWorkspace()
+	function moveWorkSpaceRight()
 	{
-		var wsId = RED.view.getWorkspace();
-		var index = 0;
-		console.error("workspaces.length:"+workspaces.length+"\n"+Object.getOwnPropertyNames(workspaces));
-		for (i in workspaces) {
-			if (workspaces.hasOwnProperty(i)) {
-				if (workspaces[i].id == wsId)
-				{
-					console.error(Object.getOwnPropertyNames(workspaces[i]));
-					console.warn("found ws index:" + index);
-					return index;
-				}
-				else
-					index++;
-			}
-		}
+		var index = getWorkspaceIndex(RED.view.getWorkspace());
+		if (index == (workspaces.length-1)) return;
+
+		let wrapper=document.querySelector(".red-ui-tabs");
+		let children=wrapper.children;
 		
-		return -1;
+		wrapper.insertBefore(children[index+1], children[index]); // children[index+1] is inserted before children[index]
+
+		var wsTemp = workspaces[index+1];
+		workspaces[index+1] = workspaces[index];
+		workspaces[index] = wsTemp;
+		RED.storage.update();
+	}
+	function arraySpliceExample()
+	{
+		var arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+		console.error("original:" + arr);
+		var removed = arr.splice(2,2,4,3);
+		console.error("removed:" + removed);
+		console.error("modified:" + arr);
 	}
 	$('#btn-workspace-toolbar').click(function() {
 		showWorkspaceToolbar = !showWorkspaceToolbar;
@@ -311,13 +318,29 @@ RED.nodes = (function() {
 	}
 
 	function addWorkspace(ws) {
-		workspaces[ws.id] = ws;
+		workspaces.push(ws);
+	}
+	function getWorkspaceIndex(id)
+	{
+		for (var i = 0; i < workspaces.length; i++)
+		{
+			if (workspaces[i].id == id)
+				return i;
+		}
+		return -1;
 	}
 	function getWorkspace(id) {
-		return workspaces[id];
+		for (var i = 0; i < workspaces.length; i++)
+		{
+			if (workspaces[i].id == id)
+				return workspaces[i];
+		}
+		return null;
 	}
 	function removeWorkspace(id) {
-		delete workspaces[id];
+		var index = getWorkspaceIndex(id);
+		if (index != -1) workspaces.splice(index, 1);
+		
 		var removedNodes = [];
 		var removedLinks = [];
 		var n;
@@ -422,26 +445,13 @@ RED.nodes = (function() {
 		}
 		return nns;
 	}
-	function getWorkspacesAsNodeSet() {
-		var nns = [];
-		var i;
-		for (i in workspaces) {
-			if (workspaces.hasOwnProperty(i)) {
-				nns.push(workspaces[i]);
-			}
-		}
-		return nns;
-	}
-
 	//TODO: rename this (createCompleteNodeSet)
 	function createCompleteNodeSet() {
 		var nns = [];
 		var i;
-		for (i in workspaces) {
-			if (workspaces.hasOwnProperty(i)) {
-				nns.push(workspaces[i]);
-			}
-		}
+		for (i=0;i<workspaces.length;i++)
+			nns.push(workspaces[i]);
+
 		for (i in configNodes) {
 			if (configNodes.hasOwnProperty(i)) {
 				nns.push(convertNode(configNodes[i], true));
@@ -730,7 +740,7 @@ RED.nodes = (function() {
 					var ws = convertWorkspaceToNewVersion(newNodes, n);
 					addWorkspace(ws);
 					RED.view.addWorkspace(ws); // final function is in tabs.js
-					console.warn("added new workspace lbl:" + n.label + ",inputs:" + n.inputs + ",outputs:" + n.outputs);
+					console.warn("added new workspace lbl:" + ws.label + ",inputs:" + ws.inputs + ",outputs:" + ws.outputs + ",id:" + ws.id);
 
 					if (ws.inputs != 0 || ws.outputs != 0) // this adds workspaces that have inputs and/or outputs to the palette
 					{
@@ -753,6 +763,9 @@ RED.nodes = (function() {
 				n = newNodes[i];
 				// TODO: remove workspace in next release+1
 				if (n.type !== "workspace" && n.type !== "tab") {
+					
+					if (n.type == "AudioMixerX") n.type = "AudioMixer"; // type conversion
+
 					var def = getType(n.type);
 					if (def && def.category == "config") {
 						if (!RED.nodes.node(n.id)) {
@@ -808,8 +821,15 @@ RED.nodes = (function() {
 						} else {
 							node.name = n.name;
 							node.id = n.id;
-							if (node.z == null || !workspaces[node.z]) {
-								node.z = RED.view.getWorkspace(); // failsafe
+							if (node.z == null) { //!workspaces[node.z]) {
+								console.error("node.z == null -> add node to current workspace");
+								node.z = RED.view.getWorkspace(); // failsafe to set node workspace as current
+							}
+							else if (getWorkspaceIndex(node.z) == -1)
+							{
+								console.error("getWorkspaceIndex("+node.z+") == -1 -> add node to current workspace");
+								//console.error(workspaces);
+								node.z = RED.view.getWorkspace(); // failsafe to set node workspace as current
 							}
 							
 
@@ -907,18 +927,11 @@ RED.nodes = (function() {
 	}
 	function workspaceNameCheck(newName)
 	{
-		var i;
-		for (i in workspaces) {
-			if (workspaces.hasOwnProperty(i)) {
-				if (workspaces[i].label == newName)
-					return true;
-			}
-		}
-		/*for (var wsi=0; wsi < workspaces.length; wsi++)
+		for (var wsi=0; wsi < workspaces.length; wsi++)
 		{
 			if (workspaces[wsi].label == newName)
 				return true;
-		}*/
+		}
 		return false;
 	}
 
@@ -1038,11 +1051,9 @@ RED.nodes = (function() {
 	}
 	function isClass(type)
 	{
-		var wns = RED.nodes.getWorkspacesAsNodeSet();
-
-		for (var wsi = 0; wsi < wns.length; wsi++)
+		for (var wsi = 0; wsi < workspaces.length; wsi++)
 		{
-			var ws = wns[wsi];
+			var ws = workspaces[wsi];
 			if (type == ws.label) return true;
 			//console.log(node.type  + "!="+ ws.label);
 		}
@@ -1051,11 +1062,9 @@ RED.nodes = (function() {
 	
 	function getWorkspaceIdFromClassName(type)
 	{
-		var wns = RED.nodes.getWorkspacesAsNodeSet();
-
-		for (var wsi = 0; wsi < wns.length; wsi++)
+		for (var wsi = 0; wsi < workspaces.length; wsi++)
 		{
-			var ws = wns[wsi];
+			var ws = workspaces[wsi];
 			if (type == ws.label)  return ws.id;
 		}
 		return "";
@@ -1205,6 +1214,93 @@ RED.nodes = (function() {
 		});
 		return items;
 	}
+	/**
+	 * function used by addClassTabsToPalette()
+	 */
+	function getClassNrOfInputs(nns, classUid)// Jannik add function
+	{
+		var count = 0;
+		for (var i = 0; i  < nns.length; i++)
+		{
+			var n = nns[i];
+			if (n.z == classUid)
+			{
+				if (n.type == "TabInput")
+				{
+					count++;
+					//console.log("TabInput:" + n.name);
+				}
+			}
+		}
+		return count;
+	}
+	/**
+	 * function used by addClassTabsToPalette()
+	 */
+	function getClassNrOfOutputs(nns, classUid)// Jannik add function
+	{
+		var count = 0;
+		for (var i = 0; i  < nns.length; i++)
+		{
+			var n = nns[i];
+			if (n.z == classUid)
+			{
+				if (n.type == "TabOutput")
+				{
+					count++;
+					//console.log("TabOutput:" + n.name);
+				}
+			}
+		}
+		return count;
+	}
+	
+	function refreshClassNodes()// Jannik add function
+	{
+	   for ( var wsi = 0; wsi < workspaces.length; wsi++)
+	   {
+		   var ws = workspaces[wsi];
+		   //console.log("ws.label:" + ws.label); // debug
+		   for ( var ni = 0; ni < nodes.length; ni++)
+		   {
+			   var n = nodes[ni];
+			   //console.log("n.type:" + n.type); // debug
+			   if (n.type == ws.label)
+			   {
+				   console.log("updating " + n.type);
+					var node = RED.nodes.node(n.id);
+					node._def = RED.nodes.getType(n.type); // refresh type def
+					if (!node._def)
+					{
+						console.error("@refreshClassNodes: node._def is undefined!!!")
+						continue;
+					}
+					node._def.inputs = getClassNrOfInputs(nodes, ws.id);
+					
+					node._def.outputs = getClassNrOfOutputs(nodes, ws.id); // this dont really work directly
+					node.outputs = node._def.outputs; // this will update current
+
+					node.resize = true; // trigger redraw of ports
+			   }
+		   }
+	   }
+	}
+	function addClassTabsToPalette()// Jannik add function
+	{
+		for (var i=0; i < workspaces.length; i++)
+		{
+			var ws = workspaces[i];
+			var inputCount = getClassNrOfInputs(nodes, ws.id);
+			var outputCount = getClassNrOfOutputs(nodes, ws.id);
+
+			if ((inputCount == 0) && (outputCount == 0)) continue; // skip adding class with no IO
+			var classColor = RED.classColor;
+			//var data = $.parseJSON("{\"defaults\":{\"name\":{\"value\":\"new\"}},\"shortName\":\"" + ws.label + "\",\"inputs\":" + inputCount + ",\"outputs\":" + outputCount + ",\"category\":\"tabs-function\",\"color\":\"" + classColor + "\",\"icon\":\"arrow-in.png\"}");
+			var data = $.parseJSON("{\"defaults\":{\"name\":{\"value\":\"new\"},\"id\":{\"value\":\"new\"}},\"shortName\":\"" + ws.label + "\",\"inputs\":" + inputCount + ",\"outputs\":" + outputCount + ",\"category\":\"tabs-function\",\"color\":\"" + classColor + "\",\"icon\":\"arrow-in.png\"}");
+
+			registerType(ws.label, data);
+		}
+	}
 	function make_name(n) {
 		var name = (n.name ? n.name : n.id);
 		name = name.replace(" ", "_").replace("+", "_").replace("-", "_");
@@ -1252,7 +1348,6 @@ RED.nodes = (function() {
 		refreshValidation: refreshValidation,
 		getAllFlowNodes: getAllFlowNodes,
 		createExportableNodeSet: createExportableNodeSet,
-		getWorkspacesAsNodeSet: getWorkspacesAsNodeSet,
 		createCompleteNodeSet: createCompleteNodeSet,
 		id: getID,
 		cppName: createUniqueCppName,
@@ -1262,7 +1357,7 @@ RED.nodes = (function() {
 		isClass:isClass,
 		getClassComments:getClassComments,
 		getWorkspaceIdFromClassName:getWorkspaceIdFromClassName,
-
+		getWorkspace:getWorkspace,
 		getClassPortNode:getClassPortNode,
 		getWireInputSourceNode:getWireInputSourceNode,
 		getClassIOportsSorted:getClassIOportsSorted,
@@ -1270,6 +1365,8 @@ RED.nodes = (function() {
 		classOutputPortToCpp:classOutputPortToCpp,
 		classInputPortToCpp:classInputPortToCpp,
 		isNameDeclarationArray:isNameDeclarationArray,
+		addClassTabsToPalette:addClassTabsToPalette,
+		refreshClassNodes:refreshClassNodes,
 		make_name:make_name,
 		showWorkspaceToolbar:showWorkspaceToolbar,
 		nodes: nodes, // TODO: exposed for d3 vis
