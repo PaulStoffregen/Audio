@@ -18,32 +18,51 @@
 RED.palette = (function() {
 
 	var exclusion = ['config','unknown','deprecated'];
-	var core =		   ['tabs',  'synth' , 'mixer', 'effect', 'input', 'output', 'play', 'record', 'filter', 'analyze'];
-	var displayStyle = ['block', 'block',  'block', 'block',  'none',  'none',   'none', 'none',   'none',   'none'];
-	var inCat = ['i2s1','i2s2','spdif','adc','other'];
-	var outCat = ['i2s1','i2s2','spdif','adc','other'];
-	//var outputCat = ['output-i2s1','output-i2s2','output-spdif','output-adc'];
-	
-	function createCategoryContainer(category, destContainer, displayStyle, isSubCat){ // displayStyle can be set to none to collapse all categories at start
-		if (!displayStyle)
-			displayStyle = "block"; // jannik add
-		if (!destContainer)
-			destContainer = "palette-container";
-		var palette_category = "palette-category";
+	var core =	
+	[
+		{name:'favs',    expanded:false},
+		{name:'used',    expanded:false},
+		{name:'tabs',    expanded:false},
+		{name:'synth',   expanded:false},
+		{name:'mixer',   expanded:false},
+		{name:'effect',  expanded:false},
+		{name:'filter',  expanded:false},
+		{name:'input',   expanded:false, subcats:['i2s1','i2s2','spdif','adc','other']},
+		{name:'output',  expanded:false, subcats:['i2s1','i2s2','spdif','adc','other']},
+		{name:'play',    expanded:false},
+		{name:'record',  expanded:false},
+		{name:'analyze', expanded:false},
+		{name:'control', expanded:false}
+	];
+
+	function createCategoryContainer(category, destContainer, expanded, isSubCat){ 
 		var chevron = "";
+		var displayStyle = "";
+		if (!destContainer)	destContainer = "palette-container"; // failsafe
+		var palette_category = "palette-category";
+		
 		var header = category;
 		var palette_header_class = "palette-header";
 		if (isSubCat)
 		{
+			displayStyle = "block";
 			palette_category += "-sub-cat";
 			header = header.substring(header.indexOf('-')+1);
 			palette_header_class += "-sub-cat";
 		}
-		else
-			chevron = '<i class="expaded icon-chevron-down"></i>';
-
-
-
+		//else
+		//{
+			if (expanded == true)
+			{
+				chevron = '<i class="icon-chevron-down expanded"></i>';
+				displayStyle = "block";
+			}
+			else
+			{
+				chevron = '<i class="icon-chevron-down"></i>';
+				displayStyle = "none";
+			}
+		//}
 		$("#" + destContainer).append('<div class="' + palette_category + '">'+
 			'<div id="header-'+category+'" class="'+palette_header_class+'">'+chevron+'<span>'+header+'</span></div>'+
 			'<div class="palette-content" id="palette-base-category-'+category+'" style="display: '+displayStyle+';">'+
@@ -52,104 +71,142 @@ RED.palette = (function() {
 			  '<div id="palette-'+category+'-function"></div>'+
 			'</div>'+
 			'</div>');
-			
-
 	}
-	function doInit(categories, destContainer, display, catPreName, isSubCat)
+	function doInit(categories)
 	{
-		if (!catPreName) catPreName = "";
 		for (var i = 0; i < categories.length; i++)
 		{
-			if (display)
-				createCategoryContainer(catPreName + categories[i],destContainer, display[i], isSubCat); 
-			else
-				createCategoryContainer(catPreName + categories[i],destContainer, null, isSubCat);
+			var cat = categories[i];
+			createCategoryContainer(cat.name, "palette-container", cat.expanded, false); 
+			if (cat.subcats != undefined)
+				addSubCats("palette-" + cat.name + "-function", cat.name + "-", cat.subcats);
+		}
+		setCategoryClickFunction('input');
+		setCategoryClickFunction('output');
+	}
+	function addSubCats(destContainer, catPreName, categories)
+	{
+		for (var i = 0; i < categories.length; i++)
+		{
+			createCategoryContainer(catPreName + categories[i],destContainer, true, true); 
 		}
 	}
-	//core.forEach(createCategoryContainer);
-	doInit(core, "palette-container", displayStyle, null, false);
-	//doInit(inputCat,"palette-base-category-input");
-	//doInit(outputCat,"palette-base-category-output");
-	doInit(inCat,"palette-input-function", null, "input-", true);
-	doInit(outCat,"palette-output-function", null, "output-", true);
+	doInit(core);
 	
+	/**
+	 * add new node type to the palette
+	 * @param {*} nt  node type
+	 * @param {*} def node type def
+	 * 	 */
 	function addNodeType(nt,def) {
 		
-		if ($("#palette_node_"+nt).length) {
-			return;
-		}
-		
-		if (exclusion.indexOf(def.category)===-1) {
-		  
-		  var category = def.category.split("-");
-		  
-		  var d = document.createElement("div");
-		  d.id = "palette_node_"+nt;
-		  d.type = nt;
+		if ($("#palette_node_"+nt).length)	return;		
+		if (exclusion.indexOf(def.category)!=-1) return;
+		var indexOf = def.category.lastIndexOf("-");
+		var category = def.category.substring(0, indexOf);
 
-		  //var label = /^(.*?)([ -]in|[ -]out)?$/.exec(nt)[1];
-		  var label = (def.shortName) ? def.shortName : nt;
+		console.warn("add addNodeType:" + category);
+			
+			var d = document.createElement("div");
+			d.id = "palette_node_"+nt;
+			d.type = nt;
 
-		  d.innerHTML = '<div class="palette_label">'+label+"</div>";
-		  d.className="palette_node";
-		  if (def.icon) {
-			  d.style.backgroundImage = "url(icons/"+def.icon+")";
-			  if (def.align == "right") {
-				  d.style.backgroundPosition = "95% 50%";
-			  } else if (def.inputs > 0) {
-				  d.style.backgroundPosition = "10% 50%";
-			  }
-		  }
-		  
-		  d.style.backgroundColor = def.color;
-		  
-		  if (def.outputs > 0) {
-			  var portOut = document.createElement("div");
-			  portOut.className = "palette_port palette_port_output";
-			  d.appendChild(portOut);
-		  }
+			//var label = /^(.*?)([ -]in|[ -]out)?$/.exec(nt)[1];
+			var label = (def.shortName) ? def.shortName : nt;
 
-		  var reqError = document.createElement("div");
-		  reqError.className = "palette_req_error hidden";
+			d.innerHTML = '<div class="palette_label">'+label+"</div>";
+			d.className="palette_node";
+			if (def.icon) {
+				d.style.backgroundImage = "url(icons/"+def.icon+")";
+				if (def.align == "right") {
+					d.style.backgroundPosition = "95% 50%";
+				} else if (def.inputs > 0) {
+					d.style.backgroundPosition = "10% 50%";
+				}
+			}
+			
+			d.style.backgroundColor = def.color;
+			
+			if (def.outputs > 0) {
+				var portOut = document.createElement("div");
+				portOut.className = "palette_port palette_port_output";
+				d.appendChild(portOut);
+			}
 
-		  d.appendChild(reqError);
-		  
-		  if (def.inputs > 0) {
-			  var portIn = document.createElement("div");
-			  portIn.className = "palette_port";
-			  d.appendChild(portIn);
-		  }
-		  
-		  if ($("#palette-base-category-"+category[0]).length === 0){
-			  createCategoryContainer(category[0], "palette-container");
-		  }
-		  
-		  if ($("#palette-"+def.category).length === 0) {          
-			  $("#palette-base-category-"+category[0]).append('<div id="palette-'+def.category+'"></div>');            
-		  }
-		  
-		  $("#palette-"+def.category).append(d);
-		  d.onmousedown = function(e) { e.preventDefault(); };
+			var reqError = document.createElement("div");
+			reqError.className = "palette_req_error hidden";
 
-		  setTooltipContent('', nt, d);
+			d.appendChild(reqError);
+			
+			if (def.inputs > 0) {
+				var portIn = document.createElement("div");
+				portIn.className = "palette_port";
+				d.appendChild(portIn);
+			}
+			
+			if ($("#palette-base-category-"+category).length === 0){
+				createCategoryContainer(category, "palette-container");
+			}
+			
+			if ($("#palette-"+def.category).length === 0) {          
+				$("#palette-base-category-"+category).append('<div id="palette-'+def.category+'"></div>');            
+			}
+			
+			$("#palette-"+def.category).append(d);
+			d.onmousedown = function(e) { e.preventDefault(); };
 
-		  $(d).click(function() {
+			setTooltipContent('', nt, d);
+
+		    $(d).click(function() {
 			  	console.warn("palette node click:" + d.type);
 				RED.nodes.selectNode(d.type);
 			  	RED.sidebar.info.setHelpContent('', d.type);
-		  });
-		  $(d).draggable({
-			  helper: 'clone',
-			  appendTo: 'body',
-			  revert: true,
-			  revertDuration: 50
-		  });
-		 
-		  $("#header-"+category[0]).off('click').on('click', function(e) {
-			  $(this).next().slideToggle();
-			  $(this).children("i").toggleClass("expanded");
-		  });
-		}
+		    });
+		    $(d).draggable({
+			   helper: 'clone',
+			   appendTo: 'body',
+			   revert: true,
+			   revertDuration: 50
+		    });
+		    
+			setCategoryClickFunction(category);
+		
+	}
+	
+	function setCategoryClickFunction(category)
+	{
+		$("#header-"+category).off('click').on('click', function(e) {
+			
+			var displayStyle = $(this).next().css('display');
+			if (displayStyle == "block")
+			{
+				$(this).next().slideUp();
+			}
+			else
+			{
+				if (!isSubCat($(this).next().attr('id'))) // don't run when colapsing sub cat
+				{
+					var otherCat = $(".palette-content");
+					for (var i = 0; i < otherCat.length; i++)
+					{
+						if (isSubCat(otherCat[i].id)) continue; // don't colapse sub-cat
+
+						//console.warn(otherCat[i].id);
+						$(otherCat[i]).slideUp();
+					}
+				}
+				$(this).next().slideDown();
+			}
+			//$(this).next().slideToggle(250,'swing');
+
+			$(this).children("i").toggleClass("expanded");
+		});
+	}
+	function isSubCat(id)
+	{
+		if (id.startsWith("palette-base-category-input-")) return true;
+		if (id.startsWith("palette-base-category-output-")) return true;
+		return false;
 	}
 
 	function setTooltipContent(prefix, key, elem) {
@@ -193,13 +250,13 @@ RED.palette = (function() {
 			$("#palette-search-clear").show();
 		}
 		
-		var re = new RegExp(val);
+		var re = new RegExp(val, "i");
 		$(".palette_node").each(function(i,el) {
-			if (val === "" || re.test(el.id)) {
+			var label = $(el).find(".palette_label").html(); // fixed this so that it searches for the label 
+			if (val === "" || re.test(label))
 				$(this).show();
-			} else {
+			else
 				$(this).hide();
-			}
 		});
 	}
 	
@@ -227,6 +284,11 @@ RED.palette = (function() {
 			$("#palette-search-input").blur();
 		});
 	});
+	
+	
+	
+
+	
 	
 	return {
 		add:addNodeType,

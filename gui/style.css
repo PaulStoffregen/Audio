@@ -201,7 +201,7 @@ a.brand img {
 .palette-header-sub-cat {
     background: #fafafa;
     border-radius: 3px;
-    cursor: default;
+    cursor: pointer;
     text-align: center;
     padding: 3px;
 }
@@ -215,6 +215,20 @@ a.brand img {
     -o-transform: rotate(-90deg);
 }
 .palette-header i.expanded {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+}
+.palette-header-sub-cat i {
+    float: right;
+    -webkit-transition: all 0.2s ease-in-out;
+    -moz-transition: all 0.2s ease-in-out;
+    -o-transition: all 0.2s ease-in-out;
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
+}
+.palette-header-sub-cat i.expanded {
     -webkit-transform: rotate(0deg);
     -moz-transform: rotate(0deg);
     -o-transform: rotate(0deg);
@@ -296,7 +310,7 @@ a.brand img {
 /* ---------- Layout ---------- */
 #main-container {
     position: absolute;
-    top:50px; left:0; bottom: 0; right:0;
+    top:50px; left:0px; bottom: 0; right:0;
     overflow:hidden;
 }
 #palette {
@@ -306,7 +320,7 @@ a.brand img {
 #workspace {
     position: absolute;
     margin: 0;
-    top:5px; left:160px; bottom: 10px; right: 330px;
+    top:5px; left:180px; bottom: 10px; right: 330px;
 }
 #chart-zoom-controls {
     position: absolute;
