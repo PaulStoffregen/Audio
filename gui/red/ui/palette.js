@@ -17,6 +17,7 @@
  
 RED.palette = (function() {
 
+	var onlyShowOne = true;
 	var exclusion = ['config','unknown','deprecated'];
 	var core =	
 	[
@@ -101,11 +102,15 @@ RED.palette = (function() {
 	function addNodeType(nt,def) {
 		
 		if ($("#palette_node_"+nt).length)	return;		
-		if (exclusion.indexOf(def.category)!=-1) return;
+		//if (exclusion.indexOf(def.category)!=-1) return;
 		var indexOf = def.category.lastIndexOf("-");
-		var category = def.category.substring(0, indexOf);
+		var category = "";
+		if (indexOf != -1)
+			category = def.category.substring(0, indexOf);
+		else
+			category = def.category;
 
-		console.warn("add addNodeType:" + category);
+		//console.warn("add addNodeType:" + category);
 			
 			var d = document.createElement("div");
 			d.id = "palette_node_"+nt;
@@ -177,30 +182,44 @@ RED.palette = (function() {
 	{
 		$("#header-"+category).off('click').on('click', function(e) {
 			
+			console.log("onlyShowOne:" + onlyShowOne);
 			var displayStyle = $(this).next().css('display');
 			if (displayStyle == "block")
 			{
 				$(this).next().slideUp();
+				$(this).children("i").removeClass("expanded"); // chevron
 			}
 			else
 			{
-				if (!isSubCat($(this).next().attr('id'))) // don't run when colapsing sub cat
+				if (!isSubCat($(this).next().attr('id')) && (onlyShowOne == true)) // don't run when collapsing sub cat
 				{
-					var otherCat = $(".palette-content");
-					for (var i = 0; i < otherCat.length; i++)
-					{
-						if (isSubCat(otherCat[i].id)) continue; // don't colapse sub-cat
-
-						//console.warn(otherCat[i].id);
-						$(otherCat[i]).slideUp();
-					}
+					setShownStateForAll(false);
 				}
 				$(this).next().slideDown();
+				$(this).children("i").addClass("expanded"); // chevron
 			}
-			//$(this).next().slideToggle(250,'swing');
-
-			$(this).children("i").toggleClass("expanded");
+			//$(this).children("i").toggleClass("expanded");
 		});
+	}
+	function setShownStateForAll(state)
+	{
+		var otherCat = $(".palette-header");
+		var otherCat2 = $(".palette-content");
+		for (var i = 0; i < otherCat.length; i++)
+		{
+			if (isSubCat(otherCat2[i].id)) continue; // don't collapse sub-cat
+			//console.warn(otherCat[i].id);
+			if (state)
+			{
+				$(otherCat2[i]).slideDown();
+				$(otherCat[i]).children("i").addClass("expanded");
+			}
+			else
+			{
+				$(otherCat2[i]).slideUp();
+				$(otherCat[i]).children("i").removeClass("expanded");
+			}
+		}
 	}
 	function isSubCat(id)
 	{
@@ -288,10 +307,15 @@ RED.palette = (function() {
 	
 	
 
-	
+	function SetOnlyShowOne(state)
+	{
+		onlyShowOne = state;
+	}
 	
 	return {
 		add:addNodeType,
-		remove:removeNodeType
+		remove:removeNodeType,
+		SetOnlyShowOne:SetOnlyShowOne,
+		onlyShowOne:onlyShowOne
 	};
 })();

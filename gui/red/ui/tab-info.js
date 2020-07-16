@@ -21,8 +21,9 @@ RED.sidebar.info = (function() {
 	content.style.paddingTop = "4px";
 	content.style.paddingLeft = "4px";
 	content.style.paddingRight = "4px";
-
 	RED.sidebar.addTab("info",content);
+
+	console.warn("tab-info loading.."); // to see loading order
 	
 	var standardHelpText = "<h3>Welcome</h3><p>The Audio System Design Tool lets you easily draw a system to process 16 bit, 44.1 kHz streaming audio while your Arduino sketch also runs.</p><p>Export will generate code to copy into the Arduino editor, to implement your system.</p><p>Most objects provide simple functions you can call from setup() or loop() to control your audio project!</p><h3>Offline Use</h3><p>This tool does not use a server.  A stand-alone copy is provided with the Teensy Audio Library, in the gui folder.</p><h3>Credits</h3><p>Special thanks to Nicholas O'Leary, Dave Conway-Jones and IBM.</p><p>Without their work on the open source <a href=\"http://nodered.org/\" target=\"_blank\">Node-RED</a> project, this graphical design tool would not have been possible!</p>";
 	$("#tab-info").html(standardHelpText);
@@ -45,10 +46,14 @@ RED.sidebar.info = (function() {
 	}
 	
 	function refresh(node) {
+		//console.warn("tab-info refresh");
+		RED.sidebar.show("info");
 		var table = '<table class="node-info"><tbody>';
 
 		table += "<tr><td>Type</td><td>&nbsp;"+node.type+"</td></tr>";
 		table += "<tr><td>ID</td><td>&nbsp;"+node.id+"</td></tr>";
+		table += "<tr><td>posX</td><td>&nbsp;"+node.x+"</td></tr>"; // development info only
+		table += "<tr><td>posY</td><td>&nbsp;"+node.y+"</td></tr>"; // development info only
 		table += '<tr class="blank"><td colspan="2">&nbsp;Properties</td></tr>';
 		for (var n in node._def.defaults) {
 			if (node._def.defaults.hasOwnProperty(n)) {
@@ -135,6 +140,7 @@ RED.sidebar.info = (function() {
 
 	function showSelection(items)
 	{
+		RED.sidebar.show("info");
 		var firstType = items[0].n.type;
 		var sameType = true;
 		for (var i = 1; i < items.length; i++)

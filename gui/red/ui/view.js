@@ -17,6 +17,7 @@
 
 
 RED.view = (function() {
+	var showGrid = true;
 	var space_width = 5000,
 		space_height = 5000,
 		lineCurveScale = 0.75,
@@ -192,11 +193,15 @@ RED.view = (function() {
 		.attr('fill','#fff');
 
 	var gridScale = d3.scale.linear().range([0,5000]).domain([0,5000]);
-	
 	var grid = vis.append('g');
-
-	grid.selectAll("line.horizontal").data(gridScale.ticks(500)).enter()
-	    .append("line")
+	makeGridVisible();
+	var drag_line = vis.append("svg:path").attr("class", "drag_line");
+	
+	
+	function makeGridVisible()
+	{
+		grid.selectAll("line.horizontal").data(gridScale.ticks(500)).enter()
+	    	.append("line")
 	        .attr(
 	        {
 	            "class":"horizontal",
@@ -210,8 +215,8 @@ RED.view = (function() {
 				//"stroke-dasharray":"2",
 	            "stroke-width" : "1px"
 	        });
-	grid.selectAll("line.vertical").data(gridScale.ticks(500)).enter()
-	     .append("line")
+		grid.selectAll("line.vertical").data(gridScale.ticks(50)).enter()
+	     	.append("line")
 	        .attr(
 	        {
 	            "class":"vertical",
@@ -225,10 +230,24 @@ RED.view = (function() {
 				//"stroke-dasharray":"2",
 	            "stroke-width" : "1px"
 	        });
+	}
 
-
-	var drag_line = vis.append("svg:path").attr("class", "drag_line");
 	
+	function showHideGrid(state)
+	{
+		// hmm. see how we can do this
+		showGrid = state;
+		if (showGrid == true)
+		{
+			makeGridVisible();
+		}
+		else
+		{
+			grid.selectAll("line.horizontal").remove();
+			grid.selectAll("line.vertical").remove();
+		}
+	}
+
 	$('#btn-cut').click(function() {copySelection();deleteSelection();});
 	$('#btn-copy').click(function() {copySelection()});
 	$('#btn-paste').click(function() {importNodes(clipboard)});
@@ -236,11 +255,8 @@ RED.view = (function() {
 	var workspace_tabs = RED.tabs.create({
 		id: "workspace-tabs",
 		onchange: function(tab) {
-			if (RED.nodes.showWorkspaceToolbar == true) { //(tab.type == "subflow") {
-				$("#workspace-toolbar").show();
-			} else {
-				$("#workspace-toolbar").hide();
-			}
+			RED.setShowWorkspaceToolbarVisible(RED.nodes.showWorkspaceToolbar);
+						
 			console.log("workspace_tabs onchange:" + tab);
 			var chart = $("#chart");
 			if (activeWorkspace !== 0) {
@@ -378,17 +394,20 @@ RED.view = (function() {
 		//if (d3.touches(this)[0]) {
 		//    d3.event.preventDefault();
 		//}
-
+		var chart = $("#chart");
+		
 		// TODO: auto scroll the container
 		//var point = d3.mouse(this);
 		//if (point[0]-container.scrollLeft < 30 && container.scrollLeft > 0) { container.scrollLeft -= 15; }
-		//console.log(d3.mouse(this),container.offsetWidth,container.offsetHeight,container.scrollLeft,container.scrollTop);
+		//console.log(d3.mouse(this));//,container.offsetWidth,container.offsetHeight,container.scrollLeft,container.scrollTop);
 
 		if (lasso) {
+			
 			var ox = parseInt(lasso.attr("ox"));
 			var oy = parseInt(lasso.attr("oy"));
 			var x = parseInt(lasso.attr("x"));
 			var y = parseInt(lasso.attr("y"));
+			
 			var w;
 			var h;
 			if (mouse_position[0] < ox) {
@@ -629,14 +648,24 @@ RED.view = (function() {
 	});
 
 	function zoomIn() {
-		if (scaleFactor < 2) {
+		if (scaleFactor < 0.3)
+		{
+			scaleFactor += 0.05;
+			redraw();
+		}
+		else if (scaleFactor < 2) {
 			scaleFactor += 0.1;
 			redraw();
 		}
+
 	}
 	function zoomOut() {
 		if (scaleFactor > 0.3) {
 			scaleFactor -= 0.1;
+			redraw();
+		}
+		else if (scaleFactor > 0.1) {
+			scaleFactor -= 0.05;
 			redraw();
 		}
 	}
@@ -1488,6 +1517,7 @@ RED.view = (function() {
 	/*********************************************************************************************************************************/
 	/*********************************************************************************************************************************/
 	function redraw() {
+		console.trace("redraw");
 		//RED.addClassTabsToPalette(); // failsafe debug test that is very slow
 		//RED.refreshClassNodes(); // failsafe debug test that is very slow
 		//console.log("redraw");
@@ -1791,7 +1821,7 @@ RED.view = (function() {
 	RED.keyboard.add(/* 0 */ 48,{ctrl:true},function(){zoomZero();d3.event.preventDefault();});
 	RED.keyboard.add(/* v */ 86,{ctrl:true},function(){importNodes(clipboard);d3.event.preventDefault();});
 	RED.keyboard.add(/* e */ 69,{ctrl:true},function(){showExportNodesDialog();d3.event.preventDefault();});
-	RED.keyboard.add(/* i */ 73,{ctrl:true},function(){showImportNodesDialog();d3.event.preventDefault();});
+	RED.keyboard.add(/* i */ 73,{ctrl:true},function(){showImportNodesDialog(true);d3.event.preventDefault();});
 
 	// TODO: 'dirty' should be a property of RED.nodes - with an event callback for ui hooks
 	function setDirty(d) {
@@ -1927,7 +1957,8 @@ RED.view = (function() {
 		return form;
 	}
 
-	$('#btn-import').click(function() {showImportNodesDialog();});
+	$('#btn-import-json').click(function() {showImportNodesDialog(false);});
+	$('#btn-import-arduino').click(function() {showImportNodesDialog(true);});
 	$('#btn-export-clipboard').click(function() {showExportNodesDialog();});
 	$('#btn-export-library').click(function() {showExportNodesLibraryDialog();});
 
@@ -1958,11 +1989,12 @@ RED.view = (function() {
 		});
 	}
 
-	function showImportNodesDialog() {
+	function showImportNodesDialog(arduino_code) {
 		mouse_mode = RED.state.IMPORT;
 		//$("#dialog-form").html(this.getForm('import-dialog'));
 		getForm("dialog-form", "import-dialog", function(d, f) {
 		$("#node-input-import").val("");
+		$( "#node-input-arduino" ).prop('checked', arduino_code);
 		$( "#dialog" ).dialog("option","title","Import nodes").dialog( "open" );
 		});
 	}
@@ -2175,6 +2207,8 @@ RED.view = (function() {
 	}
 
 	return {
+		showHideGrid:showHideGrid,
+		showGrid:showGrid,
 		state:function(state) {
 			if (state == null) {
 				return mouse_mode

@@ -74,14 +74,7 @@ RED.nodes = (function() {
 		console.error("removed:" + removed);
 		console.error("modified:" + arr);
 	}
-	$('#btn-workspace-toolbar').click(function() {
-		showWorkspaceToolbar = !showWorkspaceToolbar;
-		if (showWorkspaceToolbar)
-			$("#workspace-toolbar").show();
-		else
-			$("#workspace-toolbar").hide();
-		btnWworkspaceToolbar.toggleClass("active", showWorkspaceToolbar);
-		});
+	
 		
 	function registerType(nt,def) {
 		node_defs[nt] = def;
@@ -385,12 +378,13 @@ RED.nodes = (function() {
 		var node = {};
 		node.id = n.id;
 		node.type = n.type;
+
 		for (var d in n._def.defaults) {
 			if (n._def.defaults.hasOwnProperty(d)) {
 				node[d] = n[d];
 			}
 		}
-		if(exportCreds && n.credentials) {
+		/*if(exportCreds && n.credentials) {
 			node.credentials = {};
 			for (var cred in n._def.credentials) {
 				if (n._def.credentials.hasOwnProperty(cred)) {
@@ -399,7 +393,7 @@ RED.nodes = (function() {
 					}
 				}
 			}
-		}
+		}*/
 		if (n._def.category != "config") {
 			node.x = n.x;
 			node.y = n.y;
@@ -414,6 +408,10 @@ RED.nodes = (function() {
 				node.wires[w.sourcePort].push(w.target.id + ":" + w.targetPort);
 			}
 		}
+		
+		//console.warn("convert node: " + n.name);
+		//console.warn("from:" + Object.getOwnPropertyNames(n._def));
+		//console.warn("to:" + Object.getOwnPropertyNames(node));
 		return node;
 	}
 
@@ -809,7 +807,7 @@ RED.nodes = (function() {
 							
 								//console.log("keep name:" + n.name);
 							}
-							node.id = RED.nodes.cppId(node, RED.nodes.workspaces[RED.view.getWorkspace()].label); // jannik add
+							node.id = RED.nodes.cppId(node, getWorkspace(RED.view.getWorkspace()).label); // jannik add
 							for (var d2 in node._def.defaults) {
 								if (node._def.defaults.hasOwnProperty(d2)) {
 									if (d2 == "name" || d2 == "id") continue;

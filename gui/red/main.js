@@ -19,6 +19,8 @@ var RED = (function() {
 	//var classColor = "#E6E0F8"; // standard
 	var classColor = "#ccffcc"; // new
 
+	
+
 	$('#btn-keyboard-shortcuts').click(function(){showHelp();});
 
 	function hideDropTarget() {
@@ -595,23 +597,17 @@ var RED = (function() {
 	$('#btn-saveTofile').click(function() { saveAsFile(); });
 	function saveAsFile()
 	{
-		try
-		{
-			var nns = RED.nodes.createCompleteNodeSet();
-			var jsonString  = JSON.stringify(nns, null, 4);
-			download("TeensyAudioDesign.json", jsonString);
-		}catch (err)
-		{
-
-		}
+		showSelectNameDialog();
+		
 	}
 	
 	function getConfirmLoadDemoText(filename)
 	{
-		return "<p> You are going to replace your current flow</p>" +
-			   "<p> with " + filename + ".</p>" +
-			   "<p>Are you sure you want to load?</p>" +
-			   "<p>Note. your current design will be downloaded as TeensyAudioDesign.json</p>";
+		return "<p> You are going to replace<br> <b>current flow</b>" +
+			   " with <b>" + filename + "</b>.</p><br>" +
+			   "<p>Are you sure you want to load?</p><br>" +
+			   "<p>Note. your current design will be automatically downloaded as <b>TeensyAudioDesign.json</b></p><br>"+
+			   "If you want a different filename,<br>then use the<b> export menu - SaveToFile</b> instead.";
 	}
 	$('#btn-demoFlowA').click(function() {
 		var data = $("script[data-container-name|='DemoFlowA']").html();
@@ -620,7 +616,7 @@ var RED = (function() {
 		verifyDialog("Confirm Load", "!!!WARNING!!!", getConfirmLoadDemoText("DemoFlowA"), function(okPressed) { 
 			if (okPressed)
 			{
-				saveAsFile();
+				saveToFile("TeensyAudioDesign.json");
 				RED.storage.loadFile(data);
 			}
 		});
@@ -633,7 +629,7 @@ var RED = (function() {
 		verifyDialog("Confirm Load", "!!!WARNING!!!", getConfirmLoadDemoText("DemoFlowB"), function(okPressed) { 
 			if (okPressed)
 			{
-				saveAsFile();
+				saveToFile("TeensyAudioDesign.json");
 				RED.storage.loadFile(data);
 			}
 		});
@@ -645,7 +641,7 @@ var RED = (function() {
 		verifyDialog("Confirm Load", "!!!WARNING!!!", getConfirmLoadDemoText("FlowOriginal"), function(okPressed) { 
 			if (okPressed)
 			{
-				saveAsFile();
+				saveToFile("TeensyAudioDesign.json");
 				RED.storage.loadFile(data);
 			}
 		});
@@ -705,6 +701,47 @@ var RED = (function() {
 		}
 		return(false);
 	}
+	function saveToFile(name)
+	{
+		try
+		{
+			var nns = RED.nodes.createCompleteNodeSet();
+			var jsonString  = JSON.stringify(nns, null, 4);
+			download(name, jsonString);
+		}catch (err)
+		{
+
+		}
+	}
+	function showSelectNameDialog()
+	{
+		$( "#select-name-dialog" ).dialog({
+			title: "Confirm deploy",
+			modal: true,
+			autoOpen: true,
+			width: 530,
+			height: 230,
+			buttons: [
+				{
+					text: "Ok",
+					click: function() {
+						//console.warn($( "#select-name-dialog-name" ).val());
+						saveToFile($( "#select-name-dialog-name" ).val());
+						$( this ).dialog( "close" );
+					}
+				},
+				{
+					text: "Cancel",
+					click: function() {
+						$( this ).dialog( "close" );
+					}
+				}
+			]
+		});
+		if ($( "#select-name-dialog-name" ).val().trim().length == 0)
+			$( "#select-name-dialog-name" ).val("TeensyAudioDesign.json");
+		$( "#select-name-dialog" ).dialog('open');
+	}
 
 	function loadNodes() {
 			$(".palette-scroll").show();
@@ -715,12 +752,13 @@ var RED = (function() {
 			RED.view.redraw();
 			
 			setTimeout(function() {
-				$("#btn-deploy").removeClass("disabled").addClass("btn-danger");
-				$("#btn-deploy2").removeClass("disabled").addClass("btn-danger");
-				$("#btn-import").removeClass("disabled").addClass("btn-success");
-			}, 1500);
-			//$('#btn-deploy').click(function() { save(); }); // duplicate
-			//$('#btn-deploy2').click(function() { save2(); }); // duplicate
+				//$("#btn-deploy").removeClass("disabled").addClass("btn-danger");
+				//$("#btn-deploy2").removeClass("disabled").addClass("btn-danger");
+				//$("#btn-import").removeClass("disabled").addClass("btn-success");
+				$("#menu-import").removeClass("disabled").addClass("btn-success");
+				$("#menu-export").removeClass("disabled").addClass("btn-danger");
+			}, 1000);
+			
 			// if the query string has ?info=className, populate info tab
 			var info = getQueryVariable("info");
 			if (info) {
@@ -755,9 +793,86 @@ var RED = (function() {
 		dialog.modal();
 	}
 
-	$(function() {
-		$(".palette-spinner").show();
+	function createSettingsTab()
+	{
+		var content = document.createElement("div");
+		content.id = "tab-settings";
+		content.style.paddingTop = "4px";
+		content.style.paddingLeft = "4px";
+		content.style.paddingRight = "4px";
+		RED.sidebar.addTab("settings",content);
+		var html = "<h3>Settings</h3>";
+		html += createCheckBox("setting-show-workspace-toolbar", "Show Workspace toolbar.");
+		html += createCheckBox("setting-show-palette-onlyOne", "Palette Show Only one category at a time.");
+		html += createCheckBox("setting-show-workspace-grid", "Show Workspace grid.");
+		html += createTextInputWithApplyButton("setting-grid-xSize", "Grid Size X");
+		html += createTextInputWithApplyButton("setting-grid-ySize", "Grid Size Y");
 
+		//html += '<p><br><br>this is a placeholder for future settings:<br>accessible with:<br>$("#tab-settings").html("text");</p>';
+
+		$("#tab-settings").html(html);
+
+		functionalizeCheckBox("setting-show-workspace-toolbar", RED.nodes.showWorkspaceToolbar, setShowWorkspaceToolbarVisible);
+		functionalizeCheckBox("setting-show-palette-onlyOne", RED.palette.onlyShowOne, RED.palette.SetOnlyShowOne);
+		functionalizeCheckBox("setting-show-workspace-grid", RED.view.showGrid, RED.view.showHideGrid);
+		functionalizeTextInputWithApplyButton("setting-grid-xSize", 500, function(value) { console.error("new grid-xsize:" + value);});
+		functionalizeTextInputWithApplyButton("setting-grid-ySize", 500, function(value) { console.error("new grid-ysize:" + value);});
+	}
+	/**
+	 * creates and returns html code for a checkbox with label
+	 * @param {string} id 
+	 * @param {string} label 
+	 */
+	function createCheckBox(id, label)
+	{
+		var html = '<label for="'+id+'" style="font-size: 16px; padding: 2px 0px 0px 4px;">';
+		html +=	'<input style="margin-bottom: 4px; margin-left: 4px;" type="checkbox" id="'+id+'" checked="checked" />';
+		html +=	'&nbsp;'+label+'</label>';
+		return html;
+	}
+	function createTextInputWithApplyButton(id, label)
+	{
+		var html = '<label for="'+id+'" style="font-size: 16px;">';
+			html += '&nbsp;'+label+' <input type="text" id="'+id+'" name="'+id+'" style="width: 40px;">';
+			html += ' <button type="button" id="btn-'+id+'">Apply</button></label>';
+		return html;
+	}
+	function functionalizeTextInputWithApplyButton(id, text, func)
+	{
+		$('#btn-' + id).click(function() { func($('#' + id).val());});
+		$('#' + id).val(text);
+	}
+	/**
+	 * this must be run after the html is applied to the document
+	 * @param {string} id 
+	 * @param {boolean} initalState 
+	 * @param {function} func 
+	 */
+	function functionalizeCheckBox(id, initalState, func)
+	{
+		$('#' + id).click(function() { func($('#' + id).prop('checked'));});
+		$('#' + id).prop('checked', initalState);
+	}
+
+	function setShowWorkspaceToolbarVisible(state)
+	{
+		RED.nodes.showWorkspaceToolbar = state;
+		if (state)
+		{
+			$("#workspace-toolbar").show();
+			$("#chart").css("top", 67);
+		}
+		else
+		{
+			$("#workspace-toolbar").hide();
+			$("#chart").css("top", 31);
+		}
+	}
+
+	$(function() {
+		console.warn("main $(function() {...}); is executed after page load!"); // to see load order
+		$(".palette-spinner").show();
+		createSettingsTab();
 		// server test switched off - test purposes only
 		var patt = new RegExp(/^[http|https]/);
 		var server = false && patt.test(location.protocol);
@@ -798,6 +913,7 @@ var RED = (function() {
 
 	return {
 		isSpecialNode:isSpecialNode,
+		setShowWorkspaceToolbarVisible:setShowWorkspaceToolbarVisible,
 		classColor:classColor
 	};
 })();

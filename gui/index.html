@@ -58,11 +58,10 @@ span.mainfunction {color: #993300; font-weight: bolder}
 				<a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-align-justify"></i> <span class="caret"></span></a>
 				<ul class="dropdown-menu">
 					<li><a id="btn-sidebar" tabindex="-1" href="#"><i class="icon-ok pull-right"></i><i class="icon-list-alt"></i> Sidebar</a></li>
-					<li><a id="btn-workspace-toolbar" tabindex="-1" href="#"><i class="icon-ok pull-right"></i><i class="icon-list-alt"></i> Toolbar</a></li>
+					<!--<li><a id="btn-workspace-toolbar" tabindex="-1" href="#"><i class="icon-ok pull-right"></i><i class="icon-list-alt"></i> Toolbar</a></li>-->
 					<li class="divider"></li> 
-					<li><a id="btn-saveTofile" tabindex="-1" href="#"><i id="btn-icn-deploy" class="icon-upload"></i> SaveToFile</a></li>
-					<input id="file-input" tabindex="-1" type="file" style="display:none;">
-					<li><label for="file-input" tabindex="-1" ><i id="btn-icn-deploy" class="icon-download"></i> LoadFromFile</label></li>
+					
+					
 					<li class="divider"></li>
 					<!-- <li><a id="btn-node-status" tabindex="-1" href="#"><i class="icon-ok pull-right"></i><i class="icon-info-sign"></i> Node Status</a></li>
 					<li class="divider"></li>
@@ -90,13 +89,14 @@ span.mainfunction {color: #993300; font-weight: bolder}
 					<li class="divider"></li>
 -->
 					
-<li class="dropdown-submenu pull-left"><a tabindex="-1" href="#"><i class="icon-th-large"></i> Workspaces</a>
-						<ul id="workspace-menu-list" class="dropdown-menu">
-							<li><a id="btn-workspace-add" tabindex="-1" href="#"><i class="icon-plus"></i> Add</a></li>
-							<li><a id="btn-workspace-edit" tabindex="-1" href="#"><i class="icon-edit"></i> Rename</a></li>
-							<li><a id="btn-workspace-delete" tabindex="-1" href="#"><i class="icon-minus"></i> Delete</a></li>
-							<li class="divider"></li>
-						</ul>
+						<li class="dropdown-submenu pull-left"><a tabindex="-1" href="#"><i class="icon-th-large"></i> Workspaces</a>
+							<ul id="workspace-menu-list" class="dropdown-menu">
+								<li><a id="btn-workspace-add" tabindex="-1" href="#"><i class="icon-plus"></i> Add</a></li>
+								<li><a id="btn-workspace-edit" tabindex="-1" href="#"><i class="icon-edit"></i> Rename</a></li>
+								<li><a id="btn-workspace-delete" tabindex="-1" href="#"><i class="icon-minus"></i> Delete</a></li>
+								<li class="divider"></li>
+							</ul>
+						</li>
 					</li>
 					<li class="divider"></li>
 					<li><a id="btn-keyboard-shortcuts" tabindex="-1" href="#"><i class="icon-question-sign"></i> Keyboard Shortcuts</a></li>
@@ -104,15 +104,40 @@ span.mainfunction {color: #993300; font-weight: bolder}
 				</ul>
 			</div>
 			<div class="btn-group pull-left">
+				<a id="menu-import" class="btn dropdown-toggle btn-success disabled" data-toggle="dropdown" href="#"><i class="icon-download"></i> Import <span class="caret"></span></a>
+				<ul class="dropdown-menu">
+					<li><a id="btn-import-json" class="btn action-import" href="#"><i id="btn-icn-download" class="icon-download"></i>JSON</a></li>
+					<li><a id="btn-import-arduino" class="btn action-import" href="#"><i id="btn-icn-download" class="icon-download"></i>Arduino</a></li>
+					<input id="file-input" class="btn action-import" type="file" style="display:none;">
+					<li><label for="file-input" class="btn action-import" ><i id="btn-icn-deploy" class="icon-download"></i> LoadFromFile</label></li>
+				</ul>
+			</div>
+			<div class="btn-group pull-left">
+				<a id="menu-export" class="btn dropdown-toggle btn-danger disabled" data-toggle="dropdown" href="#"><i class="icon-download"></i> Export <span class="caret"></span></a>
+				<ul class="dropdown-menu"">
+					<li><a id="btn-deploy"" class="btn action-deploy" href="#"><i id="btn-icn-deploy" class="icon-upload"></i>Simple</a></li>
+					<li><a id="btn-deploy2";" class="btn action-deploy" href="#"><i id="btn-icn-deploy" class="icon-upload"></i>Class-based</a></li>
+					<li><a id="btn-saveTofile" class="btn action-deploy href="#"><i id="btn-icn-deploy" class="icon-upload"></i> SaveToFile</a></li>
+				</ul>
+			</div>
+			<!--<div class="btn-group pull-left">
 				<a id="btn-deploy" class="btn action-deploy disabled" href="#"><i id="btn-icn-deploy" class="icon-upload"></i>Export</a>
 				<a id="btn-deploy2" class="btn action-deploy " href="#"><i id="btn-icn-deploy" class="icon-upload"></i>ExportAsClass(es)</a>
-				<a id="btn-import" class="btn action-import disabled" href="#"><i id="btn-icn-download" class="icon-download"></i>Import</a>
-			</div>
+				<a id="btn-import-arduino" class="btn action-import disabled" href="#"><i id="btn-icn-download" class="icon-download"></i>Import</a>
+			</div>-->
 			<div class="btn-group pull-right">
+				<a id="menu-export" class="btn dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-download"></i> Demo Flows <span class="caret"></span></a>
+				<ul class="dropdown-menu"">
+					<li><a id="btn-demoFlowA" class="btn action-import enabled" href="#"><i id="btn-icn-download" class="icon-download"></i>DemoFlowA</a></li>
+					<li><a id="btn-demoFlowB" class="btn action-import enabled" href="#"><i id="btn-icn-download" class="icon-download"></i>DemoFlowB</a></li>
+					<li><a id="btn-originalFlow" class="btn action-import enabled" href="#"><i id="btn-icn-download" class="icon-download"></i>originalFlow</a></li>
+				</ul>
+			</div>
+			<!--<div class="btn-group pull-right">
 				<a id="btn-demoFlowA" class="btn action-import enabled" href="#"><i id="btn-icn-download" class="icon-download"></i>DemoFlowA</a>
 				<a id="btn-demoFlowB" class="btn action-import enabled" href="#"><i id="btn-icn-download" class="icon-download"></i>DemoFlowB</a>
 				<a id="btn-originalFlow" class="btn action-import enabled" href="#"><i id="btn-icn-download" class="icon-download"></i>originalFlow</a>
-			</div>
+			</div>-->
 		</div>
 	</div>
 </div>
@@ -305,6 +330,14 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		</div>
 	</form>
 </div>
+<div id="select-name-dialog" class="hide">
+	<form class="form-horizontal">
+		<div class="form-row">
+		<label for="select-name-dialog-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="select-name-dialog-name" placeholder="Name">
+		</div>
+	</form>
+</div>
 
 <script type="text/x-red" data-template-name="export-clipboard-dialog">
 	<div class="form-row">
@@ -333,6 +366,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		</label>
 	</div>
 </script>
+
 
 <script src="jquery/js/jquery-1.9.1.js"></script>
 <script src="bootstrap/js/bootstrap.min.js"></script>
@@ -512,7 +546,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"TabOutput","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":""}},"shortName":"Out","inputs":1,"outputs":0,"category":"tabs-function","color":"#cce6ff","icon":"arrow-in.png"}},
 		{"type":"TabInput","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":""}},"shortName":"In","inputs":0,"outputs":1,"category":"tabs-function","color":"#cce6ff","icon":"arrow-in.png", "align":"right"}},
 		{"type":"Array","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":""}},"shortName":"Array","inputs":0,"outputs":0,"category":"tabs-function","color":"#aaffdd","icon":"range.png"}},
-		{"type":"AudioMixer","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"inputs":{"value":"1"},"outputs":{"value":"1"},"comment":{"value":"new"}},"shortName":"MixerX","inputs":1,"outputs":1,"category":"mixer-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioMixer","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"inputs":{"value":"1"},"comment":{"value":"new"}},"shortName":"mixer","inputs":1,"outputs":1,"category":"mixer-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"ClassComment","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"}},"shortName":"ClassComment","inputs":0,"outputs":0,"category":"tabs-function","color":"#ccffcc","icon":"comment.png"}},
 		{"type":"Comment","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":""}},"shortName":"Comment","inputs":0,"outputs":0,"category":"tabs-function","color":"#ddffbb","icon":"comment.png"}},
 		{"type":"Function","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":""}},"shortName":"code","inputs":0,"outputs":0,"category":"tabs-function","color":"#ddffbb","icon":"function.png"}},
@@ -554,7 +588,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioOutputUSB","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"usb","inputs":2,"outputs":0,"category":"output-other-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 
 		{"type":"AudioAmplifier","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"amp","inputs":1,"outputs":1,"category":"mixer-function","color":"#E6E0F8","icon":"arrow-in.png"}},
-		{"type":"AudioMixer4","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"mixer","inputs":4,"outputs":1,"category":"mixer-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioMixer4","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"mixer4","inputs":4,"outputs":1,"category":"mixer-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioPlayMemory","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"playMem","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioPlaySdWav","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"playSdWav","inputs":0,"outputs":2,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioPlaySdRaw","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"playSdRaw","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
