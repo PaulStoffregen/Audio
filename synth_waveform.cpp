@@ -560,13 +560,9 @@ int32_t BandLimitedWaveform::process_active_steps_saw (uint32_t new_phase)
   }
 
   sample += (int16_t) ((((uint64_t)phase_word * (2*BASE_AMPLITUDE)) >> 32) - BASE_AMPLITUDE) ;  // generate the sloped part of the wave
-  //printf ("phases ,  %x   %x\n", phase_word, new_phase) ;
 
   if (new_phase < DEG180 && phase_word >= DEG180) // detect wrap around, correct dc offset
-  {
-    //printf ("Trigger dc offset at 0 deg,  %lu   %lu  (%lu)\n", phase_word, new_phase, DEG180) ;
     dc_offset += 2*BASE_AMPLITUDE ;
-  }
 
   return sample ;
 }
