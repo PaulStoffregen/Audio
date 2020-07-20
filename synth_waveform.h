@@ -46,6 +46,46 @@ extern const int16_t AudioWaveformSine[257];
 #define WAVEFORM_SAWTOOTH_REVERSE  6
 #define WAVEFORM_SAMPLE_HOLD       7
 #define WAVEFORM_TRIANGLE_VARIABLE 8
+#define WAVEFORM_BANDLIMIT_SAWTOOTH  9
+#define WAVEFORM_BANDLIMIT_SAWTOOTH_REVERSE 10
+#define WAVEFORM_BANDLIMIT_SQUARE 11
+
+
+typedef struct step_state
+{
+  int offset ;
+  bool positive ;
+} step_state ;
+
+
+class BandLimitedWaveform
+{
+public:
+  BandLimitedWaveform (void) ;
+  int16_t generate_sawtooth (uint32_t new_phase, int i) ;
+  int16_t generate_square (uint32_t new_phase, int i) ;
+  void init_sawtooth (uint32_t freq_word) ;
+  void init_square (uint32_t freq_word) ;
+  
+
+private:
+  int32_t lookup (int offset) ;
+  void insert_step (int offset, bool rising, int i) ;
+  int32_t process_step (int i) ;
+  int32_t process_active_steps (uint32_t new_phase) ;
+  int32_t process_active_steps_saw (uint32_t new_phase) ;
+  void new_step_check (uint32_t new_phase, int i) ;
+  void new_step_check_saw (uint32_t new_phase, int i) ;
+
+  
+  uint32_t phase_word ;
+  int32_t dc_offset ;
+  step_state states [32] ; // circular buffer of active steps
+  int newptr ;         // buffer pointers into states, AND'd with PTRMASK to keep in buffer range.
+  int delptr ;
+  int16_t  cyclic[16] ;    // circular buffer of output samples
+};
+
 
 class AudioSynthWaveform : public AudioStream
 {
@@ -102,12 +142,16 @@ public:
 	void begin(short t_type) {
 		phase_offset = 0;
 		tone_type = t_type;
+		if (t_type == WAVEFORM_BANDLIMIT_SQUARE)
+		  band_limit_waveform.init_square (phase_increment) ;
+		if (t_type == WAVEFORM_BANDLIMIT_SAWTOOTH || t_type == WAVEFORM_BANDLIMIT_SAWTOOTH_REVERSE)
+		  band_limit_waveform.init_sawtooth (phase_increment) ;
 	}
 	void begin(float t_amp, float t_freq, short t_type) {
 		amplitude(t_amp);
 		frequency(t_freq);
 		phase_offset = 0;
-		tone_type = t_type;
+		begin (t_type);
 	}
 	void arbitraryWaveform(const int16_t *data, float maxFreq) {
 		arbdata = data;
@@ -124,6 +168,7 @@ private:
 	int16_t  sample; // for WAVEFORM_SAMPLE_HOLD
 	short    tone_type;
 	int16_t  tone_offset;
+        BandLimitedWaveform band_limit_waveform ;
 };
 
 
@@ -163,11 +208,15 @@ public:
 	}
 	void begin(short t_type) {
 		tone_type = t_type;
+		if (t_type == WAVEFORM_BANDLIMIT_SQUARE)
+		  band_limit_waveform.init_square (phase_increment) ;
+		if (t_type == WAVEFORM_BANDLIMIT_SAWTOOTH || t_type == WAVEFORM_BANDLIMIT_SAWTOOTH_REVERSE)
+		  band_limit_waveform.init_sawtooth (phase_increment) ;
 	}
 	void begin(float t_amp, float t_freq, short t_type) {
 		amplitude(t_amp);
 		frequency(t_freq);
-		tone_type = t_type;
+		begin (t_type) ;
 	}
 	void arbitraryWaveform(const int16_t *data, float maxFreq) {
 		arbdata = data;
@@ -204,6 +253,7 @@ private:
 	int16_t  tone_offset;
 	uint8_t  tone_type;
 	uint8_t  modulation_type;
+        BandLimitedWaveform band_limit_waveform ;
 };
 
 

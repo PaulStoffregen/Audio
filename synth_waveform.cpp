@@ -102,6 +102,16 @@ void AudioSynthWaveform::update(void)
 		}
 		break;
 
+	case WAVEFORM_BANDLIMIT_SQUARE:
+		for (int i = 0 ; i < AUDIO_BLOCK_SAMPLES ; i++)
+		{
+		  uint32_t new_ph = ph + inc ;
+		  int16_t val = band_limit_waveform.generate_square (new_ph, i) ;
+		  *bp++ = (val * magnitude) >> 16 ;
+		  ph = new_ph ;
+		}
+		break;
+
 	case WAVEFORM_SAWTOOTH:
 		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
 			*bp++ = signed_multiply_32x16t(magnitude, ph);
@@ -113,6 +123,20 @@ void AudioSynthWaveform::update(void)
 		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
 			*bp++ = signed_multiply_32x16t(0xFFFFFFFFu - magnitude, ph);
 			ph += inc;
+		}
+		break;
+
+	case WAVEFORM_BANDLIMIT_SAWTOOTH:
+	case WAVEFORM_BANDLIMIT_SAWTOOTH_REVERSE:
+		for (i = 0 ; i < AUDIO_BLOCK_SAMPLES; i++)
+		{
+		  uint32_t new_ph = ph + inc ;
+		  int16_t val = band_limit_waveform.generate_sawtooth (new_ph, i) ;
+		  if (tone_type == WAVEFORM_BANDLIMIT_SAWTOOTH_REVERSE)
+		    *bp++ = (val * -magnitude) >> 16 ;
+		  else
+		    *bp++ = (val * magnitude) >> 16 ;
+		  ph = new_ph ;
 		}
 		break;
 
@@ -223,6 +247,7 @@ void AudioSynthWaveformModulated::update(void)
 			// exp2 algorithm by Laurent de Soras
 			// https://www.musicdsp.org/en/latest/Other/106-fast-exp2-approximation.html
 			n = (n + 134217728) << 3;
+
 			n = multiply_32x32_rshift32_rounded(n, n);
 			n = multiply_32x32_rshift32_rounded(n, 715827883) << 3;
 			n = n + 715827882;
@@ -330,6 +355,14 @@ void AudioSynthWaveformModulated::update(void)
 		}
 		break;
 
+	case WAVEFORM_BANDLIMIT_SQUARE:
+		for (i = 0 ; i < AUDIO_BLOCK_SAMPLES ; i++)
+		{
+		  int32_t val = band_limit_waveform.generate_square (phasedata[i], i) ;
+		  *bp++ = val ; /// (int16_t) ((val * magnitude) >> 16) ;
+		}
+		break;
+
 	case WAVEFORM_SAWTOOTH:
 		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
 			*bp++ = signed_multiply_32x16t(magnitude, phasedata[i]);
@@ -339,6 +372,16 @@ void AudioSynthWaveformModulated::update(void)
 	case WAVEFORM_SAWTOOTH_REVERSE:
 		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
 			*bp++ = signed_multiply_32x16t(0xFFFFFFFFu - magnitude, phasedata[i]);
+		}
+		break;
+
+	case WAVEFORM_BANDLIMIT_SAWTOOTH:
+	case WAVEFORM_BANDLIMIT_SAWTOOTH_REVERSE:
+		for (i = 0 ; i < AUDIO_BLOCK_SAMPLES ; i++)
+		{
+		  int16_t val = band_limit_waveform.generate_sawtooth (phasedata[i], i) ;
+		  ///val = (int16_t) ((val * magnitude) >> 16) ;
+		  *bp++ = tone_type == WAVEFORM_BANDLIMIT_SAWTOOTH_REVERSE ? (int16_t) -val : (int16_t) +val ;
 		}
 		break;
 
@@ -403,3 +446,218 @@ void AudioSynthWaveformModulated::update(void)
 }
 
 
+// BandLimitedWaveform
+
+
+#define SUPPORT_SHIFT 4
+#define SUPPORT (1 << SUPPORT_SHIFT)
+#define PTRMASK ((2 << SUPPORT_SHIFT) - 1)
+
+#define SCALE 16
+#define SCALE_MASK (SCALE-1)
+#define N (SCALE * SUPPORT * 2)
+
+#define GUARD_BITS 8
+#define GUARD      (1 << GUARD_BITS)
+#define HALF_GUARD (1 << (GUARD_BITS-1))
+
+
+#define BASE_AMPLITUDE 0x6000  // 0x7fff won't work due to Gibb's phenomenon, so use 3/4 of full range.
+
+#define DEG180 0x80000000u
+
+#define PHASE_SCALE (0x100000000L / (2 * BASE_AMPLITUDE))
+
+
+extern "C"
+{
+  extern const int16_t step_table [258] ;
+}
+
+int32_t BandLimitedWaveform::lookup (int offset)
+{
+  int off = offset >> GUARD_BITS ;
+  int frac = offset & (GUARD-1) ;
+
+  int32_t a, b ;
+  if (off < N/2)   // handle odd symmetry by reflecting table
+  {
+    a = step_table [off+1] ;
+    b = step_table [off+2] ;
+  }
+  else
+  {
+    a = - step_table [N-off] ;
+    b = - step_table [N-off-1] ;
+  }
+  return  BASE_AMPLITUDE + ((frac * b + (GUARD - frac) * a + HALF_GUARD) >> GUARD_BITS) ; // interpolated
+}
+
+void BandLimitedWaveform::insert_step (int offset, bool rising, int i)
+{
+  while (offset <= (N/2-SCALE)<<GUARD_BITS)
+  {
+    if (offset >= 0)
+      cyclic [i & 15] += rising ? lookup (offset) : -lookup (offset) ;
+    offset += SCALE<<GUARD_BITS ;
+    i ++ ;
+  }
+
+  states[newptr].offset = offset ;
+  states[newptr].positive = rising ;
+  newptr = (newptr+1) & PTRMASK ;
+}
+
+int32_t BandLimitedWaveform::process_step (int i)
+{
+  int off = states[i].offset ;
+  bool positive = states[i].positive ;
+
+  int32_t entry = lookup (off) ;
+  off += SCALE<<GUARD_BITS ;
+  states[i].offset = off ;  // update offset in table for next sample
+  if (off >= N<<GUARD_BITS)             // at end of step table we alter dc_offset to extend the step into future
+    dc_offset += positive ? 2*BASE_AMPLITUDE : -2*BASE_AMPLITUDE ;
+
+  return positive ? entry : -entry ;
+}
+
+
+int32_t BandLimitedWaveform::process_active_steps (uint32_t new_phase)
+{
+  int32_t sample = dc_offset ;
+  
+  int step_count = (newptr - delptr) & PTRMASK ;
+  if (step_count > 0)        // for any steps in-flight we sum in table entry and update its state
+  {
+    int i = newptr ;
+    do
+    {
+      i = (i-1) & PTRMASK ;
+      sample += process_step (i) ;
+    } while (i != delptr) ;
+    if (states[delptr].offset >= N<<GUARD_BITS)
+      delptr = (delptr+1) & PTRMASK ;
+  }
+  return sample ;
+}
+
+int32_t BandLimitedWaveform::process_active_steps_saw (uint32_t new_phase)
+{
+  int32_t sample = dc_offset ;
+  
+  int step_count = (newptr - delptr) & PTRMASK ;
+  if (step_count > 0)
+  {
+    int i = newptr ;
+    do
+    {
+      i = (i-1) & PTRMASK ;
+      sample += process_step (i) ;
+    } while (i != delptr) ;
+    if (states[delptr].offset >= N<<GUARD_BITS)
+      delptr = (delptr+1) & PTRMASK ;
+  }
+
+  sample += (int16_t) ((((uint64_t)phase_word * (2*BASE_AMPLITUDE)) >> 32) - BASE_AMPLITUDE) ;  // generate the sloped part of the wave
+  //printf ("phases ,  %x   %x\n", phase_word, new_phase) ;
+
+  if (new_phase < DEG180 && phase_word >= DEG180) // detect wrap around, correct dc offset
+  {
+    //printf ("Trigger dc offset at 0 deg,  %lu   %lu  (%lu)\n", phase_word, new_phase, DEG180) ;
+    dc_offset += 2*BASE_AMPLITUDE ;
+  }
+
+  return sample ;
+}
+
+void BandLimitedWaveform::new_step_check (uint32_t new_phase, int i)
+{
+  if (new_phase >= DEG180 && phase_word < DEG180) // detect rising step
+  {
+    int32_t offset = (int32_t) ((uint64_t) (SCALE<<GUARD_BITS) * (DEG180 - phase_word) / (new_phase - phase_word)) ;
+    if (offset == SCALE<<GUARD_BITS)
+      offset -- ;
+    insert_step (- offset, true, i) ;
+  }
+  if (new_phase < DEG180 && phase_word >= DEG180) // detect wrap around, falling step
+  {
+    int32_t offset = (int32_t) ((uint64_t) (SCALE<<GUARD_BITS) * (- phase_word) / (new_phase - phase_word)) ;
+    if (offset == SCALE<<GUARD_BITS)
+      offset -- ;
+    insert_step (- offset, false, i) ;
+  }
+}
+
+  
+void BandLimitedWaveform::new_step_check_saw (uint32_t new_phase, int i)
+{
+  if (new_phase >= DEG180 && phase_word < DEG180) // detect falling step
+  {
+    int32_t offset = (int32_t) ((uint64_t) (SCALE<<GUARD_BITS) * (DEG180 - phase_word) / (new_phase - phase_word)) ;
+    if (offset == SCALE<<GUARD_BITS)
+      offset -- ;
+    insert_step (- offset, false, i) ;
+  }
+}
+  
+
+int16_t BandLimitedWaveform::generate_sawtooth (uint32_t new_phase, int i)
+{
+  new_step_check_saw (new_phase, i) ;
+  uint16_t val = (int16_t) process_active_steps_saw (new_phase) ;
+  int16_t sample = cyclic [i&15] ;
+  cyclic [i&15] = val ;
+  phase_word = new_phase ;
+  return sample ;
+}
+
+int16_t BandLimitedWaveform::generate_square (uint32_t new_phase, int i)
+{
+  new_step_check (new_phase, i) ;
+  uint16_t val = (int16_t) process_active_steps (new_phase) ;
+  int16_t sample = cyclic [i&15] ;
+  cyclic [i&15] = val ;
+  phase_word = new_phase ;
+  return sample ;
+}
+
+void BandLimitedWaveform::init_sawtooth (uint32_t freq_word)
+{
+  phase_word = 0 ;
+  for (int i = 0 ; i < 2*SUPPORT ; i++)
+    phase_word -= freq_word ;
+  dc_offset = phase_word < DEG180 ? BASE_AMPLITUDE : -BASE_AMPLITUDE ;
+  for (int i = 0 ; i < 2*SUPPORT ; i++)
+  {
+    uint32_t new_phase = phase_word + freq_word ;
+    new_step_check_saw (new_phase, i) ;
+    cyclic [i & 15] = (int16_t) process_active_steps_saw (new_phase) ;
+    phase_word = new_phase ;
+  }
+}
+
+
+void BandLimitedWaveform::init_square (uint32_t freq_word)
+{
+  phase_word = 0 ;
+  for (int i = 0 ; i < 2*SUPPORT ; i++)
+    phase_word -= freq_word ;
+  dc_offset = phase_word < DEG180 ? -BASE_AMPLITUDE : BASE_AMPLITUDE ;
+  
+  for (int i = 0 ; i < 2*SUPPORT ; i++)
+  {
+    uint32_t new_phase = phase_word + freq_word ;
+    new_step_check (new_phase, i) ;
+    cyclic [i & 15] = (int16_t) process_active_steps (new_phase) ;
+    phase_word = new_phase ;
+  }
+}
+
+BandLimitedWaveform::BandLimitedWaveform()
+{
+  newptr = 0 ;
+  delptr = 0 ;
+  dc_offset = BASE_AMPLITUDE ;
+  phase_word = 0 ;
+}
