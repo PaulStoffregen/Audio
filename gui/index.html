@@ -120,6 +120,13 @@ span.mainfunction {color: #993300; font-weight: bolder}
 					<li><a id="btn-saveTofile" class="btn action-deploy href="#"><i id="btn-icn-deploy" class="icon-upload"></i> SaveToFile</a></li>
 				</ul>
 			</div>
+			<div class="btn-group pull-left">
+				<a id="menu-arduino" class="btn dropdown-toggle btn-warning disabled" data-toggle="dropdown" href="#"><i class="icon-download"></i> Arduino <span class="caret"></span></a>
+				<ul class="dropdown-menu"">
+					<li><a id="btn-verify-compile"" class="btn action-deploy" href="#"><i id="btn-icn-deploy" class="icon-upload"></i>Verify/Compile</a></li>
+					<li><a id="btn-compile-upload";" class="btn action-deploy" href="#"><i id="btn-icn-deploy" class="icon-upload"></i>Upload</a></li>
+				</ul>
+			</div>
 			<!--<div class="btn-group pull-left">
 				<a id="btn-deploy" class="btn action-deploy disabled" href="#"><i id="btn-icn-deploy" class="icon-upload"></i>Export</a>
 				<a id="btn-deploy2" class="btn action-deploy " href="#"><i id="btn-icn-deploy" class="icon-upload"></i>ExportAsClass(es)</a>
@@ -377,6 +384,10 @@ span.mainfunction {color: #993300; font-weight: bolder}
 <script src="red/ui/ace/ext-language_tools.js"></script>
 <script src="red/d3/d3.v3.min.js"></script>
 <script src="red/main.js"></script>
+<script src="red/settings.js"></script>
+<script src="red/arduino.js"></script>
+<script src="red/arduino-import.js"></script>
+<script src="red/arduino-export.js"></script>
 <script src="red/ui/state.js"></script>
 <script src="red/nodes.js"></script>
 <script src="red/storage.js"></script>

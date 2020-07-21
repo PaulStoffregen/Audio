@@ -15,7 +15,8 @@
  * limitations under the License.
  **/
 RED.sidebar.info = (function() {
-	
+	var autoSwitchTabToThis = true;
+
 	var content = document.createElement("div");
 	content.id = "tab-info";
 	content.style.paddingTop = "4px";
@@ -47,7 +48,8 @@ RED.sidebar.info = (function() {
 	
 	function refresh(node) {
 		//console.warn("tab-info refresh");
-		RED.sidebar.show("info");
+		if (autoSwitchTabToThis)
+			RED.sidebar.show("info");
 		var table = '<table class="node-info"><tbody>';
 
 		table += "<tr><td>Type</td><td>&nbsp;"+node.type+"</td></tr>";
@@ -169,6 +171,8 @@ RED.sidebar.info = (function() {
 	}
 	
 	return {
+		autoSwitchTabToThis:autoSwitchTabToThis,
+		setAutoSwitchTab: function (state) { autoSwitchTabToThis = state;},
 		refresh:refresh,
 		showSelection: showSelection,
 		clear: function() {
