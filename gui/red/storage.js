@@ -4,6 +4,7 @@
 
 RED.storage = (function() {
 	function update() {
+
 		RED.nodes.addClassTabsToPalette(); //Jannik
 		RED.nodes.refreshClassNodes(); //Jannik
 		
@@ -33,6 +34,7 @@ RED.storage = (function() {
 		return archive;
 	}
 	function load() {
+		const t0 = performance.now();
 		if (localStorage) {
 			console.warn(allStorage());
 			var data = localStorage.getItem("audio_library_guitool");
@@ -42,9 +44,11 @@ RED.storage = (function() {
 			else
 				RED.nodes.createNewDefaultWorkspace();
 		}
+		const t1 = performance.now();
+		console.log('storage-load took: ' + (t1-t0) +' milliseconds.');
 	}
-	function loadFile(data) {// TODO: rename to loadContents
-		console.log("loadFile:" +data);
+	function loadContents(data) {
+		console.log("loadContents:" +data);
 		localStorage.setItem("audio_library_guitool", data);
 		window.location.reload();
 		
@@ -61,7 +65,7 @@ RED.storage = (function() {
 	return {
 		update: update,
 		load: load,
-		loadFile:loadFile, // TODO: rename to loadContents
+		loadContents:loadContents, 
 		clear: clear
 	}
 })();

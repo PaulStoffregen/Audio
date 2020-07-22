@@ -17,10 +17,11 @@
 
 
 RED.view = (function() {
-	var showGridV = true;
+	var showGridVminor = true;
+	var showGridVmajor = true;
 	var showGridH = true;
 	var snapToGrid = true; // this is allready implemented with shift button, this locks that mode
-	var snapToGridXsize = 10;
+	var snapToGridXsize = 5;
 	var snapToGridYsize = 5;
 
 	var showWorkspaceToolbar = true;
@@ -204,14 +205,14 @@ RED.view = (function() {
 		"id":"grid-h",
 		"style":"display:none;"
 		});
-	var gridV1 = vis.append('g').attr({
-		"id":"grid-v1",
-		"style":"display:none;"
-		});
-	var gridV2 = vis.append('g').attr({
-		"id":"grid-v2",
+	var gridVminor = vis.append('g').attr({ // minor gets rendered first
+		"id":"grid-v-mi",
 		"style":"display:none;"
 	});
+	var gridVmajor = vis.append('g').attr({ // major then "overrides" the minors
+		"id":"grid-v-ma",
+		"style":"display:none;"
+		});
 	
 	initGrid();
 	var drag_line = vis.append("svg:path").attr("class", "drag_line");
@@ -219,7 +220,7 @@ RED.view = (function() {
 	
 	function initGrid()
 	{
-		gridH.selectAll("line.horizontal").data(gridScale.ticks(500)).enter()
+		gridH.selectAll("line.horizontal").data(gridScale.ticks(250)).enter()
 	    	.append("line")
 	        .attr(
 	        {
@@ -233,23 +234,8 @@ RED.view = (function() {
 	            "stroke" : "#eee",
 				//"stroke-dasharray":"2",
 	            "stroke-width" : "1px"
-	        });
-		gridV1.selectAll("line.vertical").data(gridScale.ticks(50)).enter()
-	     	.append("line")
-	        .attr(
-	        {
-	            "class":"vertical",
-	            "y1" : 0,
-	            "y2" : 5000,
-	            "x1" : function(d){ return gridScale(d);},
-	            "x2" : function(d){ return gridScale(d);},
-	            "fill" : "none",
-	            "shape-rendering" : "optimizeSpeed",
-		        "stroke" : "#aaa",
-				//"stroke-dasharray":"2",
-	            "stroke-width" : "2px"
 			});
-		gridV2.selectAll("line.vertical").data(gridScale.ticks(500)).enter()
+		gridVminor.selectAll("line.vertical").data(gridScale.ticks(250)).enter()
 	     	.append("line")
 	        .attr(
 	        {
@@ -264,8 +250,26 @@ RED.view = (function() {
 				//"stroke-dasharray":"2",
 	            "stroke-width" : "1px"
 			});
+		gridVmajor.selectAll("line.vertical").data(gridScale.ticks(50)).enter()
+	     	.append("line")
+	        .attr(
+	        {
+	            "class":"vertical",
+	            "y1" : 0,
+	            "y2" : 5000,
+	            "x1" : function(d){ return gridScale(d);},
+	            "x2" : function(d){ return gridScale(d);},
+	            "fill" : "none",
+	            "shape-rendering" : "optimizeSpeed",
+		        "stroke" : "#aaa",
+				//"stroke-dasharray":"2",
+	            "stroke-width" : "2px"
+			});
+		
+			// sets visibility according to vars, so that it's only changed at one place
 			showHideGridH(showGridH);
-			showHideGridV(showGridV);
+			showHideGridVmajor(showGridVmajor);
+			showHideGridVminor(showGridVminor);
 	}
 	function setSnapToGrid(state)
 	{
@@ -274,30 +278,31 @@ RED.view = (function() {
 	function showHideGrid(state)
 	{
 		showHideGridH(showGridH || state);
-		showHideGridV(showGridV || state);
+		showHideGridVmajor(showGridVmajor || state);
+		showHideGridVminor(showGridVminor || state);
 	}
 
-	function showHideGridV(state)
+	function showHideGridVmajor(state)
 	{
-		if (state == true)
-		{
-			$('#grid-v1').attr("style", "display:block;");
-			$('#grid-v2').attr("style", "display:block;");
+		if (state == true) {
+			$('#grid-v-ma').attr("style", "display:block;");
+		} else {
+			$('#grid-v-ma').attr("style", "display:none;");
 		}
-		else
-		{
-			$('#grid-v1').attr("style", "display:none;");
-			$('#grid-v2').attr("style", "display:none;");
+	}
+	function showHideGridVminor(state)
+	{
+		if (state == true) {
+			$('#grid-v-mi').attr("style", "display:block;");
+		} else {
+			$('#grid-v-mi').attr("style", "display:none;");
 		}
 	}
 	function showHideGridH(state)
 	{
-		if (state == true)
-		{
+		if (state == true) {
 			$('#grid-h').attr("style", "display:block;");
-		}
-		else
-		{
+		} else {
 			$('#grid-h').attr("style", "display:none;");
 		}
 	}
@@ -563,7 +568,8 @@ RED.view = (function() {
 			if (((snapToGrid == true) || d3.event.shiftKey) && moving_set.length > 0) {
 				var gridOffset =  [0,0];
 				node = moving_set[0];
-				gridOffset[0] = node.n.x-(snapToGridXsize*Math.floor((node.n.x-node.n.w/2)/snapToGridXsize)+node.n.w/2);
+				//gridOffset[0] = node.n.x-(snapToGridXsize*Math.floor((node.n.x-node.n.w/2)/snapToGridXsize)+node.n.w/2);
+				gridOffset[0] = node.n.x-(snapToGridXsize*Math.floor(node.n.x/snapToGridXsize)); // this works much better than above
 				gridOffset[1] = node.n.y-(snapToGridYsize*Math.floor(node.n.y/snapToGridYsize));
 				if (gridOffset[0] !== 0 || gridOffset[1] !== 0) {
 					for (i = 0; i<moving_set.length; i++) {
@@ -1261,10 +1267,13 @@ RED.view = (function() {
 					//console.log("node mouseover:" + d.name);
 					var popoverText = "<b>" + d.type + "</b><br>";
 					if (d.comment && (d.comment.trim().length != 0))
-						popoverText+=d.comment;
-
+						popoverText+="<p>"+d.comment.replace(/\n/g, "<br>") + "</p>";
+					//console.warn("popoverText:" +popoverText);
 					$(current_popup_rect).popover("destroy"); // destroy prev
-					showPopOver(this, true, popoverText)
+					if (d.type == "Function")
+						showPopOver(this, true, popoverText, "bottom");
+					else
+					showPopOver(this, true, popoverText, "top");
 				}
 			})
 			.on("mouseout",function(d) {
@@ -1542,7 +1551,7 @@ RED.view = (function() {
 		
 		$(this).popover("destroy"); // destroy prev
 		var data = getIOpinInfo(this, undefined, pi);
-		showPopOver(this, true, data);
+		showPopOver(this, true, data, "left");
 						
 		port.classed("port_hovered",(mouse_mode!=RED.state.JOINING || mousedown_port_type != 0 ));
 		//console.log("nodeOutput_mouseover: " + this.getAttribute("nodeZ") + "." + this.getAttribute("nodeName") +" , port:" + pi);
@@ -1553,7 +1562,7 @@ RED.view = (function() {
 		
 		$(this).popover("destroy"); // destroy prev
 		var data = getIOpinInfo(this, d, this.getAttribute("index")); // d is the node
-		showPopOver(this, true, data);
+		showPopOver(this, true, data, "right");
 						
 		port.classed("port_hovered",(mouse_mode!=RED.state.JOINING || mousedown_port_type != 1 ));
 		//console.log("nodeInput_mouseover: " + d.name +" , port:" + this.getAttribute("index"));
@@ -1574,7 +1583,8 @@ RED.view = (function() {
 	/*********************************************************************************************************************************/
 	/*********************************************************************************************************************************/
 	function redraw() {
-		console.trace("redraw");
+		const t0 = performance.now();
+		//console.trace("redraw");
 		//RED.addClassTabsToPalette(); // failsafe debug test that is very slow
 		//RED.refreshClassNodes(); // failsafe debug test that is very slow
 		//console.log("redraw");
@@ -1584,9 +1594,11 @@ RED.view = (function() {
 
 		if (mouse_mode != RED.state.JOINING) {
 			// Don't bother redrawing nodes if we're drawing links
-
+			const t2 = performance.now();
 			var node = vis.selectAll(".nodegroup").data(RED.nodes.nodes.filter(function(d) { return d.z == activeWorkspace }),function(d){return d.id});
-			
+			const t3 = performance.now();
+			console.log('vis.selectAll: ' + (t3-t2) +' milliseconds.');
+
 			node.exit().remove();
 
 			var nodeEnter = node.enter().insert("svg:g").attr("class", "node nodegroup");
@@ -1636,7 +1648,7 @@ RED.view = (function() {
 							redraw_nodeOutputs(nodeRect, d);
 							d.resize = false;
 						}
-						console.log("redraw stuff");
+						//console.log("redraw stuff");
 						redraw_nodeReqError(nodeRect, d);
 						redraw_paletteNodesReqError(d);
 						redraw_other(nodeRect, d);
@@ -1651,6 +1663,8 @@ RED.view = (function() {
 		if (d3.event) {
 			d3.event.preventDefault();
 		}
+		const t1 = performance.now();
+		console.log('redraw took: ' + (t1-t0) +' milliseconds.');
 	}
 	function redraw_paletteNodesReqError(d)
 	{
@@ -1837,16 +1851,22 @@ RED.view = (function() {
 		var ioCtrl = [];
 
 		RED.nodes.eachNode(function (node) {
+			if (node.z != activeWorkspace) return;
+			var inputs = 0;
+			if (node.inputs == undefined)
+				inputs = node._def.inputs;
+			else
+				inputs = node.inputs;
 
-			if (node._def.inputs == 0 && node._def.outputs == 0) {
+			if (inputs == 0 && node._def.outputs == 0) {
 				ioCtrl.push(node);
-			} else if (node._def.inputs == 0) {
+			} else if (inputs == 0) {
 				ioNoIn.push(node);
 			} else if (node._def.outputs == 0) {
 				ioNoOut.push(node);
-			} else if (node._def.inputs == 1 && node._def.outputs == 1) {
+			} else if (inputs == 1 && node._def.outputs == 1) {
 				ioInOut.push(node);
-			} else if (node._def.inputs > 1) {
+			} else if (inputs > 1 || node._def.outputs > 1) {
 				ioMultiple.push(node);
 			}
 		});
@@ -2216,10 +2236,10 @@ RED.view = (function() {
 			}
 			data2 = $("<div/>").append("<p>" + portName + "</p></div>").html();
 		}
-		else if (nodeType == "AudioMixer" && portType == "In")
+		/*else if (nodeType == "AudioMixer" && portType == "In")
 		{
 			data2 = $("<div/>").append("<p>" + portName + ": Input Signal #" + (Number(index) + 1) + "</p></div>").html();
-		}
+		}*/
 		else // here we must extract info from Audio Connections table
 		{
 			var tableRows = data2.split("\n");
@@ -2240,24 +2260,27 @@ RED.view = (function() {
 					break;
 				}
 			}
-			//console.log("table contens:\n" + data2); // development debug
+			console.log("table contens: type("+ typeof data2 + "):\n"+ data2); // development debug
 		}
 		//console.log(data2); // development debug
 		return data2;
-		
 	}
 
-	function showPopOver(rect, htmlMode, content)
+	function showPopOver(rect, htmlMode, content,placement)
 	{
+		if (placement == null) placement = "top";
 		current_popup_rect = rect;
 		var options = {
-			placement: "right",
+			placement: placement,
 			trigger: "manual",
 			html: htmlMode,
 			container:'body',
+			rootClose:true, // failsafe
 			content : content
 		};
 		$(rect).popover(options).popover("show");
+		//console.warn("content type:" + typeof content);
+		//console.warn("content:" + content);
 		//console.warn("showPopOver retVal:" + Object.getOwnPropertyNames(retVal)); // debug
 		//console.warn("showPopOver retVal.context:" + retVal.context); // debug
 		//console.warn("showPopOver retVal.length:" + retVal.length); // debug
@@ -2281,11 +2304,17 @@ RED.view = (function() {
 	return {
 		showHideGrid:showHideGrid,
 		showHideGridH: function (state) { showGridH = state; showHideGridH(state); },
-		showHideGridV: function (state) { showGridV = state; showHideGridV(state); },
+		showHideGridVmajor: function (state) { showGridVmajor = state; showHideGridVmajor(state); },
+		showHideGridVminor: function (state) { showGridVminor = state; showHideGridVminor(state); },
 		showGridH:showGridH,
-		showGridV:showGridV,
+		showGridVmajor:showGridVmajor,
+		showGridVminor:showGridVminor,
 		setSnapToGrid:setSnapToGrid,
 		snapToGrid: snapToGrid,
+		setSnapToGridXsize: function (size) { snapToGridXsize = size;},
+		setSnapToGridYsize: function (size) { snapToGridYsize = size;},
+		snapToGridXsize:snapToGridXsize,
+		snapToGridYsize:snapToGridYsize,
 		setShowWorkspaceToolbarVisible:setShowWorkspaceToolbarVisible,
 		showWorkspaceToolbar:showWorkspaceToolbar,
 		

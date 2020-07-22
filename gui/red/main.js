@@ -79,7 +79,7 @@ var RED = (function() {
 	   
 	function displayContents(contents) {
 		//var element = document.getElementById('file-content');
-		RED.storage.loadFile(contents);
+		RED.storage.loadContents(contents);
 	}
 	   
 	document.getElementById('file-input').addEventListener('change', readSingleFile, false);
@@ -106,7 +106,7 @@ var RED = (function() {
 			if (okPressed)
 			{
 				saveToFile("TeensyAudioDesign.json");
-				RED.storage.loadFile(data);
+				RED.storage.loadContents(data);
 			}
 		});
 	});
@@ -119,7 +119,7 @@ var RED = (function() {
 			if (okPressed)
 			{
 				saveToFile("TeensyAudioDesign.json");
-				RED.storage.loadFile(data);
+				RED.storage.loadContents(data);
 			}
 		});
 		
@@ -131,12 +131,13 @@ var RED = (function() {
 			if (okPressed)
 			{
 				saveToFile("TeensyAudioDesign.json");
-				RED.storage.loadFile(data);
+				RED.storage.loadContents(data);
 			}
 		});
 		
 	});
 
+	
 	function verifyDialog(dialogTitle, textTitle, text, cb) {
 		$( "#node-dialog-verify" ).dialog({
 			modal: true,

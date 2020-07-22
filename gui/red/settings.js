@@ -31,32 +31,41 @@ RED.settings = (function() {
 		content.style.paddingLeft = "4px";
 		content.style.paddingRight = "4px";
 		RED.sidebar.addTab("settings",content);
-        var html = "<h3>Settings</h3>";
+		var html = "<h3>Settings</h3>";
+		var htmlCategory = "";
         html += createCheckBox("setting-auto-switch-to-info-tab", "Auto switch to info-tab when selecting node(s).");
 		html += createCheckBox("setting-show-workspace-toolbar", "Show Workspace toolbar.");
 		html += createCheckBox("setting-show-palette-onlyOne", "Palette Show Only one category at a time.");
-		html += createCheckBox("setting-show-workspace-v-grid", "Show Workspace v-grid.");
-		html += createCheckBox("setting-show-workspace-h-grid", "Show Workspace h-grid.");
-		html += createCheckBox("setting-snap-to-grid", "Snap to grid.");
-		//html += createTextInputWithApplyButton("setting-grid-xSize", "Grid Size X");
-		//html += createTextInputWithApplyButton("setting-grid-ySize", "Grid Size Y");
-		html += createTextInputWithApplyButton("setting-test-post", "test post");
-		html += createTextInputWithApplyButton("setting-test-get", "test get");
+		htmlCategory = "";
+		htmlCategory += createCheckBox("setting-show-workspace-v-grid-ma", "Show Workspace major v-grid.");
+		htmlCategory += createCheckBox("setting-show-workspace-v-grid-mi", "Show Workspace minor v-grid.");
+		htmlCategory += createCheckBox("setting-show-workspace-h-grid", "Show Workspace h-grid.");
+		htmlCategory += createCheckBox("setting-snap-to-grid", "Snap to grid.");
+		htmlCategory += createTextInputWithApplyButton("setting-snap-grid-xSize", "Snap Grid Size X");
+		htmlCategory += createTextInputWithApplyButton("setting-snap-grid-ySize", "Snap Grid Size Y");
+		html += createCategory("workspace-grid", "Workspace Grid", htmlCategory);
 
-		//html += '<p><br><br>this is a placeholder for future settings:<br>accessible with:<br>$("#tab-settings").html("text");</p>';
+		htmlCategory = "";
+		htmlCategory += createTextInputWithApplyButton("setting-test-post", "test post");
+		htmlCategory += createTextInputWithApplyButton("setting-test-get", "test get");
+		html += createCategory("development-tests", "Development Tests", htmlCategory);
 
 		$("#tab-settings").html(html);
+		
+		// theese functionalize functions allways end with the callback function
         functionalizeCheckBox("setting-auto-switch-to-info-tab", RED.sidebar.info.autoSwitchTabToThis, RED.sidebar.info.setAutoSwitchTab);
 		functionalizeCheckBox("setting-show-workspace-toolbar", RED.view.showWorkspaceToolbar, RED.view.setShowWorkspaceToolbarVisible);
 		functionalizeCheckBox("setting-show-palette-onlyOne", RED.palette.onlyShowOne, RED.palette.SetOnlyShowOne);
-		functionalizeCheckBox("setting-show-workspace-v-grid", RED.view.showGridV, RED.view.showHideGridV);
+		functionalizeCheckBox("setting-show-workspace-v-grid-ma", RED.view.showGridVmajor, RED.view.showHideGridVmajor);
+		functionalizeCheckBox("setting-show-workspace-v-grid-mi", RED.view.showGridVminor, RED.view.showHideGridVminor);
 		functionalizeCheckBox("setting-show-workspace-h-grid", RED.view.showGridH, RED.view.showHideGridH);
 		functionalizeCheckBox("setting-snap-to-grid", RED.view.snapToGrid, RED.view.setSnapToGrid);
-		//functionalizeTextInputWithApplyButton("setting-grid-xSize", 500, function(value) { console.error("new grid-xsize:" + value);});
-		//functionalizeTextInputWithApplyButton("setting-grid-ySize", 500, function(value) { console.error("new grid-ysize:" + value);});
+		functionalizeTextInputWithApplyButton("setting-snap-grid-xSize", RED.view.snapToGridXsize, RED.view.setSnapToGridXsize);
+		functionalizeTextInputWithApplyButton("setting-snap-grid-ySize", RED.view.snapToGridYsize, RED.view.setSnapToGridYsize);
 		functionalizeTextInputWithApplyButton("setting-test-post", "Hello", RED.arduino.httpPostAsync);
 		functionalizeTextInputWithApplyButton("setting-test-get", "cmd", RED.arduino.httpGetAsync);
-
+		functionalizeCategory("workspace-grid");
+		functionalizeCategory("development-tests");
 		RED.sidebar.show("settings"); // development, allways show settings tab first
 	}
 	
@@ -94,7 +103,37 @@ RED.settings = (function() {
 	{
 		$('#' + id).click(function() { func($('#' + id).prop('checked'));});
 		$('#' + id).prop('checked', initalState);
-    }
+	}
+	
+	function createCategory(category, header, content)
+	{
+		var chevron = '<i class="icon-chevron-down"></i>';
+		var displayStyle = "none";
+		var html = '<div class="palette-category">'+ // use style from palette-category
+			'<div id="setting-header-'+category+'" class="palette-header">'+chevron+'<span>'+header+'</span></div>'+
+			'<div class="palette-content" id="palette-base-category-'+category+'" style="display: '+displayStyle+';">'+
+			  content+
+			'</div>'+
+			'</div>'
+		return html;
+	}
+	function functionalizeCategory(category)
+	{
+		$("#setting-header-"+category).off('click').on('click', function(e) {
+			
+			var displayStyle = $(this).next().css('display');
+			if (displayStyle == "block")
+			{
+				$(this).next().slideUp();
+				$(this).children("i").removeClass("expanded"); // chevron
+			}
+			else
+			{
+				$(this).next().slideDown();
+				$(this).children("i").addClass("expanded"); // chevron
+			}
+		});
+	}
     
     return {
 		createTab:createTab,

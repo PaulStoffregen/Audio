@@ -45,13 +45,18 @@ RED.sidebar.info = (function() {
 		}
 		return value;
 	}
+	function clearSelection()
+	{
+		if (window.getSelection) {window.getSelection().removeAllRanges();}
+		else if (document.selection) {document.selection.empty();}
+	}
 	
 	function refresh(node) {
 		//console.warn("tab-info refresh");
 		if (autoSwitchTabToThis)
 			RED.sidebar.show("info");
 		var table = '<table class="node-info"><tbody>';
-
+		clearSelection();// partly fix a select node bug, that selects all text, it happens when you try select and move a node to quickly
 		table += "<tr><td>Type</td><td>&nbsp;"+node.type+"</td></tr>";
 		table += "<tr><td>ID</td><td>&nbsp;"+node.id+"</td></tr>";
 		table += "<tr><td>posX</td><td>&nbsp;"+node.x+"</td></tr>"; // development info only
