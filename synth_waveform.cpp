@@ -359,7 +359,7 @@ void AudioSynthWaveformModulated::update(void)
 		for (i = 0 ; i < AUDIO_BLOCK_SAMPLES ; i++)
 		{
 		  int32_t val = band_limit_waveform.generate_square (phasedata[i], i) ;
-		  *bp++ = val ; /// (int16_t) ((val * magnitude) >> 16) ;
+		  *bp++ = (int16_t) ((val * magnitude) >> 16) ;
 		}
 		break;
 
@@ -380,7 +380,7 @@ void AudioSynthWaveformModulated::update(void)
 		for (i = 0 ; i < AUDIO_BLOCK_SAMPLES ; i++)
 		{
 		  int16_t val = band_limit_waveform.generate_sawtooth (phasedata[i], i) ;
-		  ///val = (int16_t) ((val * magnitude) >> 16) ;
+		  val = (int16_t) ((val * magnitude) >> 16) ;
 		  *bp++ = tone_type == WAVEFORM_BANDLIMIT_SAWTOOTH_REVERSE ? (int16_t) -val : (int16_t) +val ;
 		}
 		break;
@@ -621,6 +621,8 @@ int16_t BandLimitedWaveform::generate_square (uint32_t new_phase, int i)
 void BandLimitedWaveform::init_sawtooth (uint32_t freq_word)
 {
   phase_word = 0 ;
+  newptr = 0 ;
+  delptr = 0 ;
   for (int i = 0 ; i < 2*SUPPORT ; i++)
     phase_word -= freq_word ;
   dc_offset = phase_word < DEG180 ? BASE_AMPLITUDE : -BASE_AMPLITUDE ;
@@ -637,6 +639,8 @@ void BandLimitedWaveform::init_sawtooth (uint32_t freq_word)
 void BandLimitedWaveform::init_square (uint32_t freq_word)
 {
   phase_word = 0 ;
+  newptr = 0 ;
+  delptr = 0 ;
   for (int i = 0 ; i < 2*SUPPORT ; i++)
     phase_word -= freq_word ;
   dc_offset = phase_word < DEG180 ? -BASE_AMPLITUDE : BASE_AMPLITUDE ;
