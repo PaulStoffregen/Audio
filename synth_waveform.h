@@ -49,6 +49,7 @@ extern const int16_t AudioWaveformSine[257];
 #define WAVEFORM_BANDLIMIT_SAWTOOTH  9
 #define WAVEFORM_BANDLIMIT_SAWTOOTH_REVERSE 10
 #define WAVEFORM_BANDLIMIT_SQUARE 11
+#define WAVEFORM_BANDLIMIT_PULSE 12
 
 
 typedef struct step_state
@@ -64,8 +65,10 @@ public:
   BandLimitedWaveform (void) ;
   int16_t generate_sawtooth (uint32_t new_phase, int i) ;
   int16_t generate_square (uint32_t new_phase, int i) ;
+  int16_t generate_pulse (uint32_t new_phase, uint32_t pulse_width, int i) ;
   void init_sawtooth (uint32_t freq_word) ;
   void init_square (uint32_t freq_word) ;
+  void init_pulse (uint32_t freq_word, uint32_t pulse_width) ;
   
 
 private:
@@ -74,7 +77,7 @@ private:
   int32_t process_step (int i) ;
   int32_t process_active_steps (uint32_t new_phase) ;
   int32_t process_active_steps_saw (uint32_t new_phase) ;
-  void new_step_check (uint32_t new_phase, int i) ;
+  void new_step_check_pulse (uint32_t new_phase, uint32_t pulse_width, int i) ;
   void new_step_check_saw (uint32_t new_phase, int i) ;
 
   
@@ -83,7 +86,7 @@ private:
   step_state states [32] ; // circular buffer of active steps
   int newptr ;         // buffer pointers into states, AND'd with PTRMASK to keep in buffer range.
   int delptr ;
-  int16_t  cyclic[16] ;    // circular buffer of output samples
+  int32_t  cyclic[16] ;    // circular buffer of output samples
 };
 
 
@@ -138,13 +141,28 @@ public:
 			n = 1.0;
 		}
 		pulse_width = n * 4294967296.0;
+		if (tone_type == WAVEFORM_BANDLIMIT_PULSE)
+		{
+		  if (pulse_width < phase_increment)  // ensure pulse never narrow enough to glitch out of existence.
+		    pulse_width = phase_increment ;
+		  else if (pulse_width > -phase_increment)
+		    pulse_width = -phase_increment;
+		}
 	}
 	void begin(short t_type) {
 		phase_offset = 0;
 		tone_type = t_type;
 		if (t_type == WAVEFORM_BANDLIMIT_SQUARE)
 		  band_limit_waveform.init_square (phase_increment) ;
-		if (t_type == WAVEFORM_BANDLIMIT_SAWTOOTH || t_type == WAVEFORM_BANDLIMIT_SAWTOOTH_REVERSE)
+		else if (t_type == WAVEFORM_BANDLIMIT_PULSE)
+		{
+		  if (pulse_width < phase_increment)  // ensure pulse never narrow enough to glitch out of existence.
+		    pulse_width = phase_increment ;
+		  else if (pulse_width > -phase_increment)
+		    pulse_width = -phase_increment;
+		  band_limit_waveform.init_pulse (phase_increment, pulse_width) ;
+		}
+		else if (t_type == WAVEFORM_BANDLIMIT_SAWTOOTH || t_type == WAVEFORM_BANDLIMIT_SAWTOOTH_REVERSE)
 		  band_limit_waveform.init_sawtooth (phase_increment) ;
 	}
 	void begin(float t_amp, float t_freq, short t_type) {
@@ -210,7 +228,9 @@ public:
 		tone_type = t_type;
 		if (t_type == WAVEFORM_BANDLIMIT_SQUARE)
 		  band_limit_waveform.init_square (phase_increment) ;
-		if (t_type == WAVEFORM_BANDLIMIT_SAWTOOTH || t_type == WAVEFORM_BANDLIMIT_SAWTOOTH_REVERSE)
+		else if (t_type == WAVEFORM_BANDLIMIT_PULSE)
+		  band_limit_waveform.init_pulse (phase_increment, 0x80000000u) ;
+		else if (t_type == WAVEFORM_BANDLIMIT_SAWTOOTH || t_type == WAVEFORM_BANDLIMIT_SAWTOOTH_REVERSE)
 		  band_limit_waveform.init_sawtooth (phase_increment) ;
 	}
 	void begin(float t_amp, float t_freq, short t_type) {
