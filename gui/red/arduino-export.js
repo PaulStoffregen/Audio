@@ -16,6 +16,8 @@
  * limitations under the License.
  **/
 RED.arduino.export = (function() {
+
+	var useExportDialog = true;
     /**
 	 * this take a multiline text, 
 	 * break it up into linearray, 
@@ -104,7 +106,7 @@ RED.arduino.export = (function() {
 	/**
 	 * This is only for the moment to get special type AudioMixer<n>
 	 * @param {*} nns nodeArray
-	 * @param {*} n node
+	 * @param {Node} n node
 	 */
 	function getTypeName(nns, n)
 	{
@@ -117,14 +119,14 @@ RED.arduino.export = (function() {
 			{
 				// check if source is a array
 				var src = RED.nodes.getWireInputSourceNode(nns, n.z, n.id);
-				if (!src.node.name)
+				if (src && (src.node.name)) // if not src.node.name is defined then it is not an array, because the id never defines a array
 				{
-					console.error("!src.node:" + n.z + ":" + n.id); // failsafe only happens when no name is used for an node
-					return;
+					var isArray = RED.nodes.isNameDeclarationArray(src.node.name);
+					if (isArray) tmplDef = "<" + isArray.arrayLenght + ">";
+					console.log("special case AudioMixer connected from array " + src.node.name + ", new AudioMixer def:" + tmplDef);
 				}
-				var isArray = RED.nodes.isNameDeclarationArray(src.node.name);
-				if (isArray) tmplDef = "<" + isArray.arrayLenght + ">";
-				console.log("special case AudioMixer connected from array " + src.node.name + ", new AudioMixer def:" + tmplDef);
+				else
+					tmplDef = "<" + n.inputs + ">";
 			}
 			else
 				tmplDef = "<" + n.inputs + ">";
@@ -147,6 +149,23 @@ RED.arduino.export = (function() {
 				+ "#include <SerialFlash.h>\n\n"
 				+ "// GUItool: begin automatically generated code\n"
 				+ "// JSON string:" + JSON.stringify(nns) + "\n";
+	}
+	function getCppFooter()
+	{
+		return "// GUItool: end automatically generated code\n";
+	}
+	function getNewWsCppFile(name, contents)
+	{
+		return {name:name + ".h", cpp:contents};
+	}
+	/**
+	 * 
+	 * @param {*} wsCppFiles array of type "getNewWsCppFile"
+	 * @param {*} removeFiles this tells arduino ide to remove files that is not present in this post, the main ino-file is never removed
+	 */
+	function getPOST_JSON(wsCppFiles, removeFiles)
+	{
+		return {files:wsCppFiles, removeUnusedFiles:removeFiles};
 	}
 	function getNewAudioConnectionType()
 	{
@@ -219,14 +238,23 @@ RED.arduino.export = (function() {
 	{
 		// sort by vertical position, plus vertical position,
 		// for well defined update order that follows signal flow
-		return (a.x/50 + a.y/30) - (b.x/50 + b.y/30);
+		return (a.x/50 + a.y/100) - (b.x/50 + b.y/100);
 		// 1 4 7
 		// 2 5 8
 		// 3 6 9
 	}
+	/**
+	 * Checks if a node have any Input(s)/Output(s)
+	 * @param {Node} node 
+	 * @returns {Boolean} ((node.outputs > 0) || (node._def.inputs > 0))
+	 */
+	function haveIO(node)
+	{
+		return ((node.outputs > 0) || (node._def.inputs > 0));
+	}
 
-    $('#btn-deploy').click(function() { save(); });
-	function save() {
+    $('#btn-deploy').click(function() { export_simple(); });
+	function export_simple() {
 		const t0 = performance.now();
 		RED.storage.update();
 
@@ -235,71 +263,78 @@ RED.arduino.export = (function() {
 			return;
 		}
 		var nns = RED.nodes.createCompleteNodeSet();
-		
 		nns.sort(nodeSortFunction);
 		//console.log(JSON.stringify(nns));
 
-		var cpp = getCppHeader(nns);
-			
-		// generate code for all audio processing nodes
-		for (var i=0; i<nns.length; i++) {
-			var n = nns[i];
-			if (isSpecialNode(n.type) || (n.type == "Array")) continue;
-			var node = RED.nodes.node(n.id); // to get access to node.outputs and node._def.inputs
-			if (node == null) { console.warn("node == null:" + "type:"+n.type +",id:"+ n.id); continue;}
-			if ((node.outputs <= 0) && (node._def.inputs <= 0)) continue; // if have no I/O
-
-			cpp += getTypeName(nns,n);
-			var name = RED.nodes.make_name(n)
-			cpp += name + "; ";
-			for (var j=n.id.length; j<14; j++) cpp += " ";
-			cpp += "//xy=" + n.x + "," + n.y + "\n";
-		}
-		// generate code for all connections (aka wires or links)
+		var cppAPN = "// Audio Processing Nodes\n";
+		var cppAC = "// Audio Connections (all connections (aka wires or links))\n";
+		var cppCN = "// Control Nodes (all control nodes (no inputs or outputs))\n";
 		var cordcount = 1;
+		var activeWorkspace = RED.view.getWorkspace();
+		console.log("save1(simple) workspace:" + activeWorkspace);
+
 		for (var i=0; i<nns.length; i++) {
 			var n = nns[i];
-			if (isSpecialNode(n.type) || (n.type == "Array")) continue;
-			RED.nodes.eachWire(n, function (pi, dstId, dstPortIndex)
-			{
-				var src = RED.nodes.node(n.id);
-				var dst = RED.nodes.node(dstId);
-				var src_name = RED.nodes.make_name(src);
-				var dst_name = RED.nodes.make_name(dst);
-				cpp += "AudioConnection          patchCord" + cordcount + "(";
-				if (j == 0 && dstPortIndex == 0 && src && src.outputs == 1 && dst && dst._def.inputs == 1) {
-					cpp += src_name + ", " + dst_name;
-				} else {
-					cpp += src_name + ", " + j + ", " + dst_name + ", " + dstPortIndex;
-				}
-				cpp += ");\n";
-				cordcount++;
-			});
-		}
-		// generate code for all control nodes (no inputs or outputs)
-		for (var i=0; i<nns.length; i++) {
-			var n = nns[i];
-			if (isSpecialNode(n.type) || (n.type == "Array")) continue;
-			var node = RED.nodes.node(n.id);
-			if (node == null) continue;
-			if (node.outputs == 0 && node._def.inputs == 0) {
-				cpp += n.type + " ";
-				for (var j=n.type.length; j<24; j++) cpp += " ";
-				cpp += n.id + "; ";
-				for (var j=n.id.length; j<14; j++) cpp += " ";
-				cpp += "//xy=" + n.x + "," + n.y + "\n";
+			if (n.z != activeWorkspace) continue; // workspace filter
+			if (isSpecialNode(n.type) || (n.type == "Array")) continue; // simple export don't support Array-node, it's replaced by "real" node-array, TODO: remove Array-type
+			var node = RED.nodes.node(n.id); // to get access to node.outputs and node._def.inputs
+			if (node == null) { console.warn("node == null:" + "type:"+n.type +",id:"+ n.id); continue;} // this should never happen (because now "tab" type is in isSpecialNode)
+			
+			if (haveIO(node)) {
+				// generate code for audio processing node instance
+				cppAPN += getTypeName(nns,n);
+				var name = RED.nodes.make_name(n)
+				cppAPN += name + "; ";
+				for (var j=n.id.length; j<14; j++) cppAPN += " ";
+				cppAPN += "//xy=" + n.x + "," + n.y + "\n";
+
+				// generate code for node connections (aka wires or links)
+				RED.nodes.eachWire(n, function (pi, dstId, dstPortIndex)
+				{
+					var src = RED.nodes.node(n.id);
+					var dst = RED.nodes.node(dstId);
+					var src_name = RED.nodes.make_name(src);
+					var dst_name = RED.nodes.make_name(dst);
+					cppAC += "AudioConnection          patchCord" + cordcount + "(";
+					if (pi == 0 && dstPortIndex == 0 && src && src.outputs == 1 && dst && dst._def.inputs == 1) {
+						cppAC += src_name + ", " + dst_name;
+					} else {
+						cppAC += src_name + ", " + pi + ", " + dst_name + ", " + dstPortIndex;
+					}
+					cppAC += ");\n";
+					cordcount++;
+				});
+			} else { // generate code for control node (no inputs or outputs)
+				cppCN += n.type + " ";
+				for (var j=n.type.length; j<24; j++) cppCN += " ";
+				cppCN += n.name + "; ";
+				for (var j=n.name.length; j<14; j++) cppCN += " ";
+				cppCN += "//xy=" + n.x + "," + n.y + "\n";
 			}
 		}
-		cpp += "// GUItool: end automatically generated code\n";
+
+		var cpp = getCppHeader(nns);
+		cpp += "\n" + cppAPN + "\n" + cppAC + "\n" + cppCN + "\n";
+		cpp += getCppFooter();
 		//console.log(cpp);
-		RED.arduino.httpPostAsync(cpp);
-		showExportDialog("Export to Arduino", cpp);
+
+		var wsCppFiles = [getNewWsCppFile(RED.nodes.getWorkspace(activeWorkspace).label, cpp)];
+		var wsCppFilesJson = getPOST_JSON(wsCppFiles, false);
+		RED.arduino.httpPostAsync(JSON.stringify(wsCppFilesJson));
 		const t1 = performance.now();
-		console.log('arduino-export-save1 took: ' + (t1-t0) +' milliseconds.');
+
+		if (useExportDialog)
+			showExportDialog("Simple Export to Arduino", cpp);
+			//showExportDialog("Simple Export to Arduino", JSON.stringify(wsCppFilesJson, null, 4));	// dev. test
+
+		const t2 = performance.now();
+		console.log('arduino-export-save1 took generating: ' + (t1-t0) +' milliseconds.');
+		console.log('arduino-export-save1 took total: ' + (t2-t0) +' milliseconds.');
+		
 	}
     
-	$('#btn-deploy2').click(function() { save2(); });
-	function save2()
+	$('#btn-deploy2').click(function() { export_classBased(); });
+	function export_classBased()
 	{
 		const t0 = performance.now();
 		RED.storage.update();
@@ -319,13 +354,13 @@ RED.arduino.export = (function() {
 
 		// to make splitting the classes to different files
 		// wsCpp and newWsCpp is used
-		var wsCpp = [];
+		var wsCppFiles = [];
 		var newWsCpp;
 		for (var wsi=0; wsi < RED.nodes.workspaces.length; wsi++) // workspaces
 		{
 			var ws = RED.nodes.workspaces[wsi];
 			if (!ws.export) continue; // this skip export
-			newWsCpp = {name:ws.label, cpp:""};
+			newWsCpp = getNewWsCppFile(ws.label, "");
 			
 			// first go through special types
 			var classComment = "";
@@ -408,7 +443,7 @@ RED.arduino.export = (function() {
 				if (node.outputs == 0 && node._def.inputs == 0) {
 
 					if(isSpecialNode(n.type)) continue;
-
+					
 					newWsCpp.cpp += "    " + n.type + " ";
 					for (var j=n.type.length; j<32; j++) cpp += " ";
 					var name = RED.nodes.make_name(n)
@@ -440,22 +475,16 @@ RED.arduino.export = (function() {
 					ac.dstPort = dstPortIndex;
 
 					ac.checkIfSrcIsArray(); // we ignore the return value, there is no really use for it
-					if (RED.nodes.isClass(n.type)) // if source is class
-					{
+					if (RED.nodes.isClass(n.type)) { // if source is class
 						//console.log("root src is class:" + ac.srcName);
-						//classOutputPortToCpp(nns, outNodes, ac, n); // debug
 						RED.nodes.classOutputPortToCpp(nns, tabNodes.outputs, ac, n);
 					}
 					
 					ac.checkIfDstIsArray(); // we ignore the return value, there is no really use for it
-					if (RED.nodes.isClass(dst.type))
-					{							
+					if (RED.nodes.isClass(dst.type)) {
 						//console.log("dst is class:" + dst.name + " from:" + n.name);
-						//classInputPortToCpp(inNodes, ac.dstName , ac, dst); // debug;
 						RED.nodes.classInputPortToCpp(tabNodes.inputs, ac.dstName , ac, dst);
-					}
-					else
-					{
+					} else {
 						ac.appendToCppCode(); // this don't return anything, the result is in ac.cppCode
 					}
 					if (ac.ifAnyIsArray())
@@ -464,6 +493,7 @@ RED.arduino.export = (function() {
 						cppPcs += ac.cppCode;
 				});
 			}
+
 			newWsCpp.cpp += "    AudioConnection ";
 			for (var j="AudioConnection".length; j<32; j++) newWsCpp.cpp += " ";
 			newWsCpp.cpp += "*patchCord[" + ac.totalCount + "]; // total patchCordCount:" + ac.totalCount + " including array typed ones.\n";
@@ -494,19 +524,23 @@ RED.arduino.export = (function() {
 				newWsCpp.cpp += "\n" + incrementTextLines(classFunctions, "    ");
 			newWsCpp.cpp += "};\n"; // end of class
 
-			wsCpp.push(newWsCpp);
+			wsCppFiles.push(newWsCpp);
 		}
 		// time to generate the final result
 		var cpp = getCppHeader(nns);
-		for (var i = 0; i < wsCpp.length; i++)
+		for (var i = 0; i < wsCppFiles.length; i++)
 		{
-			cpp += wsCpp[i].cpp;
+			cpp += wsCppFiles[i].cpp;
 		}
-		cpp += "// GUItool: end automatically generated code\n";
+		cpp += getCppFooter();
 		//console.log(cpp);
-		RED.arduino.httpPostAsync(JSON.stringify(wsCpp));
-		showExportDialog("Class Export to Arduino", cpp);	
-		//showExportDialog("Class Export to Arduino", JSON.stringify(wsCpp, null, 4));	// dev. test
+		
+		var wsCppFilesJson = getPOST_JSON(wsCppFiles, false);
+		RED.arduino.httpPostAsync(JSON.stringify(wsCppFilesJson));
+
+		if (useExportDialog)
+			showExportDialog("Class Export to Arduino", cpp);	
+			//showExportDialog("Class Export to Arduino", JSON.stringify(wsCppFilesJson, null, 4));	// dev. test
 		const t1 = performance.now();
 		console.log('arduino-export-save2 took: ' + (t1-t0) +' milliseconds.');
 	}
@@ -522,6 +556,9 @@ RED.arduino.export = (function() {
 					}).focus();*/ 
 
     return {
-        isSpecialNode:isSpecialNode,
+		isSpecialNode:isSpecialNode,
+		useExportDialog:useExportDialog,
+		setUseExportDialog: function (state) { useExportDialog = state;},
+		showExportDialog:showExportDialog
 	};
 })();

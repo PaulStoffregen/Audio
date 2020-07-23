@@ -37,19 +37,19 @@ RED.storage = (function() {
 		const t0 = performance.now();
 		if (localStorage) {
 			console.warn(allStorage());
-			var data = localStorage.getItem("audio_library_guitool");
-			console.log("localStorage read: " );//+ data);
-			if (data)
-				RED.nodes.import(data, false);
+			var json_string = localStorage.getItem("audio_library_guitool");
+			console.log("localStorage read: " );//+ json_string);
+			if (json_string)
+				RED.nodes.import(json_string, false);
 			else
 				RED.nodes.createNewDefaultWorkspace();
 		}
 		const t1 = performance.now();
 		console.log('storage-load took: ' + (t1-t0) +' milliseconds.');
 	}
-	function loadContents(data) {
-		console.log("loadContents:" +data);
-		localStorage.setItem("audio_library_guitool", data);
+	function loadContents(json_string) {
+		console.log("loadContents:" +json_string);
+		localStorage.setItem("audio_library_guitool", json_string);
 		window.location.reload();
 		
 				

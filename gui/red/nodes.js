@@ -23,12 +23,28 @@ RED.nodes = (function() {
 	var defaultWorkspace;
 	var workspaces = [];
 	
+	function getNode()
+	{
+		return {id: id , type:type, name:name, x: xpos, y:ypos, z:ws, wires:[], _def:{}};
+	}
+	/**
+	 * 
+	 * @param {getNode} node ignore ():
+	 */
+	function gotNode(node)
+	{
+
+	}
+	function useNode()
+	{
+		var node = getNode();
+	}
 	/**
 	 * this creates a workspace object
 	 */
 	function createWorkspaceObject(id, label, inputs, outputs, _export) // export is a reserved word
 	{
-		return { type:"tab", id:id, label:label, inputs:inputs, outputs:outputs, export:_export};
+		return { type:"tab", id:id, label:label, inputs:inputs, outputs:outputs, export:_export, nodes:[]};
 	}
 
 	$('#btn-moveWorkSpaceLeft').click(function() { moveWorkSpaceLeft(); });
@@ -180,6 +196,10 @@ RED.nodes = (function() {
 				+ window.location.host + window.location.pathname + '?info=' + name);
 		}
 	}
+	/**
+	 * 
+	 * @param {Node} n 
+	 */
 	function addNode(n) {
 		if (n.type == "AudioMixerX")
 		{
@@ -460,7 +480,7 @@ RED.nodes = (function() {
 	
 	function createNewDefaultWorkspace() // Jannik Add function
 	{
-		defaultWorkspace = { type:"tab", id:"Main", label:"Main"};//, inputCount:"0", outputCount:"0" };
+		defaultWorkspace = createWorkspaceObject("Main","Main",0,0,true);
 		addWorkspace(defaultWorkspace);
 		RED.view.addWorkspace(defaultWorkspace);
 	}
@@ -532,7 +552,7 @@ RED.nodes = (function() {
 				//"DO NOT DEPLOY while in this state.<br/>Either, add missing types to Node-RED, restart and then reload page,<br/>or delete unknown "+n.name+", rewire as required, and then deploy.","error");
 			}
 */
-			for (i=0;i<newNodes.length;i++) { // load workspaces first
+			for (i=0;i<newNodes.length;i++) { // scan and load workspaces first
 				n = newNodes[i];
 				// TODO: not remove workspace because it's now used
 				if (n.type === "workspace" || n.type === "tab") {
@@ -739,6 +759,15 @@ RED.nodes = (function() {
 		}
 		return false;
 	}
+	/**
+	 * this is the internal type,  different from the saved one which is smaller
+	 * @typedef {"id":"Main_Array_"+type+"_"+name ,
+				 "type":"Array",
+				 "name":type + " " + name + " " + cppString,
+				 "x":500,"y":55,"z":items[0].n.z,
+				 "wires":[],
+				 "_def":node_defs["Array"]} Node 
+	 */
 
 	/**
 	 * this autogenerate a array-node from same-type selection

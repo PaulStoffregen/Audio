@@ -17,12 +17,13 @@
 
 
 RED.view = (function() {
-	var showGridVminor = true;
-	var showGridVmajor = true;
-	var showGridH = true;
-	var snapToGrid = true; // this is allready implemented with shift button, this locks that mode
-	var snapToGridXsize = 5;
-	var snapToGridYsize = 5;
+	var showGridVminor = true,
+	    showGridVmajor = true,
+		showGridH = true;
+		
+	var snapToGrid = true, // this is allready implemented with shift button, this locks that mode
+	    snapToGridXsize = 5,
+	    snapToGridYsize = 5;
 
 	var showWorkspaceToolbar = true;
 
@@ -31,7 +32,7 @@ RED.view = (function() {
 		lineCurveScale = 0.75,
 		scaleFactor = 1,
 		node_width = 100,
-		node_height = 30;
+		node_height = 35;
 
 	var touchLongPressTimeout = 1000,
 		startTouchDistance = 0,
@@ -2317,7 +2318,8 @@ RED.view = (function() {
 		snapToGridYsize:snapToGridYsize,
 		setShowWorkspaceToolbarVisible:setShowWorkspaceToolbarVisible,
 		showWorkspaceToolbar:showWorkspaceToolbar,
-		
+		lineCurveScale:lineCurveScale,
+		setLineCurveScale: function (value) { lineCurveScale = value; redraw_links()},
 		state:function(state) {
 			if (state == null) {
 				return mouse_mode
