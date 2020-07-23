@@ -49,7 +49,7 @@ extern const int16_t AudioWaveformSine[257];
 #define WAVEFORM_BANDLIMIT_SAWTOOTH  9
 #define WAVEFORM_BANDLIMIT_SAWTOOTH_REVERSE 10
 #define WAVEFORM_BANDLIMIT_SQUARE 11
-#define WAVEFORM_BANDLIMIT_PULSE 12
+#define WAVEFORM_BANDLIMIT_PULSE  12
 
 
 typedef struct step_state
@@ -87,6 +87,7 @@ private:
   int newptr ;         // buffer pointers into states, AND'd with PTRMASK to keep in buffer range.
   int delptr ;
   int32_t  cyclic[16] ;    // circular buffer of output samples
+  bool pulse_state ;
 };
 
 
@@ -108,6 +109,7 @@ public:
 		}
 		phase_increment = freq * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT);
 		if (phase_increment > 0x7FFE0000u) phase_increment = 0x7FFE0000;
+		ensure_pulse_width_ok () ;
 	}
 	void phase(float angle) {
 		if (angle < 0.0) {
@@ -141,13 +143,7 @@ public:
 			n = 1.0;
 		}
 		pulse_width = n * 4294967296.0;
-		if (tone_type == WAVEFORM_BANDLIMIT_PULSE)
-		{
-		  if (pulse_width < phase_increment)  // ensure pulse never narrow enough to glitch out of existence.
-		    pulse_width = phase_increment ;
-		  else if (pulse_width > -phase_increment)
-		    pulse_width = -phase_increment;
-		}
+		ensure_pulse_width_ok () ;
 	}
 	void begin(short t_type) {
 		phase_offset = 0;
@@ -156,10 +152,7 @@ public:
 		  band_limit_waveform.init_square (phase_increment) ;
 		else if (t_type == WAVEFORM_BANDLIMIT_PULSE)
 		{
-		  if (pulse_width < phase_increment)  // ensure pulse never narrow enough to glitch out of existence.
-		    pulse_width = phase_increment ;
-		  else if (pulse_width > -phase_increment)
-		    pulse_width = -phase_increment;
+		  ensure_pulse_width_ok () ;
 		  band_limit_waveform.init_pulse (phase_increment, pulse_width) ;
 		}
 		else if (t_type == WAVEFORM_BANDLIMIT_SAWTOOTH || t_type == WAVEFORM_BANDLIMIT_SAWTOOTH_REVERSE)
@@ -177,6 +170,16 @@ public:
 	virtual void update(void);
 
 private:
+	void ensure_pulse_width_ok()
+	{
+		if (tone_type == WAVEFORM_BANDLIMIT_PULSE)
+		{
+		  if (pulse_width < phase_increment)  // ensure pulse never narrow enough to glitch out of existence.
+		    pulse_width = phase_increment ;
+		  else if (pulse_width > -phase_increment)
+		    pulse_width = -phase_increment;
+		}
+	}
 	uint32_t phase_accumulator;
 	uint32_t phase_increment;
 	uint32_t phase_offset;

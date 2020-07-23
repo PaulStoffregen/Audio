@@ -486,6 +486,7 @@ void AudioSynthWaveformModulated::update(void)
 
 #define BASE_AMPLITUDE 0x6000  // 0x7fff won't work due to Gibb's phenomenon, so use 3/4 of full range.
 
+#define DEG90 0x40000000u
 #define DEG180 0x80000000u
 
 #define PHASE_SCALE (0x100000000L / (2 * BASE_AMPLITUDE))
@@ -578,19 +579,27 @@ int32_t BandLimitedWaveform::process_active_steps_saw (uint32_t new_phase)
 
 void BandLimitedWaveform::new_step_check_pulse (uint32_t new_phase, uint32_t pulse_width, int i)
 {
-  if (new_phase >= pulse_width && phase_word < pulse_width) // detect rising step
+  if (new_phase >= pulse_width && phase_word < pulse_width) // detect falling step
   {
     int32_t offset = (int32_t) ((uint64_t) (SCALE<<GUARD_BITS) * (pulse_width - phase_word) / (new_phase - phase_word)) ;
     if (offset == SCALE<<GUARD_BITS)
       offset -- ;
-    insert_step (- offset, true, i) ;
+    if (pulse_state) // guard against two falling steps in a row (if pulse width changing for instance)
+    {
+      insert_step (- offset, false, i) ;
+      pulse_state = false ;
+    }
   }
-  if (new_phase < pulse_width && phase_word >= pulse_width) // detect wrap around, falling step
+  if (new_phase < pulse_width && phase_word >= pulse_width) // detect wrap around, rising step
   {
     int32_t offset = (int32_t) ((uint64_t) (SCALE<<GUARD_BITS) * (- phase_word) / (new_phase - phase_word)) ;
     if (offset == SCALE<<GUARD_BITS)
       offset -- ;
-    insert_step (- offset, false, i) ;
+    if (!pulse_state) // guard against two rising steps in a row (if pulse width changing for instance)
+    {
+      insert_step (- offset, true, i) ;
+      pulse_state = true ;
+    }
   }
 }
 
@@ -668,7 +677,16 @@ void BandLimitedWaveform::init_pulse (uint32_t freq_word, uint32_t pulse_width)
   for (int i = 0 ; i < 2*SUPPORT ; i++)
     phase_word -= freq_word ;
 
-  dc_offset = phase_word < DEG180 ? -BASE_AMPLITUDE : BASE_AMPLITUDE ;
+  if (phase_word < DEG90)
+  {
+    dc_offset = BASE_AMPLITUDE ;
+    pulse_state = true ;
+  }
+  else
+  {
+    dc_offset = -BASE_AMPLITUDE ;
+    pulse_state = false ;
+  }
   
   for (int i = 0 ; i < 2*SUPPORT ; i++)
   {
