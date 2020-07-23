@@ -32,6 +32,8 @@
 
 // uncomment for more accurate but more computationally expensive frequency modulation
 //#define IMPROVE_EXPONENTIAL_ACCURACY
+#define BASE_AMPLITUDE 0x6000  // 0x7fff won't work due to Gibb's phenomenon, so use 3/4 of full range.
+
 
 
 void AudioSynthWaveform::update(void)
@@ -189,6 +191,7 @@ void AudioSynthWaveform::update(void)
 		{
 		  int32_t new_ph = ph + inc ;
 		  int32_t val = band_limit_waveform.generate_pulse (new_ph, pulse_width, i) ;
+		  val += BASE_AMPLITUDE/2 - pulse_width / (0x100000000L / BASE_AMPLITUDE) ; // correct DC offset for duty cycle
 		  *bp++ = (int16_t) ((val * magnitude) >> 16) ;
 		  ph = new_ph ;
 		}
@@ -372,6 +375,7 @@ void AudioSynthWaveformModulated::update(void)
 		  {
 		    uint32_t width = ((shapedata->data[i] + 0x8000) & 0xFFFF) << 16;
 		    int32_t val = band_limit_waveform.generate_pulse (phasedata[i], width, i) ;
+		    val += BASE_AMPLITUDE/2 - width / (0x100000000L / BASE_AMPLITUDE) ; // correct DC offset for duty cycle
 		    *bp++ = (int16_t) ((val * magnitude) >> 16) ;
 		  }
 		  break;
@@ -483,8 +487,6 @@ void AudioSynthWaveformModulated::update(void)
 #define GUARD      (1 << GUARD_BITS)
 #define HALF_GUARD (1 << (GUARD_BITS-1))
 
-
-#define BASE_AMPLITUDE 0x6000  // 0x7fff won't work due to Gibb's phenomenon, so use 3/4 of full range.
 
 #define DEG90 0x40000000u
 #define DEG180 0x80000000u
@@ -643,7 +645,7 @@ int16_t BandLimitedWaveform::generate_pulse (uint32_t new_phase, uint32_t pulse_
   int32_t sample = cyclic [i&15] ;
   cyclic [i&15] = val ;
   phase_word = new_phase ;
-  return (int16_t) (sample - (sample >> 2)) ; // scale down a bit to avoid overflow on narrow pulses
+  return (int16_t) (sample >> 1) ; // scale down to avoid overflow on narrow pulses, where the DC shift is big
 }
 
 void BandLimitedWaveform::init_sawtooth (uint32_t freq_word)
