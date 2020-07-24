@@ -181,10 +181,6 @@ a.brand img {
     border-radius: 3px;
     /*margin-bottom: 5px;*/
 }
-.palette-sub-category-label {
-    padding-top: 3px;
-    text-decoration: underline solid red;
-}
 .palette-content {
     background: #fff;
     border-top: 1px solid #aaa;
@@ -192,6 +188,7 @@ a.brand img {
     padding-bottom: 3px;
 }
 .palette-header {
+    font-weight: bold;
     background: #f1f1f1;
     border-radius: 3px;
     cursor: pointer;

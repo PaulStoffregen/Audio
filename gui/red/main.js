@@ -14,11 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-var RED = (function() {
+/**
+ * node RED namespace
+ */
+var RED = (function() { // this is used so that RED can be used as root "namespace"
+	return {
+		console_ok:function console_ok(text) { console.log('%c' + text, 'background: #ccffcc; color: #000'); }
+	};
+})();
+
+/**
+ * node RED main - here the main entry function exist
+ */
+RED.main = (function() {
 
 	//var classColor = "#E6E0F8"; // standard
 	var classColor = "#ccffcc"; // new
-
+	var requirements;
 	$('#btn-keyboard-shortcuts').click(function(){showHelp();});
 
 	function hideDropTarget() {
@@ -98,45 +110,67 @@ var RED = (function() {
 			   "<p>Note. your current design will be automatically downloaded as <b>TeensyAudioDesign.json</b></p><br>"+
 			   "If you want a different filename,<br>then use the<b> export menu - SaveToFile</b> instead.";
 	}
-	$('#btn-demoFlowA').click(function() {
-		var data = $("script[data-container-name|='DemoFlowA']").html();
-		console.error("load demo A");
-		//console.log(data);
-		verifyDialog("Confirm Load", "!!!WARNING!!!", getConfirmLoadDemoText("DemoFlowA"), function(okPressed) { 
-			if (okPressed)
-			{
-				saveToFile("TeensyAudioDesign.json");
-				RED.storage.loadContents(data);
-			}
-		});
-	});
-
-	$('#btn-demoFlowB').click(function() {
-		var data = $("script[data-container-name|='DemoFlowB']").html();
-		console.error("load demo B");
-		//console.log(data);
-		verifyDialog("Confirm Load", "!!!WARNING!!!", getConfirmLoadDemoText("DemoFlowB"), function(okPressed) { 
-			if (okPressed)
-			{
-				saveToFile("TeensyAudioDesign.json");
-				RED.storage.loadContents(data);
-			}
-		});
+	function addDemoFlowsToMenu()
+	{
+		var html = "";
 		
-	});
-	$('#btn-originalFlow').click(function() {
-		var data = $("script[data-container-name|='FlowOriginal']").html();
-		console.log(data);
-		verifyDialog("Confirm Load", "!!!WARNING!!!", getConfirmLoadDemoText("FlowOriginal"), function(okPressed) { 
-			if (okPressed)
-			{
-				saveToFile("TeensyAudioDesign.json");
-				RED.storage.loadContents(data);
-			}
+		html += '<li><a id="btn-demoFlowA" class="btn action-import enabled" href="#"><i id="btn-icn-download" class="icon-download"></i>DemoFlowA</a></li>';
+		html += '<li><a id="btn-demoFlowB" class="btn action-import enabled" href="#"><i id="btn-icn-download" class="icon-download"></i>DemoFlowB</a></li>';
+		html += '<li><a id="btn-originalFlow" class="btn action-import enabled" href="#"><i id="btn-icn-download" class="icon-download"></i>originalFlow</a></li>';
+		html += '<li><a id="btn-emptyFlow" class="btn action-import enabled" href="#"><i id="btn-icn-download" class="icon-download"></i>Empty Flow</a></li>';
+		$("#menu-demo-flows").next().append(html);
+	
+		$('#btn-demoFlowA').click(function() {
+			var data = $("script[data-container-name|='DemoFlowA']").html();
+			verifyDialog("Confirm Load", "!!!WARNING!!!", getConfirmLoadDemoText("DemoFlowA"), function(okPressed) { 
+				if (okPressed)
+				{
+					console.error("load demo A");
+					console.log("newFlowData:" + data);
+					saveToFile("TeensyAudioDesign.json");
+					RED.storage.loadContents(data);
+				}
+			});
 		});
-		
-	});
+		$('#btn-demoFlowB').click(function() {
+			var data = $("script[data-container-name|='DemoFlowB']").html();
+			verifyDialog("Confirm Load", "!!!WARNING!!!", getConfirmLoadDemoText("DemoFlowB"), function(okPressed) { 
+				if (okPressed)
+				{
+					console.warn("load demo B");
+					console.log("newFlowData:" + data);
+					saveToFile("TeensyAudioDesign.json");
+					RED.storage.loadContents(data);
+				}
+			});
+			
+		});
+		$('#btn-originalFlow').click(function() {
+			var data = $("script[data-container-name|='FlowOriginal']").html();
+			verifyDialog("Confirm Load", "!!!WARNING!!!", getConfirmLoadDemoText("FlowOriginal"), function(okPressed) { 
+				if (okPressed)
+				{
+					console.warn("load demo original");
+					console.log("newFlowData:" + data);
+					saveToFile("TeensyAudioDesign.json");
+					RED.storage.loadContents(data);
+				}
+			});
+			
+		});
+		$('#btn-emptyFlow').click(function() {
 
+			verifyDialog("Confirm Load", "!!!WARNING!!!", getConfirmLoadDemoText("FlowOriginal"), function(okPressed) { 
+				if (okPressed)
+				{
+					console.warn("load empty flow")
+					saveToFile("TeensyAudioDesign.json");
+					RED.storage.loadContents(""); // [{"type":"tab","id":"Main","label":"Main","inputs":0,"outputs":0,"export":true,"nodes":[]}]
+				}
+			});
+			
+		});
+	}
 	
 	function verifyDialog(dialogTitle, textTitle, text, cb) {
 		$( "#node-dialog-verify" ).dialog({
@@ -279,7 +313,9 @@ var RED = (function() {
 		dialog.modal();
 	}
 
-	$(function() {
+	$(function()  // jQuery short-hand for $(document).ready(function() { ... });
+	{	
+		addDemoFlowsToMenu();
 		console.warn("main $(function() {...}); is executed after page load!"); // to see load order
 		$(".palette-spinner").show();
 		RED.settings.createTab();
@@ -290,7 +326,10 @@ var RED = (function() {
 		if (!server) {
 			
 			var metaData = $.parseJSON($("script[data-container-name|='InputOutputCompatibilityMetadata']").html());
-			requirements = metaData["requirements"];
+			// RED.main.requirements is needed because $(function() executes at global scope, 
+			// if we just set requirements without RED.main. it's gonna be located in global scope
+			// and in that case later we cannot use RED.main.requirements because that is unassigned.
+			RED.main.requirements = metaData["requirements"]; // RED.main. is used to clarify the location of requirements
 			
 			var data = $.parseJSON($("script[data-container-name|='NodeDefinitions']").html());
 			var nodes = data["nodes"];
@@ -322,6 +361,7 @@ var RED = (function() {
 	});
 
 	return {
-		classColor:classColor
+		classColor:classColor,
+		requirements:requirements
 	};
 })();

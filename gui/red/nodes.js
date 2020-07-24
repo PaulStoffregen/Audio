@@ -569,7 +569,7 @@ RED.nodes = (function() {
 
 					if (ws.inputs != 0 || ws.outputs != 0) // this adds workspaces that have inputs and/or outputs to the palette
 					{
-						var color = RED.classColor;
+						var color = RED.main.classColor;
 						var data = $.parseJSON("{\"defaults\":{\"name\":{\"value\":\"new\"},\"id\":{\"value\":\"new\"}},\"shortName\":\"" + ws.label + "\",\"inputs\":" + ws.inputs + ",\"outputs\":" + ws.outputs + ",\"category\":\"tabs-function\",\"color\":\"" + color + "\",\"icon\":\"arrow-in.png\"}");
 						RED.nodes.registerType(ws.label, data);
 					}
@@ -1024,16 +1024,16 @@ RED.nodes = (function() {
 		
 		return {newName:name, arrayLenght:lenght};
 	}
-	var AceAutoCompleteKeywords = null;
+	//var AceAutoCompleteKeywords = null;
 	function getWorkspaceNodesAsCompletions(wsId) // this is used by ace editor for autocompletions
 	{
-		if (AceAutoCompleteKeywords == null) // if not allready loaded the data
+		/*if (AceAutoCompleteKeywords == null) // if not allready loaded the data
 		{
 			var aackw_json = $("script[data-container-name|='AceAutoCompleteKeywordsMetadata']").html(); // this cannot happen globally because of the load order in html
 			//console.log(aackw_json);
 			var aackw_metaData = $.parseJSON(aackw_json);
 			AceAutoCompleteKeywords = aackw_metaData["AceAutoCompleteKeywords"];
-		}
+		}*/
 
 		var items = []; // here we will append current workspace node names
 		for (var i = 0; i < nodes.length; i++)
@@ -1043,7 +1043,7 @@ RED.nodes = (function() {
 			if (RED.arduino.export.isSpecialNode(n.type)) continue;
 			items.push({ name:n.name, value:n.name, meta: n.type });
 		}
-		AceAutoCompleteKeywords.forEach(function(kw) {
+		AceAutoCompleteKeywords.forEach(function(kw) { // AceAutoCompleteKeywords is in AceAutoCompleteKeywords.js
 			items.push(kw);
 		});
 		return items;
@@ -1091,6 +1091,7 @@ RED.nodes = (function() {
 	
 	function refreshClassNodes()// Jannik add function
 	{
+	   //console.warn("refreshClassNodes");
 	   for ( var wsi = 0; wsi < workspaces.length; wsi++)
 	   {
 		   var ws = workspaces[wsi];
@@ -1101,7 +1102,7 @@ RED.nodes = (function() {
 			   //console.log("n.type:" + n.type); // debug
 			   if (n.type == ws.label)
 			   {
-				   console.log("updating " + n.type);
+				   //console.log("updating " + n.type);
 					var node = RED.nodes.node(n.id);
 					node._def = RED.nodes.getType(n.type); // refresh type def
 					if (!node._def)
@@ -1121,6 +1122,7 @@ RED.nodes = (function() {
 	}
 	function addClassTabsToPalette()// Jannik add function
 	{
+		//console.warn("addClassTabsToPalette");
 		for (var i=0; i < workspaces.length; i++)
 		{
 			var ws = workspaces[i];
@@ -1128,7 +1130,7 @@ RED.nodes = (function() {
 			var outputCount = getClassNrOfOutputs(nodes, ws.id);
 
 			if ((inputCount == 0) && (outputCount == 0)) continue; // skip adding class with no IO
-			var classColor = RED.classColor;
+			var classColor = RED.main.classColor;
 			//var data = $.parseJSON("{\"defaults\":{\"name\":{\"value\":\"new\"}},\"shortName\":\"" + ws.label + "\",\"inputs\":" + inputCount + ",\"outputs\":" + outputCount + ",\"category\":\"tabs-function\",\"color\":\"" + classColor + "\",\"icon\":\"arrow-in.png\"}");
 			var data = $.parseJSON("{\"defaults\":{\"name\":{\"value\":\"new\"},\"id\":{\"value\":\"new\"}},\"shortName\":\"" + ws.label + "\",\"inputs\":" + inputCount + ",\"outputs\":" + outputCount + ",\"category\":\"tabs-function\",\"color\":\"" + classColor + "\",\"icon\":\"arrow-in.png\"}");
 
@@ -1199,6 +1201,7 @@ RED.nodes = (function() {
 		classOutputPortToCpp:classOutputPortToCpp,
 		classInputPortToCpp:classInputPortToCpp,
 		isNameDeclarationArray:isNameDeclarationArray,
+		updateClassTypes: function () {addClassTabsToPalette(); refreshClassNodes(); console.warn("@updateClassTypes");},
 		addClassTabsToPalette:addClassTabsToPalette,
 		refreshClassNodes:refreshClassNodes,
 		make_name:make_name,

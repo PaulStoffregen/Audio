@@ -18,6 +18,7 @@
 RED.arduino.export = (function() {
 
 	var useExportDialog = true;
+	var IOcheckAtExport = true;
     /**
 	 * this take a multiline text, 
 	 * break it up into linearray, 
@@ -258,7 +259,7 @@ RED.arduino.export = (function() {
 		const t0 = performance.now();
 		RED.storage.update();
 
-		if (!RED.nodes.hasIO()) {
+		if (!RED.nodes.hasIO() && IOcheckAtExport) {
 			showExportErrorDialog();
 			return;
 		}
@@ -339,7 +340,7 @@ RED.arduino.export = (function() {
 		const t0 = performance.now();
 		RED.storage.update();
 
-		if (!RED.nodes.hasIO())
+		if (!RED.nodes.hasIO() && IOcheckAtExport)
 		{
 			showExportErrorDialog();
 			return;
@@ -558,6 +559,8 @@ RED.arduino.export = (function() {
     return {
 		isSpecialNode:isSpecialNode,
 		useExportDialog:useExportDialog,
+		IOcheckAtExport:IOcheckAtExport,
+		setIOcheckAtExport : function (state) { IOcheckAtExport = state; },
 		setUseExportDialog: function (state) { useExportDialog = state;},
 		showExportDialog:showExportDialog
 	};

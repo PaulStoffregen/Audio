@@ -1138,9 +1138,14 @@ RED.view = (function() {
 		d.requirementError = false;
 		d.conflicts = new Array();
 		d.requirements = new Array();
-		requirements.forEach(function(r) {
+		
+		RED.main.requirements.forEach(function(r) {
 			if (r.type == d.type) d.requirements.push(r);
 		});
+
+		// above could be:
+		// d.requirements = RED.main.requirements[d.type];
+		// if the structure is changed a little
 
 		//check for conflicts with other nodes:
 		d.requirements.forEach(function(r) {
@@ -1268,13 +1273,13 @@ RED.view = (function() {
 					//console.log("node mouseover:" + d.name);
 					var popoverText = "<b>" + d.type + "</b><br>";
 					if (d.comment && (d.comment.trim().length != 0))
-						popoverText+="<p>"+d.comment.replace(/\n/g, "<br>") + "</p>";
+						popoverText+="<p>"+d.comment.replace("    ", "&emsp;").replace("\t", "&emsp;").replace(/\n/g, "<br>") + "</p>";
 					//console.warn("popoverText:" +popoverText);
 					$(current_popup_rect).popover("destroy"); // destroy prev
 					if (d.type == "Function")
 						showPopOver(this, true, popoverText, "bottom");
 					else
-					showPopOver(this, true, popoverText, "top");
+						showPopOver(this, true, popoverText, "top");
 				}
 			})
 			.on("mouseout",function(d) {
@@ -1586,8 +1591,7 @@ RED.view = (function() {
 	function redraw() {
 		const t0 = performance.now();
 		//console.trace("redraw");
-		//RED.addClassTabsToPalette(); // failsafe debug test that is very slow
-		//RED.refreshClassNodes(); // failsafe debug test that is very slow
+		
 		//console.log("redraw");
 		
 		vis.attr("transform","scale("+scaleFactor+")");
@@ -1600,19 +1604,38 @@ RED.view = (function() {
 			const t3 = performance.now();
 			console.log('vis.selectAll: ' + (t3-t2) +' milliseconds.');
 
-			node.exit().remove();
+			var updatedClassTypes =	false; // flag so that it only run once at each redraw()
+
+			var nodeExit = node.exit().remove();
+			nodeExit.each(function(d,i) // this happens only when a node exits(is removed) from the current workspace.
+			{
+				//console.error("redraw nodeExit:" + d.type);
+				if (d.type == "TabInput" || d.type == "TabOutput")
+				{
+					if (!updatedClassTypes) { updatedClassTypes = true; RED.nodes.updateClassTypes(); }
+				}
+			});
 
 			var nodeEnter = node.enter().insert("svg:g").attr("class", "node nodegroup");
-			nodeEnter.each(function(d,i) // this happens only when a node is added to the current workspace.
+			nodeEnter.each(function(d,i) // this happens only when a node enter(is added) to the current workspace.
 			{
-				console.error("node added");
+				//console.error("redraw nodeEnter:" + d.type);
+				if (d.type == "TabInput" || d.type == "TabOutput")
+				{
+					if (!updatedClassTypes) { updatedClassTypes = true; RED.nodes.updateClassTypes(); }
+				}
+
 				var nodeRect = d3.select(this);
 				nodeRect.attr("id",d.id);
 				redraw_calcNewNodeSize(d);
 				
-				checkRequirements(d);
-				redraw_nodeReqError(nodeRect, d);
-				redraw_paletteNodesReqError(d);
+				if (d._def.category.startsWith("output") || d._def.category.startsWith("input")) // only need to check I/O
+				{	
+					checkRequirements(d); // this update nodes that allready exist
+					if (d.requirementError) console.warn("@nodeEnter reqError on:" + d.name);
+					redraw_nodeReqError(nodeRect, d);
+					redraw_paletteNodesReqError(d);
+				}
 
 				if (d._def.badge) redraw_nodeBadge(nodeRect, d);
 				if (d._def.button) redraw_nodeButton(nodeRect, d);
@@ -1633,14 +1656,16 @@ RED.view = (function() {
 				nodeRect.append("image").attr("class","node_reqerror hidden").attr("xlink:href","icons/error.png").attr("x",0).attr("y",-12).attr("width",20).attr("height",20);
 			});
 
-			node.each(function(d,i) {
+			node.each(function(d,i) { // redraw all nodes in active workspace
 					var nodeRect = d3.select(this);
-					
-					checkRequirements(d); // this is needed because it will execute on previus items
-					                      // but because it's allways running it takes up much cpu time
 
-					//if (d.requirementError) console.warn("reqError on:" + d.name);
-					if (d.dirty || d.requirementError != undefined) {
+					if (d._def.category.startsWith("output") || d._def.category.startsWith("input")) // only need to check I/O
+					{	
+						checkRequirements(d); // this update nodes that allready exist
+						if (d.requirementError) console.warn("@node.each reqError on:" + d.name);
+						redraw_nodeReqError(nodeRect, d);
+					}
+					if (d.dirty) {
 						//if (d.x < -50) deleteSelection();  // Delete nodes if dragged back to palette
 						if (d.resize) {
 							
@@ -1650,11 +1675,11 @@ RED.view = (function() {
 							d.resize = false;
 						}
 						//console.log("redraw stuff");
-						redraw_nodeReqError(nodeRect, d);
+						
 						redraw_paletteNodesReqError(d);
 						redraw_other(nodeRect, d);
 						d.dirty = false;
-						d.requirementError = false;
+						
 					}
 			});
 
@@ -2014,6 +2039,7 @@ RED.view = (function() {
 
 		if (!server) {
 			data = $("script[data-template-name|='" + key + "']").html();
+			//console.log('%c' + typeof data + "%c"+ data, 'background: #bada55; color: #555 ', 'background: #555; color: #bada55 ');
 			form = $("#" + formId);
 			$(form).empty();
 			$(form).append(data);

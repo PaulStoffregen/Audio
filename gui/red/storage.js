@@ -5,8 +5,8 @@
 RED.storage = (function() {
 	function update() {
 
-		RED.nodes.addClassTabsToPalette(); //Jannik
-		RED.nodes.refreshClassNodes(); //Jannik
+		//RED.nodes.addClassTabsToPalette(); //Jannik
+		//RED.nodes.refreshClassNodes(); //Jannik
 		
 		// TOOD: use setTimeout to limit the rate of changes?
 		// (Jannik say that is not needed because it's better to save often, not to loose any changes)
@@ -36,7 +36,7 @@ RED.storage = (function() {
 	function load() {
 		const t0 = performance.now();
 		if (localStorage) {
-			console.warn(allStorage());
+			//console.warn(allStorage());
 			var json_string = localStorage.getItem("audio_library_guitool");
 			console.log("localStorage read: " );//+ json_string);
 			if (json_string)

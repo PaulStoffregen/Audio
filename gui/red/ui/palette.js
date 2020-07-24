@@ -24,14 +24,14 @@ RED.palette = (function() {
 		{name:'favs',    expanded:false},
 		{name:'used',    expanded:false},
 		{name:'tabs',    expanded:false},
-		{name:'synth',   expanded:false},
-		{name:'mixer',   expanded:false},
-		{name:'effect',  expanded:false},
-		{name:'filter',  expanded:false},
 		{name:'input',   expanded:false, subcats:['i2s1','i2s2','spdif','adc','other']},
 		{name:'output',  expanded:false, subcats:['i2s1','i2s2','spdif','adc','other']},
+		{name:'mixer',   expanded:false},
 		{name:'play',    expanded:false},
 		{name:'record',  expanded:false},
+		{name:'synth',   expanded:false},
+		{name:'effect',  expanded:false},
+		{name:'filter',  expanded:false},
 		{name:'analyze', expanded:false},
 		{name:'control', expanded:false}
 	];
@@ -99,7 +99,7 @@ RED.palette = (function() {
 	 * @param {*} nt  node type
 	 * @param {*} def node type def
 	 * 	 */
-	function addNodeType(nt,def) {
+	function addNodeType(nt,def) { // externally RED.palettte.add
 		
 		if ($("#palette_node_"+nt).length)	return;		
 		//if (exclusion.indexOf(def.category)!=-1) return;
@@ -110,7 +110,7 @@ RED.palette = (function() {
 		else
 			category = def.category;
 
-		//console.warn("add addNodeType:" + category);
+		//console.warn("add addNodeType:@" + category + ":" + def.shortName);
 			
 			var d = document.createElement("div");
 			d.id = "palette_node_"+nt;
@@ -311,11 +311,13 @@ RED.palette = (function() {
 	{
 		onlyShowOne = state;
 	}
-	
+	var categoryHeaderTextSize = 12;
 	return {
 		add:addNodeType,
 		remove:removeNodeType,
 		SetOnlyShowOne:SetOnlyShowOne,
-		onlyShowOne:onlyShowOne
+		onlyShowOne:onlyShowOne,
+		categoryHeaderTextSize:categoryHeaderTextSize,
+		setCategoryHeaderTextSize: function (size) { $(".palette-header").each( function(i,e) { $(e).attr("style", "font-size:" + size + "px");}) }
 	};
 })();
