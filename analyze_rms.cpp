@@ -25,14 +25,18 @@
  */
 
 
+#include <Arduino.h>
 #include "analyze_rms.h"
 #include "utility/dspinst.h"
 
 void AudioAnalyzeRMS::update(void)
 {
 	audio_block_t *block = receiveReadOnly();
-	if (!block) return;
-#if defined(KINETISK)
+	if (!block) {
+		count++;
+		return;
+	}
+#if defined(__ARM_ARCH_7EM__)
 	uint32_t *p = (uint32_t *)(block->data);
 	uint32_t *end = p + AUDIO_BLOCK_SAMPLES/2;
 	int64_t sum = accum;

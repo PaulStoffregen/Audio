@@ -32,6 +32,12 @@
 
 class AudioRecordQueue : public AudioStream
 {
+private:
+#if defined(__IMXRT1062__) || defined(__MK66FX1M0__) || defined(__MK64FX512__)
+	static const int max_buffers = 209;
+#else
+	static const int max_buffers = 53;
+#endif
 public:
 	AudioRecordQueue(void) : AudioStream(1, inputQueueArray),
 		userblock(NULL), head(0), tail(0), enabled(0) { }
@@ -49,7 +55,7 @@ public:
 	virtual void update(void);
 private:
 	audio_block_t *inputQueueArray[1];
-	audio_block_t * volatile queue[53];
+	audio_block_t * volatile queue[max_buffers];
 	audio_block_t *userblock;
 	volatile uint8_t head, tail, enabled;
 };

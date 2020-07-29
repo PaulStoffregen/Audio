@@ -1,8 +1,9 @@
 // Audio data converted from WAV file by wav2sketch
 
 #include "AudioSampleSnare.h"
-
+#include <Arduino.h>
 // Converted from snare.wav, using 22050 Hz, u-law encoding
+PROGMEM
 const unsigned int AudioSampleSnare[2817] = {
 0x02002BD3,0x65636656,0x6B6A6B67,0x7071706F,0x43637171,0x29ABBA23,0x3137474C,0x3A4A544D,
 0x30C1542C,0xE14F6360,0xEDDCE2E6,0xEEF1F4F4,0xEEEDEAEA,0x3745A2E2,0xE7E6DAC8,0xC7C3C3DA,

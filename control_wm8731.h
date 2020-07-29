@@ -36,7 +36,7 @@ public:
 	bool disable(void) { return false; }
 	bool volume(float n) { return volumeInteger(n * 80.0 + 47.499); }
 	bool inputLevel(float n); // range: 0.0f to 1.0f
-	bool inputSelect(int n) { return false; }
+	bool inputSelect(int n);
 protected:
 	bool write(unsigned int reg, unsigned int val);
 	bool volumeInteger(unsigned int n); // range: 0x2F to 0x7F

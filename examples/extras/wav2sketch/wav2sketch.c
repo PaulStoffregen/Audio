@@ -42,7 +42,7 @@ uint32_t read_uint32(FILE *in);
 void die(const char *format, ...) __attribute__ ((format (printf, 1, 2)));
 
 // WAV file format:
-// https://ccrma.stanford.edu/courses/422/projects/WaveFormat/
+// http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html
 
 const char *filename="";
 char samplename[64];
@@ -52,20 +52,26 @@ int pcm_mode=0;
 
 void wav2c(FILE *in, FILE *out, FILE *outh)
 {
-	uint32_t header[5];
+	uint32_t header[4];
 	int16_t format, channels, bits;
 	uint32_t rate;
 	uint32_t i, length, padlength=0, arraylen;
+	uint32_t chunkSize;
 	int32_t audio=0;
 
 	// read the WAV file's header
-	for (i=0; i<5; i++) {
+	for (i=0; i < 4; i++) {
 		header[i] = read_uint32(in);
 	}
-	if (header[0] != 0x46464952 || header[2] != 0x45564157
-	  || header[3] != 0x20746D66 || header[4] != 0x00000010) {
-		 die("error in format of file %s", filename);
+	while (header[3] != 0x20746D66) {
+		// skip past unknown sections until "fmt "
+		chunkSize = read_uint32(in);
+		for (i=0; i < chunkSize; i++) {
+			read_uint8(in);
+		}
+		header[3] = read_uint32(in);
 	}
+	chunkSize = read_uint32(in);
 
 	// read the audio format parameters
 	format = read_int16(in);
@@ -84,6 +90,11 @@ void wav2c(FILE *in, FILE *out, FILE *outh)
 		die("file %s has %d channels, but only 1 & 2 are supported", filename, channels);
 	if (bits != 16)
 		die("file %s has %d bit format, but only 16 is supported", filename, bits);
+
+	// skip past any extra data on the WAVE header (hopefully it doesn't matter?)
+	for (chunkSize -= 16; chunkSize > 0; chunkSize--) {
+		read_uint8(in);
+	}
 
 	// read the data header, skip non-audio data
 	while (1) {

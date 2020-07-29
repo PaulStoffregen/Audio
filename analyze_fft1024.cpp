@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "analyze_fft1024.h"
 #include "sqrt_integer.h"
 #include "utility/dspinst.h"
@@ -61,7 +62,7 @@ void AudioAnalyzeFFT1024::update(void)
 	block = receiveReadOnly();
 	if (!block) return;
 
-#if defined(KINETISK)
+#if defined(__ARM_ARCH_7EM__)
 	switch (state) {
 	case 0:
 		blocklist[0] = block;

@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
+#if !defined(__IMXRT1052__) && !defined(__IMXRT1062__)
 #ifndef pdb_h_
 #define pdb_h_
 
@@ -70,4 +70,5 @@
   #error "Unsupported F_BUS speed"
 #endif
 
+#endif
 #endif

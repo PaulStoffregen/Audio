@@ -31,21 +31,45 @@
 #include "AudioStream.h"
 #include "DMAChannel.h"
 
+#if defined(__IMXRT1062__)
+struct _pwm_pin_info_struct {
+  uint8_t type;    // 0=no pwm, 1=flexpwm, 2=quad
+  uint8_t module;  // 0-3, 0-3
+  uint8_t channel; // 0=X, 1=A, 2=B
+  uint8_t muxval;  //
+};
+struct _audio_info_flexpwm {
+  IMXRT_FLEXPWM_t *flexpwm;
+  _pwm_pin_info_struct info;
+  uint8_t pin;
+};
+#endif
+
 class AudioOutputPWM : public AudioStream
 {
 public:
 	AudioOutputPWM(void) : AudioStream(1, inputQueueArray) { begin(); }
 	virtual void update(void);
 private:
+	static bool update_responsibility;
+	audio_block_t *inputQueueArray[1];
+	static void isr(void);
+	void begin(void);
+#if defined(KINETISK)
 	static audio_block_t *block_1st;
 	static audio_block_t *block_2nd;
 	static uint32_t block_offset;
-	static bool update_responsibility;
 	static uint8_t interrupt_count;
-	audio_block_t *inputQueueArray[1];
 	static DMAChannel dma;
-	static void isr(void);
-	void begin(void);
+#elif defined(__IMXRT1062__)
+public:
+	AudioOutputPWM(uint8_t pin1, uint8_t pin2) : AudioStream(1, inputQueueArray) { begin(pin1, pin2); }
+private: 
+	void begin(uint8_t pin1, uint8_t pin2); //FlexPWM pins only
+	static audio_block_t *block;
+	static DMAChannel dma[2];
+	static _audio_info_flexpwm apins[2];
+#endif
 };
 
 #endif

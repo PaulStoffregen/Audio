@@ -30,6 +30,14 @@ AudioConnection          patchCord4(playRaw1, 0, i2s1, 1);
 AudioControlSGTL5000     sgtl5000_1;     //xy=265,212
 // GUItool: end automatically generated code
 
+// For a stereo recording version, see this forum thread:
+// https://forum.pjrc.com/threads/46150?p=158388&viewfull=1#post158388
+
+// A much more advanced sound recording and data logging project:
+// https://github.com/WMXZ-EU/microSoundRecorder
+// https://github.com/WMXZ-EU/microSoundRecorder/wiki/Hardware-setup
+// https://forum.pjrc.com/threads/52175?p=185386&viewfull=1#post185386
+
 // Bounce objects to easily and reliably read the buttons
 Bounce buttonRecord = Bounce(0, 8);
 Bounce buttonStop =   Bounce(1, 8);  // 8 = 8 ms debounce time
@@ -39,6 +47,23 @@ Bounce buttonPlay =   Bounce(2, 8);
 // which input on the audio shield will be used?
 const int myInput = AUDIO_INPUT_LINEIN;
 //const int myInput = AUDIO_INPUT_MIC;
+
+
+// Use these with the Teensy Audio Shield
+#define SDCARD_CS_PIN    10
+#define SDCARD_MOSI_PIN  7
+#define SDCARD_SCK_PIN   14
+
+// Use these with the Teensy 3.5 & 3.6 SD card
+//#define SDCARD_CS_PIN    BUILTIN_SDCARD
+//#define SDCARD_MOSI_PIN  11  // not actually used
+//#define SDCARD_SCK_PIN   13  // not actually used
+
+// Use these for the SD+Wiz820 or other adaptors
+//#define SDCARD_CS_PIN    4
+//#define SDCARD_MOSI_PIN  11
+//#define SDCARD_SCK_PIN   13
+
 
 // Remember which mode we're doing
 int mode = 0;  // 0=stopped, 1=recording, 2=playing
@@ -62,9 +87,9 @@ void setup() {
   sgtl5000_1.volume(0.5);
 
   // Initialize the SD card
-  SPI.setMOSI(7);
-  SPI.setSCK(14);
-  if (!(SD.begin(10))) {
+  SPI.setMOSI(SDCARD_MOSI_PIN);
+  SPI.setSCK(SDCARD_SCK_PIN);
+  if (!(SD.begin(SDCARD_CS_PIN))) {
     // stop here if no SD card, but print a message
     while (1) {
       Serial.println("Unable to access the SD card");
@@ -137,7 +162,7 @@ void continueRecording() {
     memcpy(buffer+256, queue1.readBuffer(), 256);
     queue1.freeBuffer();
     // write all 512 bytes to the SD card
-    elapsedMicros usec = 0;
+    //elapsedMicros usec = 0;
     frec.write(buffer, 512);
     // Uncomment these lines to see how long SD writes
     // are taking.  A pair of audio blocks arrives every

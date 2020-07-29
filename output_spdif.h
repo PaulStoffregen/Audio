@@ -34,10 +34,10 @@ public:
 	AudioOutputSPDIF(void) : AudioStream(2, inputQueueArray) { begin(); }
 	virtual void update(void);
 	void begin(void);
-	friend class AudioInputSPDIF;
+	//friend class AudioInputSPDIF;
 	static void mute_PCM(const bool mute);
 protected:
-	AudioOutputSPDIF(int dummy): AudioStream(2, inputQueueArray) {}
+	//AudioOutputSPDIF(int dummy): AudioStream(2, inputQueueArray) {}
 	static void config_SPDIF(void);
 	static audio_block_t *block_left_1st;
 	static audio_block_t *block_right_1st;

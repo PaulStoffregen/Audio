@@ -95,7 +95,7 @@ var RED = (function() {
 									var src_name = make_name(src);
 									var dst_name = make_name(dst);
 									if (j == 0 && parts[1] == 0 && src && src.outputs == 1 && dst && dst._def.inputs == 1) {
-										cpp += src_name + ", " + parts[0];
+										cpp += src_name + ", " + dst_name;
 									} else {
 										cpp += src_name + ", " + j + ", " + dst_name + ", " + parts[1];
 									}
@@ -241,6 +241,10 @@ var RED = (function() {
 		var server = false && patt.test(location.protocol);
 
 		if (!server) {
+			
+			var metaData = $.parseJSON($("script[data-container-name|='InputOutputCompatibilityMetadata']").html());
+			requirements = metaData["requirements"];
+			
 			var data = $.parseJSON($("script[data-container-name|='NodeDefinitions']").html());
 			var nodes = data["nodes"];
 			$.each(nodes, function (key, val) {

@@ -24,10 +24,11 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "filter_biquad.h"
 #include "utility/dspinst.h"
 
-#if defined(KINETISK)
+#if defined(__ARM_ARCH_7EM__)
 
 void AudioFilterBiquad::update(void)
 {
@@ -67,6 +68,11 @@ void AudioFilterBiquad::update(void)
 			bprev = in2;
 			aprev = pack_16b_16b(
 				signed_saturate_rshift(sum, 16, 14), out2);
+			// retaining part of the sum is meant to implement the
+			// "first order noise shaping" described in this article:
+			// http://www.earlevel.com/main/2003/02/28/biquads/
+			//  TODO: is logical AND really correct, or maybe it
+			//        should really be signed_saturate_rshift() ???
 			sum &= 0x3FFF;
 			bprev = in2;
 			*data++ = aprev;

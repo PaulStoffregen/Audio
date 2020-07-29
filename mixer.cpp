@@ -24,10 +24,11 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "mixer.h"
 #include "utility/dspinst.h"
 
-#if defined(KINETISK)
+#if defined(__ARM_ARCH_7EM__)
 #define MULTI_UNITYGAIN 65536
 
 static void applyGain(int16_t *data, int32_t mult)
@@ -130,4 +131,29 @@ void AudioMixer4::update(void)
 	}
 }
 
+void AudioAmplifier::update(void)
+{
+	audio_block_t *block;
+	int32_t mult = multiplier;
 
+	if (mult == 0) {
+		// zero gain, discard any input and transmit nothing
+		block = receiveReadOnly(0);
+		if (block) release(block);
+	} else if (mult == MULTI_UNITYGAIN) {
+		// unity gain, pass input to output without any change
+		block = receiveReadOnly(0);
+		if (block) {
+			transmit(block);
+			release(block);
+		}
+	} else {
+		// apply gain to signal
+		block = receiveWritable(0);
+		if (block) {
+			applyGain(block->data, mult);
+			transmit(block);
+			release(block);
+		}
+	}
+}

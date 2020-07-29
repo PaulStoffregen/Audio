@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "effect_delay.h"
 
 void AudioEffectDelay::update(void)
@@ -38,7 +39,7 @@ void AudioEffectDelay::update(void)
 	tail = tailindex;
 	if (++head >= DELAY_QUEUE_SIZE) head = 0;
 	if (head == tail) {
-		release(queue[tail]);
+		if (queue[tail] != NULL) release(queue[tail]);
 		if (++tail >= DELAY_QUEUE_SIZE) tail = 0;
 	}
 	queue[head] = receiveReadOnly();
@@ -70,8 +71,10 @@ void AudioEffectDelay::update(void)
 	if (count > maxblocks) {
 		count -= maxblocks;
 		do {
-			release(queue[tail]);
-			queue[tail] = NULL;
+			if (queue[tail] != NULL) {
+				release(queue[tail]);
+				queue[tail] = NULL;
+			}
 			if (++tail >= DELAY_QUEUE_SIZE) tail = 0;
 		} while (--count > 0);
 	}

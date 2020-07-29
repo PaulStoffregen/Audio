@@ -32,6 +32,9 @@
 #define NOTE_As4 466.16
 #define NOTE_B4  493.88
 
+// The equation for note to frequency is:
+// float freq = 440.0f * exp2f((float)(note - 69) * 0.0833333f);
+
 // according to http://www.guitar-chords.org.uk/
 // and http://www.8notes.com/guitar_chord_chart/c.asp
 //

@@ -33,7 +33,7 @@
 // compute (a - b) / c
 // handling 32 bit interger overflow at every step
 // without resorting to slow 64 bit math
-#if defined(KINETISK)
+#if defined(__ARM_ARCH_7EM__)
 static inline int32_t substract_int32_then_divide_int32(int32_t a, int32_t b, int32_t c) __attribute__((always_inline, unused));
 static inline int32_t substract_int32_then_divide_int32(int32_t a, int32_t b, int32_t c)
 {
@@ -126,6 +126,10 @@ public:
 		}
 		state = 1;
 		__enable_irq();
+	}
+	float read(void) {
+		int32_t m = magnitude;
+		return (float)m * (1.0 / 2147418112.0);
 	}
 	virtual void update(void);
 private:

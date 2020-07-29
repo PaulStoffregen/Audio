@@ -24,10 +24,16 @@
  * THE SOFTWARE.
  */
 
+#include <Arduino.h>
 #include "output_i2s_quad.h"
+#include "output_i2s.h"
 #include "memcpy_audio.h"
 
-#if defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
+#if defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__) || defined(__IMXRT1062__)
+
+#if defined(__IMXRT1062__)
+#include "utility/imxrt_hw.h"
+#endif
 
 audio_block_t * AudioOutputI2SQuad::block_ch1_1st = NULL;
 audio_block_t * AudioOutputI2SQuad::block_ch2_1st = NULL;
@@ -41,16 +47,14 @@ uint16_t  AudioOutputI2SQuad::ch1_offset = 0;
 uint16_t  AudioOutputI2SQuad::ch2_offset = 0;
 uint16_t  AudioOutputI2SQuad::ch3_offset = 0;
 uint16_t  AudioOutputI2SQuad::ch4_offset = 0;
-//audio_block_t * AudioOutputI2SQuad::inputQueueArray[4];
 bool AudioOutputI2SQuad::update_responsibility = false;
-DMAMEM static uint32_t i2s_tx_buffer[AUDIO_BLOCK_SAMPLES*2];
+DMAMEM __attribute__((aligned(32))) static uint32_t i2s_tx_buffer[AUDIO_BLOCK_SAMPLES*2];
 DMAChannel AudioOutputI2SQuad::dma(false);
 
 static const uint32_t zerodata[AUDIO_BLOCK_SAMPLES/4] = {0};
 
 void AudioOutputI2SQuad::begin(void)
 {
-#if 1
 	dma.begin(true); // Allocate the DMA channel first
 
 	block_ch1_1st = NULL;
@@ -58,6 +62,7 @@ void AudioOutputI2SQuad::begin(void)
 	block_ch3_1st = NULL;
 	block_ch4_1st = NULL;
 
+#if defined(KINETISK)
 	// TODO: can we call normal config_i2s, and then just enable the extra output?
 	config_i2s();
 	CORE_PIN22_CONFIG = PORT_PCR_MUX(6); // pin 22, PTC1, I2S0_TXD0 -> ch1 & ch2
@@ -80,6 +85,45 @@ void AudioOutputI2SQuad::begin(void)
 
 	I2S0_TCSR = I2S_TCSR_SR;
 	I2S0_TCSR = I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
+	dma.attachInterrupt(isr);
+
+#elif defined(__IMXRT1062__)
+	const int pinoffset = 0; // TODO: make this configurable...
+	memset(i2s_tx_buffer, 0, sizeof(i2s_tx_buffer));
+	AudioOutputI2S::config_i2s();
+	I2S1_TCR3 = I2S_TCR3_TCE_2CH << pinoffset;
+	switch (pinoffset) {
+	  case 0:
+		CORE_PIN7_CONFIG  = 3;
+		CORE_PIN32_CONFIG = 3;
+		break;
+	  case 1:
+		CORE_PIN32_CONFIG = 3;
+		CORE_PIN9_CONFIG  = 3;
+		break;
+	  case 2:
+		CORE_PIN9_CONFIG  = 3;
+		CORE_PIN6_CONFIG  = 3;
+	}
+	dma.TCD->SADDR = i2s_tx_buffer;
+	dma.TCD->SOFF = 2;
+	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
+	dma.TCD->NBYTES_MLOFFYES = DMA_TCD_NBYTES_DMLOE |
+		DMA_TCD_NBYTES_MLOFFYES_MLOFF(-8) |
+		DMA_TCD_NBYTES_MLOFFYES_NBYTES(4);
+	dma.TCD->SLAST = -sizeof(i2s_tx_buffer);
+	dma.TCD->DADDR = (void *)((uint32_t)&I2S1_TDR0 + 2 + pinoffset * 4);
+	dma.TCD->DOFF = 4;
+	dma.TCD->CITER_ELINKNO = AUDIO_BLOCK_SAMPLES * 2;
+	dma.TCD->DLASTSGA = -8;
+	dma.TCD->BITER_ELINKNO = AUDIO_BLOCK_SAMPLES * 2;
+	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
+	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI1_TX);
+	dma.enable();
+	I2S1_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE;
+	I2S1_TCSR = I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
+	I2S1_TCR3 = I2S_TCR3_TCE_2CH << pinoffset;
+	update_responsibility = update_setup();
 	dma.attachInterrupt(isr);
 #endif
 }
@@ -107,7 +151,6 @@ void AudioOutputI2SQuad::isr(void)
 	src3 = (block_ch3_1st) ? block_ch3_1st->data + ch3_offset : zeros;
 	src4 = (block_ch4_1st) ? block_ch4_1st->data + ch4_offset : zeros;
 
-	// TODO: fast 4-way interleaved memcpy...
 #if 1
 	memcpy_tointerleaveQuad(dest, src1, src2, src3, src4);
 #else
@@ -118,6 +161,7 @@ void AudioOutputI2SQuad::isr(void)
 		*dest++ = *src4++;
 	}
 #endif
+	arm_dcache_flush_delete(dest, sizeof(i2s_tx_buffer) / 2 );
 
 	if (block_ch1_1st) {
 		if (ch1_offset == 0) {
@@ -244,7 +288,7 @@ void AudioOutputI2SQuad::update(void)
 	}
 }
 
-
+#if defined(KINETISK)
 // MCLK needs to be 48e6 / 1088 * 256 = 11.29411765 MHz -> 44.117647 kHz sample rate
 //
 #if F_CPU == 96000000 || F_CPU == 48000000 || F_CPU == 24000000
@@ -271,12 +315,17 @@ void AudioOutputI2SQuad::update(void)
   #define MCLK_MULT 1
   #define MCLK_DIV  17
 #elif F_CPU == 216000000
-  #define MCLK_MULT 8
-  #define MCLK_DIV  153
-  #define MCLK_SRC  0
+  #define MCLK_MULT 12
+  #define MCLK_DIV  17
+  #define MCLK_SRC  1
 #elif F_CPU == 240000000
-  #define MCLK_MULT 4
+  #define MCLK_MULT 2
   #define MCLK_DIV  85
+  #define MCLK_SRC  0
+#elif F_CPU == 256000000
+  #define MCLK_MULT 12
+  #define MCLK_DIV  17
+  #define MCLK_SRC  1
 #elif F_CPU == 16000000
   #define MCLK_MULT 12
   #define MCLK_DIV  17
@@ -332,10 +381,10 @@ void AudioOutputI2SQuad::config_i2s(void)
 	CORE_PIN9_CONFIG  = PORT_PCR_MUX(6); // pin  9, PTC3, I2S0_TX_BCLK
 	CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK
 }
+#endif // KINETISK
 
 
-#else // not __MK20DX256__
-
+#else // not supported
 
 void AudioOutputI2SQuad::begin(void)
 {
