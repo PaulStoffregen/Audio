@@ -191,7 +191,6 @@ void AudioSynthWaveform::update(void)
 		{
 		  int32_t new_ph = ph + inc ;
 		  int32_t val = band_limit_waveform.generate_pulse (new_ph, pulse_width, i) ;
-		  val += BASE_AMPLITUDE/2 - pulse_width / (0x100000000L / BASE_AMPLITUDE) ; // correct DC offset for duty cycle
 		  *bp++ = (int16_t) ((val * magnitude) >> 16) ;
 		  ph = new_ph ;
 		}
@@ -375,7 +374,6 @@ void AudioSynthWaveformModulated::update(void)
 		  {
 		    uint32_t width = ((shapedata->data[i] + 0x8000) & 0xFFFF) << 16;
 		    int32_t val = band_limit_waveform.generate_pulse (phasedata[i], width, i) ;
-		    val += BASE_AMPLITUDE/2 - width / (0x100000000L / BASE_AMPLITUDE) ; // correct DC offset for duty cycle
 		    *bp++ = (int16_t) ((val * magnitude) >> 16) ;
 		  }
 		  break;
@@ -517,6 +515,8 @@ int32_t BandLimitedWaveform::lookup (int offset)
   return  BASE_AMPLITUDE + ((frac * b + (GUARD - frac) * a + HALF_GUARD) >> GUARD_BITS) ; // interpolated
 }
 
+// create a new step, apply its past waveform into the cyclic sample buffer
+// and add a step_state object into active list so it can be added for the future samples
 void BandLimitedWaveform::insert_step (int offset, bool rising, int i)
 {
   while (offset <= (N/2-SCALE)<<GUARD_BITS)
@@ -532,6 +532,8 @@ void BandLimitedWaveform::insert_step (int offset, bool rising, int i)
   newptr = (newptr+1) & PTRMASK ;
 }
 
+// generate value for current sample from one active step, checking for the
+// dc_offset adjustment at the end of the table.
 int32_t BandLimitedWaveform::process_step (int i)
 {
   int off = states[i].offset ;
@@ -546,7 +548,9 @@ int32_t BandLimitedWaveform::process_step (int i)
   return positive ? entry : -entry ;
 }
 
-
+// process all active steps for current sample, basically generating the waveform portion
+// due only to steps
+// square waves use this directly.
 int32_t BandLimitedWaveform::process_active_steps (uint32_t new_phase)
 {
   int32_t sample = dc_offset ;
@@ -560,12 +564,18 @@ int32_t BandLimitedWaveform::process_active_steps (uint32_t new_phase)
       i = (i-1) & PTRMASK ;
       sample += process_step (i) ;
     } while (i != delptr) ;
-    if (states[delptr].offset >= N<<GUARD_BITS)
+    if (states[delptr].offset >= N<<GUARD_BITS)  // remove any finished entries from the buffer.
+    {
       delptr = (delptr+1) & PTRMASK ;
+      // can be upto two steps per sample now for pulses
+      if (newptr != delptr && states[delptr].offset >= N<<GUARD_BITS)
+	delptr = (delptr+1) & PTRMASK ;
+    }
   }
   return sample ;
 }
 
+// for sawtooth need to add in the slope and compensate for all the steps being one way
 int32_t BandLimitedWaveform::process_active_steps_saw (uint32_t new_phase)
 {
   int32_t sample = process_active_steps (new_phase) ;
@@ -578,6 +588,15 @@ int32_t BandLimitedWaveform::process_active_steps_saw (uint32_t new_phase)
   return sample ;
 }
 
+// for pulse need to adjust the baseline according to the pulse width to cancel the DC component.
+int32_t BandLimitedWaveform::process_active_steps_pulse (uint32_t new_phase, uint32_t pulse_width)
+{
+  int32_t sample = process_active_steps (new_phase) ;
+
+  return sample + BASE_AMPLITUDE/2 - pulse_width / (0x80000000u / BASE_AMPLITUDE) ; // correct DC offset for duty cycle
+}
+
+// Check for new steps using the phase update for the current sample for a square wave
 void BandLimitedWaveform::new_step_check_square (uint32_t new_phase, int i)
 {
   if (new_phase >= DEG180 && phase_word < DEG180) // detect falling step
@@ -610,38 +629,38 @@ void BandLimitedWaveform::new_step_check_square (uint32_t new_phase, int i)
 // parameter, which then has to be checked against the instantaneous frequency every sample.
 void BandLimitedWaveform::new_step_check_pulse (uint32_t new_phase, uint32_t pulse_width, int i)
 {
-  uint32_t phase_advance = new_phase - phase_word ;
-  // prevent pulses glitching away by enforcing 1 sample minimum pulse width.
-  if (sampled_width < phase_advance)
-    sampled_width = phase_advance ;
-  else if (sampled_width > -phase_advance)
-    sampled_width = -phase_advance ;
-  
-  if (new_phase < DEG180 && phase_word >= DEG180) // detect wrap around, rising step
+  if (pulse_state && phase_word < sampled_width && (new_phase >= sampled_width || new_phase < phase_word))  // falling edge
   {
-    // sample the pulse width value so its not changing under our feet later in cycle due to modulation
-    sampled_width = pulse_width ;
-
-    int32_t offset = (int32_t) ((uint64_t) (SCALE<<GUARD_BITS) * (- phase_word) / phase_advance) ;
-    if (offset == SCALE<<GUARD_BITS)
-      offset -- ;
-    if (!pulse_state) // guard against two rising steps in a row (if pulse width changing for instance)
-    {
-      insert_step (- offset, true, i) ;
-      pulse_state = true ;
-    }
-  }
-  else if (pulse_state && phase_word < sampled_width && new_phase >= sampled_width) // detect falling step
-  {
-    int32_t offset = (int32_t) ((uint64_t) (SCALE<<GUARD_BITS) * (sampled_width - phase_word) / phase_advance) ;
+    int32_t offset = (int32_t) ((uint64_t) (SCALE<<GUARD_BITS) * (sampled_width - phase_word) / (new_phase - phase_word)) ;
     if (offset == SCALE<<GUARD_BITS)
       offset -- ;
     insert_step (- offset, false, i) ;
     pulse_state = false ;
   }
+  if ((!pulse_state) && phase_word >= DEG180 && new_phase < DEG180) // detect wrap around, rising step
+  {
+    // sample the pulse width value so its not changing under our feet later in cycle due to modulation
+    sampled_width = pulse_width ;
+
+    int32_t offset = (int32_t) ((uint64_t) (SCALE<<GUARD_BITS) * (- phase_word) / (new_phase - phase_word)) ;
+    if (offset == SCALE<<GUARD_BITS)
+      offset -- ;
+    insert_step (- offset, true, i) ;
+    pulse_state = true ;
+    
+    if (pulse_state && new_phase >= sampled_width) // detect falling step directly after a rising edge
+    //if (new_phase - sampled_width < DEG180) // detect falling step directly after a rising edge
+    {
+      int32_t offset = (int32_t) ((uint64_t) (SCALE<<GUARD_BITS) * (sampled_width - phase_word) / (new_phase - phase_word)) ;
+      if (offset == SCALE<<GUARD_BITS)
+	offset -- ;
+      insert_step (- offset, false, i) ;
+      pulse_state = false ;
+    }
+  }
 }
 
-  
+// new steps for sawtooth are at 180 degree point, always falling.
 void BandLimitedWaveform::new_step_check_saw (uint32_t new_phase, int i)
 {
   if (new_phase >= DEG180 && phase_word < DEG180) // detect falling step
@@ -653,7 +672,9 @@ void BandLimitedWaveform::new_step_check_saw (uint32_t new_phase, int i)
   }
 }
   
-
+// the generation function pushd new sample into cyclic buffer, having taken out the oldest entry
+// to return.  The output is thus 16 samples behind, which allows the non-casual step function to
+// work in real time.
 int16_t BandLimitedWaveform::generate_sawtooth (uint32_t new_phase, int i)
 {
   new_step_check_saw (new_phase, i) ;
@@ -677,11 +698,11 @@ int16_t BandLimitedWaveform::generate_square (uint32_t new_phase, int i)
 int16_t BandLimitedWaveform::generate_pulse (uint32_t new_phase, uint32_t pulse_width, int i)
 {
   new_step_check_pulse (new_phase, pulse_width, i) ;
-  int32_t val = process_active_steps (new_phase) ;
+  int32_t val = process_active_steps_pulse (new_phase, pulse_width) ;
   int32_t sample = cyclic [i&15] ;
   cyclic [i&15] = val ;
   phase_word = new_phase ;
-  return (int16_t) (sample >> 1) ; // scale down to avoid overflow on narrow pulses, where the DC shift is big
+  return (int16_t) ((sample >> 1) - (sample >> 5)) ; // scale down to avoid overflow on narrow pulses, where the DC shift is big
 }
 
 void BandLimitedWaveform::init_sawtooth (uint32_t freq_word)
@@ -731,7 +752,7 @@ void BandLimitedWaveform::init_pulse (uint32_t freq_word, uint32_t pulse_width)
   {
     uint32_t new_phase = phase_word + freq_word ;
     new_step_check_pulse (new_phase, pulse_width, i) ;
-    cyclic [i & 15] = (int16_t) process_active_steps (new_phase) ;
+    cyclic [i & 15] = (int16_t) process_active_steps_pulse (new_phase, pulse_width) ;
     phase_word = new_phase ;
   }
 }

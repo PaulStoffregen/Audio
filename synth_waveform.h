@@ -77,6 +77,7 @@ private:
   int32_t process_step (int i) ;
   int32_t process_active_steps (uint32_t new_phase) ;
   int32_t process_active_steps_saw (uint32_t new_phase) ;
+  int32_t process_active_steps_pulse (uint32_t new_phase, uint32_t pulse_width) ;
   void new_step_check_square (uint32_t new_phase, int i) ;
   void new_step_check_pulse (uint32_t new_phase, uint32_t pulse_width, int i) ;
   void new_step_check_saw (uint32_t new_phase, int i) ;
@@ -89,7 +90,7 @@ private:
   int delptr ;
   int32_t  cyclic[16] ;    // circular buffer of output samples
   bool pulse_state ;
-  uint32_t sampled_width ;
+  uint32_t sampled_width ; // pulse width is sampled once per waveform
 };
 
 
@@ -111,7 +112,6 @@ public:
 		}
 		phase_increment = freq * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT);
 		if (phase_increment > 0x7FFE0000u) phase_increment = 0x7FFE0000;
-		ensure_pulse_width_ok () ;
 	}
 	void phase(float angle) {
 		if (angle < 0.0) {
@@ -145,7 +145,6 @@ public:
 			n = 1.0;
 		}
 		pulse_width = n * 4294967296.0;
-		ensure_pulse_width_ok () ;
 	}
 	void begin(short t_type) {
 		phase_offset = 0;
@@ -153,10 +152,7 @@ public:
 		if (t_type == WAVEFORM_BANDLIMIT_SQUARE)
 		  band_limit_waveform.init_square (phase_increment) ;
 		else if (t_type == WAVEFORM_BANDLIMIT_PULSE)
-		{
-		  ensure_pulse_width_ok () ;
 		  band_limit_waveform.init_pulse (phase_increment, pulse_width) ;
-		}
 		else if (t_type == WAVEFORM_BANDLIMIT_SAWTOOTH || t_type == WAVEFORM_BANDLIMIT_SAWTOOTH_REVERSE)
 		  band_limit_waveform.init_sawtooth (phase_increment) ;
 	}
@@ -172,16 +168,6 @@ public:
 	virtual void update(void);
 
 private:
-	void ensure_pulse_width_ok()
-	{
-		if (tone_type == WAVEFORM_BANDLIMIT_PULSE)
-		{
-		  if (pulse_width < phase_increment)  // ensure pulse never narrow enough to glitch out of existence.
-		    pulse_width = phase_increment ;
-		  else if (pulse_width > -phase_increment)
-		    pulse_width = -phase_increment;
-		}
-	}
 	uint32_t phase_accumulator;
 	uint32_t phase_increment;
 	uint32_t phase_offset;
