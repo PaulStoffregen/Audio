@@ -77,6 +77,7 @@ private:
   int32_t process_step (int i) ;
   int32_t process_active_steps (uint32_t new_phase) ;
   int32_t process_active_steps_saw (uint32_t new_phase) ;
+  void new_step_check_square (uint32_t new_phase, int i) ;
   void new_step_check_pulse (uint32_t new_phase, uint32_t pulse_width, int i) ;
   void new_step_check_saw (uint32_t new_phase, int i) ;
 
@@ -88,6 +89,7 @@ private:
   int delptr ;
   int32_t  cyclic[16] ;    // circular buffer of output samples
   bool pulse_state ;
+  uint32_t sampled_width ;
 };
 
 

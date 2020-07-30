@@ -488,7 +488,6 @@ void AudioSynthWaveformModulated::update(void)
 #define HALF_GUARD (1 << (GUARD_BITS-1))
 
 
-#define DEG90 0x40000000u
 #define DEG180 0x80000000u
 
 #define PHASE_SCALE (0x100000000L / (2 * BASE_AMPLITUDE))
@@ -579,11 +578,11 @@ int32_t BandLimitedWaveform::process_active_steps_saw (uint32_t new_phase)
   return sample ;
 }
 
-void BandLimitedWaveform::new_step_check_pulse (uint32_t new_phase, uint32_t pulse_width, int i)
+void BandLimitedWaveform::new_step_check_square (uint32_t new_phase, int i)
 {
-  if (new_phase >= pulse_width && phase_word < pulse_width) // detect falling step
+  if (new_phase >= DEG180 && phase_word < DEG180) // detect falling step
   {
-    int32_t offset = (int32_t) ((uint64_t) (SCALE<<GUARD_BITS) * (pulse_width - phase_word) / (new_phase - phase_word)) ;
+    int32_t offset = (int32_t) ((uint64_t) (SCALE<<GUARD_BITS) * (sampled_width - phase_word) / (new_phase - phase_word)) ;
     if (offset == SCALE<<GUARD_BITS)
       offset -- ;
     if (pulse_state) // guard against two falling steps in a row (if pulse width changing for instance)
@@ -592,7 +591,7 @@ void BandLimitedWaveform::new_step_check_pulse (uint32_t new_phase, uint32_t pul
       pulse_state = false ;
     }
   }
-  if (new_phase < pulse_width && phase_word >= pulse_width) // detect wrap around, rising step
+  else if (new_phase < DEG180 && phase_word >= DEG180) // detect wrap around, rising step
   {
     int32_t offset = (int32_t) ((uint64_t) (SCALE<<GUARD_BITS) * (- phase_word) / (new_phase - phase_word)) ;
     if (offset == SCALE<<GUARD_BITS)
@@ -602,6 +601,43 @@ void BandLimitedWaveform::new_step_check_pulse (uint32_t new_phase, uint32_t pul
       insert_step (- offset, true, i) ;
       pulse_state = true ;
     }
+  }
+}
+
+// Checking for new steps for pulse waveform has to deal with changing frequency and pulse width and
+// not letting a pulse glitch out of existence as these change across a single period of the waveform
+// now we detect the rising edge just like for a square wave and use that to sample the pulse width
+// parameter, which then has to be checked against the instantaneous frequency every sample.
+void BandLimitedWaveform::new_step_check_pulse (uint32_t new_phase, uint32_t pulse_width, int i)
+{
+  uint32_t phase_advance = new_phase - phase_word ;
+  // prevent pulses glitching away by enforcing 1 sample minimum pulse width.
+  if (sampled_width < phase_advance)
+    sampled_width = phase_advance ;
+  else if (sampled_width > -phase_advance)
+    sampled_width = -phase_advance ;
+  
+  if (new_phase < DEG180 && phase_word >= DEG180) // detect wrap around, rising step
+  {
+    // sample the pulse width value so its not changing under our feet later in cycle due to modulation
+    sampled_width = pulse_width ;
+
+    int32_t offset = (int32_t) ((uint64_t) (SCALE<<GUARD_BITS) * (- phase_word) / phase_advance) ;
+    if (offset == SCALE<<GUARD_BITS)
+      offset -- ;
+    if (!pulse_state) // guard against two rising steps in a row (if pulse width changing for instance)
+    {
+      insert_step (- offset, true, i) ;
+      pulse_state = true ;
+    }
+  }
+  else if (pulse_state && phase_word < sampled_width && new_phase >= sampled_width) // detect falling step
+  {
+    int32_t offset = (int32_t) ((uint64_t) (SCALE<<GUARD_BITS) * (sampled_width - phase_word) / phase_advance) ;
+    if (offset == SCALE<<GUARD_BITS)
+      offset -- ;
+    insert_step (- offset, false, i) ;
+    pulse_state = false ;
   }
 }
 
@@ -630,7 +666,7 @@ int16_t BandLimitedWaveform::generate_sawtooth (uint32_t new_phase, int i)
 
 int16_t BandLimitedWaveform::generate_square (uint32_t new_phase, int i)
 {
-  new_step_check_pulse (new_phase, DEG180, i) ;
+  new_step_check_square (new_phase, i) ;
   int32_t val = process_active_steps (new_phase) ;
   int16_t sample = (int16_t) cyclic [i&15] ;
   cyclic [i&15] = val ;
@@ -674,12 +710,13 @@ void BandLimitedWaveform::init_square (uint32_t freq_word)
 void BandLimitedWaveform::init_pulse (uint32_t freq_word, uint32_t pulse_width)
 {
   phase_word = 0 ;
+  sampled_width = pulse_width ;
   newptr = 0 ;
   delptr = 0 ;
   for (int i = 0 ; i < 2*SUPPORT ; i++)
     phase_word -= freq_word ;
 
-  if (phase_word < DEG90)
+  if (phase_word < pulse_width)
   {
     dc_offset = BASE_AMPLITUDE ;
     pulse_state = true ;
