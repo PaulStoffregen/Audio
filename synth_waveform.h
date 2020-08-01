@@ -133,7 +133,7 @@ public:
 	AudioSynthWaveformModulated(void) : AudioStream(2, inputQueueArray),
 		phase_accumulator(0), phase_increment(0), modulation_factor(32768),
 		magnitude(0), arbdata(NULL), sample(0), tone_offset(0),
-		tone_type(WAVEFORM_SINE), modulation_type(0) {
+		tone_type(WAVEFORM_SINE), modulation_type(0), phase_overdrive(0) {
 	}
 
 	void frequency(float freq) {
@@ -190,6 +190,10 @@ public:
 		modulation_factor = degrees * (65536.0 / 180.0);
 		modulation_type = 1;
 	}
+        void phaseOverdrive (int lshift)
+        {
+	  phase_overdrive = lshift ;
+	}
 	virtual void update(void);
 
 private:
@@ -204,6 +208,7 @@ private:
 	int16_t  tone_offset;
 	uint8_t  tone_type;
 	uint8_t  modulation_type;
+        uint8_t  phase_overdrive;
 };
 
 
