@@ -243,7 +243,7 @@ void AudioSynthWaveformModulated::update(void)
 		bp = moddata->data;
 		for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
 			// more than +/- 180 deg shift by 32 bit overflow of "n"
-			uint32_t n = (*bp++) * modulation_factor;
+		        uint32_t n = ((uint32_t)(*bp++)) * modulation_factor;
 			phasedata[i] = ph + n;
 			ph += inc;
 		}
