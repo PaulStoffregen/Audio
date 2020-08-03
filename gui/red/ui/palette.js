@@ -17,13 +17,37 @@
  
 RED.palette = (function() {
 
-	var onlyShowOne = true;
+	var _settings = {
+		categoryHeaderTextSize: 12,
+		onlyShowOne: true,
+	};
+
+	var settings = {
+		set categoryHeaderTextSize(size) { _settings.categoryHeaderTextSize = size; setCategoryHeaderTextSize(size); },
+		get categoryHeaderTextSize() {return _settings.categoryHeaderTextSize;},
+		set onlyShowOne(state) { _settings.onlyShowOne = state; },
+		get onlyShowOne() { return _settings.onlyShowOne; },
+	};
+
+	var settingsCategoryTitle = "Palette";
+
+	var settingsEditorLabels = {
+		categoryHeaderTextSize: "Header Text Size",
+		onlyShowOne: "Only show one category at a time.",
+	};
+
+	function setCategoryHeaderTextSize(size) // this is to make above "setter" cleaner
+	{
+		$(".palette-header").each( function(i,e) { $(e).attr("style", "font-size:" + size + "px");});
+	}
+
 	var exclusion = ['config','unknown','deprecated'];
 	var core =	
 	[
 		{name:'favs',    expanded:false},
 		{name:'used',    expanded:false},
 		{name:'tabs',    expanded:false},
+		{name:'special', expanded:false},
 		{name:'input',   expanded:false, subcats:['i2s1','i2s2','spdif','adc','other']},
 		{name:'output',  expanded:false, subcats:['i2s1','i2s2','spdif','adc','other']},
 		{name:'mixer',   expanded:false},
@@ -182,7 +206,7 @@ RED.palette = (function() {
 	{
 		$("#header-"+category).off('click').on('click', function(e) {
 			
-			console.log("onlyShowOne:" + onlyShowOne);
+			//console.log("onlyShowOne:" + _settings.onlyShowOne);
 			var displayStyle = $(this).next().css('display');
 			if (displayStyle == "block")
 			{
@@ -191,7 +215,7 @@ RED.palette = (function() {
 			}
 			else
 			{
-				if (!isSubCat($(this).next().attr('id')) && (onlyShowOne == true)) // don't run when collapsing sub cat
+				if (!isSubCat($(this).next().attr('id')) && (_settings.onlyShowOne == true)) // don't run when collapsing sub cat
 				{
 					setShownStateForAll(false);
 				}
@@ -304,20 +328,12 @@ RED.palette = (function() {
 		});
 	});
 	
-	
-	
-
-	function SetOnlyShowOne(state)
-	{
-		onlyShowOne = state;
-	}
-	var categoryHeaderTextSize = 12;
 	return {
+		settings:settings,
+		settingsCategoryTitle:settingsCategoryTitle,
+		settingsEditorLabels:settingsEditorLabels,
+
 		add:addNodeType,
 		remove:removeNodeType,
-		SetOnlyShowOne:SetOnlyShowOne,
-		onlyShowOne:onlyShowOne,
-		categoryHeaderTextSize:categoryHeaderTextSize,
-		setCategoryHeaderTextSize: function (size) { $(".palette-header").each( function(i,e) { $(e).attr("style", "font-size:" + size + "px");}) }
 	};
 })();

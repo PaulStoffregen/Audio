@@ -19,15 +19,43 @@ RED.editor = (function() {
 	// TODO: should IMPORT/EXPORT get their own dialogs?
 
 	var aceLangTools = ace.require("ace/ext/language_tools");
-	var completions = []; // here we will append current workspace node names
-	//completions.push({ name:"test1", value:"testing1", meta: "code1" });
-	//completions.push({ name:"test2", value:"testing2", meta: "code2" }); 
+	var lang = ace.require("../lib/lang");
+	var rootCompletions = [];
+	var classCompletions = [];
+	var defaultCompleters = {};
+	
+	
 	completer= {
 		getCompletions: function(editor, session, pos, prefix, callback) {
-				callback(null, completions);
-			}
+				callback(null, rootCompletions);
+			},
+		getDocTooltip: function(item) {
+			var name = "";
+			if (item.name == undefined) name = item.caption;
+			else name = item.name;
+			item.docHTML = [
+				"<b>", name, "</b>", "<hr></hr>",
+				item.me
+			].join("");
+		}
 	}
+	classCompleter= {
+		getCompletions: function(editor, session, pos, prefix, callback) {
+			callback(null, classCompletions);
+		},
+		getDocTooltip: function(item) {
+			var name = "";
+			if (item.name == undefined) name = item.caption;
+			else name = item.name;
+			item.docHTML = [
+				"<b>", name, "</b>", "<hr></hr>",
+				item.meta
+			].join("");
+		}
+	}
+	
 	aceLangTools.addCompleter(completer);
+
 
 	function getCredentialsURL(nodeType, nodeID) {
 		var dashedType = nodeType.replace(/\s+/g, '-');
@@ -125,7 +153,110 @@ RED.editor = (function() {
 		return removedLinks;
 	}
 
+	function editNode_dialog_OK_pressed()
+	{
+		var changes = {};
+		var changed = false;
+		var wasDirty = RED.view.dirty();
+		var d;
 
+		if (editing_node._def.oneditsave) {
+			var oldValues = {};
+			for (d in editing_node._def.defaults) {
+				if (editing_node._def.defaults.hasOwnProperty(d)) {
+					if (typeof editing_node[d] === "string" || typeof editing_node[d] === "number") {
+						oldValues[d] = editing_node[d];
+					} else {
+						oldValues[d] = $.extend(true,{},{v:editing_node[d]}).v;
+					}
+				}
+			}
+			var rc = editing_node._def.oneditsave.call(editing_node);
+			if (rc === true) {
+				changed = true;
+			}
+
+			for (d in editing_node._def.defaults) {
+				if (editing_node._def.defaults.hasOwnProperty(d)) {
+					if (oldValues[d] === null || typeof oldValues[d] === "string" || typeof oldValues[d] === "number") {
+						if (oldValues[d] !== editing_node[d]) {
+							changes[d] = oldValues[d];
+							changed = true;
+						}
+					} else {
+						if (JSON.stringify(oldValues[d]) !== JSON.stringify(editing_node[d])) {
+							changes[d] = oldValues[d];
+							changed = true;
+						}
+					}
+				}
+			}
+		}
+
+		if (editing_node._def.defaults) {
+			for (d in editing_node._def.defaults) {
+				if (editing_node._def.defaults.hasOwnProperty(d)) {
+					var input = $("#node-input-"+d);
+					var newValue;
+					if (input.attr('type') === "checkbox") {
+						newValue = input.prop('checked');
+					} else {
+						newValue = input.val();
+					}
+					if (newValue != null) {
+						if (editing_node[d] != newValue) {
+							if (editing_node._def.defaults[d].type) {
+								if (newValue == "_ADD_") {
+									newValue = "";
+								}
+								// Change to a related config node
+								var configNode = RED.nodes.node(editing_node[d]);
+								if (configNode) {
+									var users = configNode.users;
+									users.splice(users.indexOf(editing_node),1);
+								}
+								configNode = RED.nodes.node(newValue);
+								if (configNode) {
+									configNode.users.push(editing_node);
+								}
+							}
+
+							changes[d] = editing_node[d];
+							editing_node[d] = newValue;
+							changed = true;
+						}
+					}
+				}
+			}
+		}
+		if (editing_node._def.credentials) {
+			var prefix = 'node-input';
+			var credDefinition = editing_node._def.credentials;
+			var credsChanged = updateNodeCredentials(editing_node,credDefinition,prefix);
+			changed = changed || credsChanged;
+		}
+
+
+		var removedLinks = updateNodeProperties(editing_node);
+		if (changed) {
+			var wasChanged = editing_node.changed;
+			editing_node.changed = true;
+			RED.view.dirty(true);
+			RED.history.push({t:'edit',node:editing_node,changes:changes,links:removedLinks,dirty:wasDirty,changed:wasChanged});
+		}
+		editing_node.dirty = true;
+		validateNode(editing_node);
+		if (editing_node.type == "Function" || editing_node.type == "Variables")
+		{ 
+			var editor = ace.edit("aceEditor");
+			editing_node.comment = editor.getValue();
+		}
+		console.log("edit node bgColor:" + editing_node.bgColor);
+		editing_node.bgColor = $("#node-input-color").val();
+		console.log("edit node bgColor:" + editing_node.bgColor);
+		RED.view.redraw();
+		console.log("edit node saved!");
+	}
 
 	$( "#dialog" ).dialog({
 			modal: true,
@@ -137,106 +268,7 @@ RED.editor = (function() {
 					text: "Ok",
 					click: function() {
 						if (editing_node) {
-							var changes = {};
-							var changed = false;
-							var wasDirty = RED.view.dirty();
-							var d;
-
-							if (editing_node._def.oneditsave) {
-								var oldValues = {};
-								for (d in editing_node._def.defaults) {
-									if (editing_node._def.defaults.hasOwnProperty(d)) {
-										if (typeof editing_node[d] === "string" || typeof editing_node[d] === "number") {
-											oldValues[d] = editing_node[d];
-										} else {
-											oldValues[d] = $.extend(true,{},{v:editing_node[d]}).v;
-										}
-									}
-								}
-								var rc = editing_node._def.oneditsave.call(editing_node);
-								if (rc === true) {
-									changed = true;
-								}
-
-								for (d in editing_node._def.defaults) {
-									if (editing_node._def.defaults.hasOwnProperty(d)) {
-										if (oldValues[d] === null || typeof oldValues[d] === "string" || typeof oldValues[d] === "number") {
-											if (oldValues[d] !== editing_node[d]) {
-												changes[d] = oldValues[d];
-												changed = true;
-											}
-										} else {
-											if (JSON.stringify(oldValues[d]) !== JSON.stringify(editing_node[d])) {
-												changes[d] = oldValues[d];
-												changed = true;
-											}
-										}
-									}
-								}
-
-
-							}
-
-							if (editing_node._def.defaults) {
-								for (d in editing_node._def.defaults) {
-									if (editing_node._def.defaults.hasOwnProperty(d)) {
-										var input = $("#node-input-"+d);
-										var newValue;
-										if (input.attr('type') === "checkbox") {
-											newValue = input.prop('checked');
-										} else {
-											newValue = input.val();
-										}
-										if (newValue != null) {
-											if (editing_node[d] != newValue) {
-												if (editing_node._def.defaults[d].type) {
-													if (newValue == "_ADD_") {
-														newValue = "";
-													}
-													// Change to a related config node
-													var configNode = RED.nodes.node(editing_node[d]);
-													if (configNode) {
-														var users = configNode.users;
-														users.splice(users.indexOf(editing_node),1);
-													}
-													configNode = RED.nodes.node(newValue);
-													if (configNode) {
-														configNode.users.push(editing_node);
-													}
-												}
-	
-												changes[d] = editing_node[d];
-												editing_node[d] = newValue;
-												changed = true;
-											}
-										}
-									}
-								}
-							}
-							if (editing_node._def.credentials) {
-								var prefix = 'node-input';
-								var credDefinition = editing_node._def.credentials;
-								var credsChanged = updateNodeCredentials(editing_node,credDefinition,prefix);
-								changed = changed || credsChanged;
-							}
-
-
-							var removedLinks = updateNodeProperties(editing_node);
-							if (changed) {
-								var wasChanged = editing_node.changed;
-								editing_node.changed = true;
-								RED.view.dirty(true);
-								RED.history.push({t:'edit',node:editing_node,changes:changes,links:removedLinks,dirty:wasDirty,changed:wasChanged});
-							}
-							editing_node.dirty = true;
-							validateNode(editing_node);
-							if (editing_node.type == "Function" || editing_node.type == "Variables")
-							{ 
-								var editor = ace.edit("aceEditor");
-								editing_node.comment = editor.getValue();
-							}
-							RED.view.redraw();
-							console.log("edit node saved!");
+							editNode_dialog_OK_pressed(); // found above
 						} else if (RED.view.state() == RED.state.EXPORT) {
 							if (/library/.test($( "#dialog" ).dialog("option","title"))) {
 								//TODO: move this to RED.library
@@ -263,18 +295,38 @@ RED.editor = (function() {
 			],
 			resize: function(e,ui) {
 				if (editing_node) {
+
 					$(this).dialog('option',"sizeCache-"+editing_node.type,ui.size);
+					//RED.console_ok("editor height:" + ui.size.height);
+					//RED.console_ok("editor this height:"+$(this).height())
+					var aceEditor = $("#aceEditor");
+					if (aceEditor)
+					{
+						aceEditor.css("height", $(this).height() - 100);
+						$(this).scrollTop(aceEditor.scrollHeight);
+					}
 				}
 			},
 			open: function(e) {
 				RED.keyboard.disable();
 				if (editing_node) {
+					
 					var size = $(this).dialog('option','sizeCache-'+editing_node.type);
 					if (size) {
 						$(this).dialog('option','width',size.width);
 						$(this).dialog('option','height',size.height);
 					}
+					var aceEditor = $("#aceEditor");
+					if (aceEditor)
+					{
+						aceEditor.css("height", $(this).height() - 100);
+						$(this).scrollTop(aceEditor.scrollHeight);
+						
+					}
+					$("#node-input-color").val(editing_node.bgColor);
+					jscolor.init();
 				}
+
 			},
 			close: function(e) {
 				RED.keyboard.enable();
@@ -286,6 +338,7 @@ RED.editor = (function() {
 				$( this ).dialog('option','width','500');
 				if (editing_node) {
 					RED.sidebar.info.refresh(editing_node);
+					RED.view.resetMouseVars();
 					console.log("edit node done!");
 				}
 				RED.sidebar.config.refresh();
@@ -436,18 +489,127 @@ RED.editor = (function() {
 	function prepareEditDialog(node,definition,prefix) {
 		if (node.type == "Function" || node.type == "Variables")
 		{ 
-			completions = RED.nodes.getWorkspaceNodesAsCompletions(node.z);
-			var editor = ace.edit("aceEditor");
+			
+
+			rootCompletions = RED.nodes.getWorkspaceNodesAsCompletions(node.z);
+			
+			classCompletions = AceAutoComplete.Extension;
+			//classCompletions = ; // clear array, this also works: completionsSub.splice(0,completionsSub.length);
+			//AceAutoCompleteKeywords.forEach(function(kw) { // AceAutoCompleteKeywords is in AceAutoCompleteKeywords.js
+			//	classCompletions.push(kw);
+			//}); // this is only development test it could search help for functions
+			// of could have global function def list with typenames 
+			// this global def could be used by the help tab to make sure
+			// that there is only one text for each type
+
+			currentCompletions = rootCompletions; // default
+
+			var aceEditor = ace.edit("aceEditor");
+			
+			//aceEditor.completers = [completer];
 
 			//editor.setTheme("ace/theme/iplastic");
-			editor.session.setMode("ace/mode/c_cpp");
-			editor.setOptions({
+			aceEditor.session.setMode("ace/mode/c_cpp");
+			aceEditor.setOptions({
 				enableBasicAutocompletion: true,
 				enableSnippets: true,
-				enableLiveAutocompletion: true
+				enableLiveAutocompletion: true,
 			});
-			editor.setValue(node.comment);
-			editor.session.selection.clearSelection();
+			aceEditor.setValue(node.comment);
+			aceEditor.session.selection.clearSelection();
+			//aceEditor.setOption("showInvisibles", true);
+			aceEditor.setOption("showTokenInfo", true);
+			defaultCompleters = aceEditor.completers;
+			console.warn("aceEditor.completers:");
+					console.warn(aceEditor.completers);
+
+			aceEditor.commands.addCommand({
+				name: "dotCommand",
+				bindKey: { win: ".", mac: "." },
+				exec: function () {
+					var pos = aceEditor.selection.getCursor();
+					var session = aceEditor.session;
+					console.log(pos);
+					var curLine = (session.getDocument().getLine(pos.row)).trim();
+					var curTokens = curLine.slice(0, pos.column).split(/\s+/);
+					var curCmd = curTokens[0];
+					if (!curCmd) return;
+					var lastToken = curTokens[curTokens.length - 1];
+			
+					aceEditor.insert(".");            
+
+					
+					
+					// here it need also need to check the type
+					// to get correct function list
+					var tokenType = "";
+					for (var i = 0; i < rootCompletions.length; i++) { // AceAutoCompleteKeywords is in AceAutoCompleteKeywords.js
+						var kw = rootCompletions[i];
+						if (kw.name == lastToken)
+						{
+							tokenType = kw.meta;
+							break;
+						}
+						else
+						{
+							console.warn("kw.name:" + kw.name);
+						}
+					}
+					console.log("lastToken:" + lastToken + " @ " + tokenType);
+					defaultCompleters = aceEditor.completers; // save default
+					if (AceAutoComplete.ClassFunctions[tokenType] != null)
+					{
+						classCompletions = AceAutoComplete.ClassFunctions[tokenType];
+					}
+					else
+					{
+						classCompletions = AceAutoComplete.Extension;
+					}
+
+					aceEditor.completers = [classCompleter]; // only show class objects
+
+					aceEditor.execCommand("startAutocomplete");
+					return lastToken;
+				}
+			});
+			aceEditor.commands.on("afterExec", function (e) {
+				console.log("afterExec:" + e.command.name + ":" + e.args + ":" + e.returnValue);
+				if (e.command.name == "insertstring")
+				{
+					if (/^[\w.]$/.test(e.args)) {
+						RED.console_ok("hello");
+						aceEditor.execCommand("startAutocomplete");
+					}
+					if (e.args.endsWith(";"))
+					{
+						RED.console_ok("insertString ended");
+						aceEditor.completers = defaultCompleters; // reset to default
+					}
+					else if (e.args == "\n")
+					{
+						console.log("newline");
+					}
+				}
+				else if (e.command.name == "backspace")
+				{
+					aceEditor.completers = defaultCompleters; // reset to default
+				}
+				else if (e.command.name == "Return")
+				{
+					aceEditor.completers = defaultCompleters; // reset to default
+				}
+				else if (e.command.name == "Esc")
+				{
+					aceEditor.completers = defaultCompleters; // reset to default
+				}
+				else if (e.command.name == "dotCommand")
+				{
+					// e.returnValue is the last token
+					//console.log(e.returnValue);
+					//console.trace("dotCommand trace");
+				}
+				//
+			});
 		}
 		for (var d in definition.defaults) {
 			if (definition.defaults.hasOwnProperty(d)) {

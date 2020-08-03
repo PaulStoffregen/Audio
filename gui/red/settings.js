@@ -16,128 +16,106 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+
+
+
 RED.settings = (function() {
 
+	this.sidebar = {};
+	this.view = {};
+	this.arduino = {};
+	this.arduino.export = {};
+	this.palette = {};
 	
+	this.sidebar.autoSwitchTabToInfo = true;
+	this.view.showWorkspaceToolbar = true;
+	this.palette.onlyShowOne = true;
+	this.view.showGridVmajor = true;
+	this.view.showGridVminor = true;
+	this.view.showGridH = true;
+	this.view.snapToGrid = true;
+	this.arduino.export.useExportDialog = true;
+	this.view.snapToGridXsize = 5;
+	this.view.snapToGridYsize = 5;
+    this.view.lineCurveScale = 0.75;
+    this.arduino.export.IOcheckAtExport = true;
+	this.palette.categoryHeaderTextSize = 12;
+	
+	function to_json()
+	{
+		return JSON.stringify(this);
+	}
 
     function createTab()
 	{
-	/*	app.UseCors(builder => builder
-					.AllowAnyOrigin()
-					.AllowAnyMethod()
-					.AllowAnyHeader());*/
-
 		var content = document.createElement("div");
 		content.id = "tab-settings";
 		content.style.paddingTop = "4px";
 		content.style.paddingLeft = "4px";
 		content.style.paddingRight = "4px";
 		RED.sidebar.addTab("settings",content);
-		var html = "<h3>Settings</h3>";
-		var htmlCategory = "";
-        html += createCheckBox("setting-auto-switch-to-info-tab", "Auto switch to info-tab when selecting node(s).");
-		html += createCheckBox("setting-show-workspace-toolbar", "Show Workspace toolbar.");
+		var catContainerId = "";
+		generateSettingsFromClasses(content.id);
+
+		catContainerId = createCategory(content.id, "development-tests", "Development Tests", true);
+		createCheckBox(catContainerId, "setting-auto-switch-to-info-tab", "Auto switch to info-tab when selecting node(s).",RED.sidebar.info.settings, "autoSwitchTabToThis");
 		
-		html += createCheckBox("setting-use-export-dialog", "Show export dialog.");
-		html += createTextInputWithApplyButton("setting-line-curve-scale", "Line Curve Scale");
-		
-		htmlCategory = "";
-		htmlCategory += createCheckBox("setting-show-palette-onlyOne", "Only show one category at a time.");
-		htmlCategory += createTextInputWithApplyButton("setting-palette-header-text-size", "Header Text Size");
-		html += createCategory("palette", "Palette", htmlCategory, true);
+		createButton(catContainerId, "btn-dev-create-new-ws-structure", "print new ws struct", "btn-dark btn-sm", RED.devTest.createAndPrintNewWsStruct);
+		createButton(catContainerId, "btn-dev-test", "console color test", "btn-primary btn-sm", function () {RED.devTest.console_logColor("Hello World"); RED.console_ok("Test of console_ok")});
+		// test creating subcat
+		catContainerId = createCategory(catContainerId, "development-tests-sub", "Test post/get (sub-cat of dev-test)", true);
+		createTextInputWithApplyButton(catContainerId, "setting-test-post", "test post", RED.arduino.httpPostAsync, "data");
+		createTextInputWithApplyButton(catContainerId, "setting-test-get", "test get", RED.arduino.httpGetAsync, "cmd");
 
-		htmlCategory = "";
-		htmlCategory += createCheckBox("setting-show-workspace-v-grid-ma", "Show Workspace major v-grid.");
-		htmlCategory += createCheckBox("setting-show-workspace-v-grid-mi", "Show Workspace minor v-grid.");
-		htmlCategory += createCheckBox("setting-show-workspace-h-grid", "Show Workspace h-grid.");
-		htmlCategory += createCheckBox("setting-snap-to-grid", "Snap to grid.");
-		htmlCategory += createTextInputWithApplyButton("setting-snap-grid-xSize", "Snap Grid Size X");
-		htmlCategory += createTextInputWithApplyButton("setting-snap-grid-ySize", "Snap Grid Size Y");
-		html += createCategory("workspace-grid", "Workspace Grid", htmlCategory, true);
-
-		htmlCategory = "";
-		htmlCategory += createCheckBox("setting-io-check-at-export", "IO check At Export");
-		htmlCategory += createTextInputWithApplyButton("setting-test-post", "test post");
-		htmlCategory += createTextInputWithApplyButton("setting-test-get", "test get");
-		htmlCategory += createButton("btn-dev-create-new-ws-structure", "print new ws struct");
-		htmlCategory += createButton("btn-dev-test", "console color test");
-		html += createCategory("development-tests", "Development Tests", htmlCategory, true);
-
-		$("#tab-settings").html(html);
-		
-		// theese functionalize functions allways end with the callback function
-		functionalizeCheckBox("setting-io-check-at-export", RED.arduino.export.IOcheckAtExport, RED.arduino.export.setIOcheckAtExport);
-        functionalizeCheckBox("setting-auto-switch-to-info-tab", RED.sidebar.info.autoSwitchTabToThis, RED.sidebar.info.setAutoSwitchTab);
-		functionalizeCheckBox("setting-show-workspace-toolbar", RED.view.showWorkspaceToolbar, RED.view.setShowWorkspaceToolbarVisible);
-		functionalizeCheckBox("setting-show-palette-onlyOne", RED.palette.onlyShowOne, RED.palette.SetOnlyShowOne);
-		functionalizeCheckBox("setting-show-workspace-v-grid-ma", RED.view.showGridVmajor, RED.view.showHideGridVmajor);
-		functionalizeCheckBox("setting-show-workspace-v-grid-mi", RED.view.showGridVminor, RED.view.showHideGridVminor);
-		functionalizeCheckBox("setting-show-workspace-h-grid", RED.view.showGridH, RED.view.showHideGridH);
-		functionalizeCheckBox("setting-snap-to-grid", RED.view.snapToGrid, RED.view.setSnapToGrid);
-		functionalizeCheckBox("setting-use-export-dialog", RED.arduino.export.useExportDialog, RED.arduino.export.setUseExportDialog);
-		functionalizeTextInputWithApplyButton("setting-snap-grid-xSize", RED.view.snapToGridXsize, RED.view.setSnapToGridXsize);
-		functionalizeTextInputWithApplyButton("setting-snap-grid-ySize", RED.view.snapToGridYsize, RED.view.setSnapToGridYsize);
-		functionalizeTextInputWithApplyButton("setting-test-post", "Hello", RED.arduino.httpPostAsync);
-		functionalizeTextInputWithApplyButton("setting-test-get", "cmd", RED.arduino.httpGetAsync);
-		functionalizeTextInputWithApplyButton("setting-line-curve-scale", RED.view.lineCurveScale, RED.view.setLineCurveScale);
-
-		functionalizeTextInputWithApplyButton("setting-palette-header-text-size", RED.palette.categoryHeaderTextSize, RED.palette.setCategoryHeaderTextSize);
-		functionalizeButton("btn-dev-create-new-ws-structure", RED.devTest.createAndPrintNewWsStruct);
-		functionalizeButton("btn-dev-test", function () {RED.devTest.console_logColor("Hello World"); RED.console_ok("Test of console_ok")});
-		functionalizeCategory("workspace-grid");
-		functionalizeCategory("development-tests");
 		RED.sidebar.show("settings"); // development, allways show settings tab first
 
-		RED.palette.setCategoryHeaderTextSize(RED.palette.categoryHeaderTextSize);
+		RED.palette.settings.categoryHeaderTextSize = RED.palette.settings.categoryHeaderTextSize; // read/apply
 	}
-	
-	
-	/**
-	 * creates and returns html code for a checkbox with label
-	 * @param {string} id 
-	 * @param {string} label 
-	 */
-	function createCheckBox(id, label)
+
+	function generateSettingsFromClasses(containerId)
 	{
-		var html = '<label for="'+id+'" style="font-size: 16px; padding: 2px 0px 0px 4px;">';
-		html +=	'<input style="margin-bottom: 4px; margin-left: 4px;" type="checkbox" id="'+id+'" checked="checked" />';
-		html +=	'&nbsp;'+label+'</label>';
-		return html;
+		var RED_Classes = Object.getOwnPropertyNames(RED);
+		var catContainerId = "";
+        for (let rci = 0; rci < RED_Classes.length; rci++)
+        {
+            var RED_Class_Name = RED_Classes[rci];
+            var RED_Class = RED[RED_Class_Name];
+            var RED_Class_SubClasses = Object.getOwnPropertyNames(RED_Class);
+
+            //RED.console_ok("@" + RED_Class_Name);
+            //console.log(Object.getOwnPropertyNames(RED_Class));
+
+            for (let sci = 0; sci < RED_Class_SubClasses.length; sci++)
+            {
+                let RED_SubClass_Name = RED_Class_SubClasses[sci];
+                if (RED_SubClass_Name == "settings")
+                {
+					catContainerId = createCategory(containerId, RED_Class_Name, RED_Class.settingsCategoryTitle, true);
+					var settingNames = Object.getOwnPropertyNames(RED_Class.settings);
+					for (let i = 0; i < settingNames.length; i++)
+					{
+						var settingName = settingNames[i];
+						var typeOf = typeof RED_Class.settings[settingName];
+						if (typeOf === "boolean")
+						{
+							createCheckBox(catContainerId, RED_Class_Name+"-"+settingName, RED_Class.settingsEditorLabels[settingName], RED_Class.settings, settingName);
+						}
+						else if (typeOf === "number" || typeOf === "string")
+						{
+							createTextInputWithApplyButton(catContainerId, RED_Class_Name+"-"+settingName, RED_Class.settingsEditorLabels[settingName], RED_Class.settings, settingName);
+						}
+						else
+							console.error("generateSettingsFromClasses unknown type:" + typeOf);
+					}
+                    //settings.push({[RED_Class_Name]:RED_Class.settings});
+                    //RED.console_ok("found settings@" + RED_Class_Name);
+                }
+                
+            }
+        }
 	}
-	function createTextInputWithApplyButton(id, label)
-	{
-		var html = '<label for="'+id+'" style="font-size: 16px;">';
-			html += '&nbsp;'+label+' <input type="text" id="'+id+'" name="'+id+'" style="width: 40px;">';
-			html += ' <button type="button" id="btn-'+id+'">Apply</button></label>';
-		return html;
-	}
-	function createButton(id, label)
-	{
-		var html = '<button type="button" id="btn-'+id+'">'+label+'</button></label>';
-		return html;
-	}
-	function functionalizeTextInputWithApplyButton(id, text, func)
-	{
-		$('#btn-' + id).click(function() { func($('#' + id).val());});
-		$('#' + id).val(text);
-	}
-	/**
-	 * this must be run after the html is applied to the document
-	 * @param {string} id 
-	 * @param {boolean} initalState 
-	 * @param {function} func 
-	 */
-	function functionalizeCheckBox(id, initalState, func)
-	{
-		$('#' + id).click(function() { func($('#' + id).prop('checked'));});
-		$('#' + id).prop('checked', initalState);
-	}
-	function functionalizeButton(id, func)
-	{
-		$('#btn-' + id).click(func);
-	}
-	
-	function createCategory(category, header, content, expanded)
+
+	function createCategory(containerId, id, headerLabel, expanded)
 	{
 		if (expanded)
 		{
@@ -149,17 +127,16 @@ RED.settings = (function() {
 			var chevron = '<i class="icon-chevron-down"></i>';
 			var displayStyle = "none";
 		}
+		var headerId = "set-header-" + id;
+		var catContainerId = "set-content-"  + id;
 		var html = '<div class="palette-category">'+ // use style from palette-category
-			'<div id="setting-header-'+category+'" class="palette-header">'+chevron+'<span>'+header+'</span></div>'+
-			'<div class="palette-content" id="palette-base-category-'+category+'" style="display: '+displayStyle+';">'+
-			  content+
-			'</div>'+
-			'</div>'
-		return html;
-	}
-	function functionalizeCategory(category)
-	{
-		$("#setting-header-"+category).off('click').on('click', function(e) {
+			'<div id="'+headerId+'" class="palette-header">'+chevron+'<span>'+headerLabel+'</span></div>'+
+			'<div class="palette-content" id="'+catContainerId+'" style="display: '+displayStyle+';">'+
+			'</div>\n'+
+			'</div>\n'
+		//RED.console_ok("create complete Button @ " + containerId + " = " + label + " : " + id);
+		$("#"+containerId).append(html);
+		$("#" + headerId).off('click').on('click', function(e) {
 			
 			var displayStyle = $(this).next().css('display');
 			if (displayStyle == "block")
@@ -173,9 +150,65 @@ RED.settings = (function() {
 				$(this).children("i").addClass("expanded"); // chevron
 			}
 		});
+		return catContainerId;
 	}
-    
+
+	/**
+	 * creates and returns html code for a checkbox with label
+	 * @param {string} id 
+	 * @param {string} label 
+	 */
+	function createCheckBox(containerId, id, label, cb, param)
+	{
+		var html = '<label for="'+id+'" style="font-size: 16px; padding: 2px 0px 0px 4px;">';
+		html +=	'<input style="margin-bottom: 4px; margin-left: 4px;" type="checkbox" id="'+id+'" checked="checked" />';
+		html +=	'&nbsp;'+label+'</label>';
+
+		//RED.console_ok("create complete checkbox @ " + containerId + " = " + label + " : " + id);
+		$("#" + containerId).append(html);
+		if (typeof cb === "function")
+		{
+			$('#' + id).click(function() { cb($('#' + id).prop('checked')); });
+			$('#' + id).prop('checked', param);
+		}
+		else if(typeof cb == "object")
+		{
+			$('#' + id).click(function() { cb[param] = $('#' + id).prop('checked'); });
+			$('#' + id).prop('checked', cb[param]);
+		}
+	}
+	function createTextInputWithApplyButton(containerId, id, label, cb, param)
+	{
+		var html = '<div class="center"><label  for="'+id+'" style="font-size: 16px;">';
+			html += '&nbsp;'+label+' <input type="text" id="'+id+'" name="'+id+'" style="width: 40px;">';
+			html += ' <button class="btn btn-success btn-sm" type="button" id="btn-'+id+'">Apply</button></label></div>';
+
+		//RED.console_ok("create complete TextInputWithApplyButton @ " + containerId + " = " + label + " : " + id);
+		$("#" + containerId).append(html);
+		if (typeof cb === "function")
+		{
+			$('#btn-' + id).click(function() { cb($('#' + id).val());});
+			$('#' + id).val(param);
+		}
+		else if(typeof cb == "object")
+		{
+			$('#btn-' + id).click(function() { cb[param] = $('#' + id).val(); });
+			$('#' + id).val(cb[param]);
+		}
+	}
+	function createButton(containerId, id, label, buttonClass, cb)
+	{
+		var html = '<button class="btn '+buttonClass+'" type="button" id="btn-'+id+'">'+label+'</button></label>';
+		//RED.console_ok("create complete Button @ " + containerId + " = " + label + " : " + id);
+		$("#" + containerId).append(html);
+		$('#btn-' + id).click(cb);
+
+	}
+	
+	
+
     return {
 		createTab:createTab,
+		to_json:to_json
 	};
 })();

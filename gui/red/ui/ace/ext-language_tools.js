@@ -1949,6 +1949,7 @@ ace.define("ace/autocomplete/text_completer",["require","exports","module","ace/
         var wordScore = wordDistance(session, pos);
         var wordList = Object.keys(wordScore);
         callback(null, wordList.map(function(word) {
+            console.log(word + ":" + wordScore[word]);
             return {
                 caption: word,
                 value: word,

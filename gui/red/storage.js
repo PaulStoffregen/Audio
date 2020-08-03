@@ -39,8 +39,18 @@ RED.storage = (function() {
 			//console.warn(allStorage());
 			var json_string = localStorage.getItem("audio_library_guitool");
 			console.log("localStorage read: " );//+ json_string);
-			if (json_string)
-				RED.nodes.import(json_string, false);
+
+			if (json_string && (json_string.trim().length != 0))
+			{
+				var jsonObj = JSON.parse(json_string);
+
+				if (jsonObj.workspaces) // new version
+				{
+					RED.nodes.importWorkspaces(jsonObj.workspaces);
+				}
+				else
+					RED.nodes.import(json_string, false);
+			}
 			else
 				RED.nodes.createNewDefaultWorkspace();
 		}

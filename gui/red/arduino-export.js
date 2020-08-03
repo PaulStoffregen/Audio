@@ -17,8 +17,7 @@
  **/
 RED.arduino.export = (function() {
 
-	var useExportDialog = true;
-	var IOcheckAtExport = true;
+	
     /**
 	 * this take a multiline text, 
 	 * break it up into linearray, 
@@ -84,7 +83,23 @@ RED.arduino.export = (function() {
 			$( "#dialog" ).dialog({
 				title: title,
 				width:  box.clientWidth*0.60, // setting the size of dialog takes ~170mS
-				height:   box.clientHeight
+				height:   box.clientHeight,
+				buttons: [
+					{
+						text: "Ok",
+						click: function() {
+							RED.console_ok("Export dialog OK pressed!");
+							$( this ).dialog( "close" );
+						}
+					},
+					{
+						text: "Cancel",
+						click: function() {
+							RED.console_ok("Export dialog Cancel pressed!");
+							$( this ).dialog( "close" );
+						}
+					}
+				],
 			}).dialog( "open" );
 			
 		});
@@ -102,6 +117,7 @@ RED.arduino.export = (function() {
 		else if (type == "Function") return true;
 		else if (type == "Variables") return true;
 		else if (type == "tab") return true;
+		else if (type == "Array") return true;
 		else return false;
 	}
 	/**
@@ -141,14 +157,20 @@ RED.arduino.export = (function() {
 		for (var j=typeLength; j<32; j++) cpp += " ";
 		return cpp;
 	}
-	function getCppHeader(nns)
+	
+	function getCppHeader(nns,includes)
 	{
+		if (includes == undefined)
+			includes = "";
+
 		return    "#include <Audio.h>\n"
 				+ "#include <Wire.h>\n"
 				+ "#include <SPI.h>\n"
 				+ "#include <SD.h>\n"
-				+ "#include <SerialFlash.h>\n\n"
+				+ "#include <SerialFlash.h>\n"
+				+ includes + "\n"
 				+ "// GUItool: begin automatically generated code\n"
+				+ "// the following JSON string contains the whole project, \n// it's included in all generated files.\n"
 				+ "// JSON string:" + JSON.stringify(nns) + "\n";
 	}
 	function getCppFooter()
@@ -259,7 +281,7 @@ RED.arduino.export = (function() {
 		const t0 = performance.now();
 		RED.storage.update();
 
-		if (!RED.nodes.hasIO() && IOcheckAtExport) {
+		if (!RED.nodes.hasIO() && RED.arduino.settings.IOcheckAtExport) {
 			showExportErrorDialog();
 			return;
 		}
@@ -324,7 +346,7 @@ RED.arduino.export = (function() {
 		RED.arduino.httpPostAsync(JSON.stringify(wsCppFilesJson));
 		const t1 = performance.now();
 
-		if (useExportDialog)
+		if (RED.arduino.settings.useExportDialog)
 			showExportDialog("Simple Export to Arduino", cpp);
 			//showExportDialog("Simple Export to Arduino", JSON.stringify(wsCppFilesJson, null, 4));	// dev. test
 
@@ -340,7 +362,7 @@ RED.arduino.export = (function() {
 		const t0 = performance.now();
 		RED.storage.update();
 
-		if (!RED.nodes.hasIO() && IOcheckAtExport)
+		if (!RED.nodes.hasIO() && RED.arduino.settings.IOcheckAtExport)
 		{
 			showExportErrorDialog();
 			return;
@@ -367,6 +389,7 @@ RED.arduino.export = (function() {
 			var classComment = "";
 			var classFunctions = "";
 			var classVars = "";
+			var classAdditional = [];
 			var arrayNode = undefined;
 			var foundArrayNode = false;
 			for (var i=0; i<nns.length; i++) { 
@@ -387,9 +410,10 @@ RED.arduino.export = (function() {
 				{
 					classVars += n.comment + "\n" // we use comment field for vars-data
 				}
-				else if (n.type == "Array" && !foundArrayNode) // this is special thingy that was before real-node, now it's obsolete, it only generates more code
+				else if (n.type == "Array" && (foundArrayNode == false)) // this is special thingy that was before real-node, now it's obsolete, it only generates more code
 				{
-					var arrayNode = node.name.split(" ");
+					//console.warn("found array node:" + n.name);
+					arrayNode = n.name.split(" ");
 					if (!arrayNode) continue;
 					if (arrayNode.length < 2 || arrayNode.length > 3) continue;
 					// we just save the array def. to later
@@ -397,12 +421,12 @@ RED.arduino.export = (function() {
 						arrayNode = {type:arrayNode[0], name:arrayNode[1], cppCode:"", objectCount:0, autoGenerate:true}; 
 					else // arrayNode[2] contains predefined array contents
 						arrayNode = {type:arrayNode[0], name:arrayNode[1], cppCode:arrayNode[2], objectCount:arrayNode[2].split(",").length, autoGenerate:false};
-
-						newWsCpp.cpp += "    " + arrayNode.type + " ";
-					for (var j=arrayNode.type.length; j<32; j++) cpp += " ";
-					newWsCpp.cpp += "*" + arrayNode.name +";\n";
-					
-					foundArrayNode = true; // only one can be defined at this beta test
+					foundArrayNode = true; // only one can be defined
+				}
+				else if (RED.nodes.isClass(n.type))
+				{
+					var includeName = '#include "' + n.type + '.h"';
+					if (!classAdditional.includes(includeName)) classAdditional.push(includeName);
 				}
 			}
 			if (classComment.length > 0)
@@ -498,6 +522,12 @@ RED.arduino.export = (function() {
 			newWsCpp.cpp += "    AudioConnection ";
 			for (var j="AudioConnection".length; j<32; j++) newWsCpp.cpp += " ";
 			newWsCpp.cpp += "*patchCord[" + ac.totalCount + "]; // total patchCordCount:" + ac.totalCount + " including array typed ones.\n";
+			if (arrayNode) // if defined and found prev, add it now
+			{
+				newWsCpp.cpp += "    " + arrayNode.type + " ";
+				for (var j=arrayNode.type.length; j<32; j++) cpp += " ";
+				newWsCpp.cpp += "*" + arrayNode.name +";\n";
+			}
 			if (classVars.trim().length > 0)
 				newWsCpp.cpp += "\n" + incrementTextLines(classVars, "    ");
 			newWsCpp.cpp+= "\n    " + ws.label + "() // constructor (this is called when class-object is created)\n    {\n";
@@ -505,13 +535,13 @@ RED.arduino.export = (function() {
 
 			if (arrayNode) // if defined and found prev, add it now
 			{
-				newWsCpp.cpp += "        // array workaround until we get real object-array in GUI-tool\n";
 				newWsCpp.cpp += "        " + arrayNode.name + " = new " + arrayNode.type + "[" + arrayNode.objectCount + "]";
 				if (arrayNode.autoGenerate)
-					newWsCpp.cpp += "{" + arrayNode.cppCode.substring(0, arrayNode.cppCode.length - 1) + "};\n\n"
+					newWsCpp.cpp += "{" + arrayNode.cppCode.substring(0, arrayNode.cppCode.length - 1) + "}"
 				else
-					newWsCpp.cpp += arrayNode.cppCode + ";\n\n"
-				
+					newWsCpp.cpp += arrayNode.cppCode;
+
+				newWsCpp.cpp += "; // pointer array\n\n";
 			}
 			newWsCpp.cpp += cppPcs;
 			if (ac.arrayLenght != 0)
@@ -524,14 +554,19 @@ RED.arduino.export = (function() {
 			if (classFunctions.trim().length > 0)
 				newWsCpp.cpp += "\n" + incrementTextLines(classFunctions, "    ");
 			newWsCpp.cpp += "};\n"; // end of class
-
+			newWsCpp.header = getCppHeader(nns, classAdditional.join("\n"));
+			newWsCpp.footer = getCppFooter();
 			wsCppFiles.push(newWsCpp);
-		}
+		} // workspaces loop
 		// time to generate the final result
 		var cpp = getCppHeader(nns);
 		for (var i = 0; i < wsCppFiles.length; i++)
 		{
+
 			cpp += wsCppFiles[i].cpp;
+			wsCppFiles[i].cpp = wsCppFiles[i].header + wsCppFiles[i].cpp + wsCppFiles[i].footer;
+			delete wsCppFiles[i].header;
+			delete wsCppFiles[i].footer;
 		}
 		cpp += getCppFooter();
 		//console.log(cpp);
@@ -539,7 +574,7 @@ RED.arduino.export = (function() {
 		var wsCppFilesJson = getPOST_JSON(wsCppFiles, false);
 		RED.arduino.httpPostAsync(JSON.stringify(wsCppFilesJson));
 
-		if (useExportDialog)
+		if (RED.arduino.settings.useExportDialog)
 			showExportDialog("Class Export to Arduino", cpp);	
 			//showExportDialog("Class Export to Arduino", JSON.stringify(wsCppFilesJson, null, 4));	// dev. test
 		const t1 = performance.now();
@@ -558,10 +593,6 @@ RED.arduino.export = (function() {
 
     return {
 		isSpecialNode:isSpecialNode,
-		useExportDialog:useExportDialog,
-		IOcheckAtExport:IOcheckAtExport,
-		setIOcheckAtExport : function (state) { IOcheckAtExport = state; },
-		setUseExportDialog: function (state) { useExportDialog = state;},
 		showExportDialog:showExportDialog
 	};
 })();

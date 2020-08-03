@@ -30,6 +30,7 @@
 <link rel="stylesheet" type="text/css" href="orion/built-editor.css"/>
 <link rel="stylesheet" type="text/css" href="font-awesome/css/font-awesome.min.css"/>
 <link rel="stylesheet" href="style.css">
+
 <style>
 table.doc {border-spacing:3px; border-collapse:separate; font-size: 80%}
 tr.top {background-color:#C0C0C0}
@@ -121,7 +122,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 				</ul>
 			</div>
 			<div class="btn-group pull-left">
-				<a id="menu-arduino" class="btn dropdown-toggle btn-warning disabled" data-toggle="dropdown" href="#"><i class="icon-download"></i> Arduino <span class="caret"></span></a>
+				<a id="menu-arduino" class="btn dropdown-toggle btn-info disabled" data-toggle="dropdown" href="#"><i class="icon-download"></i> Compiler <span class="caret"></span></a>
 				<ul class="dropdown-menu">
 					<li><a id="btn-verify-compile"" class="btn action-deploy" href="#"><i id="btn-icn-deploy" class="icon-upload"></i>Verify/Compile</a></li>
 					<li><a id="btn-compile-upload";" class="btn action-deploy" href="#"><i id="btn-icn-deploy" class="icon-upload"></i>Upload</a></li>
@@ -378,6 +379,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 <script src="jquery/js/jquery-ui-1.10.3.custom.min.js"></script>
 <script src="jquery/js/jquery.ui.touch-punch.min.js"></script>
 <script src="orion/built-editor.min.js"></script>
+<script src="jscolor.js"></script>
 <script src="red/ui/ace/ace.js" type="text/javascript" charset="utf-8"></script>
 <script src="red/ui/ace/ext-language_tools.js"></script>
 <script src="red/d3/d3.v3.min.js"></script>
@@ -402,6 +404,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 <script src="red/ui/notifications.js"></script>
 <script src="red/ui/touch/radialMenu.js"></script>
 <script src="red/devTest.js"></script>
+
 
 
 <!--
@@ -549,12 +552,12 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	{"nodes":[
 		{"type":"TabOutput","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":""}},"shortName":"Out","inputs":1,"outputs":0,"category":"tabs-function","color":"#cce6ff","icon":"arrow-in.png"}},
 		{"type":"TabInput","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":""}},"shortName":"In","inputs":0,"outputs":1,"category":"tabs-function","color":"#cce6ff","icon":"arrow-in.png", "align":"right"}},
-		{"type":"Array","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":""}},"shortName":"Array","inputs":0,"outputs":0,"category":"tabs-function","color":"#aaffdd","icon":"range.png"}},
+		{"type":"Array","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":""}},"shortName":"Array","inputs":0,"outputs":0,"category":"special-function","color":"#aaffdd","icon":"range.png"}},
 		{"type":"AudioMixer","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"inputs":{"value":"1"},"comment":{"value":""}},"shortName":"mixer","inputs":1,"outputs":1,"category":"mixer-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"ClassComment","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"}},"shortName":"ClassComment","inputs":0,"outputs":0,"category":"tabs-function","color":"#ccffcc","icon":"comment.png"}},
-		{"type":"Comment","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":""}},"shortName":"Comment","inputs":0,"outputs":0,"category":"tabs-function","color":"#ddffbb","icon":"comment.png"}},
-		{"type":"Function","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":""}},"shortName":"code","inputs":0,"outputs":0,"category":"tabs-function","color":"#ddffbb","icon":"function.png"}},
-		{"type":"Variables","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":""}},"shortName":"vars","inputs":0,"outputs":0,"category":"tabs-function","color":"#ddffbb","icon":"function.png"}},
+		{"type":"Comment","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":""}},"shortName":"Comment","inputs":0,"outputs":0,"category":"special-function","color":"#ddffbb","icon":"comment.png"}},
+		{"type":"Function","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":""}},"shortName":"code","inputs":0,"outputs":0,"category":"special-function","color":"#ddffbb","icon":"function.png"}},
+		{"type":"Variables","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":""}},"shortName":"vars","inputs":0,"outputs":0,"category":"special-function","color":"#ddffbb","icon":"function.png"}},
 
 		{"type":"AudioInputI2S","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"i2s","inputs":0,"outputs":2,"category":"input-i2s1-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputI2SQuad","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"i2s_quad","inputs":0,"outputs":4,"category":"input-i2s1-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -660,6 +663,9 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		<input type="text" id="node-input-comment" placeholder="Comment">
 		<!--<textarea style="font-family: monospace; font-size: 12px; background:rgb(226, 229, 255); padding-left: 0.5em;" class="input-block-level" id="node-input-comment" rows="12"></textarea> -->
 	</div>
+	<div class="form-row">
+		Color: <input id="node-input-color" data-jscolor="">
+	</div>
 </script>
 
 <div> <!-- tab-category -->
@@ -707,6 +713,9 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		<input type="text" id="node-input-name" placeholder="Name">
 	</div>
 	<div class="form-row">
+		Color: <input id="node-input-color" data-jscolor="">
+	</div>
+	<div class="form-row-long">
 		<label for="node-input-comment"><i class="fa fa-tag"></i> Code contents:</label>
 		<pre id="aceEditor" style="height: 400px;"></pre>
 		
@@ -737,6 +746,9 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+	<div class="form-row">
+		Color: <input id="node-input-color" data-jscolor="">
 	</div>
 	<div class="form-row">
 		<label for="node-input-comment"><i class="fa fa-tag"></i> Variable contens:</label>
@@ -2719,6 +2731,9 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<div class="form-row">
 		<label for="node-input-inputs"><i class="fa fa-tag"></i> Inputs</label>
 		<input type="text" id="node-input-inputs" placeholder="Inputs">
+	</div>
+	<div class="form-row">
+		Color: <input id="node-input-color" data-jscolor="">
 	</div>
 	<!-- this is only for debugging of the output pins change so i choose MixerX because it's allready dynamic -->
 	<!-- <div class="form-row"> 

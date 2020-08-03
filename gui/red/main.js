@@ -1,4 +1,6 @@
 /** Modified from original Node-Red source, for audio system visualization
+ * //NOTE: code generation save function have moved to arduino-export.js
+ *
  * vim: set ts=4:
  * Copyright 2013 IBM Corp.
  *
@@ -27,7 +29,9 @@ var RED = (function() { // this is used so that RED can be used as root "namespa
  * node RED main - here the main entry function exist
  */
 RED.main = (function() {
-
+	
+	//NOTE: code generation save function have moved to arduino-export.js
+	
 	//var classColor = "#E6E0F8"; // standard
 	var classColor = "#ccffcc"; // new
 	var requirements;
@@ -172,6 +176,9 @@ RED.main = (function() {
 		});
 	}
 	
+	// function save(force)
+	//NOTE: code generation save function have moved to arduino-export.js
+	
 	function verifyDialog(dialogTitle, textTitle, text, cb) {
 		$( "#node-dialog-verify" ).dialog({
 			modal: true,
@@ -312,10 +319,21 @@ RED.main = (function() {
 
 		dialog.modal();
 	}
-
+	function update(picker, selector) {
+		document.querySelector(selector).style.background = picker.toBackground()
+	}
 	$(function()  // jQuery short-hand for $(document).ready(function() { ... });
 	{	
+		
 		addDemoFlowsToMenu();
+		RED.view.init();
+
+		jscolor.presets.default = {
+			closeButton:true
+		};
+		jscolor.trigger('input change');
+		jscolor.installByClassName("jscolor");
+		
 		console.warn("main $(function() {...}); is executed after page load!"); // to see load order
 		$(".palette-spinner").show();
 		RED.settings.createTab();

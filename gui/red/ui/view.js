@@ -17,19 +17,59 @@
 
 
 RED.view = (function() {
-	var showGridVminor = true,
-	    showGridVmajor = true,
-		showGridH = true;
-		
-	var snapToGrid = true, // this is allready implemented with shift button, this locks that mode
-	    snapToGridXsize = 5,
-	    snapToGridYsize = 5;
+	var _settings = {
+		showWorkspaceToolbar: true,
+		showGridVminor: true,
+		showGridVmajor: true,
+		showGridH: true,		
+		snapToGrid: true, // this is allready implemented with shift button, this locks that mode
+	    snapToGridXsize: 5,
+	    snapToGridYsize: 5,
+		lineCurveScale: 0.75,
+	};
 
-	var showWorkspaceToolbar = true;
+	var settingsCategoryTitle = "Workspace View";
+
+	var settingsEditorLabels = {
+		showWorkspaceToolbar: "Show Workspace toolbar.",
+		showGridVminor: "Show Workspace minor v-grid.",
+		showGridVmajor: "Show Workspace major v-grid.",
+		showGridH: "Show Workspace h-grid.",		
+		snapToGrid: "Snap to grid.",
+	    snapToGridXsize: "Snap Grid Size X",
+	    snapToGridYsize: "Snap Grid Size Y",
+		
+		lineCurveScale: "Line Curve Scale",
+	}
+
+	var settings = {
+		get showWorkspaceToolbar() { return _settings.showWorkspaceToolbar; },
+		set showWorkspaceToolbar(state) { _settings.showWorkspaceToolbar = state; setShowWorkspaceToolbarVisible(state); },
+
+		get showGridVminor() { return _settings.showGridVminor; },
+		set showGridVminor(state) { _settings.showGridVminor = state; showHideGridVminor(state); },
+
+		get showGridVmajor() { return _settings.showGridVmajor; },
+		set showGridVmajor(state) { _settings.showGridVmajor = state; showHideGridVmajor(state); },
+
+		get showGridH() { return _settings.showGridH; },
+		set showGridH(state) { _settings.showGridH = state; showHideGridH(state); },
+
+		get snapToGrid() { return _settings.snapToGrid; },
+		set snapToGrid(state) { _settings.snapToGrid = state; },
+
+		get snapToGridXsize() { return _settings.snapToGridXsize; },
+		set snapToGridXsize(value) { _settings.snapToGridXsize = value; },
+
+		get snapToGridYsize() { return _settings.snapToGridYsize; },
+		set snapToGridYsize(value) { _settings.snapToGridYsize = value; },
+
+		get lineCurveScale() { return _settings.lineCurveScale;},
+		set lineCurveScale(value) { _settings.lineCurveScale = value; redraw_links(); },
+	};
 
 	var space_width = 5000,
 		space_height = 5000,
-		lineCurveScale = 0.75,
 		scaleFactor = 1,
 		node_width = 100,
 		node_height = 35;
@@ -215,9 +255,20 @@ RED.view = (function() {
 		"style":"display:none;"
 		});
 	
-	initGrid();
+	
 	var drag_line = vis.append("svg:path").attr("class", "drag_line");
 	
+	function initView() // called from main.js - document ready function
+	{
+		initGrid();
+		$("#menu-arduino").mouseover(function(){
+			showPopOver("#menu-arduino", false, "Arduino-Compatible API", "bottom");
+		});
+		$("#menu-arduino").mouseout(function(){
+			$(this).popover("destroy");
+		});
+		
+	}
 	
 	function initGrid()
 	{
@@ -268,19 +319,15 @@ RED.view = (function() {
 			});
 		
 			// sets visibility according to vars, so that it's only changed at one place
-			showHideGridH(showGridH);
-			showHideGridVmajor(showGridVmajor);
-			showHideGridVminor(showGridVminor);
-	}
-	function setSnapToGrid(state)
-	{
-		snapToGrid = state;
+			showHideGridH(_settings.showGridH);
+			showHideGridVmajor(_settings.showGridVmajor);
+			showHideGridVminor(_settings.showGridVminor);
 	}
 	function showHideGrid(state)
 	{
-		showHideGridH(showGridH || state);
-		showHideGridVmajor(showGridVmajor || state);
-		showHideGridVminor(showGridVminor || state);
+		showHideGridH(_settings.showGridH || state);
+		showHideGridVmajor(_settings.showGridVmajor || state);
+		showHideGridVminor(_settings.showGridVminor || state);
 	}
 
 	function showHideGridVmajor(state)
@@ -315,7 +362,7 @@ RED.view = (function() {
 	var workspace_tabs = RED.tabs.create({
 		id: "workspace-tabs",
 		onchange: function(tab) {
-			setShowWorkspaceToolbarVisible(showWorkspaceToolbar);
+			setShowWorkspaceToolbarVisible(_settings.showWorkspaceToolbar);
 						
 			console.log("workspace_tabs onchange:" + tab);
 			var chart = $("#chart");
@@ -513,7 +560,7 @@ RED.view = (function() {
 			var dy = mousePos[1]-(mousedown_node.y+portY);
 			var dx = mousePos[0]-(mousedown_node.x+sc*mousedown_node.w/2);
 			var delta = Math.sqrt(dy*dy+dx*dx);
-			var scale = lineCurveScale;
+			var scale = _settings.lineCurveScale;
 			var scaleY = 0;
 
 			if (delta < node_width) {
@@ -566,12 +613,14 @@ RED.view = (function() {
 				}
 			}
 			// snap to grid
-			if (((snapToGrid == true) || d3.event.shiftKey) && moving_set.length > 0) {
+			if (((_settings.snapToGrid == true) || d3.event.shiftKey) && moving_set.length > 0) {
 				var gridOffset =  [0,0];
 				node = moving_set[0];
-				//gridOffset[0] = node.n.x-(snapToGridXsize*Math.floor((node.n.x-node.n.w/2)/snapToGridXsize)+node.n.w/2);
-				gridOffset[0] = node.n.x-(snapToGridXsize*Math.floor(node.n.x/snapToGridXsize)); // this works much better than above
-				gridOffset[1] = node.n.y-(snapToGridYsize*Math.floor(node.n.y/snapToGridYsize));
+
+				//gridOffset[0] = node.n.x-(_settings.snapToGridXsize*Math.floor((node.n.x-node.n.w/2)/_settings.snapToGridXsize)+node.n.w/2);
+
+				gridOffset[0] = node.n.x-(_settings.snapToGridXsize*Math.floor(node.n.x/_settings.snapToGridXsize)); // this works much better than above
+				gridOffset[1] = node.n.y-(_settings.snapToGridYsize*Math.floor(node.n.y/_settings.snapToGridYsize));
 				if (gridOffset[0] !== 0 || gridOffset[1] !== 0) {
 					for (i = 0; i<moving_set.length; i++) {
 						node = moving_set[i];
@@ -788,10 +837,10 @@ RED.view = (function() {
 			RED.keyboard.remove(/* left */ 37);
 			RED.keyboard.remove(/* right*/ 39);
 		} else {
-			RED.keyboard.add(/* up   */ 38, function() { if(d3.event.shiftKey || (snapToGrid == true)){moveSelection(  0,-snapToGridYsize)}else{moveSelection( 0,-1);}d3.event.preventDefault();},endKeyboardMove);
-			RED.keyboard.add(/* down */ 40, function() { if(d3.event.shiftKey || (snapToGrid == true)){moveSelection(  0, snapToGridYsize)}else{moveSelection( 0, 1);}d3.event.preventDefault();},endKeyboardMove);
-			RED.keyboard.add(/* left */ 37, function() { if(d3.event.shiftKey || (snapToGrid == true)){moveSelection(-snapToGridXsize,  0)}else{moveSelection(-1, 0);}d3.event.preventDefault();},endKeyboardMove);
-			RED.keyboard.add(/* right*/ 39, function() { if(d3.event.shiftKey || (snapToGrid == true)){moveSelection( snapToGridXsize,  0)}else{moveSelection( 1, 0);}d3.event.preventDefault();},endKeyboardMove);
+			RED.keyboard.add(/* up   */ 38, function() { if(d3.event.shiftKey || (_settings.snapToGrid == true)){moveSelection(  0,-_settings.snapToGridYsize)}else{moveSelection( 0,-1);}d3.event.preventDefault();},endKeyboardMove);
+			RED.keyboard.add(/* down */ 40, function() { if(d3.event.shiftKey || (_settings.snapToGrid == true)){moveSelection(  0, _settings.snapToGridYsize)}else{moveSelection( 0, 1);}d3.event.preventDefault();},endKeyboardMove);
+			RED.keyboard.add(/* left */ 37, function() { if(d3.event.shiftKey || (_settings.snapToGrid == true)){moveSelection(-_settings.snapToGridXsize,  0)}else{moveSelection(-1, 0);}d3.event.preventDefault();},endKeyboardMove);
+			RED.keyboard.add(/* right*/ 39, function() { if(d3.event.shiftKey || (_settings.snapToGrid == true)){moveSelection( _settings.snapToGridXsize,  0)}else{moveSelection( 1, 0);}d3.event.preventDefault();},endKeyboardMove);
 		}
 		if (moving_set.length == 1) {
 			RED.sidebar.info.refresh(moving_set[0].n);
@@ -811,7 +860,7 @@ RED.view = (function() {
 		}
 		RED.history.push({t:'move',nodes:ns,dirty:dirty});// TODO: is this nessesary
 	}
-	function moveSelection(dx,dy) {
+	function moveSelection(dx,dy) { // used when moving by keyboard keys
 		var minX = 0;
 		var minY = 0;
 		var node;
@@ -822,11 +871,32 @@ RED.view = (function() {
 				node.ox = node.n.x;
 				node.oy = node.n.y;
 			}
-			node.n.x += dx;
-			node.n.y += dy;
+				node.n.x += dx;
+				node.n.y += dy;
 			node.n.dirty = true;
 			minX = Math.min(node.n.x-node.n.w/2-5,minX);
 			minY = Math.min(node.n.y-node.n.h/2-5,minY);
+		}
+
+		// snap to grid
+		if (((_settings.snapToGrid == true) || d3.event.shiftKey) && moving_set.length > 0) {
+			var gridOffset =  [0,0];
+			node = moving_set[0];
+
+			//gridOffset[0] = node.n.x-(_settings.snapToGridXsize*Math.floor((node.n.x-node.n.w/2)/_settings.snapToGridXsize)+node.n.w/2);
+
+			gridOffset[0] = node.n.x-(_settings.snapToGridXsize*Math.floor(node.n.x/_settings.snapToGridXsize)); // this works much better than above
+			gridOffset[1] = node.n.y-(_settings.snapToGridYsize*Math.floor(node.n.y/_settings.snapToGridYsize));
+			if (gridOffset[0] !== 0 || gridOffset[1] !== 0) {
+				for (i = 0; i<moving_set.length; i++) {
+					node = moving_set[i];
+					node.n.x -= gridOffset[0];
+					node.n.y -= gridOffset[1];
+					if (node.n.x == node.n.ox && node.n.y == node.n.oy) {
+						node.dirty = false;
+					}
+				}
+			}
 		}
 
 		if (minX !== 0 || minY !== 0) {
@@ -852,15 +922,7 @@ RED.view = (function() {
 				if (node.x < 0) {
 					node.x = 25
 				}
-				/*for (var ipi = 0; ipi < node.inputlist.length; ipi++)
-				{
-					$(node.inputlist[ipi]).popover("destroy"); // remove any popovers visible (otherwise they will be left behind)
-				}
-				for (var opi = 0; opi < node._ports.length; opi++)
-				{
-					$(node._ports[opi]).popover("destroy"); // remove any popovers visible (otherwise they will be left behind)
-				}*/
-				
+								
 				var rmlinks = RED.nodes.remove(node.id);
 				for (var j=0; j < rmlinks.length; j++) {
 					var link = rmlinks[j];
@@ -1454,7 +1516,7 @@ RED.view = (function() {
 		//if (d.type == "Mod") // debug test only
 		//	console.error("after:" + d.ports);
 		
-			d._ports = nodeRect.selectAll(".port_output").data(d.ports);
+		d._ports = nodeRect.selectAll(".port_output").data(d.ports);
 		d._ports.enter().append("rect")
 		    .attr("class","port port_output").attr("rx",3).attr("ry",3).attr("width",10).attr("height",10)
 			.attr("nodeType",d.type)
@@ -1524,7 +1586,7 @@ RED.view = (function() {
 				var dy = (d.target.y+ytarget)-(d.source.y+ysource);
 				var dx = (d.target.x-d.target.w/2)-(d.source.x+d.source.w/2);
 				var delta = Math.sqrt(dy*dy+dx*dx);
-				var scale = lineCurveScale;
+				var scale = _settings.lineCurveScale;
 				var scaleY = 0;
 				if (delta < node_width) {
 					scale = 0.75-0.75*((node_width-delta)/node_width);
@@ -1666,6 +1728,13 @@ RED.view = (function() {
 						redraw_nodeReqError(nodeRect, d);
 					}
 					if (d.dirty) {
+						//nodeRect.attr("fill",function(d) { console.warn("node bg color:" + d.bgColor); return d.bgColor;});
+						if (d.bgColor == null)
+							d.bgColor = d._def.color;
+							
+						nodeRect.selectAll(".node").attr("fill", d.bgColor);
+
+						//nodeRect.style("background-color", d.bgColor)
 						//if (d.x < -50) deleteSelection();  // Delete nodes if dragged back to palette
 						if (d.resize) {
 							
@@ -1675,7 +1744,7 @@ RED.view = (function() {
 							d.resize = false;
 						}
 						//console.log("redraw stuff");
-						
+
 						redraw_paletteNodesReqError(d);
 						redraw_other(nodeRect, d);
 						d.dirty = false;
@@ -1944,7 +2013,7 @@ RED.view = (function() {
 	 *  - attached to mouse for placing - 'IMPORT_DRAGGING'
 	 */
 	function importNodes(newNodesStr,touchImport) {
-
+		console.trace("importNodes");
 		var createNewIds = true;
 		var useStorage = false;
 
@@ -1969,62 +2038,62 @@ RED.view = (function() {
 
 		try {
 			var result = RED.nodes.import(newNodesStr,createNewIds);
-			if (result) {
-				var new_nodes = result[0];
-				var new_links = result[1];
-				var new_ms = new_nodes.map(function(n) { n.z = activeWorkspace; return {n:n};});
-				var new_node_ids = new_nodes.map(function(n){ return n.id; });
+			if (!result) return;
+			
+			var new_nodes = result[0];
+			var new_links = result[1];
+			var new_ms = new_nodes.map(function(n) { n.z = activeWorkspace; return {n:n};});
+			var new_node_ids = new_nodes.map(function(n){ return n.id; });
 
-				// TODO: pick a more sensible root node
-				var root_node = new_ms[0].n;
-				var dx = root_node.x;
-				var dy = root_node.y;
+			// TODO: pick a more sensible root node
+			var root_node = new_ms[0].n;
+			var dx = root_node.x;
+			var dy = root_node.y;
 
-				if (mouse_position == null) {
-					mouse_position = [0,0];
-				}
-
-				var minX = 0;
-				var minY = 0;
-				var i;
-				var node;
-
-				for (i=0;i<new_ms.length;i++) {
-					node = new_ms[i];
-					node.n.selected = true;
-					node.n.changed = true;
-					node.n.x -= dx - mouse_position[0];
-					node.n.y -= dy - mouse_position[1];
-					node.dx = node.n.x - mouse_position[0];
-					node.dy = node.n.y - mouse_position[1];
-					minX = Math.min(node.n.x-node_width/2-5,minX);
-					minY = Math.min(node.n.y-node_height/2-5,minY);
-				}
-				for (i=0;i<new_ms.length;i++) {
-					node = new_ms[i];
-					node.n.x -= minX;
-					node.n.y -= minY;
-					node.dx -= minX;
-					node.dy -= minY;
-				}
-				if (!touchImport) {
-					mouse_mode = RED.state.IMPORT_DRAGGING;
-				}
-
-				RED.keyboard.add(/* ESCAPE */ 27,function(){
-						RED.keyboard.remove(/* ESCAPE */ 27);
-						clearSelection();
-						RED.history.pop();
-						mouse_mode = 0;
-				});
-
-				RED.history.push({t:'add',nodes:new_node_ids,links:new_links,dirty:RED.view.dirty()});
-
-				clearSelection();
-				moving_set = new_ms;
-
-				redraw();
+			if (mouse_position == null) {
+				mouse_position = [0,0];
 			}
+
+			var minX = 0;
+			var minY = 0;
+			var i;
+			var node;
+
+			for (i=0;i<new_ms.length;i++) {
+				node = new_ms[i];
+				node.n.selected = true;
+				node.n.changed = true;
+				node.n.x -= dx - mouse_position[0];
+				node.n.y -= dy - mouse_position[1];
+				node.dx = node.n.x - mouse_position[0];
+				node.dy = node.n.y - mouse_position[1];
+				minX = Math.min(node.n.x-node_width/2-5,minX);
+				minY = Math.min(node.n.y-node_height/2-5,minY);
+			}
+			for (i=0;i<new_ms.length;i++) {
+				node = new_ms[i];
+				node.n.x -= minX;
+				node.n.y -= minY;
+				node.dx -= minX;
+				node.dy -= minY;
+			}
+			if (!touchImport) {
+				mouse_mode = RED.state.IMPORT_DRAGGING;
+			}
+
+			RED.keyboard.add(/* ESCAPE */ 27,function(){
+					RED.keyboard.remove(/* ESCAPE */ 27);
+					clearSelection();
+					RED.history.pop();
+					mouse_mode = 0;
+			});
+
+			RED.history.push({t:'add',nodes:new_node_ids,links:new_links,dirty:RED.view.dirty()});
+
+			clearSelection();
+			moving_set = new_ms;
+
+			redraw();
 		} catch(error) {
 			console.log(error);
 			RED.notify("<strong>Error</strong>: "+error,"error");
@@ -2093,12 +2162,12 @@ RED.view = (function() {
 		});
 	}
 
-	function showImportNodesDialog(arduino_code) {
+	function showImportNodesDialog(is_arduino_code) {
 		mouse_mode = RED.state.IMPORT;
 		//$("#dialog-form").html(this.getForm('import-dialog'));
 		getForm("dialog-form", "import-dialog", function(d, f) {
 		$("#node-input-import").val("");
-		$( "#node-input-arduino" ).prop('checked', arduino_code);
+		$( "#node-input-arduino" ).prop('checked', is_arduino_code);
 		$( "#dialog" ).dialog("option","title","Import nodes").dialog( "open" );
 		});
 	}
@@ -2315,7 +2384,6 @@ RED.view = (function() {
 
 	function setShowWorkspaceToolbarVisible(state)
 	{
-		RED.nodes.showWorkspaceToolbar = state;
 		if (state)
 		{
 			$("#workspace-toolbar").show();
@@ -2329,23 +2397,11 @@ RED.view = (function() {
 	}
 
 	return {
-		showHideGrid:showHideGrid,
-		showHideGridH: function (state) { showGridH = state; showHideGridH(state); },
-		showHideGridVmajor: function (state) { showGridVmajor = state; showHideGridVmajor(state); },
-		showHideGridVminor: function (state) { showGridVminor = state; showHideGridVminor(state); },
-		showGridH:showGridH,
-		showGridVmajor:showGridVmajor,
-		showGridVminor:showGridVminor,
-		setSnapToGrid:setSnapToGrid,
-		snapToGrid: snapToGrid,
-		setSnapToGridXsize: function (size) { snapToGridXsize = size;},
-		setSnapToGridYsize: function (size) { snapToGridYsize = size;},
-		snapToGridXsize:snapToGridXsize,
-		snapToGridYsize:snapToGridYsize,
-		setShowWorkspaceToolbarVisible:setShowWorkspaceToolbarVisible,
-		showWorkspaceToolbar:showWorkspaceToolbar,
-		lineCurveScale:lineCurveScale,
-		setLineCurveScale: function (value) { lineCurveScale = value; redraw_links()},
+		settings:settings,
+		settingsCategoryTitle:settingsCategoryTitle,
+		settingsEditorLabels:settingsEditorLabels,
+		init:initView,
+		resetMouseVars:resetMouseVars, // exposed for editor
 		state:function(state) {
 			if (state == null) {
 				return mouse_mode

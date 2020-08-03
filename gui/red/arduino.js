@@ -16,6 +16,18 @@
  * limitations under the License.
  **/
 RED.arduino = (function() {
+	var settings = {
+		useExportDialog: true,
+		IOcheckAtExport: true,
+	};
+
+	var settingsCategoryTitle = "Arduino Export/Import";
+
+	var settingsEditorLabels = {
+		useExportDialog: "Show export dialog",
+		IOcheckAtExport: "IO check At Export",
+	};
+
     function httpPostAsync(data)
 	{
 		var xhr = new XMLHttpRequest();
@@ -42,7 +54,11 @@ RED.arduino = (function() {
     $('#btn-compile-upload').click(function() { httpGetAsync("upload"); });
     
     return {
-        httpPostAsync:httpPostAsync,
-        httpGetAsync:httpGetAsync,
+		settings:settings,
+		settingsCategoryTitle:settingsCategoryTitle,
+		settingsEditorLabels:settingsEditorLabels,
+
+		httpPostAsync:httpPostAsync,
+		httpGetAsync:httpGetAsync,
 	};
 })();
