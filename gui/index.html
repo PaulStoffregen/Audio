@@ -945,7 +945,24 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughAsyncSpdif
 	</p>
 	<h3>Notes</h3>
-	<p>TODO: document optional instance parameters.... (dither, noiseshaping, attenuation, minHalfFilterLength) </p>
+	<p>AsyncAudioInputSPDIF3 is not able to clock the audio pipline (never has the 'update_responsibility'). At least 1 other input or output must be used to cause the entire Audio library to update.
+	</p>
+
+	<p>AsyncAudioInputSPDIF3 can optionally take parameters to alter its resampling behavior.
+	</p>
+	<p><span class=keyword>AsyncAudioInputSPDIF3</span>  spdif_async1(<i>dither</i>, <i>noiseshaping</i>, <i>attenuation</i>, <i>minHalfFilterLength</i>, <i>maxHalfFilterLength</i>);
+	</p>
+	<p class=desc><i>dither</i>: triangular shaped dither is added at the transition from 32bit float to 16bit integer if true (default: true)
+	</p>
+	<p class=desc><i>noiseshaping</i>: noise shaping is applied at the aforementioned transition if true (default: true)
+	</p>
+	<p class=desc><i>attenuation</i>: target attenuation of the anti-aliasing filter (default: 100dB). The attenuation is not reached if a filter longer than 161 is needed.
+	</p>
+	<p class=desc><i>minHalfFilterLength</i>: half of the guaranteed resampling filter (internally restricted to 80, default: 20). The filter might be longer if needed to achieve the requested attenuation.
+	</p>
+	<p class=desc><i>maxHalfFilterLength</i>: Restricts the maximum length of the resampling filter. The maximum half filter length is 80. This parameter can be used to further restrict the length in order to limit the processor usage.
+	</p>
+	<p>The windowed (Kaiser window) sinc-function is used as resample filter (i.e. to interpolate the incoming signal). The longer the filter, the better the quality of the resampled signal. However, a longer filter has a higher group delay and increases the processor usage. The sinc- filter also serves as anti-aliasing filter if the input sample rate is larger than 44.1kHz. The filter length is automatically increased at high input sample rates to reach the specified attenuation. However its half length is restricted to 80. 32bit floating point arithmetic is used at the resampling stage and the resampled signal is transformed to 16 bit integers afterwards. Here it is possible to apply triangular shaped dither and noise shaping to increase the perceived signal-to-noise-ratio.</p>
 </script>
 <script type="text/x-red" data-template-name="AsyncAudioInputSPDIF3">
 	<div class="form-row">
