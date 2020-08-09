@@ -912,17 +912,27 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</table>
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>getBufferedTime</span>();</p>
-	<p class=desc>TODO: documentation needed here (and what units does the returned value use?)
+	<p class=desc>Returns the buffered time in seconds. The buffered time is the duration of the incoming samples which are not resampled yet. The step width of the resampling algorithm is constantly slightly adjusted to keep the buffered time closely to the target latency. The difference between the target latency and the buffered time is typically smaller than 1 microsecond.
 	</p>
-	<p class=func><span class=keyword>getInputFrequency</span>();</p>
+	<!--<p class=func><span class=keyword>getInputFrequency</span>();</p>
 	<p class=desc>TODO: documentation needed here
-	</p>
+	</p>-->
 	<p class=func><span class=keyword>isLocked</span>();</p>
 	<p class=desc>Returns true if the S/PDIF phase locked loop is tracking
 		the sample rate of incoming digital audio data.
 	</p>
+	<p class=func><span class=keyword>getInputFrequency</span>();</p>
+	<p class=desc>Returns the sample rate of incoming data, if the PLL has locked, or returns 0 if the audio sample rate is unknown.
+	</p>
 	<p class=func><span class=keyword>getTargetLantency</span>();</p>
-	<p class=desc>TODO: documentation needed here (and what units does the returned value use?)
+	<p class=desc>Returns the target latency in seconds. The latency is the time from the moment a sample is received by the Teensy SPDIF hardware receiver until it is transmitted by the asrc intput. The audio samples arrive at the asrc input in chunks of 32 samples per channel. The target latency consists of these 32 samples + some buffer that is needed to compensate for timing variations.
+	</p>
+	<p class=func><span class=keyword>getAttenuation</span>();</p>
+	<p class=desc>
+Returns the actual achieved attenuation of the anti-aliasing filter. If the input sampling rate is smaller or equal to 44.1kHz, no low pass filtering is needed and zero is returned.
+	</p>
+	<p class=func><span class=keyword>getHalfFilterLength</span>();</p>
+	<p class=desc>Returns the half length of the resampling filter. Its complete length is 2*(the returned value)+1.
 	</p>
 	<h3>Hardware</h3>
 	<p>
