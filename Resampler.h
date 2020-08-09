@@ -49,11 +49,11 @@ class Resampler {
             double ki=0.00012;
             double kd= 1.8;
         };
-        Resampler(StepAdaptionParameters settings=StepAdaptionParameters());
+        Resampler(float attenuation=100, int32_t minHalfFilterLength=20, int32_t maxHalfFilterLength=80, StepAdaptionParameters settings=StepAdaptionParameters());
         void reset();
         ///@param attenuation target attenuation [dB] of the anti-aliasing filter. Only used if newFs<fs. The attenuation can't be reached if the needed filter length exceeds 2*MAX_FILTER_SAMPLES+1
         ///@param minHalfFilterLength If newFs >= fs, the filter length of the resampling filter is 2*minHalfFilterLength+1. If fs y newFs the filter is maybe longer to reach the desired attenuation
-        void configure(float fs, float newFs, float attenuation=100, int32_t minHalfFilterLength=20);
+        void configure(float fs, float newFs);
         ///@param input0 first input array/ channel
         ///@param input1 second input array/ channel
         ///@param inputLength length of each input array
@@ -69,6 +69,8 @@ class Resampler {
         void addToPos(double val);
         void fixStep();
         bool initialized() const;
+		double getAttenuation() const;
+		int32_t getHalfFilterLength() const;
         
         //resampling NOCHANNELS channels. Performance is increased a lot if the number of channels is known at compile time -> the number of channels is a template argument
         template <uint8_t NOCHANNELS>
@@ -205,6 +207,8 @@ class Resampler {
         float _buffer[MAX_NO_CHANNELS][MAX_HALF_FILTER_LENGTH*2];
         float* _endOfBuffer[MAX_NO_CHANNELS];
 
+		int32_t _minHalfFilterLength;
+		int32_t _maxHalfFilterLength;
         int32_t _overSamplingFactor;
         int32_t _halfFilterLength;
         int32_t _filterLength;     
@@ -218,6 +222,9 @@ class Resampler {
         double _cPos;
         double _sum;
         double _oldDiffs[2]; 
+		
+		double _attenuation=0;
+		float _targetAttenuation=100;
 };
 
 #endif

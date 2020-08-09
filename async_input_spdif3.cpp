@@ -29,6 +29,8 @@
 #if defined(__IMXRT1052__) || defined(__IMXRT1062__)
 
 #include "async_input_spdif3.h"
+#include "output_spdif3.h"
+
 #include "biquad.h"
 #include <utility/imxrt_hw.h>
 //Parameters
@@ -36,8 +38,8 @@ namespace {
 	#define SPDIF_RX_BUFFER_LENGTH AUDIO_BLOCK_SAMPLES
 	const int32_t bufferLength=8*AUDIO_BLOCK_SAMPLES;
 	const uint16_t noSamplerPerIsr=SPDIF_RX_BUFFER_LENGTH/4;
+	const float toFloatAudio= 1.f/pow(2., 23.);
 }
-volatile bool AsyncAudioInputSPDIF3::resetResampler=true;
 
 #ifdef DEBUG_SPDIF_IN
 volatile bool AsyncAudioInputSPDIF3::bufferOverflow=false;
@@ -53,8 +55,6 @@ static float bufferL[bufferLength];
 volatile int32_t AsyncAudioInputSPDIF3::buffer_offset = 0;	// read by resample/ written in spdif input isr -> copied at the beginning of 'resmaple' protected by __disable_irq() in resample
 int32_t AsyncAudioInputSPDIF3::resample_offset = 0; // read/written by resample/ read in spdif input isr -> no protection needed?
 
-volatile bool AsyncAudioInputSPDIF3::lockChanged=false;
-volatile bool AsyncAudioInputSPDIF3::locked=false;
 DMAChannel AsyncAudioInputSPDIF3::dma(false);
 
 AsyncAudioInputSPDIF3::~AsyncAudioInputSPDIF3(){
@@ -64,10 +64,11 @@ AsyncAudioInputSPDIF3::~AsyncAudioInputSPDIF3(){
 	delete quantizer[1];
 }
 
-PROGMEM
-AsyncAudioInputSPDIF3::AsyncAudioInputSPDIF3(bool dither, bool noiseshaping,float attenuation, int32_t minHalfFilterLength) : AudioStream(0, NULL) {
-	_attenuation=attenuation;
-	_minHalfFilterLength=minHalfFilterLength;
+FLASHMEM
+AsyncAudioInputSPDIF3::AsyncAudioInputSPDIF3(bool dither, bool noiseshaping,float attenuation, int32_t minHalfFilterLength, int32_t maxHalfFilterLength):
+	AudioStream(0, NULL),
+	_resampler(attenuation, minHalfFilterLength, maxHalfFilterLength)
+	{
 	const float factor = powf(2, 15)-1.f; // to 16 bit audio
 	quantizer[0]=new Quantizer(AUDIO_SAMPLE_RATE_EXACT);
 	quantizer[0]->configure(noiseshaping, dither, factor);
@@ -75,9 +76,12 @@ AsyncAudioInputSPDIF3::AsyncAudioInputSPDIF3(bool dither, bool noiseshaping,floa
 	quantizer[1]->configure(noiseshaping, dither, factor);
 	begin();
 	}
-PROGMEM
+FLASHMEM
 void AsyncAudioInputSPDIF3::begin()
 {
+	
+	AudioOutputSPDIF3::config_spdif3();
+		
 	dma.begin(true); // Allocate the DMA channel first
 	const uint32_t noByteMinorLoop=2*4;
 	dma.TCD->SOFF = 4;
@@ -94,10 +98,9 @@ void AsyncAudioInputSPDIF3::begin()
 	dma.TCD->DADDR = spdif_rx_buffer;
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SPDIF_RX);
 
-	SPDIF_SCR |=SPDIF_SCR_DMA_RX_EN;		//DMA Receive Request Enable
+	//SPDIF_SCR |=SPDIF_SCR_DMA_RX_EN;		//DMA Receive Request Enable
 	dma.enable();
 	dma.attachInterrupt(isr);
-	config_spdifIn();
 #ifdef DEBUG_SPDIF_IN
 	while (!Serial);
 #endif
@@ -105,44 +108,24 @@ void AsyncAudioInputSPDIF3::begin()
 	_bufferLPFilter.numStages=1;
 	_bufferLPFilter.pState=new float[2];
 	getCoefficients(_bufferLPFilter.pCoeffs, BiquadType::LOW_PASS, 0., 5., AUDIO_SAMPLE_RATE_EXACT/AUDIO_BLOCK_SAMPLES, 0.5);
+	SPDIF_SCR &=(~SPDIF_SCR_RXFIFO_OFF_ON);	//receive fifo is turned on again
+	
+	SPDIF_SRCD = 0;
+	SPDIF_SCR |= SPDIF_SCR_DMA_RX_EN;
+	CORE_PIN15_CONFIG = 3;
+	IOMUXC_SPDIF_IN_SELECT_INPUT = 0; // GPIO_AD_B1_03_ALT3
 }
-bool AsyncAudioInputSPDIF3::isLocked() const {
-	__disable_irq();
-	bool l=locked;
-	__enable_irq();
-	return l;
-}
-void AsyncAudioInputSPDIF3::spdif_interrupt(){
-	if(SPDIF_SIS & SPDIF_SIS_LOCK){
-		if (!locked){
-			locked=true;
-			lockChanged=true;
-		}
-	}
-	else if(SPDIF_SIS & SPDIF_SIS_LOCKLOSS){
-		if (locked){
-			locked=false;
-			lockChanged=true;
-			resetResampler=true;
-		}
-	}
-	SPDIF_SIC |= SPDIF_SIC_LOCKLOSS;//clear SPDIF_SIC_LOCKLOSS interrupt
-	SPDIF_SIC |= SPDIF_SIC_LOCK;	//clear SPDIF_SIC_LOCK interrupt
+bool AsyncAudioInputSPDIF3::isLocked() {
+	return (SPDIF_SRPC & SPDIF_SRPC_LOCK) == SPDIF_SRPC_LOCK;
 }
 
 void AsyncAudioInputSPDIF3::resample(int16_t* data_left, int16_t* data_right, int32_t& block_offset){
 	block_offset=0;
-	if(!_resampler.initialized()){
-		return;
-	}
-	__disable_irq();
-	if(!locked){
-		__enable_irq();
+	if(!_resampler.initialized() || !isLocked()){
 		return;
 	}
 	int32_t bOffset=buffer_offset;
 	int32_t resOffset=resample_offset;
-	__enable_irq();
 		
 	uint16_t inputBufferStop = bOffset >= resOffset ? bOffset-resOffset : bufferLength-resOffset;
 	if (inputBufferStop==0){
@@ -199,14 +182,13 @@ void AsyncAudioInputSPDIF3::isr(void)
 		#endif
 		float *destR = &(bufferR[buffer_offset]);
 		float *destL = &(bufferL[buffer_offset]);
-		const float factor= pow(2., 23.)+1;
 		do {			
 			int32_t n=(*src) & 0x800000 ? (*src)|0xFF800000  : (*src) & 0xFFFFFF;
-			*destL++ = (float)(n)/factor;
+			*destL++ = (float)(n)*toFloatAudio;
 			++src;
 
 			n=(*src) & 0x800000 ? (*src)|0xFF800000  : (*src) & 0xFFFFFF;
-			*destR++ = (float)(n)/factor;
+			*destR++ = (float)(n)*toFloatAudio;
 			++src;
 		} while (src < end);
 		buffer_offset=(buffer_offset+SPDIF_RX_BUFFER_LENGTH/4)%bufferLength;
@@ -219,8 +201,8 @@ void AsyncAudioInputSPDIF3::isr(void)
 }
 double AsyncAudioInputSPDIF3::getNewValidInputFrequ(){
 	//page 2129: FrequMeas[23:0]=FreqMeas_CLK / BUS_CLK * 2^10 * GAIN
-	if (SPDIF_SRPC & SPDIF_SRPC_LOCK){
-		const double f=(float)F_BUS_ACTUAL/(1024.*1024.*24.*128.);// bit clock = 128 * sampling frequency
+	if (isLocked()){
+		const double f=(float)F_BUS_ACTUAL/(1024.*1024.*AudioOutputSPDIF3::dpll_Gain()*128.);// bit clock = 128 * sampling frequency
 		const double freqMeas=(SPDIF_SRFM & 0xFFFFFF)*f;
 		if (_lastValidInputFrequ != freqMeas){//frequency not stable yet;
 			_lastValidInputFrequ=freqMeas;
@@ -239,26 +221,14 @@ double AsyncAudioInputSPDIF3::getBufferedTime() const{
 }
 
 void AsyncAudioInputSPDIF3::configure(){
-	__disable_irq();
-	if(resetResampler){
+	if(!isLocked()){
 		_resampler.reset();
-		resetResampler=false;
-	}
-	if(!locked){
-		__enable_irq();
-#ifdef DEBUG_SPDIF_IN
-		Serial.println("lock lost");
-#endif
 		return;
-	}	
+	}
+		
 #ifdef DEBUG_SPDIF_IN
 	const bool bOverf=bufferOverflow;
 	bufferOverflow=false;
-#endif
-	const bool lc=lockChanged;
-	__enable_irq();
-
-#ifdef DEBUG_SPDIF_IN
 	if (bOverf){
 		Serial.print("buffer overflow, buffer offset: ");
 		Serial.print(buffer_offset);
@@ -269,34 +239,30 @@ void AsyncAudioInputSPDIF3::configure(){
 		}
 	}
 #endif
-	if (lc || !_resampler.initialized()){
-		const double inputF=getNewValidInputFrequ();	//returns: -1 ... invalid frequency
-		if (inputF > 0.){
+	const double inputF=getNewValidInputFrequ();	//returns: -1 ... invalid frequency
+	if (inputF > 0.){
+		//we got a valid sample frequency
+		const double frequDiff=inputF/_inputFrequency-1.;
+		if (abs(frequDiff) > 0.01 || !_resampler.initialized()){
+			//the new sample frequency differs from the last one -> configure the _resampler again
+			_inputFrequency=inputF;		
+			_targetLatencyS=max(0.001,(noSamplerPerIsr*3./2./_inputFrequency));
+			_maxLatency=max(2.*_blockDuration, 2*noSamplerPerIsr/_inputFrequency);
+			const int32_t targetLatency=round(_targetLatencyS*inputF);
 			__disable_irq();
-			lockChanged=false;	//only reset lockChanged if a valid frequency was received (inputFrequ > 0.)
+			resample_offset =  targetLatency <= buffer_offset ? buffer_offset - targetLatency : bufferLength -(targetLatency-buffer_offset);
 			__enable_irq();
-			//we got a valid sample frequency
-			const double frequDiff=inputF/_inputFrequency-1.;
-			if (abs(frequDiff) > 0.01 || !_resampler.initialized()){
-				//the new sample frequency differs from the last one -> configure the _resampler again
-				_inputFrequency=inputF;		
-				const int32_t targetLatency=round(_targetLatencyS*inputF);
-				_targetLatencyS=max(0.001,(noSamplerPerIsr*3./2./_inputFrequency));
-				__disable_irq();
-				resample_offset =  targetLatency <= buffer_offset ? buffer_offset - targetLatency : bufferLength -(targetLatency-buffer_offset);
-				__enable_irq();
-				_resampler.configure(inputF, AUDIO_SAMPLE_RATE_EXACT, _attenuation, _minHalfFilterLength);
-		#ifdef DEBUG_SPDIF_IN
-				Serial.print("_maxLatency: ");
-				Serial.println(_maxLatency);
-				Serial.print("targetLatency: ");
-				Serial.println(targetLatency);
-				Serial.print("relative frequ diff: ");
-				Serial.println(frequDiff, 8);
-				Serial.print("configure _resampler with frequency ");
-				Serial.println(inputF,8);			
-		#endif			
-			}
+			_resampler.configure(inputF, AUDIO_SAMPLE_RATE_EXACT);
+	#ifdef DEBUG_SPDIF_IN
+			Serial.print("_maxLatency: ");
+			Serial.println(_maxLatency);
+			Serial.print("targetLatency: ");
+			Serial.println(targetLatency);
+			Serial.print("relative frequ diff: ");
+			Serial.println(frequDiff, 8);
+			Serial.print("configure _resampler with frequency ");
+			Serial.println(inputF,8);			
+	#endif			
 		}
 	}
 }
@@ -332,24 +298,23 @@ void AsyncAudioInputSPDIF3::monitorResampleBuffer(){
 		while (resample_offset<0){
 			resample_offset+=bufferLength;
 		}	
-		//int32_t b_offset=buffer_offset;
 #ifdef DEBUG_SPDIF_IN
 		double bTimeFixed = resample_offset <= buffer_offset ? (buffer_offset-resample_offset-_resampler.getXPos())/_lastValidInputFrequ+dmaOffset : (bufferLength-resample_offset +buffer_offset-_resampler.getXPos())/_lastValidInputFrequ+dmaOffset;	//[seconds]
 #endif
 		__enable_irq();
 #ifdef DEBUG_SPDIF_IN
-		// Serial.print("settled: ");
-		// Serial.println(settled);
+		Serial.print("settled: ");
+		Serial.println(settled);
 		Serial.print("bTime: ");
-		Serial.print(bTime*1e6,3);
+		Serial.println(bTime*1e6,3);
 		Serial.print("_maxLatency: ");
 		Serial.println(_maxLatency*1e6,3);
 		Serial.print("bTime-dmaOffset: ");
-		Serial.print((bTime-dmaOffset)*1e6,3);
+		Serial.println((bTime-dmaOffset)*1e6,3);
 		Serial.print(", _blockDuration: ");
-		Serial.print(_blockDuration*1e6,3);
+		Serial.println(_blockDuration*1e6,3);
 		Serial.print("bTimeFixed: ");
-		Serial.print(bTimeFixed*1e6,3);
+		Serial.println(bTimeFixed*1e6,3);
 
 #endif
 		preload(&_bufferLPFilter, diff);
@@ -403,7 +368,7 @@ double AsyncAudioInputSPDIF3::getInputFrequency() const{
 	__disable_irq();
 	double f=_lastValidInputFrequ;
 	__enable_irq();
-	return f;
+	return isLocked() ? f : 0.;
 }
 double AsyncAudioInputSPDIF3::getTargetLantency() const {
 	__disable_irq();
@@ -411,57 +376,12 @@ double AsyncAudioInputSPDIF3::getTargetLantency() const {
 	__enable_irq();
 	return l ;
 }
-void AsyncAudioInputSPDIF3::config_spdifIn(){
-	//CCM Clock Gating Register 5, imxrt1060_rev1.pdf page 1145
-	CCM_CCGR5 |=CCM_CCGR5_SPDIF(CCM_CCGR_ON); //turn spdif clock on - necessary for receiver!
-	
-	SPDIF_SCR |=SPDIF_SCR_RXFIFO_OFF_ON;	//turn receive fifo off 1->off, 0->on
-
-	SPDIF_SCR&=~(SPDIF_SCR_RXFIFO_CTR);		//reset rx fifo control: normal opertation
-
-	SPDIF_SCR&=~(SPDIF_SCR_RXFIFOFULL_SEL(3));	//reset rx full select
-	SPDIF_SCR|=SPDIF_SCR_RXFIFOFULL_SEL(2);	//full interrupt if at least 8 sample in Rx left and right FIFOs
-
-	SPDIF_SCR|=SPDIF_SCR_RXAUTOSYNC; //Rx FIFO auto sync on
-
-	SPDIF_SCR&=(~SPDIF_SCR_USRC_SEL(3));	//No embedded U channel
-
-    CORE_PIN15_CONFIG  = 3;  //pin 15 set to alt3 -> spdif input
-
-	/// from eval board sample code
-	//   IOMUXC_SetPinConfig(
-	//       IOMUXC_GPIO_AD_B1_03_SPDIF_IN,        /* GPIO_AD_B1_03 PAD functional properties : */
-	//       0x10B0u);                               /* Slew Rate Field: Slow Slew Rate
-	//                                                  Drive Strength Field: R0/6
-	//                                                  Speed Field: medium(100MHz)
-	//                                                  Open Drain Enable Field: Open Drain Disabled
-	//                                                  Pull / Keep Enable Field: Pull/Keeper Enabled
-	//                                                  Pull / Keep Select Field: Keeper
-	//                                                  Pull Up / Down Config. Field: 100K Ohm Pull Down
-	//                                                  Hyst. Enable Field: Hysteresis Disabled */
-	CORE_PIN15_PADCONFIG=0x10B0;
-	SPDIF_SCR &=(~SPDIF_SCR_RXFIFO_OFF_ON);	//receive fifo is turned on again
-
-
-	SPDIF_SRPC &= ~SPDIF_SRPC_CLKSRC_SEL(15);	//reset clock selection page 2136
-	//SPDIF_SRPC |=SPDIF_SRPC_CLKSRC_SEL(6);		//if (DPLL Locked) SPDIF_RxClk else tx_clk (SPDIF0_CLK_ROOT)
-	//page 2129: FrequMeas[23:0]=FreqMeas_CLK / BUS_CLK * 2^10 * GAIN
-	SPDIF_SRPC &=~SPDIF_SRPC_GAINSEL(7);	//reset gain select 0 -> gain = 24*2^10
-	//SPDIF_SRPC |= SPDIF_SRPC_GAINSEL(3);	//gain select: 8*2^10
-	//==============================================
-
-	//interrupts
-	SPDIF_SIE |= SPDIF_SIE_LOCK;	//enable spdif receiver lock interrupt
-	SPDIF_SIE |=SPDIF_SIE_LOCKLOSS;
-
-	lockChanged=true;
-	attachInterruptVector(IRQ_SPDIF, spdif_interrupt);
-	NVIC_SET_PRIORITY(IRQ_SPDIF, 208); // 255 = lowest priority, 208 = priority of update
-	NVIC_ENABLE_IRQ(IRQ_SPDIF);
-
-	SPDIF_SIC |= SPDIF_SIC_LOCK;	//clear SPDIF_SIC_LOCK interrupt
-	SPDIF_SIC |= SPDIF_SIC_LOCKLOSS;//clear SPDIF_SIC_LOCKLOSS interrupt
-	locked=(SPDIF_SRPC & SPDIF_SRPC_LOCK);
+double AsyncAudioInputSPDIF3::getAttenuation() const{
+	return _resampler.getAttenuation();
 }
+int32_t AsyncAudioInputSPDIF3::getHalfFilterLength() const{
+	return _resampler.getHalfFilterLength();
+}
+
 #endif
 

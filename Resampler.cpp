@@ -30,7 +30,10 @@
 #include "Resampler.h"
 #include <math.h>
 
-Resampler::Resampler(StepAdaptionParameters settings){
+Resampler::Resampler(float attenuation, int32_t minHalfFilterLength, int32_t maxHalfFilterLength, StepAdaptionParameters settings): _targetAttenuation(attenuation)
+{
+	_maxHalfFilterLength=max(1, min(MAX_HALF_FILTER_LENGTH, maxHalfFilterLength));
+	_minHalfFilterLength=max(1, min(maxHalfFilterLength, minHalfFilterLength));
 #ifdef DEBUG_RESAMPLER
 	while (!Serial);
 #endif
@@ -129,16 +132,25 @@ void Resampler::setFilter(int32_t halfFiltLength,int32_t overSampling, float cut
 double Resampler::getStep() const {
     return  _stepAdapted;
 }
+double Resampler::getAttenuation() const {
+    return  _attenuation;
+}
+int32_t Resampler::getHalfFilterLength() const{
+	return  _halfFilterLength;
+}
 void Resampler::reset(){
     _initialized=false;
 }
-void Resampler::configure(float fs, float newFs, float attenuation, int32_t minHalfFilterLength){
+void Resampler::configure(float fs, float newFs){
     // Serial.print("configure, fs: ");
     // Serial.println(fs);
     if (fs<=0. || newFs <=0.){
+		_attenuation=0;
+		_halfFilterLength=0;
         _initialized=false;
         return;
     }
+	_attenuation=_targetAttenuation;
     _step=(double)fs/newFs;
     _configuredStep=_step;
     _stepAdapted=_step;
@@ -146,15 +158,16 @@ void Resampler::configure(float fs, float newFs, float attenuation, int32_t minH
     _oldDiffs[0]=0.;
     _oldDiffs[1]=0.;
     for (uint8_t i =0; i< MAX_NO_CHANNELS; i++){
-        memset(_buffer[i], 0, sizeof(float)*MAX_HALF_FILTER_LENGTH*2);
+        memset(_buffer[i], 0, sizeof(float)*_maxHalfFilterLength*2);
     }
 
     float cutOffFrequ, kaiserBeta;
     _overSamplingFactor=1024;
     if (fs <= newFs){
+		_attenuation=0;
         cutOffFrequ=1.;
         kaiserBeta=10;
-        _halfFilterLength=minHalfFilterLength;
+        _halfFilterLength=min(_minHalfFilterLength,_maxHalfFilterLength);
     }
     else{
         cutOffFrequ=newFs/fs;
@@ -163,38 +176,23 @@ void Resampler::configure(float fs, float newFs, float attenuation, int32_t minH
         Serial.print("b: ");
         Serial.println(b);
 #endif
-        double hfl=(int32_t)((attenuation-8)/(2.*2.285*TWO_PI*b)+0.5);
-        if (hfl >= minHalfFilterLength && hfl <= MAX_HALF_FILTER_LENGTH){
+        double hfl=(int32_t)((_attenuation-8)/(2.*2.285*TWO_PI*b)+0.5);
+        if (hfl >= _minHalfFilterLength && hfl <= _maxHalfFilterLength){
             _halfFilterLength=hfl;
-#ifdef DEBUG_RESAMPLER
-            Serial.print("Attenuation: ");
-#endif
         }
-        else if (hfl < minHalfFilterLength){
-            _halfFilterLength=minHalfFilterLength;
-            attenuation=((2*_halfFilterLength+1)-1)*(2.285*TWO_PI*b)+8;            
-#ifdef DEBUG_RESAMPLER
-            Serial.println("Resmapler: sinc filter length increased");
-            Serial.print("Attenuation increased to ");
-#endif
+        else if (hfl < _minHalfFilterLength){
+            _halfFilterLength=_minHalfFilterLength;
+            _attenuation=((2*_halfFilterLength+1)-1)*(2.285*TWO_PI*b)+8;            
         }
         else{
-            _halfFilterLength=MAX_HALF_FILTER_LENGTH;
-            attenuation=((2*_halfFilterLength+1)-1)*(2.285*TWO_PI*b)+8;
-#ifdef DEBUG_RESAMPLER
-            Serial.println("Resmapler: needed sinc filter length too long");
-            Serial.print("Attenuation decreased to ");
-#endif
+            _halfFilterLength=_maxHalfFilterLength;
+            _attenuation=((2*_halfFilterLength+1)-1)*(2.285*TWO_PI*b)+8;
         }
-#ifdef DEBUG_RESAMPLER
-        Serial.print(attenuation);
-        Serial.println("dB");
-#endif
-        if (attenuation>50.){
-            kaiserBeta=0.1102*(attenuation-8.7);
+        if (_attenuation>50.){
+            kaiserBeta=0.1102*(_attenuation-8.7);
         }
-        else if (21<=attenuation && attenuation<=50){
-            kaiserBeta=0.5842*(float)pow(attenuation-21.,0.4)+0.07886*(attenuation-21.);
+        else if (21<=_attenuation && _attenuation<=50){
+            kaiserBeta=0.5842*(float)pow(_attenuation-21.,0.4)+0.07886*(_attenuation-21.);
         }
         else{
             kaiserBeta=0.;

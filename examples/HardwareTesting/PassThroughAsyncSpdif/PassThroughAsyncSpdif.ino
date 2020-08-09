@@ -1,41 +1,45 @@
 
 #include <Audio.h>
 
+AsyncAudioInputSPDIF3     spdifIn(false, false, 100, 20, 80);	//dither = true, noiseshaping = true, anti-aliasing attenuation=100dB, minimum half resampling filter length=20, maximum half resampling filter length=80
 AudioOutputSPDIF3   spdifOut;
-AsyncAudioInputSPDIF3     spdifIn(true, true, 100, 20);	//dither = true, noiseshaping = true, anti-aliasing attenuation=100dB, minimum resampling filter length=20
-//
 
 AudioConnection          patchCord1(spdifIn, 0, spdifOut, 0);
 AudioConnection          patchCord2(spdifIn, 1, spdifOut, 1);
 
 void setup() {
-
-  // put your setup code here, to run once:
   AudioMemory(12);
+  Serial.begin(57600);
   while (!Serial);
 
 }
 
 void loop() {
-	double bufferedTine=spdifIn.getBufferedTime();
-	//double targetLatency = spdifIn.getTargetLantency();
-	Serial.print("buffered time [micro seconds]: ");
-	Serial.println(bufferedTine*1e6,2);
-	// Serial.print(", target: ");
-	// Serial.println(targetLatency*1e6,2);
-	
-	double pUsageIn=spdifIn.processorUsage(); 
-	Serial.print("processor usage [%]: ");
-	Serial.println(pUsageIn);
+  double bufferedTime=spdifIn.getBufferedTime();
+  Serial.print("buffered time [micro seconds]: ");
+  Serial.println(bufferedTime*1e6,2);
+  
+  
+  Serial.print("locked: ");
+  Serial.println(spdifIn.isLocked());
+  Serial.print("input frequency: ");
+  double inputFrequency=spdifIn.getInputFrequency();
+  Serial.println(inputFrequency);
+  Serial.print("anti-aliasing attenuation: ");
+  Serial.println(spdifIn.getAttenuation());
+  
+  Serial.print("resampling goup delay [milli seconds]: ");
+  Serial.println(spdifIn.getHalfFilterLength()/inputFrequency*1e3,2);
+  
+  Serial.print("half filter length: ");
+  Serial.println(spdifIn.getHalfFilterLength()); 
+  
+  double pUsageIn=spdifIn.processorUsage(); 
+  Serial.print("processor usage [%]: ");
+  Serial.println(pUsageIn);
 
-	// bool islocked=spdifIn.isLocked(); 
-	// Serial.print("isLocked: ");
-	// Serial.println(islocked);
+  Serial.print("max number of used blocks: ");
+  Serial.println(AudioMemoryUsageMax()); 
 
-	// double f=spdifIn.getInputFrequency();
-	// Serial.print("frequency: ");
-	// Serial.println(f);
-	// Serial.print("Memory max: ");
-  	// Serial.println(AudioMemoryUsageMax());
-	delay(500);
+  delay(500);
 }

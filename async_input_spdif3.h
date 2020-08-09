@@ -40,17 +40,19 @@
 class AsyncAudioInputSPDIF3 : public AudioStream
 {
 public:
-	///@param attenuation target attenuation [dB] of the anti-aliasing filter. Only used if newFs<fs. The attenuation can't be reached if the needed filter length exceeds 2*MAX_FILTER_SAMPLES+1
-	///@param minHalfFilterLength If newFs >= fs, the filter length of the resampling filter is 2*minHalfFilterLength+1. If fs y newFs the filter is maybe longer to reach the desired attenuation
-	AsyncAudioInputSPDIF3(bool dither=true, bool noiseshaping=true,float attenuation=100, int32_t minHalfFilterLength=20);
+	///@param attenuation target attenuation [dB] of the anti-aliasing filter. Only used if AUDIO_SAMPLE_RATE_EXACT < input sample rate (input fs). The attenuation can't be reached if the needed filter length exceeds 2*MAX_FILTER_SAMPLES+1
+	///@param minHalfFilterLength If AUDIO_SAMPLE_RATE_EXACT >= input fs), the filter length of the resampling filter is 2*minHalfFilterLength+1. If AUDIO_SAMPLE_RATE_EXACT < input fs the filter is maybe longer to reach the desired attenuation
+	///@param maxHalfFilterLength Can be used to restrict the maximum filter length at the cost of a lower attenuation
+	AsyncAudioInputSPDIF3(bool dither=true, bool noiseshaping=true,float attenuation=100, int32_t minHalfFilterLength=20, int32_t maxHalfFilterLength=80);
 	~AsyncAudioInputSPDIF3();
-	virtual void update(void);
 	void begin();
-	void stop();
+	virtual void update(void);
 	double getBufferedTime() const;
 	double getInputFrequency() const;
-	bool isLocked() const;
+	static bool isLocked();
 	double getTargetLantency() const;
+	double getAttenuation() const;
+	int32_t getHalfFilterLength() const;
 protected:	
 	static DMAChannel dma;
 	static void isr(void);
@@ -67,27 +69,16 @@ private:
     static volatile uint32_t microsLast;
 	//====================
 
-	// spdif lock-changed interrupt
-	static volatile bool locked;
-	static volatile bool lockChanged;
-	static volatile bool resetResampler;
-  	static void spdif_interrupt();
-	#ifdef MEASURE_FREQ
-	static FrequencyMeasurement frequMeasure;	
-	#endif
-	//=============================
-	float _attenuation;
-	int32_t _minHalfFilterLength;
 	Resampler _resampler;
 	Quantizer* quantizer[2];
 	arm_biquad_cascade_df2T_instance_f32 _bufferLPFilter;
 	
 	volatile double _bufferedTime;
 	volatile double _lastValidInputFrequ;
-	double _inputFrequency;
+	double _inputFrequency=0.;
 	double _targetLatencyS;	//target latency [seconds]
-	const double _blockDuration=AUDIO_BLOCK_SAMPLES/AUDIO_SAMPLE_RATE; //[seconds] 
-	const double _maxLatency=2.*_blockDuration;
+	const double _blockDuration=AUDIO_BLOCK_SAMPLES/AUDIO_SAMPLE_RATE_EXACT; //[seconds] 
+	double _maxLatency=2.*_blockDuration;
 
 #ifdef DEBUG_SPDIF_IN
 	static volatile bool bufferOverflow;
