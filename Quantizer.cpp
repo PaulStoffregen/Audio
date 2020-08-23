@@ -82,6 +82,21 @@ void Quantizer::configure(bool noiseShaping, bool dither, float factor){
      _noiseShaping=noiseShaping;
      _dither=dither;
      _factor=factor;
+     if (_dither){
+         _factor-=1.f;
+     }
+     if (_noiseShaping){
+        // the maximum rounding error is 0.5
+        // Assuming the rounding errors of the last NOISE_SHAPE_F_LENGTH samples was 0.5 at the positive noise-shaping-coefficients and -0.5 at the negative coefficients,
+        // the maximum added value can be computed as follows:
+        float* f=_noiseSFilter;
+        float maxAddedVal=0.f;
+        for (uint16_t j =0; j< NOISE_SHAPE_F_LENGTH; j++){
+            maxAddedVal+=abs(*f++);
+        }
+        maxAddedVal/=2.f;  
+        _factor-=maxAddedVal;
+     }
      reset();
 }
 void Quantizer::reset(){
@@ -141,7 +156,7 @@ void Quantizer::quantize(float* input, int16_t* output, uint16_t length){
             *output=(int16_t)_factor;
         }
         else if (xnDR < -_factor){
-            *output=(int16_t)_factor;
+            *output=-(int16_t)_factor;
         }
         else {
             *output=(int16_t)xnDR;
