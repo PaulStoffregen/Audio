@@ -44,69 +44,23 @@ RED.devTest = (function() {
                 }
             }            
         }
-        // get all settings that is defined
-        var settings = [];
-        var RED_Classes = Object.getOwnPropertyNames(RED);
-        for (let rci = 0; rci < RED_Classes.length; rci++)
-        {
-            var RED_Class_Name = RED_Classes[rci];
-            var RED_Class = RED[RED_Class_Name];
-            var RED_Class_SubClasses = Object.getOwnPropertyNames(RED_Class);
-
-            RED.console_ok("@" + RED_Class_Name);
-            //console.log(Object.getOwnPropertyNames(RED_Class));
-
-            for (let i = 0; i < RED_Class_SubClasses.length; i++)
-            {
-                let RED_SubClass_Name = RED_Class_SubClasses[i];
-                if (RED_SubClass_Name == "settings")
-                {
-                    settings.push({[RED_Class_Name]:RED_Class.settings});
-                    //RED.console_ok("found settings@" + RED_Class_Name);
-                }
-                
-            }
-        }
+        
         console.warn(RED["arduino"]["export"]);
         console.warn(RED["view"].settings);
-
+        
 		var project1 = {}
-		project1.settings = settings;
+		project1.settings = RED.settings.getAsJSONobj();
 		project1.workspaces = RED.nodes.workspaces;
-
+        // SAVE test
 		var project_jsonString = JSON.stringify(project1, null, 4);
 		RED.arduino.export.showExportDialog("New Project JSON Test", project_jsonString);
 
-        testSettingsLoad(project_jsonString);
+        // LOAD test
+        var projectLoadTest = JSON.parse(project_jsonString);
+        RED.settings.setFromJSONobj(projectLoadTest.settings);
     }
     
-    function testSettingsLoad(project_jsonString)
-    {
-        var project = JSON.parse(project_jsonString);
-        
-        var psettings = project.settings;
-        for (let i = 0; i < psettings.length; i++)
-        {
-            var csettings = psettings[i];
-            var json_object = Object.getOwnPropertyNames(csettings)[0]; // there is only one item
-            console.log(json_object);
-            console.log(csettings[json_object]);
-            
-            //RED[json_object].settings = csettings[json_object];// this don't run setters 
-            var settingValueNames = Object.getOwnPropertyNames(csettings[json_object]);
-            console.log("@testSettingLoad:");
-            console.log(settingValueNames);
-            for (var svi = 0; svi < settingValueNames.length; svi++)
-            {
-                var valueName = settingValueNames[svi];
-                if (RED[json_object].settings[valueName]) // this skip any removed settings
-                {
-                    RED[json_object].settings[valueName] = csettings[json_object][valueName];
-                    console.warn("typeof " + valueName + ":" + typeof csettings[json_object][valueName])
-                }
-            }
-        }
-    }
+    
     
     return {
         createAndPrintNewWsStruct:createAndPrintNewWsStruct,

@@ -376,6 +376,8 @@ RED.view = (function() {
 			var scrollStartTop = chart.scrollTop();
 
 			activeWorkspace = tab.id;
+			RED.nodes.selectWorkspace(activeWorkspace);
+
 			if (workspaceScrollPositions[activeWorkspace]) {
 				chart.scrollLeft(workspaceScrollPositions[activeWorkspace].left);
 				chart.scrollTop(workspaceScrollPositions[activeWorkspace].top);
@@ -1662,13 +1664,13 @@ RED.view = (function() {
 		if (mouse_mode != RED.state.JOINING) {
 			// Don't bother redrawing nodes if we're drawing links
 			const t2 = performance.now();
-			var node = vis.selectAll(".nodegroup").data(RED.nodes.nodes.filter(function(d) { return d.z == activeWorkspace }),function(d){return d.id});
+			var nodes = vis.selectAll(".nodegroup").data(RED.nodes.nodes.filter(function(d) { return d.z == activeWorkspace }),function(d){return d.id});
 			const t3 = performance.now();
 			console.log('vis.selectAll: ' + (t3-t2) +' milliseconds.');
 
 			var updatedClassTypes =	false; // flag so that it only run once at each redraw()
 
-			var nodeExit = node.exit().remove();
+			var nodeExit = nodes.exit().remove();
 			nodeExit.each(function(d,i) // this happens only when a node exits(is removed) from the current workspace.
 			{
 				//console.error("redraw nodeExit:" + d.type);
@@ -1678,7 +1680,7 @@ RED.view = (function() {
 				}
 			});
 
-			var nodeEnter = node.enter().insert("svg:g").attr("class", "node nodegroup");
+			var nodeEnter = nodes.enter().insert("svg:g").attr("class", "node nodegroup");
 			nodeEnter.each(function(d,i) // this happens only when a node enter(is added) to the current workspace.
 			{
 				//console.error("redraw nodeEnter:" + d.type);
@@ -1718,7 +1720,7 @@ RED.view = (function() {
 				nodeRect.append("image").attr("class","node_reqerror hidden").attr("xlink:href","icons/error.png").attr("x",0).attr("y",-12).attr("width",20).attr("height",20);
 			});
 
-			node.each(function(d,i) { // redraw all nodes in active workspace
+			nodes.each(function(d,i) { // redraw all nodes in active workspace
 					var nodeRect = d3.select(this);
 
 					if (d._def.category.startsWith("output") || d._def.category.startsWith("input")) // only need to check I/O
@@ -2013,7 +2015,7 @@ RED.view = (function() {
 	 *  - attached to mouse for placing - 'IMPORT_DRAGGING'
 	 */
 	function importNodes(newNodesStr,touchImport) {
-		console.trace("importNodes");
+		console.trace("view: importNodes");
 		var createNewIds = true;
 		var useStorage = false;
 

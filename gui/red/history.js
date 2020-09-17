@@ -29,21 +29,31 @@ RED.history = (function() {
 		},
 		push: function(ev) {
 			undo_history.push(ev);
+			console.trace();
 		},
 		pop: function() {
 			var ev = undo_history.pop();
 			var i;
 			if (ev) {
 				if (ev.t == 'add') {
-					for (i=0;i<ev.nodes.length;i++) {
-						RED.nodes.remove(ev.nodes[i]);
+					if (ev.nodes)
+					{
+						for (i=0;i<ev.nodes.length;i++) {
+							RED.nodes.remove(ev.nodes[i]);
+						}
 					}
-					for (i=0;i<ev.links.length;i++) {
-						RED.nodes.removeLink(ev.links[i]);
+					if (ev.links)
+					{
+						for (i=0;i<ev.links.length;i++) {
+							RED.nodes.removeLink(ev.links[i]);
+						}
 					}
-					for (i=0;i<ev.workspaces.length;i++) {
-						RED.nodes.removeWorkspace(ev.workspaces[i].id);
-						RED.view.removeWorkspace(ev.workspaces[i]);
+					if (ev.workspaces)
+					{
+						for (i=0;i<ev.workspaces.length;i++) {
+							RED.nodes.removeWorkspace(ev.workspaces[i].id);
+							RED.view.removeWorkspace(ev.workspaces[i]);
+						}
 					}
 				} else if (ev.t == "delete") {
 					for (i=0;i<ev.workspaces.length;i++) {

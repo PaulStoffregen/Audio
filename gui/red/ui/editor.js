@@ -21,7 +21,7 @@ RED.editor = (function() {
 	var aceLangTools = ace.require("ace/ext/language_tools");
 	var lang = ace.require("../lib/lang");
 	var rootCompletions = [];
-	var classCompletions = [];
+	var classCompletions = []; // TODO: replace static typed @ AceAutoCompleteKeywords.js to fetch data from built in help @ index.html
 	var defaultCompleters = {};
 	
 	
@@ -37,6 +37,7 @@ RED.editor = (function() {
 				"<b>", name, "</b>", "<hr></hr>",
 				item.me
 			].join("");
+			item.toolTipFixedWidth = "300px";
 		}
 	}
 	classCompleter= {
@@ -51,6 +52,7 @@ RED.editor = (function() {
 				"<b>", name, "</b>", "<hr></hr>",
 				item.meta
 			].join("");
+			item.toolTipFixedWidth = "300px";
 		}
 	}
 	

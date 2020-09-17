@@ -43,16 +43,26 @@ RED.storage = (function() {
 			if (json_string && (json_string.trim().length != 0))
 			{
 				var jsonObj = JSON.parse(json_string);
+				
+				if (jsonObj.settings) 
+				{
+					RED.settings.setFromJSONobj(jsonObj.settings);
+				}
 
-				if (jsonObj.workspaces) // new version
+				if (jsonObj.workspaces) // new version have this defined
 				{
 					RED.nodes.importWorkspaces(jsonObj.workspaces);
 				}
 				else
-					RED.nodes.import(json_string, false);
+				{
+					RED.nodes.import(jsonObj, false);
+				}
+				
 			}
 			else
+			{
 				RED.nodes.createNewDefaultWorkspace();
+			}
 		}
 		const t1 = performance.now();
 		console.log('storage-load took: ' + (t1-t0) +' milliseconds.');

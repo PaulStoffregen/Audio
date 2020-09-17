@@ -20,8 +20,8 @@ RED.nodes = (function() {
 	var nodes = [];
 	var configNodes = {};
 	var links = []; // link structure {source:,sourcePort:,target:,targetPort:};
-	var defaultWorkspace;
 	var workspaces = [];
+	var currentWorkspace = {};
 	
 	function getNode()
 	{
@@ -98,11 +98,11 @@ RED.nodes = (function() {
 		return str;
 	}
 
-	function checkID(name) {
+	function checkID(id) {
 		var i;
 		for (i=0;i<nodes.length;i++) {
 			//console.log("checkID, nodes[i].id = " + nodes[i].id);
-			if (nodes[i].id == name) return true;
+			if (nodes[i].id == id) return true;
 		}
 /*
 		for (i in workspaces) {
@@ -213,6 +213,9 @@ RED.nodes = (function() {
 		if (n._def.category != "config") { // config nodes is not used in this GUI
 			n.dirty = true;
 			nodes.push(n);
+			
+			console.warn("addNode:");
+			console.warn(n);
 			
 			/*var updatedConfigNode = false; // config nodes is not used in this GUI
 			for (var d in n._def.defaults) {
@@ -434,6 +437,7 @@ RED.nodes = (function() {
 			node.x = n.x;
 			node.y = n.y;
 			node.z = n.z;
+			node.bgColor = n.bgColor;
 			node.wires = [];
 			for(var i=0;i<n.outputs;i++) {
 				node.wires.push([]);
@@ -509,10 +513,12 @@ RED.nodes = (function() {
 	
 	function createNewDefaultWorkspace() // Jannik Add function
 	{
-		if (defaultWorkspace) return;
-		defaultWorkspace = createWorkspaceObject("Main","Main",0,0,true);
-		addWorkspace(defaultWorkspace);
-		RED.view.addWorkspace(defaultWorkspace);
+		console.trace();
+		if (workspaces.length != 0) return;
+		var newWorkspace = createWorkspaceObject("Main","Main",0,0,true);
+		console.warn("add new default workspace Main");
+		addWorkspace(newWorkspace);
+		RED.view.addWorkspace(newWorkspace);
 	}
 	function convertWorkspaceToNewVersion(nns, ws)
 	{
@@ -537,18 +543,26 @@ RED.nodes = (function() {
 
 		return createWorkspaceObject(ws.id, ws.label, cIOs.inCount, cIOs.outCount, ws_export);
 	}
-	function importWorkspaces(jsonObj)
-	{
 
+	function importWorkspaces(newWorkspaces)
+	{
+		for (var i = 0; i < newWorkspaces.lenght; i++)
+		{
+			currentWorkspace = newWorkspaces[i];
+			importNodes(newWorkspaces[i].nodes, false);
+		}
 	}
 
 	function importNodes(newNodesObj,createNewIds) {
+		var i;
+		var n;
+		var newNodes;
+		if (createNewIds == undefined)
+			createNewIds = false; // not really necessary
 		try {
-			var i;
-			var n;
-			var newNodes;
 			if (typeof newNodesObj === "string") {
 				if (newNodesObj === "") {
+					//console.trace("newNodexObj == null create");
 					createNewDefaultWorkspace();
 					return;
 				}
@@ -558,6 +572,7 @@ RED.nodes = (function() {
 			}
 
 			if (!$.isArray(newNodes)) { // if only one node is imported
+				console.warn("@ !$.isArray(newNodes)");
 				newNodes = [newNodes];
 			}
 /*			var unknownTypes = [];
@@ -593,12 +608,10 @@ RED.nodes = (function() {
 					if (n.type === "workspace") {
 						n.type = "tab";
 					}
-					if (defaultWorkspace == null) {
-						defaultWorkspace = n;
-					}
+					
 					var ws = convertWorkspaceToNewVersion(newNodes, n);
 					addWorkspace(ws);
-					RED.view.addWorkspace(ws); // final function is in tabs.js
+					RED.view.addWorkspace(ws); // "final" function is in tabs.js
 					console.warn("added new workspace lbl:" + ws.label + ",inputs:" + ws.inputs + ",outputs:" + ws.outputs + ",id:" + ws.id);
 
 					if (ws.inputs != 0 || ws.outputs != 0) // this adds workspaces that have inputs and/or outputs to the palette
@@ -609,8 +622,7 @@ RED.nodes = (function() {
 					}
 				}
 			}
-			if (defaultWorkspace == null) {
-				console.log("no default workspace");
+			if (workspaces.length == 0) {
 				createNewDefaultWorkspace(); // jannik changed to function
 			}
 
@@ -651,25 +663,19 @@ RED.nodes = (function() {
 							}
 						}
 
-						if (createNewIds) {
-							node.name = n.name; // we set temporary
+						if (createNewIds) { // this is only used by import dialog and paste function
+							node.name = n.name; // set temporary
 							//console.log("@createNewIds srcnode: " + n.id + ":" + n.name);
-							if (n.z == RED.view.getWorkspace())	{
+							if (n.z == RED.view.getWorkspace())	{ // only generate new names on currentWorkspace
 								node.name = createUniqueCppName(node, n.z); // jannik add
 								//console.warn("make new name: n.name=" + node.name);
 							}
-							else {
+							else {// this allow different workspaces to have nodes that have same name
 								node.name = n.name;
-								//console.log("keep name:" + n.name);
+								//console.trace("keep name:" + n.name);
 							}
+							// allways create unique id:s
 							node.id = RED.nodes.cppId(node, getWorkspace(RED.view.getWorkspace()).label); // jannik add
-							for (var d2 in node._def.defaults) {
-								if (node._def.defaults.hasOwnProperty(d2)) {
-									if (d2 == "name" || d2 == "id") continue;
-									node[d2] = n[d2];
-									//console.log("d2: " + d2);
-								}
-							}
 
 						} else {
 							node.name = n.name;
@@ -684,15 +690,23 @@ RED.nodes = (function() {
 								//console.error(workspaces);
 								node.z = RED.view.getWorkspace(); // failsafe to set node workspace as current
 							}
-
-							for (var d2 in node._def.defaults) {
-								if (node._def.defaults.hasOwnProperty(d2)) {
-									node[d2] = n[d2];
-									//console.log("d2: " + d2);
-								}
-							}	
 						}
-						node.bgColor = node._def.color; 
+						for (var d2 in node._def.defaults) {
+							if (node._def.defaults.hasOwnProperty(d2)) {
+								if (d2 == "name" || d2 == "id") continue;
+								node[d2] = n[d2];
+								//console.log("d2: " + d2);
+							}
+						}
+						if (n.bgColor == undefined)
+						{
+							node.bgColor = node._def.color; 
+						}
+						else
+						{
+							node.bgColor = n.bgColor;
+						}
+						
 						node.outputs = n.outputs||node._def.outputs;
 
 						addNode(node);
@@ -726,13 +740,12 @@ RED.nodes = (function() {
 				delete n.wires;
 			}
 			return [new_nodes,new_links];
-		} catch(error) { // this try catch is very bad when debugging because you have errors inside somewhere they are hard to find! 
+		}
+		catch(error) { // hijack import errors so that a notification can be shown to the user
 			createNewDefaultWorkspace();
-			//TODO: get this UI thing out of here! (see above as well)
-			var newException = "<strong>import nodes Error</strong>: "+error.message + " " +  error.stack;
-			RED.notify(newException, "error",null,false,10000); // better timeout
-			throw newException;
-			return null;
+			var newException = error.message + " " +  error.stack;
+			RED.notify("<strong>import nodes Error</strong>: " + newException, "error",null,false,10000); // better timeout
+			throw newException; // throw exception so it can be shown in webbrowser console
 		}
 
 	}
@@ -1280,6 +1293,15 @@ RED.nodes = (function() {
 		addClassTabsToPalette:addClassTabsToPalette,
 		refreshClassNodes:refreshClassNodes,
 		make_name:make_name,
+		selectWorkspace: function (id)
+		{
+			var ws = getWorkspace(id);
+			if (ws != undefined)
+			{
+				currentWorkspace = ws;
+				console.warn("workspace selected:"+ id);
+			}
+		},
 		nodes: nodes, // TODO: exposed for d3 vis
 		workspaces:workspaces,
 		links: links,  // TODO: exposed for d3 vis

@@ -21,31 +21,6 @@
 
 RED.settings = (function() {
 
-	this.sidebar = {};
-	this.view = {};
-	this.arduino = {};
-	this.arduino.export = {};
-	this.palette = {};
-	
-	this.sidebar.autoSwitchTabToInfo = true;
-	this.view.showWorkspaceToolbar = true;
-	this.palette.onlyShowOne = true;
-	this.view.showGridVmajor = true;
-	this.view.showGridVminor = true;
-	this.view.showGridH = true;
-	this.view.snapToGrid = true;
-	this.arduino.export.useExportDialog = true;
-	this.view.snapToGridXsize = 5;
-	this.view.snapToGridYsize = 5;
-    this.view.lineCurveScale = 0.75;
-    this.arduino.export.IOcheckAtExport = true;
-	this.palette.categoryHeaderTextSize = 12;
-	
-	function to_json()
-	{
-		return JSON.stringify(this);
-	}
-
     function createTab()
 	{
 		var content = document.createElement("div");
@@ -70,6 +45,59 @@ RED.settings = (function() {
 		RED.sidebar.show("settings"); // development, allways show settings tab first
 
 		RED.palette.settings.categoryHeaderTextSize = RED.palette.settings.categoryHeaderTextSize; // read/apply
+	}
+
+	function setFromJSONobj(projectSettings_jsonObj)
+    {
+        var psettings = projectSettings_jsonObj;
+        for (let i = 0; i < psettings.length; i++)
+        {
+            var csettings = psettings[i];
+            var json_object = Object.getOwnPropertyNames(csettings)[0]; // there is only one item
+            console.log(json_object);
+            console.log(csettings[json_object]);
+            
+            //RED[json_object].settings = csettings[json_object];// this don't run setters 
+            var settingValueNames = Object.getOwnPropertyNames(csettings[json_object]);
+            console.log("@testSettingLoad:");
+            console.log(settingValueNames);
+            for (var svi = 0; svi < settingValueNames.length; svi++)
+            {
+                var valueName = settingValueNames[svi];
+                if (RED[json_object].settings[valueName]) // this skip any removed settings
+                {
+                    RED[json_object].settings[valueName] = csettings[json_object][valueName];
+                    console.warn("typeof " + valueName + ":" + typeof csettings[json_object][valueName])
+                }
+            }
+        }
+	}
+	function getAsJSONobj()
+	{
+		// get all settings that is defined
+        var settings = [];
+        var RED_Classes = Object.getOwnPropertyNames(RED);
+        for (let rci = 0; rci < RED_Classes.length; rci++)
+        {
+            var RED_Class_Name = RED_Classes[rci];
+            var RED_Class = RED[RED_Class_Name];
+            var RED_Class_SubClasses = Object.getOwnPropertyNames(RED_Class);
+
+            RED.console_ok("@" + RED_Class_Name);
+            //console.log(Object.getOwnPropertyNames(RED_Class));
+
+            for (let i = 0; i < RED_Class_SubClasses.length; i++)
+            {
+                let RED_SubClass_Name = RED_Class_SubClasses[i];
+                if (RED_SubClass_Name == "settings")
+                {
+                    settings.push({[RED_Class_Name]:RED_Class.settings});
+                    //RED.console_ok("found settings@" + RED_Class_Name);
+                }
+                
+            }
+		}
+		return settings;
 	}
 
 	function generateSettingsFromClasses(containerId)
@@ -209,6 +237,7 @@ RED.settings = (function() {
 
     return {
 		createTab:createTab,
-		to_json:to_json
+		getAsJSONobj:getAsJSONobj,
+		setFromJSONobj:setFromJSONobj
 	};
 })();
