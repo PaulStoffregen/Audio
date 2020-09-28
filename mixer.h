@@ -160,8 +160,7 @@ public:
 		}
 	}
 	/**
-	 * this sets the individual gain, this function is not used on AudioAmplifier
-	 * and the gain is not set when used on that.
+	 * this sets the individual gains
 	 * @param channel
 	 * @param gain
 	 */
@@ -172,7 +171,8 @@ public:
 		multiplier[channel] = gain * MIXER_MULTI_UNITYGAIN_F; // TODO: proper roundoff?
 	}
 	/**
-	 * set all multipliers to specified gain
+	 * set all channels to specified gain
+	 * @param gain
 	 */
 	void gain(float gain) {
 		for (int i = 0; i < NN; i++)
@@ -219,11 +219,12 @@ public:
 				release(block);
 			}
 		}
-		digitalWrite(13, HIGH);
-		digitalWrite(13, LOW);
 	}
 	/**
-	 * shorthand for gain(0, value)
+	 * sets the gain for the amplifier 
+	 * if 0 it will transmit nothing
+	 * if 1 it will transmit without any change
+	 * @param gain
 	 */
 	void gain(float gain) {
 		if (gain > MIXER_MAX_GAIN) gain = MIXER_MAX_GAIN;
