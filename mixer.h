@@ -44,11 +44,11 @@ static inline uint32_t signed_add_16_and_16(uint32_t a, uint32_t b);
 // because of the template use applyGain and applyGainThenAdd functions
 // must be in this file and NOT in cpp file
 #if defined(__ARM_ARCH_7EM__)
-#define MULTI_UNITYGAIN 65536
-#define MULTI_UNITYGAIN_F 65536.0f
-#define MAX_GAIN 32767.0f
-#define MIN_GAIN -32767.0f
-#define MULT_DATA_TYPE int32_t
+#define MIXER_MULTI_UNITYGAIN 65536
+#define MIXER_MULTI_UNITYGAIN_F 65536.0f
+#define MIXER_MAX_GAIN 32767.0f
+#define MIXER_MIN_GAIN -32767.0f
+#define MIXER_MULT_DATA_TYPE int32_t
 
 	static void applyGain(int16_t *data, int32_t mult)
 	{
@@ -71,7 +71,7 @@ static inline uint32_t signed_add_16_and_16(uint32_t a, uint32_t b);
 		const uint32_t *src = (uint32_t *)in;
 		const uint32_t *end = (uint32_t *)(data + AUDIO_BLOCK_SAMPLES);
 
-		if (mult == MULTI_UNITYGAIN) {
+		if (mult == MIXER_MULTI_UNITYGAIN) {
 			do {
 				uint32_t tmp32 = *dst;
 				*dst++ =  signed_add_16_and_16(tmp32, *src++);
@@ -93,11 +93,11 @@ static inline uint32_t signed_add_16_and_16(uint32_t a, uint32_t b);
 	}
 
 #elif defined(KINETISL)
-#define MULTI_UNITYGAIN 256
-#define MULTI_UNITYGAIN_F 256.0f
-#define MAX_GAIN 127.0f
-#define MIN_GAIN -127.0f
-#define MULT_DATA_TYPE int16_t
+#define MIXER_MULTI_UNITYGAIN 256
+#define MIXER_MULTI_UNITYGAIN_F 256.0f
+#define MIXER_MAX_GAIN 127.0f
+#define MIXER_MIN_GAIN -127.0f
+#define MIXER_MULT_DATA_TYPE int16_t
 
 	static void applyGain(int16_t *data, int32_t mult)
 	{
@@ -113,7 +113,7 @@ static inline uint32_t signed_add_16_and_16(uint32_t a, uint32_t b);
 	{
 		const int16_t *end = dst + AUDIO_BLOCK_SAMPLES;
 
-		if (mult == MULTI_UNITYGAIN) {
+		if (mult == MIXER_MULTI_UNITYGAIN) {
 			do {
 				int32_t val = *dst + *src++;
 				*dst++ = signed_saturate_rshift(val, 16, 0);
@@ -132,7 +132,7 @@ class AudioMixer : public AudioStream
 {
 public:
 	AudioMixer(void) : AudioStream(NN, inputQueueArray) {
-		for (int i=0; i<NN; i++) multiplier[i] = MULTI_UNITYGAIN;
+		for (int i=0; i<NN; i++) multiplier[i] = MIXER_MULTI_UNITYGAIN;
 	}
 	
 	void update() {
@@ -144,7 +144,7 @@ public:
 				out = receiveWritable(channel);
 				if (out) {
 					int32_t mult = multiplier[channel];
-					if (mult != MULTI_UNITYGAIN) applyGain(out->data, mult);
+					if (mult != MIXER_MULTI_UNITYGAIN) applyGain(out->data, mult);
 				}
 			} else {
 				in = receiveReadOnly(channel);
@@ -167,9 +167,9 @@ public:
 	 */
 	void gain(unsigned int channel, float gain) {
 		if (channel >= NN) return;
-		if (gain > MAX_GAIN) gain = MAX_GAIN;
-		else if (gain < MIN_GAIN) gain = MIN_GAIN;
-		multiplier[channel] = gain * MULTI_UNITYGAIN_F; // TODO: proper roundoff?
+		if (gain > MIXER_MAX_GAIN) gain = MIXER_MAX_GAIN;
+		else if (gain < MIXER_MIN_GAIN) gain = MIXER_MIN_GAIN;
+		multiplier[channel] = gain * MIXER_MULTI_UNITYGAIN_F; // TODO: proper roundoff?
 	}
 	/**
 	 * set all multipliers to specified gain
@@ -177,14 +177,14 @@ public:
 	void gain(float gain) {
 		for (int i = 0; i < NN; i++)
 		{
-			if (gain > MAX_GAIN) gain = MAX_GAIN;
-			else if (gain < MIN_GAIN) gain = MIN_GAIN;
-			multiplier[i] = gain * MULTI_UNITYGAIN_F; // TODO: proper roundoff?
+			if (gain > MIXER_MAX_GAIN) gain = MIXER_MAX_GAIN;
+			else if (gain < MIXER_MIN_GAIN) gain = MIXER_MIN_GAIN;
+			multiplier[i] = gain * MIXER_MULTI_UNITYGAIN_F; // TODO: proper roundoff?
 		} 
 	}
 
 private:
-	MULT_DATA_TYPE multiplier[NN];
+	MIXER_MULT_DATA_TYPE multiplier[NN];
 	audio_block_t *inputQueueArray[NN];
 };
 
@@ -192,7 +192,7 @@ class AudioAmplifier : public AudioStream
 {
 public:
 	AudioAmplifier(void) : AudioStream(1, inputQueueArray) {
-		multiplier = MULTI_UNITYGAIN;
+		multiplier = MIXER_MULTI_UNITYGAIN;
 	}
 
 	void update() {
@@ -203,7 +203,7 @@ public:
 			// zero gain, discard any input and transmit nothing
 			block = receiveReadOnly(0);
 			if (block) release(block);
-		} else if (mult == MULTI_UNITYGAIN) {
+		} else if (mult == MIXER_MULTI_UNITYGAIN) {
 			// unity gain, pass input to output without any change
 			block = receiveReadOnly(0);
 			if (block) {
@@ -226,13 +226,13 @@ public:
 	 * shorthand for gain(0, value)
 	 */
 	void gain(float gain) {
-		if (gain > MAX_GAIN) gain = MAX_GAIN;
-		else if (gain < MIN_GAIN) gain = MIN_GAIN;
-		multiplier = gain * MULTI_UNITYGAIN_F; // TODO: proper roundoff?
+		if (gain > MIXER_MAX_GAIN) gain = MIXER_MAX_GAIN;
+		else if (gain < MIXER_MIN_GAIN) gain = MIXER_MIN_GAIN;
+		multiplier = gain * MIXER_MULTI_UNITYGAIN_F; // TODO: proper roundoff?
 	}
 
 private:
-	MULT_DATA_TYPE multiplier;
+	MIXER_MULT_DATA_TYPE multiplier;
 	audio_block_t *inputQueueArray[1];
 };
 
