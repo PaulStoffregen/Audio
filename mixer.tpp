@@ -41,76 +41,76 @@ static inline uint32_t signed_add_16_and_16(uint32_t a, uint32_t b);
 // must be in this file and NOT in cpp file
 #if defined(__ARM_ARCH_7EM__)
 
-	static void applyGain(int16_t *data, int32_t mult)
-	{
-		uint32_t *p = (uint32_t *)data;
-		const uint32_t *end = (uint32_t *)(data + AUDIO_BLOCK_SAMPLES);
+    static void applyGain(int16_t *data, int32_t mult)
+    {
+        uint32_t *p = (uint32_t *)data;
+        const uint32_t *end = (uint32_t *)(data + AUDIO_BLOCK_SAMPLES);
 
-		do {
-			uint32_t tmp32 = *p; // read 2 samples from *data
-			int32_t val1 = signed_multiply_32x16b(mult, tmp32);
-			int32_t val2 = signed_multiply_32x16t(mult, tmp32);
-			val1 = signed_saturate_rshift(val1, 16, 0);
-			val2 = signed_saturate_rshift(val2, 16, 0);
-			*p++ = pack_16b_16b(val2, val1);
-		} while (p < end);
-	}
+        do {
+            uint32_t tmp32 = *p; // read 2 samples from *data
+            int32_t val1 = signed_multiply_32x16b(mult, tmp32);
+            int32_t val2 = signed_multiply_32x16t(mult, tmp32);
+            val1 = signed_saturate_rshift(val1, 16, 0);
+            val2 = signed_saturate_rshift(val2, 16, 0);
+            *p++ = pack_16b_16b(val2, val1);
+        } while (p < end);
+    }
 
-	static void applyGainThenAdd(int16_t *data, const int16_t *in, int32_t mult)
-	{
-		uint32_t *dst = (uint32_t *)data;
-		const uint32_t *src = (uint32_t *)in;
-		const uint32_t *end = (uint32_t *)(data + AUDIO_BLOCK_SAMPLES);
+    static void applyGainThenAdd(int16_t *data, const int16_t *in, int32_t mult)
+    {
+        uint32_t *dst = (uint32_t *)data;
+        const uint32_t *src = (uint32_t *)in;
+        const uint32_t *end = (uint32_t *)(data + AUDIO_BLOCK_SAMPLES);
 
-		if (mult == MULTI_UNITYGAIN) {
-			do {
-				uint32_t tmp32 = *dst;
-				*dst++ =  signed_add_16_and_16(tmp32, *src++);
-				tmp32 = *dst;
-				*dst++ =  signed_add_16_and_16(tmp32, *src++);
-			} while (dst < end);
-		} else {
-			do {
-				uint32_t tmp32 = *src++; // read 2 samples from *data
-				int32_t val1 =  signed_multiply_32x16b(mult, tmp32);
-				int32_t val2 =  signed_multiply_32x16t(mult, tmp32);
-				val1 =  signed_saturate_rshift(val1, 16, 0);
-				val2 =  signed_saturate_rshift(val2, 16, 0);
-				tmp32 =  pack_16b_16b(val2, val1);
-				uint32_t tmp32b = *dst;
-				*dst++ =  signed_add_16_and_16(tmp32, tmp32b);
-			} while (dst < end);
-		}
-	}
+        if (mult == MULTI_UNITYGAIN) {
+            do {
+                uint32_t tmp32 = *dst;
+                *dst++ =  signed_add_16_and_16(tmp32, *src++);
+                tmp32 = *dst;
+                *dst++ =  signed_add_16_and_16(tmp32, *src++);
+            } while (dst < end);
+        } else {
+            do {
+                uint32_t tmp32 = *src++; // read 2 samples from *data
+                int32_t val1 =  signed_multiply_32x16b(mult, tmp32);
+                int32_t val2 =  signed_multiply_32x16t(mult, tmp32);
+                val1 =  signed_saturate_rshift(val1, 16, 0);
+                val2 =  signed_saturate_rshift(val2, 16, 0);
+                tmp32 =  pack_16b_16b(val2, val1);
+                uint32_t tmp32b = *dst;
+                *dst++ =  signed_add_16_and_16(tmp32, tmp32b);
+            } while (dst < end);
+        }
+    }
 
 #elif defined(KINETISL)
 
-	static void applyGain(int16_t *data, int32_t mult)
-	{
-		const int16_t *end = data + AUDIO_BLOCK_SAMPLES;
+    static void applyGain(int16_t *data, int32_t mult)
+    {
+        const int16_t *end = data + AUDIO_BLOCK_SAMPLES;
 
-		do {
-			int32_t val = *data * mult;
-			*data++ = signed_saturate_rshift(val, 16, 0);
-		} while (data < end);
-	}
+        do {
+            int32_t val = *data * mult;
+            *data++ = signed_saturate_rshift(val, 16, 0);
+        } while (data < end);
+    }
 
-	static void applyGainThenAdd(int16_t *dst, const int16_t *src, int32_t mult)
-	{
-		const int16_t *end = dst + AUDIO_BLOCK_SAMPLES;
+    static void applyGainThenAdd(int16_t *dst, const int16_t *src, int32_t mult)
+    {
+        const int16_t *end = dst + AUDIO_BLOCK_SAMPLES;
 
-		if (mult == MULTI_UNITYGAIN) {
-			do {
-				int32_t val = *dst + *src++;
-				*dst++ = signed_saturate_rshift(val, 16, 0);
-			} while (dst < end);
-		} else {
-			do {
-				int32_t val = *dst + ((*src++ * mult) >> 8); // overflow possible??
-				*dst++ = signed_saturate_rshift(val, 16, 0);
-			} while (dst < end);
-		}
-	}
+        if (mult == MULTI_UNITYGAIN) {
+            do {
+                int32_t val = *dst + *src++;
+                *dst++ = signed_saturate_rshift(val, 16, 0);
+            } while (dst < end);
+        } else {
+            do {
+                int32_t val = *dst + ((*src++ * mult) >> 8); // overflow possible??
+                *dst++ = signed_saturate_rshift(val, 16, 0);
+            } while (dst < end);
+        }
+    }
 #endif
 
 template <int NN> void AudioMixer<NN>::gain(unsigned int channel, float gain) {
@@ -163,23 +163,23 @@ void AudioAmplifier::update() {
     int32_t mult = multiplier;
 
     if (mult == 0) {
-	    // zero gain, discard any input and transmit nothing
-	    block = receiveReadOnly(0);
-	    if (block) release(block);
+        // zero gain, discard any input and transmit nothing
+        block = receiveReadOnly(0);
+        if (block) release(block);
     } else if (mult == MULTI_UNITYGAIN) {
-	    // unity gain, pass input to output without any change
-	    block = receiveReadOnly(0);
-	    if (block) {
-	        transmit(block);
-	        release(block);
-	    }
+        // unity gain, pass input to output without any change
+        block = receiveReadOnly(0);
+        if (block) {
+            transmit(block);
+            release(block);
+        }
     } else {
-	    // apply gain to signal
-	    block = receiveWritable(0);
-	    if (block) {
-	        applyGain(block->data, mult);
-	        transmit(block);
-	        release(block);
-	    }
+        // apply gain to signal
+        block = receiveWritable(0);
+        if (block) {
+            applyGain(block->data, mult);
+            transmit(block);
+            release(block);
+        }
     }
 }
