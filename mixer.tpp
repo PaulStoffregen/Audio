@@ -37,11 +37,6 @@ static inline int32_t signed_saturate_rshift(int32_t val, int bits, int rshift);
 static inline uint32_t pack_16b_16b(int32_t a, int32_t b);
 static inline uint32_t signed_add_16_and_16(uint32_t a, uint32_t b);
 
-//static void release(audio_block_t * block);
-//void transmit(audio_block_t *block, unsigned char index = 0);
-//audio_block_t * receiveReadOnly(unsigned int index = 0);
-//audio_block_t * receiveWritable(unsigned int index = 0);
-
 // because of the template use applyGain and applyGainThenAdd functions
 // must be in this file and NOT in cpp file
 #if defined(__ARM_ARCH_7EM__)
@@ -119,72 +114,72 @@ static inline uint32_t signed_add_16_and_16(uint32_t a, uint32_t b);
 #endif
 
 template <int NN> void AudioMixer<NN>::gain(unsigned int channel, float gain) {
-  if (channel >= NN) return;
-  if (gain > MAX_GAIN) gain = MAX_GAIN;
-  else if (gain < MIN_GAIN) gain = MIN_GAIN;
-  multiplier[channel] = gain * MULTI_UNITYGAIN_F; // TODO: proper roundoff?
+    if (channel >= NN) return;
+    if (gain > MAX_GAIN) gain = MAX_GAIN;
+    else if (gain < MIN_GAIN) gain = MIN_GAIN;
+    multiplier[channel] = gain * MULTI_UNITYGAIN_F; // TODO: proper roundoff?
 }
 
 template <int NN> void AudioMixer<NN>::gain(float gain) {
-  for (int i = 0; i < NN; i++) {
-    if (gain > MAX_GAIN) gain = MAX_GAIN;
-    else if (gain < MIN_GAIN) gain = MIN_GAIN;
-    multiplier[i] = gain * MULTI_UNITYGAIN_F; // TODO: proper roundoff?
-  } 
+    for (int i = 0; i < NN; i++) {
+        if (gain > MAX_GAIN) gain = MAX_GAIN;
+        else if (gain < MIN_GAIN) gain = MIN_GAIN;
+        multiplier[i] = gain * MULTI_UNITYGAIN_F; // TODO: proper roundoff?
+    } 
 }
 
 template <int NN> void AudioMixer<NN>::update() {
-  audio_block_t *in, *out=NULL;
-  unsigned int channel;
-  for (channel=0; channel < NN; channel++) {
-    if (!out) {
-      out = receiveWritable(channel);
-      if (out) {
-        int32_t mult = multiplier[channel];
-        if (mult != MULTI_UNITYGAIN) applyGain(out->data, mult);
-      }
-    } else {
-      in = receiveReadOnly(channel);
-      if (in) {
-        applyGainThenAdd(out->data, in->data, multiplier[channel]);
-        release(in);
-      }
+    audio_block_t *in, *out=NULL;
+    unsigned int channel;
+    for (channel=0; channel < NN; channel++) {
+        if (!out) {
+            out = receiveWritable(channel);
+            if (out) {
+                int32_t mult = multiplier[channel];
+                if (mult != MULTI_UNITYGAIN) applyGain(out->data, mult);
+            }
+        } else {
+            in = receiveReadOnly(channel);
+            if (in) {
+                applyGainThenAdd(out->data, in->data, multiplier[channel]);
+                release(in);
+            }
+        }
     }
-  }
-  if (out) {
-    transmit(out);
-    release(out);
-  }
+    if (out) {
+        transmit(out);
+        release(out);
+    }
 }
 
 void AudioAmplifier::gain(float gain) {
-  if (gain > MAX_GAIN) gain = MAX_GAIN;
-  else if (gain < MIN_GAIN) gain = MIN_GAIN;
-  multiplier = gain * MULTI_UNITYGAIN_F; // TODO: proper roundoff?
+    if (gain > MAX_GAIN) gain = MAX_GAIN;
+    else if (gain < MIN_GAIN) gain = MIN_GAIN;
+    multiplier = gain * MULTI_UNITYGAIN_F; // TODO: proper roundoff?
 }
 
 void AudioAmplifier::update() {
-  audio_block_t *block;
-  int32_t mult = multiplier;
+    audio_block_t *block;
+    int32_t mult = multiplier;
 
-  if (mult == 0) {
-	// zero gain, discard any input and transmit nothing
-	block = receiveReadOnly(0);
-	if (block) release(block);
-  } else if (mult == MULTI_UNITYGAIN) {
-	// unity gain, pass input to output without any change
-	block = receiveReadOnly(0);
-	if (block) {
-	  transmit(block);
-	  release(block);
-	}
-  } else {
-	// apply gain to signal
-	block = receiveWritable(0);
-	if (block) {
-	  applyGain(block->data, mult);
-	  transmit(block);
-	  release(block);
-	}
-  }
+    if (mult == 0) {
+	    // zero gain, discard any input and transmit nothing
+	    block = receiveReadOnly(0);
+	    if (block) release(block);
+    } else if (mult == MULTI_UNITYGAIN) {
+	    // unity gain, pass input to output without any change
+	    block = receiveReadOnly(0);
+	    if (block) {
+	        transmit(block);
+	        release(block);
+	    }
+    } else {
+	    // apply gain to signal
+	    block = receiveWritable(0);
+	    if (block) {
+	        applyGain(block->data, mult);
+	        transmit(block);
+	        release(block);
+	    }
+    }
 }
