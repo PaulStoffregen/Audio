@@ -23,7 +23,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
- 
- // all implementations have moved to mixer.tpp 
- // which is included with a #include "mixer.tpp" at end of mixer.h
+
+#include <Arduino.h>
+#include "mixer.h"
+#include "utility/dspinst.h"
 
