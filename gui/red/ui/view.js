@@ -1219,7 +1219,7 @@ RED.view = (function() {
 						if (r["resource"] == r2["resource"]) {
 							if (r["shareable"] == false ) {
 								var msg = "Conflict: shareable '"+r["resource"]+"'  "+d.name+" and "+n2.name;
-								console.log(msg);
+								//console.log(msg);
 								msg = n2.name + " uses " + r["resource"] + ", too";
 								d.conflicts.push(msg);
 								d.requirementError = true;
@@ -1227,7 +1227,7 @@ RED.view = (function() {
 							//else
 							if (r["setting"] != r2["setting"]) {
 								var msg = "Conflict: "+ d.name + " setting['"+r["setting"]+"'] and "+n2.name+" setting['"+r2["setting"]+"']";
-								console.log(msg);
+								//console.log(msg);
 								msg = n2.name + " has different settings: " + r["setting"] + " ./. " + r2["setting"];
 								d.conflicts.push(msg);
 								d.requirementError = true;
@@ -1726,7 +1726,7 @@ RED.view = (function() {
 					if (d._def.category.startsWith("output") || d._def.category.startsWith("input")) // only need to check I/O
 					{	
 						checkRequirements(d); // this update nodes that allready exist
-						if (d.requirementError) console.warn("@node.each reqError on:" + d.name);
+						//if (d.requirementError) console.warn("@node.each reqError on:" + d.name);
 						redraw_nodeReqError(nodeRect, d);
 					}
 					if (d.dirty) {
@@ -1765,7 +1765,12 @@ RED.view = (function() {
 	}
 	function redraw_paletteNodesReqError(d)
 	{
-		var e1 = document.getElementById("palette_node_"+d.type);
+		var cat = d._def.category;
+		//console.error(cat);
+		cat = cat.substring(0, cat.lastIndexOf("-"));
+		var e1 = document.getElementById("palette_node_"+cat + "_"+d.type);
+
+		//console.error("palette_node_"+cat + "_"+d.type);
 		var e2 = e1.getElementsByClassName("palette_req_error")[0]; // palette_req_error is using a style, where the position of the icon is defined
 		e2.addEventListener("click", 
 							function(){RED.notify('Conflicts:<ul><li>'+d.conflicts.join('</li><li>')+'</li></ul>',null,false, 5000);},
@@ -2017,7 +2022,7 @@ RED.view = (function() {
 	function importNodes(newNodesStr,touchImport) {
 		console.trace("view: importNodes");
 		var createNewIds = true;
-		var useStorage = false;
+		var replaceFlow = $("#node-input-replace-flow").prop('checked');
 
 		if ($("#node-input-arduino").prop('checked') === true) {
 			var nodesJSON = RED.arduino.import.cppToJSON(newNodesStr);
@@ -2027,17 +2032,20 @@ RED.view = (function() {
 			}
 
 			newNodesStr = nodesJSON.data;
-			createNewIds = false;
-
-			if (useStorage) {
-				RED.storage.clear();
-				localStorage.setItem("audio_library_guitool", newNodesStr);
-				RED.storage.load();
-				redraw();
-				return;
-			}
+			//createNewIds = false;
 		}
+		if (replaceFlow) {
+			RED.storage.clear();
+			//console.warn(newNodesStr);
+			//debugger;
+			
+			localStorage.setItem("audio_library_guitool", newNodesStr);
+			window.location.reload(); // better way because it frees up memory.
+			//RED.storage.load();
+			//redraw();
 
+			return;
+		}
 		try {
 			var result = RED.nodes.import(newNodesStr,createNewIds);
 			if (!result) return;
@@ -2170,7 +2178,19 @@ RED.view = (function() {
 		getForm("dialog-form", "import-dialog", function(d, f) {
 		$("#node-input-import").val("");
 		$( "#node-input-arduino" ).prop('checked', is_arduino_code);
-		$( "#dialog" ).dialog("option","title","Import nodes").dialog( "open" );
+		var title = "";
+		if (is_arduino_code)
+		{
+			title = "Import Arduino Code";
+			$("#node-input-import").prop('placeholder', "Paste Arduino Code here.");
+		}			
+		else
+		{
+			title = "Import JSON";
+			$("#node-input-import").prop('placeholder', "Paste JSON string here.");
+		}
+			
+		$( "#dialog" ).dialog("option","title",title).dialog( "open" );
 		});
 	}
 

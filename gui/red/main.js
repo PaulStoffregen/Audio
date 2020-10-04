@@ -276,6 +276,7 @@ RED.main = (function() {
 	}
 
 	function loadNodes() {
+		
 			$(".palette-scroll").show();
 			$("#palette-search").show();
 			RED.storage.load();

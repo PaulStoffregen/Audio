@@ -44,7 +44,7 @@ RED.palette = (function() {
 	var exclusion = ['config','unknown','deprecated'];
 	var core =	
 	[
-		{name:'favs',    expanded:false},
+		{name:'favorites',    expanded:false},
 		{name:'used',    expanded:false},
 		{name:'tabs',    expanded:false},
 		{name:'special', expanded:false},
@@ -118,33 +118,47 @@ RED.palette = (function() {
 	}
 	doInit(core);
 	
+	function clearCategory(category)
+	{
+		$("#palette-"+ category + "-function").empty();
+	}
+
 	/**
 	 * add new node type to the palette
 	 * @param {*} nt  node type
 	 * @param {*} def node type def
 	 * 	 */
-	function addNodeType(nt,def) { // externally RED.palettte.add
-		
-		if ($("#palette_node_"+nt).length)	return;		
+	function addNodeType(nt,def, category) { // externally RED.palettte.add
+		//if ($("#palette_node_"+nt).length)	return;		// avoid duplicates
 		//if (exclusion.indexOf(def.category)!=-1) return;
-		var indexOf = def.category.lastIndexOf("-");
-		var category = "";
-		if (indexOf != -1)
-			category = def.category.substring(0, indexOf);
+		var defCategory = "";
+		if (!category)
+		{
+			var indexOf = def.category.lastIndexOf("-");
+			if (indexOf != -1)
+				category = def.category.substring(0, indexOf);
+			else
+				category = def.category;
+				//console.warn("add to " + category);
+			defCategory = def.category + "";
+		}
 		else
-			category = def.category;
-
+		{
+			//console.error("add to " + category);
+			defCategory = category + "-function";
+		}
 		//console.warn("add addNodeType:@" + category + ":" + def.shortName);
-			
+			if ($("#palette_node_"+category +"_"+nt).length)	return;		// avoid duplicates
+
 			var d = document.createElement("div");
-			d.id = "palette_node_"+nt;
+			d.id = "palette_node_"+category +"_"+nt;
 			d.type = nt;
 
 			//var label = /^(.*?)([ -]in|[ -]out)?$/.exec(nt)[1];
 			var label = (def.shortName) ? def.shortName : nt;
 
 			d.innerHTML = '<div class="palette_label">'+label+"</div>";
-			d.className="palette_node";
+			d.className="palette_node";// cat_" + category;
 			if (def.icon) {
 				d.style.backgroundImage = "url(icons/"+def.icon+")";
 				if (def.align == "right") {
@@ -177,11 +191,11 @@ RED.palette = (function() {
 				createCategoryContainer(category, "palette-container");
 			}
 			
-			if ($("#palette-"+def.category).length === 0) {          
-				$("#palette-base-category-"+category).append('<div id="palette-'+def.category+'"></div>');            
+			if ($("#palette-"+defCategory).length === 0) {          
+				$("#palette-base-category-"+category).append('<div id="palette-'+defCategory+'"></div>');            
 			}
 			
-			$("#palette-"+def.category).append(d);
+			$("#palette-"+defCategory).append(d);
 			d.onmousedown = function(e) { e.preventDefault(); };
 
 			setTooltipContent('', nt, d);
@@ -207,48 +221,49 @@ RED.palette = (function() {
 		$("#header-"+category).off('click').on('click', function(e) {
 			
 			//console.log("onlyShowOne:" + _settings.onlyShowOne);
-			var displayStyle = $(this).next().css('display');
+			var catContentElement = $(this).next();
+			var displayStyle = catContentElement.css('display');
 			if (displayStyle == "block")
 			{
-				$(this).next().slideUp();
+				catContentElement.slideUp();
 				$(this).children("i").removeClass("expanded"); // chevron
 			}
 			else
 			{
-				if (!isSubCat($(this).next().attr('id')) && (_settings.onlyShowOne == true)) // don't run when collapsing sub cat
+				if (!isSubCat(catContentElement.attr('id')) && (_settings.onlyShowOne == true)) // don't run when collapsing sub cat
 				{
 					setShownStateForAll(false);
 				}
-				$(this).next().slideDown();
+				catContentElement.slideDown();
 				$(this).children("i").addClass("expanded"); // chevron
 			}
-			//$(this).children("i").toggleClass("expanded");
 		});
 	}
 	function setShownStateForAll(state)
 	{
 		var otherCat = $(".palette-header");
-		var otherCat2 = $(".palette-content");
+
 		for (var i = 0; i < otherCat.length; i++)
 		{
-			if (isSubCat(otherCat2[i].id)) continue; // don't collapse sub-cat
-			//console.warn(otherCat[i].id);
+			if (otherCat[i].id.startsWith("set-")){ continue; }// never collapse settings
+			//console.warn("setShownStateForAll:" + otherCat[i].id);
 			if (state)
 			{
-				$(otherCat2[i]).slideDown();
+				$(otherCat[i]).next().slideDown();
 				$(otherCat[i]).children("i").addClass("expanded");
 			}
 			else
 			{
-				$(otherCat2[i]).slideUp();
+				$(otherCat[i]).next().slideUp();
 				$(otherCat[i]).children("i").removeClass("expanded");
 			}
 		}
 	}
 	function isSubCat(id)
 	{
-		if (id.startsWith("palette-base-category-input-")) return true;
-		if (id.startsWith("palette-base-category-output-")) return true;
+		if (id.startsWith("palette-base-category-input-")) { return true; }
+		if (id.startsWith("palette-base-category-output-")) { return true; }
+		//console.warn(id + " is not subcat");
 		return false;
 	}
 
@@ -334,6 +349,7 @@ RED.palette = (function() {
 		settingsEditorLabels:settingsEditorLabels,
 
 		add:addNodeType,
+		clearCategory:clearCategory,
 		remove:removeNodeType,
 	};
 })();

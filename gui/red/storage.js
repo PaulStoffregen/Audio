@@ -34,6 +34,7 @@ RED.storage = (function() {
 		return archive;
 	}
 	function load() {
+
 		const t0 = performance.now();
 		if (localStorage) {
 			//console.warn(allStorage());
@@ -55,7 +56,7 @@ RED.storage = (function() {
 				}
 				else
 				{
-					RED.nodes.import(jsonObj, false);
+					RED.nodes.import(jsonObj, false, true);
 				}
 				
 			}

@@ -90,13 +90,17 @@ RED.arduino.import = (function() {
 					var newY = parseInt(coords ? coords[1] : 0);
 					//newY = newY == 0 ? lastY + (dH * n) + gap : newY;
 					//lastY = Math.max(lastY, newY);
-					var node = new Object({"order": n, "id": name, "name": name, "type": type, "x": newX, "y": newY, "z": 0, "wires": []});
-					// netter solution: create new id
-					if (RED.nodes.node(node.id) !== null) {
+					var node = new Object({/*"order": n, */"id": name, "name": name, "type": type, "x": newX, "y": newY, "z": 0, "wires": []});
+					node.z = RED.view.getWorkspace();
+					
+					// netter solution: create new id (this only messes everything up)
+					// let import nodes take care of the new names and id:s
+					/*
+					if ((RED.nodes.node(node.id) !== null) && !replaceFlow) {
 						node.z = RED.view.getWorkspace();
 						node.id = RED.nodes.id();
-						node.name = RED.nodes.getUniqueName(node);
-					}
+						node.name = RED.nodes.getUniqueName(node); // this "crash" import when nodes with theese names allready exists
+					}*/
 					newNodes.push(node);
 				}
 			}
@@ -193,6 +197,7 @@ RED.arduino.import = (function() {
 			words = Array(NODE_AC);
 			$.each(RED.nodes.node_defs, function (key, obj) {
 				words.push(key);
+				console.log(key);
 			});
 			traverseLines(newNodesStr);
 			linkCables(cables);
