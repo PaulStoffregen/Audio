@@ -21,7 +21,7 @@
  */
 var RED = (function() { // this is used so that RED can be used as root "namespace"
 	return {
-		console_ok:function console_ok(text) { console.log('%c' + text, 'background: #ccffcc; color: #000'); }
+		console_ok:function console_ok(text) { console.trace(); console.log('%c' + text, 'background: #ccffcc; color: #000'); }
 	};
 })();
 

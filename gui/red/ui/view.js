@@ -1666,7 +1666,7 @@ RED.view = (function() {
 			const t2 = performance.now();
 			var nodes = vis.selectAll(".nodegroup").data(RED.nodes.nodes.filter(function(d) { return d.z == activeWorkspace }),function(d){return d.id});
 			const t3 = performance.now();
-			console.log('vis.selectAll: ' + (t3-t2) +' milliseconds.');
+			//console.log('vis.selectAll: ' + (t3-t2) +' milliseconds.');
 
 			var updatedClassTypes =	false; // flag so that it only run once at each redraw()
 
@@ -1761,7 +1761,7 @@ RED.view = (function() {
 			d3.event.preventDefault();
 		}
 		const t1 = performance.now();
-		console.log('redraw took: ' + (t1-t0) +' milliseconds.');
+		//console.log('redraw took: ' + (t1-t0) +' milliseconds.');
 	}
 	function redraw_paletteNodesReqError(d)
 	{

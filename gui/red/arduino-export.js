@@ -105,7 +105,7 @@ RED.arduino.export = (function() {
 		});
 		//RED.view.dirty(false);
 		const t3 = performance.now();
-		console.log('arduino-export-save2-show-dialog took: ' + (t3-t2) +' milliseconds.');
+		console.log('arduino-export-save-show-dialog took: ' + (t3-t2) +' milliseconds.');
 	}
 
 	function isSpecialNode(type)
@@ -319,11 +319,11 @@ RED.arduino.export = (function() {
 					var src_name = RED.nodes.make_name(src);
 					var dst_name = RED.nodes.make_name(dst);
 					cppAC += "AudioConnection          patchCord" + cordcount + "(";
-					if (pi == 0 && dstPortIndex == 0 && src && src.outputs == 1 && dst && dst._def.inputs == 1) {
-						cppAC += src_name + ", " + dst_name;
-					} else {
+					//if (pi == 0 && dstPortIndex == 0 && src && src.outputs == 1 && dst && dst._def.inputs == 1) {
+					//	cppAC += src_name + ", " + dst_name;
+					//} else {
 						cppAC += src_name + ", " + pi + ", " + dst_name + ", " + dstPortIndex;
-					}
+					//}
 					cppAC += ");\n";
 					cordcount++;
 				});

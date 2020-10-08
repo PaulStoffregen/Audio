@@ -377,7 +377,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</div>
 </script>
 
-
+<script src="help.js"></script>
 <script src="jquery/js/jquery-1.9.1.js"></script>
 <script src="bootstrap/js/bootstrap.min.js"></script>
 <script src="jquery/js/jquery-ui-1.10.3.custom.min.js"></script>
@@ -562,6 +562,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"Comment","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":""}},"shortName":"Comment","inputs":0,"outputs":0,"category":"special-function","color":"#ddffbb","icon":"comment.png"}},
 		{"type":"Function","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":""}},"shortName":"code","inputs":0,"outputs":0,"category":"special-function","color":"#ddffbb","icon":"function.png"}},
 		{"type":"Variables","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"comment":{"value":""}},"shortName":"vars","inputs":0,"outputs":0,"category":"special-function","color":"#ddffbb","icon":"function.png"}},
+		{"type":"AudioStreamObject","data":{"defaults":{"name":{"value":"new"},"id":{"value":"new"},"subType":{"value":""},"inputs":{"value":"1"},"outputs":{"value":"1"},"comment":{"value":""},"comment2":{"value":""}},"shortName":"userObject","inputs":0,"outputs":0,"category":"special-function","color":"#ddffbb","icon":"function.png"}},
 
 		{"type":"AudioInputI2S","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"i2s","inputs":0,"outputs":2,"category":"input-i2s1-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputI2SQuad","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"i2s_quad","inputs":0,"outputs":4,"category":"input-i2s1-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -722,7 +723,125 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<div class="form-row-long">
 		<label for="node-input-comment"><i class="fa fa-tag"></i> Code contents:</label>
 		<pre id="aceEditor" style="height: 400px;"></pre>
-		
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioStreamObject">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>This used to make custom AudioStream object <br>
+		it have many fields when edit the node.<br><br>
+		<b>Name:</b> is the name given to the instance<br><br>
+		<b>Sub Type:</b> is the class name given in the code, this is the type that will be used when exporting the design.<br><br>
+		<b>Color:</b> just for visuals in this GUI tool<br><br>
+		<b>Inputs:</b> how many audio inputs the AudioStream object has<br><br>
+		<b>Outputs:</b> how many audio outputs the AudioStram object has<br><br>
+		<b>Code contents h file:</b> the contents of the h file<br><br>
+		<b>Code contents cpp file:</b> the contents of the cpp file<br><br>
+		the h and cpp file content will be only usable when using Arduino IDE webserver-link.<br>
+		if you allready have the custom Audio object files in your project then leave theese two fields empty, so that you can use your object in this tool.
+	</p>
+	
+	</div>
+	
+	<h3>Notes</h3>
+	<p></p>
+	<p></p>
+</script>
+<script type="text/x-red" data-template-name="AudioStreamObject">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+	<div class="form-row">
+		<label for="node-input-subType"><i class="fa fa-tag"></i> Sub Type</label>
+		<input type="text" id="node-input-subType" placeholder="SubType">
+	</div>
+	<div class="form-row">
+		Color: <input id="node-input-color" data-jscolor="">
+	</div>
+	<div class="form-row">
+		<label for="node-input-inputs"><i class="fa fa-tag"></i> Inputs</label>
+		<input type="text" id="node-input-inputs" placeholder="Inputs">
+	</div>
+	<div class="form-row"> 
+		<label for="node-input-outputs"><i class="fa fa-tag"></i> Outputs</label>
+		<input type="text" id="node-input-outputs" placeholder="outputs">
+	</div>
+	<div class="form-row-long">
+		<label for="node-input-comment"><i class="fa fa-tag"></i> Code contents h file:</label>
+		<pre id="aceEditor" style="height: 200px;"></pre>
+	</div>
+	<div class="form-row-long">
+		<label for="node-input-comment2"><i class="fa fa-tag"></i> Code contents cpp file:</label>
+		<pre id="aceEditor2" style="height: 200px;"></pre>
+	</div>
+	
+</script>
+
+<script type="text/x-red" data-help-name="AudioMixer">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Combine up to n audio signals together, each with adjustable gain.<br>
+		All channels support signal attenuation or amplification.</p>
+	<p>	When used together with<br> a <b>array type</b> source,<br>
+	    only one input is needed, the code generator will make a mixer matching the array-size.</p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table id='table-AudioMixer' class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In n</td><td>Input signals</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Sum of all inputs</td></tr>
+	</table>
+	
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>gain</span>(channel, level);</p>
+	<p class=desc>Adjust the amplification or attenuation.  "channel" must
+		be 0 to n.  "level" may be any floating point number from 0 to 32767.0.
+		1.0 passes the signal through directly.  Level of 0 shuts the channel
+		off completely.  Between 0 to 1.0 attenuates the signal, and above
+		1.0 amplifies it.  Negative numbers may also be used, to invert the
+		signal.  All 2 channels have separate gain settings.
+	</p>
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; SamplePlayer
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; PlaySynthMusic
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; SpectrumAnalyzerBasic
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; DialTone_Serial
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; MemoryAndCpuUsage
+	</p>
+	<h3>Notes</h3>
+	<p>Signal clipping can occur when any channel has gain greater than 1.0,
+		or when multiple signals add together to greater than 1.0.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioMixer">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+	<div class="form-row">
+		<label for="node-input-id"><i class="fa fa-tag"></i> Id</label>
+		<input type="text" id="node-input-id" placeholder="Id">
+	</div>
+	<div class="form-row">
+		<label for="node-input-inputs"><i class="fa fa-tag"></i> Inputs</label>
+		<input type="text" id="node-input-inputs" placeholder="Inputs">
+	</div>
+	<div class="form-row">
+		Color: <input id="node-input-color" data-jscolor="">
+	</div>
+	<!-- this is only for debugging of the output pins change so i choose MixerX because it's allready dynamic -->
+	<!-- <div class="form-row"> 
+		<label for="node-input-outputs"><i class="fa fa-tag"></i> Outputs</label>
+		<input type="text" id="node-input-outputs" placeholder="outputs">
+	</div> --> 
+	<div class="form-row">
+		<label for="node-input-comment"><i class="fa fa-tag"></i> Comment</label>
+		<input type="text" id="node-input-comment" placeholder="Comment">
 		<!--<textarea style="font-family: monospace; font-size: 12px; background:rgb(226, 229, 255); padding-left: 0.5em;" class="input-block-level" id="node-input-comment" rows="12"></textarea>-->
 	</div>
 </script>
@@ -757,8 +876,6 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<div class="form-row">
 		<label for="node-input-comment"><i class="fa fa-tag"></i> Variable contens:</label>
 		<pre id="aceEditor" style="height: 400px;"></pre>
-		
-		<!--<textarea style="font-family: monospace; font-size: 12px; background:rgb(226, 229, 255); padding-left: 0.5em;" class="input-block-level" id="node-input-comment" rows="12"></textarea>-->
 	</div>
 </script>
 
@@ -2684,72 +2801,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 </div> <!-- Audio Output category -->
 
 <div> <!-- Audio Mixer category -->
-<script type="text/x-red" data-help-name="AudioMixer">
-	<h3>Summary</h3>
-	<div class=tooltipinfo>
-	<p>Combine up to n audio signals together, each with adjustable gain.<br>
-		All channels support signal attenuation or amplification.</p>
-	<p>	When used together with<br> a <b>array type</b> source,<br>
-	    only one input is needed, the code generator will make a mixer matching the array-size.</p>
-	</div>
-	<h3>Audio Connections</h3>
-	<table id='table-AudioMixer' class=doc align=center cellpadding=3>
-		<tr class=top><th>Port</th><th>Purpose</th></tr>
-		<tr class=odd><td align=center>In n</td><td>Input signals</td></tr>
-		<tr class=odd><td align=center>Out 0</td><td>Sum of all inputs</td></tr>
-	</table>
-	
-	<h3>Functions</h3>
-	<p class=func><span class=keyword>gain</span>(channel, level);</p>
-	<p class=desc>Adjust the amplification or attenuation.  "channel" must
-		be 0 to n.  "level" may be any floating point number from 0 to 32767.0.
-		1.0 passes the signal through directly.  Level of 0 shuts the channel
-		off completely.  Between 0 to 1.0 attenuates the signal, and above
-		1.0 amplifies it.  Negative numbers may also be used, to invert the
-		signal.  All 2 channels have separate gain settings.
-	</p>
-	<h3>Examples</h3>
-	<p class=exam>File &gt; Examples &gt; Audio &gt; SamplePlayer
-	</p>
-	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; PlaySynthMusic
-	</p>
-	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; SpectrumAnalyzerBasic
-	</p>
-	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; DialTone_Serial
-	</p>
-	<p class=exam>File &gt; Examples &gt; Audio &gt; MemoryAndCpuUsage
-	</p>
-	<h3>Notes</h3>
-	<p>Signal clipping can occur when any channel has gain greater than 1.0,
-		or when multiple signals add together to greater than 1.0.</p>
-</script>
-<script type="text/x-red" data-template-name="AudioMixer">
-	<div class="form-row">
-		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-		<input type="text" id="node-input-name" placeholder="Name">
-	</div>
-	<div class="form-row">
-		<label for="node-input-id"><i class="fa fa-tag"></i> Id</label>
-		<input type="text" id="node-input-id" placeholder="Id">
-	</div>
-	<div class="form-row">
-		<label for="node-input-inputs"><i class="fa fa-tag"></i> Inputs</label>
-		<input type="text" id="node-input-inputs" placeholder="Inputs">
-	</div>
-	<div class="form-row">
-		Color: <input id="node-input-color" data-jscolor="">
-	</div>
-	<!-- this is only for debugging of the output pins change so i choose MixerX because it's allready dynamic -->
-	<!-- <div class="form-row"> 
-		<label for="node-input-outputs"><i class="fa fa-tag"></i> Outputs</label>
-		<input type="text" id="node-input-outputs" placeholder="outputs">
-	</div> --> 
-	<div class="form-row">
-		<label for="node-input-comment"><i class="fa fa-tag"></i> Comment</label>
-		<input type="text" id="node-input-comment" placeholder="Comment">
-		<!--<textarea style="font-family: monospace; font-size: 12px; background:rgb(226, 229, 255); padding-left: 0.5em;" class="input-block-level" id="node-input-comment" rows="12"></textarea>-->
-	</div>
-</script>
+
 <script type="text/x-red" data-help-name="AudioAmplifier">
 	<h3>Summary</h3>
 	<div class=tooltipinfo>

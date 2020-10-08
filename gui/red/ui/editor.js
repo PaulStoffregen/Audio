@@ -163,6 +163,7 @@ RED.editor = (function() {
 		var d;
 
 		if (editing_node._def.oneditsave) {
+			console.warn("editing_node._def.oneditsave");
 			var oldValues = {};
 			for (d in editing_node._def.defaults) {
 				if (editing_node._def.defaults.hasOwnProperty(d)) {
@@ -253,100 +254,115 @@ RED.editor = (function() {
 			var editor = ace.edit("aceEditor");
 			editing_node.comment = editor.getValue();
 		}
+		else if (editing_node.type == "AudioStreamObject")
+		{
+			var editor = ace.edit("aceEditor");
+			var editor2 = ace.edit("aceEditor2");
+			editing_node.comment = editor.getValue();
+			editing_node.comment2 = editor2.getValue();
+		}
 		console.log("edit node bgColor:" + editing_node.bgColor);
 		editing_node.bgColor = $("#node-input-color").val();
 		console.log("edit node bgColor:" + editing_node.bgColor);
 		RED.view.redraw();
 		console.log("edit node saved!");
 	}
-
-	$( "#dialog" ).dialog({
-			modal: true,
-			autoOpen: false,
-			closeOnEscape: false,
-			width: 500,
-			buttons: [
-				{
-					text: "Ok",
-					click: function() {
-						if (editing_node) {
-							editNode_dialog_OK_pressed(); // found above
-						} else if (RED.view.state() == RED.state.EXPORT) {
-							if (/library/.test($( "#dialog" ).dialog("option","title"))) {
-								//TODO: move this to RED.library
-								var flowName = $("#node-input-filename").val();
-								if (!/^\s*$/.test(flowName)) {
-									$.post('library/flows/'+flowName,$("#node-input-filename").attr('nodes'),function() {
-											RED.library.loadFlowLibrary();
-											RED.notify("Saved nodes","success");
-									});
+	function init_edit_dialog()
+	{
+		$( "#dialog" ).dialog({
+				modal: true,
+				autoOpen: false,
+				closeOnEscape: false,
+				width: 500,
+				buttons: [
+					{
+						text: "Ok",
+						click: function() {
+							if (editing_node) {
+								editNode_dialog_OK_pressed(); // found above
+							} else if (RED.view.state() == RED.state.EXPORT) {
+								console.error("RED.view.state() == RED.state.EXPORT");
+								if (/library/.test($( "#dialog" ).dialog("option","title"))) {
+									//TODO: move this to RED.library
+									var flowName = $("#node-input-filename").val();
+									if (!/^\s*$/.test(flowName)) {
+										$.post('library/flows/'+flowName,$("#node-input-filename").attr('nodes'),function() {
+												RED.library.loadFlowLibrary();
+												RED.notify("Saved nodes","success");
+										});
+									}
 								}
+							} else if (RED.view.state() == RED.state.IMPORT) {
+								console.error("RED.view.state() == RED.state.IMPORT");
+								RED.view.importNodes($("#node-input-import").val());
 							}
-						} else if (RED.view.state() == RED.state.IMPORT) {
-							RED.view.importNodes($("#node-input-import").val());
+							else
+							{
+								console.error("editor no mode");
+							}
+							$( this ).dialog( "close" );
 						}
-						$( this ).dialog( "close" );
+					},
+					{
+						text: "Cancel",
+						click: function() {
+							$( this ).dialog( "close" );
+						}
+					}
+				],
+				resize: function(e,ui) {
+					if (editing_node) {
+
+						$(this).dialog('option',"sizeCache-"+editing_node.type,ui.size);
+						//RED.console_ok("editor height:" + ui.size.height);
+						//RED.console_ok("editor this height:"+$(this).height())
+						var aceEditor = $("#aceEditor");
+						if (aceEditor)
+						{
+							aceEditor.css("height", $(this).height() - 100);
+							$(this).scrollTop(aceEditor.scrollHeight);
+						}
 					}
 				},
-				{
-					text: "Cancel",
-					click: function() {
-						$( this ).dialog( "close" );
-					}
-				}
-			],
-			resize: function(e,ui) {
-				if (editing_node) {
-
-					$(this).dialog('option',"sizeCache-"+editing_node.type,ui.size);
-					//RED.console_ok("editor height:" + ui.size.height);
-					//RED.console_ok("editor this height:"+$(this).height())
-					var aceEditor = $("#aceEditor");
-					if (aceEditor)
-					{
-						aceEditor.css("height", $(this).height() - 100);
-						$(this).scrollTop(aceEditor.scrollHeight);
-					}
-				}
-			},
-			open: function(e) {
-				RED.keyboard.disable();
-				if (editing_node) {
-					
-					var size = $(this).dialog('option','sizeCache-'+editing_node.type);
-					if (size) {
-						$(this).dialog('option','width',size.width);
-						$(this).dialog('option','height',size.height);
-					}
-					var aceEditor = $("#aceEditor");
-					if (aceEditor)
-					{
-						aceEditor.css("height", $(this).height() - 100);
-						$(this).scrollTop(aceEditor.scrollHeight);
+				open: function(e) {
+					RED.keyboard.disable();
+					if (editing_node) {
 						
+						var size = $(this).dialog('option','sizeCache-'+editing_node.type);
+						if (size) {
+							$(this).dialog('option','width',size.width);
+							$(this).dialog('option','height',size.height);
+						}
+						var aceEditor = $("#aceEditor");
+						if (aceEditor)
+						{
+							aceEditor.css("height", $(this).height() - 100);
+							$(this).scrollTop(aceEditor.scrollHeight);
+							
+						}
+						$("#node-input-color").val(editing_node.bgColor);
+						jscolor.init();
 					}
-					$("#node-input-color").val(editing_node.bgColor);
-					jscolor.init();
-				}
 
-			},
-			close: function(e) {
-				RED.keyboard.enable();
+				},
+				close: function(e) {
+					RED.keyboard.enable();
 
-				if (RED.view.state() != RED.state.IMPORT_DRAGGING) {
-					RED.view.state(RED.state.DEFAULT);
+					if (RED.view.state() != RED.state.IMPORT_DRAGGING) {
+						RED.view.state(RED.state.DEFAULT);
+					}
+					$( this ).dialog('option','height','auto');
+					$( this ).dialog('option','width','500');
+					if (editing_node) {
+						RED.sidebar.info.refresh(editing_node);
+						RED.view.resetMouseVars();
+						console.log("edit node done!");
+					}
+					RED.sidebar.config.refresh();
+					editing_node = null;
 				}
-				$( this ).dialog('option','height','auto');
-				$( this ).dialog('option','width','500');
-				if (editing_node) {
-					RED.sidebar.info.refresh(editing_node);
-					RED.view.resetMouseVars();
-					console.log("edit node done!");
-				}
-				RED.sidebar.config.refresh();
-				editing_node = null;
-			}
-	});
+		});
+	}
 
 	/**
 	 * Create a config-node select box for this property
@@ -613,6 +629,31 @@ RED.editor = (function() {
 				//
 			});
 		}
+		if (node.type == "AudioStreamObject")
+		{
+			var aceEditor = ace.edit("aceEditor");
+			aceEditor.session.setMode("ace/mode/c_cpp");
+			aceEditor.setOptions({
+				enableBasicAutocompletion: true,
+				enableSnippets: true,
+				enableLiveAutocompletion: true,
+			});
+			aceEditor.setValue(node.comment);
+			aceEditor.session.selection.clearSelection();
+			//aceEditor.setOption("showInvisibles", true);
+			aceEditor.setOption("showTokenInfo", true);
+			var aceEditor2 = ace.edit("aceEditor2");
+			aceEditor2.session.setMode("ace/mode/c_cpp");
+			aceEditor2.setOptions({
+				enableBasicAutocompletion: true,
+				enableSnippets: true,
+				enableLiveAutocompletion: true,
+			});
+			aceEditor2.setValue(node.comment2);
+			aceEditor2.session.selection.clearSelection();
+			//aceEditor.setOption("showInvisibles", true);
+			aceEditor2.setOption("showTokenInfo", true);
+		}
 		for (var d in definition.defaults) {
 			if (definition.defaults.hasOwnProperty(d)) {
 				if (definition.defaults[d].type) {
@@ -653,17 +694,13 @@ RED.editor = (function() {
 
 	function showEditDialog(node) {
 		editing_node = node;
+		init_edit_dialog();
 		RED.view.state(RED.state.EDITING);
 		//$("#dialog-form").html(RED.view.getForm(node.type));
 		//console.log("get form for type:" + node.type);
 		var editorType = "";
 		
 		console.log("showEditDialog"); // just to make it easier to find this function
-		
-		//if (node.type == "AudioMixer") // Jannik add
-		//	editorType = "AudioMixer"; // Jannik add
-		//else
-		//	editorType = "NodesGlobalEdit"; // Jannik add (this force use of global edit form, except for other defined above
 		
 		// Jannik add start
 		// (this method is better because then we can define special edit for some types)
