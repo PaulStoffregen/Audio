@@ -2146,6 +2146,7 @@ RED.view = (function() {
 	$('#btn-export-library').click(function() {showExportNodesLibraryDialog();});
 
 	function showExportNodesDialog() {
+		RED.editor.init_edit_dialog();
 		mouse_mode = RED.state.EXPORT;
 		var nns = RED.nodes.createExportableNodeSet(moving_set);
 		//$("#dialog-form").html(getForm("dialog-form", "export-clipboard-dialog"));
@@ -2163,6 +2164,7 @@ RED.view = (function() {
 	}
 
 	function showExportNodesLibraryDialog() {
+		RED.editor.init_edit_dialog();
 		mouse_mode = RED.state.EXPORT;
 		var nns = RED.nodes.createExportableNodeSet(moving_set);
 		//$("#dialog-form").html(this.getForm('export-library-dialog'));
@@ -2173,6 +2175,7 @@ RED.view = (function() {
 	}
 
 	function showImportNodesDialog(is_arduino_code) {
+		RED.editor.init_edit_dialog();
 		mouse_mode = RED.state.IMPORT;
 		//$("#dialog-form").html(this.getForm('import-dialog'));
 		getForm("dialog-form", "import-dialog", function(d, f) {

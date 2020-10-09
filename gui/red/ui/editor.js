@@ -913,6 +913,7 @@ RED.editor = (function() {
 
 
 	return {
+		init_edit_dialog:init_edit_dialog,
 		edit: showEditDialog,
 		editConfig: showEditConfigNodeDialog,
 		validateNode: validateNode,
