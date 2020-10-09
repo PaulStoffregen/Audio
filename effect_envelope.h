@@ -32,11 +32,13 @@
 
 #define SAMPLES_PER_MSEC (AUDIO_SAMPLE_RATE_EXACT/1000.0)
 
+enum envelopeStateEnum { STATE_IDLE, STATE_DELAY, STATE_ATTACK, STATE_HOLD, STATE_DECAY, STATE_SUSTAIN, STATE_RELEASE, STATE_FORCED };
+
 class AudioEffectEnvelope : public AudioStream
 {
 public:
 	AudioEffectEnvelope() : AudioStream(1, inputQueueArray) {
-		state = 0;
+		state = STATE_IDLE;
 		delay(0.0f);  // default values...
 		attack(10.5f);
 		hold(2.5f);
@@ -45,6 +47,7 @@ public:
 		release(300.0f);
 		releaseNoteOn(5.0f);
 	}
+	uint8_t getState() { return state; }
 	void noteOn();
 	void noteOff();
 	void delay(float milliseconds) {

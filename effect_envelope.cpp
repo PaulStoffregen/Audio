@@ -27,14 +27,6 @@
 #include <Arduino.h>
 #include "effect_envelope.h"
 
-#define STATE_IDLE	0
-#define STATE_DELAY	1
-#define STATE_ATTACK	2
-#define STATE_HOLD	3
-#define STATE_DECAY	4
-#define STATE_SUSTAIN	5
-#define STATE_RELEASE	6
-#define STATE_FORCED	7
 
 void AudioEffectEnvelope::noteOn(void)
 {
@@ -105,10 +97,15 @@ void AudioEffectEnvelope::update(void)
 				inc_hires = (sustain_mult - 0x40000000) / (int32_t)count;
 				continue;
 			} else if (state == STATE_DECAY) {
-				state = STATE_SUSTAIN;
-				count = 0xFFFF;
-				mult_hires = sustain_mult;
-				inc_hires = 0;
+			  if (sustain_mult) {
+          state = STATE_SUSTAIN;
+          count = 0xFFFF;
+					mult_hires = sustain_mult;
+					inc_hires = 0;
+				} else {
+				  state = STATE_RELEASE;
+				  continue;
+				}
 			} else if (state == STATE_SUSTAIN) {
 				count = 0xFFFF;
 			} else if (state == STATE_RELEASE) {
