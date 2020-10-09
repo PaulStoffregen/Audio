@@ -1247,6 +1247,7 @@ RED.nodes = (function() {
 		else if (nt == "ClassComment") return false;
 		else if (nt == "Array") return false;
 		else if (nt == "Function") return false;
+		else if (nt == "AudioStreamObject") return false;
 		else if (isClass(nt)) return false;
 		return true;
 	}

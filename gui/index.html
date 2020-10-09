@@ -628,6 +628,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioEffectFreeverbStereo","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"freeverbs","inputs":1,"outputs":2,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectEnvelope","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"envelope","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectMultiply","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"multiply","inputs":2,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectRectifier","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"rectify","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectDelay","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"delay","inputs":1,"outputs":8,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectDelayExternal","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"delayExt","inputs":1,"outputs":8,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectBitcrusher","data":{"defaults":{"name":{"value":"new"},"comment":{"value":""}},"shortName":"bitcrusher","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -1060,7 +1061,9 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		simply streams data from the I2S hardware to its 4 output ports.</p>
 	<h3>Hardware</h3>
 	<p>See this Sparkfun blog for <a href="https://www.sparkfun.com/news/2055" target="_blank">how
-		to connect two audio adaptors for 4 channel audio</a>.
+		to connect two audio adaptors for 4 channel audio</a>.</p>
+	<p>For Teensy 4 and Rev D audio shields, see
+		<a href="https://forum.pjrc.com/threads/61123?p=242054&viewfull=1#post242054">this forum thread</a>.</p>
 	<p>The I2S signals are used in "master" mode, where Teensy creates
 		all 3 clock signals and controls all data timing.</p>
 	<table class=doc align=center cellpadding=3>
@@ -1307,17 +1310,27 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	</table>
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>getBufferedTime</span>();</p>
-	<p class=desc>TODO: documentation needed here (and what units does the returned value use?)
+	<p class=desc>Returns the buffered time in seconds. The buffered time is the duration of the incoming samples which are not resampled yet. The step width of the resampling algorithm is constantly slightly adjusted to keep the buffered time closely to the target latency. The difference between the target latency and the buffered time is typically smaller than 1 microsecond.
 	</p>
-	<p class=func><span class=keyword>getInputFrequency</span>();</p>
+	<!--<p class=func><span class=keyword>getInputFrequency</span>();</p>
 	<p class=desc>TODO: documentation needed here
-	</p>
+	</p>-->
 	<p class=func><span class=keyword>isLocked</span>();</p>
 	<p class=desc>Returns true if the S/PDIF phase locked loop is tracking
 		the sample rate of incoming digital audio data.
 	</p>
+	<p class=func><span class=keyword>getInputFrequency</span>();</p>
+	<p class=desc>Returns the sample rate of incoming data, if the PLL has locked, or returns 0 if the audio sample rate is unknown.
+	</p>
 	<p class=func><span class=keyword>getTargetLantency</span>();</p>
-	<p class=desc>TODO: documentation needed here (and what units does the returned value use?)
+	<p class=desc>Returns the target latency in seconds. The latency is the time from the moment a sample is received by the Teensy SPDIF hardware receiver until it is transmitted by the asrc intput. The audio samples arrive at the asrc input in chunks of 32 samples per channel. The target latency consists of these 32 samples + some buffer that is needed to compensate for timing variations.
+	</p>
+	<p class=func><span class=keyword>getAttenuation</span>();</p>
+	<p class=desc>
+Returns the actual achieved attenuation of the anti-aliasing filter. If the input sampling rate is smaller or equal to 44.1kHz, no low pass filtering is needed and zero is returned.
+	</p>
+	<p class=func><span class=keyword>getHalfFilterLength</span>();</p>
+	<p class=desc>Returns the half length of the resampling filter. Its complete length is 2*(the returned value)+1.
 	</p>
 	<h3>Hardware</h3>
 	<p>
@@ -1330,7 +1343,24 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughAsyncSpdif
 	</p>
 	<h3>Notes</h3>
-	<p>TODO: document optional instance parameters.... (dither, noiseshaping, attenuation, minHalfFilterLength) </p>
+	<p>AsyncAudioInputSPDIF3 is not able to clock the audio pipline (never has the 'update_responsibility'). At least 1 other input or output must be used to cause the entire Audio library to update.
+	</p>
+
+	<p>AsyncAudioInputSPDIF3 can optionally take parameters to alter its resampling behavior.
+	</p>
+	<p><span class=keyword>AsyncAudioInputSPDIF3</span>  spdif_async1(<i>dither</i>, <i>noiseshaping</i>, <i>attenuation</i>, <i>minHalfFilterLength</i>, <i>maxHalfFilterLength</i>);
+	</p>
+	<p class=desc><i>dither</i>: triangular shaped dither is added at the transition from 32bit float to 16bit integer if true (default: true)
+	</p>
+	<p class=desc><i>noiseshaping</i>: noise shaping is applied at the aforementioned transition if true (default: true)
+	</p>
+	<p class=desc><i>attenuation</i>: target attenuation of the anti-aliasing filter (default: 100dB). The attenuation is not reached if a filter longer than 161 is needed.
+	</p>
+	<p class=desc><i>minHalfFilterLength</i>: half of the guaranteed resampling filter (internally restricted to 80, default: 20). The filter might be longer if needed to achieve the requested attenuation.
+	</p>
+	<p class=desc><i>maxHalfFilterLength</i>: Restricts the maximum length of the resampling filter. The maximum half filter length is 80. This parameter can be used to further restrict the length in order to limit the processor usage.
+	</p>
+	<p>The windowed (Kaiser window) sinc-function is used as resample filter (i.e. to interpolate the incoming signal). The longer the filter, the better the quality of the resampled signal. However, a longer filter has a higher group delay and increases the processor usage. The sinc- filter also serves as anti-aliasing filter if the input sample rate is larger than 44.1kHz. The filter length is automatically increased at high input sample rates to reach the specified attenuation. However its half length is restricted to 80. 32bit floating point arithmetic is used at the resampling stage and the resampled signal is transformed to 16 bit integers afterwards. Here it is possible to apply triangular shaped dither and noise shaping to increase the perceived signal-to-noise-ratio.</p>
 </script>
 <script type="text/x-red" data-template-name="_AsyncAudioInputSPDIF3">
 	<div class="form-row">
@@ -1880,7 +1910,9 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<h3>Hardware</h3>
 	<p>See this Sparkfun blog for <a href="https://www.sparkfun.com/news/2055" target="_blank">how
 		to connect two audio adaptors for 4 channel audio</a>.  More
-		<a href="https://forum.pjrc.com/threads/29373-Bit-bang-multiple-I2S-inputs-simultaneously?p=79606#post79606" target="_blank">details</a> are also available.
+		<a href="https://forum.pjrc.com/threads/29373-Bit-bang-multiple-I2S-inputs-simultaneously?p=79606#post79606" target="_blank">details</a> are also available.</p>
+	<p>For Teensy 4 and Rev D audio shields, see
+		<a href="https://forum.pjrc.com/threads/61123?p=242054&viewfull=1#post242054">this forum thread</a>.</p>
 	<p>The I2S signals are used in "master" mode, where Teensy creates
 		all 3 clock signals and controls all data timing.</p>
 	<table class=doc align=center cellpadding=3>
@@ -4258,6 +4290,39 @@ double s_freq = .0625;</p>
     </p>
 </script>
 <script type="text/x-red" data-template-name="_AudioEffectMultiply">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioEffectRectifier">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Invert the negative portion of a signal, similar to a full wave rectifier circuit.
+	</p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Signal Input</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Rectifed (positive only) Signal</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>There are no functions to call from the Arduino sketch.
+		This object simply passes the positive portion of the
+		signal and inverts the signal when the input is negative.
+	</p>
+<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Vocoder19Band
+	</p>
+	<h3>Notes</h3>
+	<p>To create a half wave rectifier effect, use the waveshape effect.  See
+		<a href="https://forum.pjrc.com/threads/62091?p=255367&viewfull=1#post255367">this forum message</a> for a half-wave rectifier example.
+	</p>
+    </p>
+</script>
+<script type="text/x-red" data-template-name="_AudioEffectRectifier">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
