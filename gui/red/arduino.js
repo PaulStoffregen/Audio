@@ -45,17 +45,18 @@ RED.arduino = (function() {
 	{
 		var xmlHttp = new XMLHttpRequest();
 		const url = 'http://localhost:' + settings.WebServerPort;
-		xmlHttp.onreadystatechange = function() { 
-			//if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-				//callback(xmlHttp.responseText);
-		}
-		xmlHttp.onloadend = function () {
+		xmlHttp.onreadystatechange = function () {
 			if (param == "getJSON")
 			{
-				console.warn("JSON response");
-				RED.storage.loadContents(xmlHttp.responseText);
+				if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+					console.warn("JSON response");
+					RED.storage.loadContents(xmlHttp.responseText);
+				}
+				else if (xmlHttp.readyState == 4)
+					console.warn("getJSON did not response = " + xmlHttp.status);
 			}
-			console.warn("response:" + xmlHttp.responseText);
+			else
+				console.warn("response:" + xmlHttp.responseText);
 		  };
 		xmlHttp.open("GET", url+"\\?cmd=" + param, true); // true for asynchronous 
 		xmlHttp.send(null);
