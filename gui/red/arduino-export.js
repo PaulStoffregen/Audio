@@ -340,14 +340,16 @@ RED.arduino.export = (function() {
 				cppCN += "//xy=" + n.x + "," + n.y + "\n";
 			}
 		}
-		var jsonString = JSON.stringify(nns)
+		var jsonString = JSON.stringify(nns);
 		var cpp = getCppHeader(jsonString);
 		cpp += "\n" + cppAPN + "\n" + cppAC + "\n" + cppCN + "\n";
 		cpp += getCppFooter();
 		//console.log(cpp);
 
 		var wsCppFiles = [getNewWsCppFile(RED.nodes.getWorkspace(activeWorkspace).label + ".h", cpp)];
-		wsCppFiles.push(getNewWsCppFile("GUI_TOOL.json", jsonString));
+
+		wsCppFiles.push(getNewWsCppFile("GUI_TOOL.json", JSON.stringify(nns, null, 4))); // JSON beautifier
+
 		var wsCppFilesJson = getPOST_JSON(wsCppFiles, false);
 		RED.arduino.httpPostAsync(JSON.stringify(wsCppFilesJson));
 		const t1 = performance.now();
@@ -562,7 +564,7 @@ RED.arduino.export = (function() {
 			newWsCpp.cpp += "};\n"; // end of class
 			newWsCpp.header = getCppHeader(jsonString, classAdditional.join("\n"));
 			newWsCpp.footer = getCppFooter();
-			
+			wsCppFiles.push(newWsCpp);
 		} // workspaces loop
 		// time to generate the final result
 		var cpp = getCppHeader(jsonString);
@@ -576,7 +578,7 @@ RED.arduino.export = (function() {
 		}
 		cpp += getCppFooter();
 		//console.log(cpp);
-		wsCppFiles.push(getNewWsCppFile("GUI_TOOL.json", jsonString));
+		wsCppFiles.push(getNewWsCppFile("GUI_TOOL.json", JSON.stringify(nns, null, 4))); // JSON beautifier
 		console.log(jsonString);
 		var wsCppFilesJson = getPOST_JSON(wsCppFiles, false);
 		RED.arduino.httpPostAsync(JSON.stringify(wsCppFilesJson));

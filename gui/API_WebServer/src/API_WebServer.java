@@ -476,10 +476,11 @@ class MyHttpHandler implements HttpHandler
 			//	name += ".h";
 			String cpp = e.getString("cpp");
 			//editor.addNewFile(name, cpp); // need modificzation of arduino IDE source code
-			System.out.println(data);
+			
 			api.addNewFile(name, cpp); // uses reflection to use private members
 			//TODO: fix so that tabs/files that allready exist in the sketch is removed if they not exist in the json, this should be optional
 		}
+		//System.out.println(data);
 		editor.handleSave(true);
 	}
 	
