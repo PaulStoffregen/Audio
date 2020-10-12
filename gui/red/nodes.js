@@ -808,6 +808,8 @@ RED.nodes = (function() {
 		node_defs[oldName] = undefined;
 
 		console.log("workspaceNameChanged:" + oldName + " to " + newName + " with " + changedCount + " objects changed");
+
+		RED.arduino.httpGetAsync("renameFile:" + oldName + ".h:" + newName + ".h");
 	}
 	function workspaceNameCheck(newName)
 	{

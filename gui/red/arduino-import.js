@@ -17,6 +17,9 @@
  * limitations under the License.
  **/
 RED.arduino.import = (function() {
+
+	
+
     /**
 	 * Parses the input string which contains copied code from the Arduino IDE, scans the
 	 * nodes and connections and forms them into a JSON representation which will be

@@ -448,6 +448,7 @@ RED.view = (function() {
 		workspace_tabs.activateTab(tabId);
 		RED.history.push({t:'add',workspaces:[ws],dirty:dirty});
 		RED.view.dirty(true);
+		RED.arduino.httpGetAsync("addFile:" + ws.label + ".h");
 	}
 	$('#btn-workspace-add-tab').on("click",addWorkspace);
 	$('#btn-workspace-add').on("click",addWorkspace);
@@ -466,6 +467,8 @@ RED.view = (function() {
 		$( "#node-dialog-delete-workspace" ).dialog('option','workspace',ws);
 		$( "#node-dialog-delete-workspace-name" ).text(ws.label);
 		$( "#node-dialog-delete-workspace" ).dialog('open');
+
+		
 	}
 
 	function canvasMouseDown() {
@@ -2440,6 +2443,7 @@ RED.view = (function() {
 		},
 		removeWorkspace: function(ws) {
 			workspace_tabs.removeTab(ws.id); // see tabs.js
+			RED.arduino.httpGetAsync("removeFile:" + ws.label + ".h");
 		},
 		getWorkspace: function() {
 			return activeWorkspace;

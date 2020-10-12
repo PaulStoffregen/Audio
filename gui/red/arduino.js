@@ -19,6 +19,7 @@ RED.arduino = (function() {
 	var settings = {
 		useExportDialog: true,
 		IOcheckAtExport: true,
+		WebServerPort: 8080,
 	};
 
 	var settingsCategoryTitle = "Arduino Export/Import";
@@ -26,12 +27,13 @@ RED.arduino = (function() {
 	var settingsEditorLabels = {
 		useExportDialog: "Show export dialog",
 		IOcheckAtExport: "IO check At Export",
+		WebServerPort: "Web Server Port"
 	};
 
     function httpPostAsync(data)
 	{
 		var xhr = new XMLHttpRequest();
-		const url = 'http://localhost:8080';
+		const url = 'http://localhost:' + settings.WebServerPort;
 		xhr.open("POST", url, true);
 		xhr.onloadend = function () {
 			console.warn("response:" + xhr.responseText);
@@ -42,16 +44,25 @@ RED.arduino = (function() {
 	function httpGetAsync(param)
 	{
 		var xmlHttp = new XMLHttpRequest();
-		const url = 'http://localhost:8080';
+		const url = 'http://localhost:' + settings.WebServerPort;
 		xmlHttp.onreadystatechange = function() { 
 			//if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
 				//callback(xmlHttp.responseText);
 		}
+		xmlHttp.onloadend = function () {
+			if (param == "getJSON")
+			{
+				console.warn("JSON response");
+				RED.storage.loadContents(xmlHttp.responseText);
+			}
+			console.warn("response:" + xmlHttp.responseText);
+		  };
 		xmlHttp.open("GET", url+"\\?cmd=" + param, true); // true for asynchronous 
 		xmlHttp.send(null);
     }
     $('#btn-verify-compile').click(function() { httpGetAsync("compile"); });
-    $('#btn-compile-upload').click(function() { httpGetAsync("upload"); });
+	$('#btn-compile-upload').click(function() { httpGetAsync("upload"); });
+	$('#btn-get-design-json').click(function() { httpGetAsync("getJSON"); });
     
     return {
 		settings:settings,
