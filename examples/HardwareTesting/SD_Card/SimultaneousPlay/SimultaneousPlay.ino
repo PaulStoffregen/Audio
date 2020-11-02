@@ -1,6 +1,9 @@
 #include <Audio.h>
 #include <SD.h>
 
+// Get the six WAV files this program needs on your SD card:
+// https://forum.pjrc.com/threads/64235?p=258095&viewfull=1#post258095
+
 // Reducing this delay will attempt to play the files simultaneously.
 // The clips are about 3.0 to 3.4 seconds, even though the voice is
 // heard only for the about the first half second.
@@ -28,15 +31,20 @@ AudioConnection          patchCord9(mixer2, 0, i2s1, 1);
 AudioControlSGTL5000     sgtl5000_1;     //xy=625,368
 // GUItool: end automatically generated code
 
-// Use these with the Teensy 3.x Audio Shield (Rev C)
+// SD card on Teensy 3.x Audio Shield (Rev C)
 #define SDCARD_CS_PIN    10
 #define SDCARD_MOSI_PIN  7
 #define SDCARD_SCK_PIN   14
 
-// Use these with the Teensy 3.5 & 3.6 SD card
+// Built in SD card on Teensy 3.5, 3.6 & 4.1
 //#define SDCARD_CS_PIN    BUILTIN_SDCARD
 //#define SDCARD_MOSI_PIN  11  // not actually used
 //#define SDCARD_SCK_PIN   13  // not actually used
+
+// SD card on Teensy 4.x Audio Shield (Rev D)
+//#define SDCARD_CS_PIN    10
+//#define SDCARD_MOSI_PIN  11
+//#define SDCARD_SCK_PIN   13
 
 void setup() {
   AudioMemory(40);
