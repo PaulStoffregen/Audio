@@ -79,7 +79,7 @@ void playNumber(int n)
   Serial.print("Playing File: ");
   Serial.println(filename);
   Serial.flush();
-  playerlist[n]->play(filename.c_str());
+  playerlist[n % 6]->play(filename.c_str());
 }
 
 void loop() {
