@@ -1,6 +1,6 @@
-/* Audio Library for Teensy 3.X
- * Copyright (c) 2020, Mark Tillotson
+/* Wavefolder effect for Teensy Audio library
  *
+ * Copyright (c) 2020, Mark Tillotson
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,17 +23,18 @@
 
 #ifndef effect_wavefolder_h_
 #define effect_wavefolder_h_
+
 #include "Arduino.h"
 #include "AudioStream.h"
-#include "utility/dspinst.h"
 
 class AudioEffectWaveFolder : public AudioStream
 {
 public:
-	AudioEffectWaveFolder() : AudioStream(2, inputQueueArray) { }
-	virtual void update(void);
+  AudioEffectWaveFolder() : AudioStream(2, inputQueueArray) {}
+  virtual void update() ;
+
 private:
-	audio_block_t *inputQueueArray[2];
+  audio_block_t * inputQueueArray[2] ;
 };
 
 #endif
