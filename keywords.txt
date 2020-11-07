@@ -63,6 +63,7 @@ AudioEffectRectifier	KEYWORD2
 AudioFilterBiquad	KEYWORD2
 AudioFilterFIR	KEYWORD2
 AudioFilterStateVariable	KEYWORD2
+AudioEffectWaveFolder		KEYWORD2
 AudioInputAnalog	KEYWORD2
 AudioInputAnalogStereo	KEYWORD2
 AudioMixer4	KEYWORD2

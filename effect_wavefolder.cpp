@@ -1,4 +1,5 @@
-/* Audio Library for Teensy 3.X
+/* Wavefolder effect for Teensy Audio library
+ *
  * Copyright (c) 2020, Mark Tillotson
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,55 +21,37 @@
  * THE SOFTWARE.
  */
 
-#include <Arduino.h>
 #include "effect_wavefolder.h"
 
-void AudioEffectWaveFolder::update(void)
+void AudioEffectWaveFolder::update()
 {
-#if defined(__ARM_ARCH_7EM__)
-	audio_block_t *blocka, *blockb;
-	uint32_t *pa, *pb, *end;
-	uint32_t a12, a34; //, a56, a78;
-	uint32_t b12, b34; //, b56, b78;
+  audio_block_t * blocka = receiveWritable (0);
+  if (!blocka)
+    return;
+  audio_block_t * blockb = receiveReadOnly (1);
+  if (!blockb)
+  {
+    release (blocka);
+    return;
+  }
+  int16_t * pa = blocka->data ;
+  int16_t * pb = blockb->data ;
+  for (int i = 0 ; i < AUDIO_BLOCK_SAMPLES ; i++)
+  {
+    int32_t a12 = pa[i];
+    int32_t b12 = pb[i];
 
-	blocka = receiveWritable(0);
-	blockb = receiveReadOnly(1);
-	if (!blocka) {
-		if (blockb) release(blockb);
-		return;
-	}
-	if (!blockb) {
-		release(blocka);
-		return;
-	}
-	pa = (uint32_t *)(blocka->data);
-	pb = (uint32_t *)(blockb->data);
-	end = pa + AUDIO_BLOCK_SAMPLES/2;
-	while (pa < end) {
-		a12 = *pa;
-		b12 = *pb++;
+    // scale upto 16 times input, so that can fold upto 16 times in each polarity
+    int32_t s1 = (a12 * b12 + 0x400) >> 11 ;
+    // if in a band where the sense needs to be reverse, detect this
+    bool flip1 = ((s1 + 0x8000) >> 16) & 1 ;
+    // reverse and truncate to 16 bits
+    s1 = 0xFFFF & (flip1 ? -s1 : +s1) ;
 
-		int32_t s1 = signed_saturate_rshift(multiply_16tx16t(a12, b12), 16, 7) ;
-		int32_t s2 =signed_saturate_rshift(multiply_16bx16b(a12, b12), 16, 7) ;
-		bool flip1 = ((s1 + 0x8000) >> 16) & 1 ;
-		bool flip2 = ((s2 + 0x8000) >> 16) & 1 ;
-		s1 = flip1 ? -s1 : +s1 ;
-		s2 = flip2 ? -s2 : +s2 ;
-		a12 = pack_16b_16b (s1, s2) ;
-
-		*pa++ = a12;
-	}
-	transmit(blocka);
-	release(blocka);
-	release(blockb);
-
-#elif defined(KINETISL)
-	audio_block_t *block;
-
-	block = receiveReadOnly(0);
-	if (block) release(block);
-	block = receiveReadOnly(1);
-	if (block) release(block);
-#endif
+    pa[i] = s1;
+  }
+  transmit(blocka);
+  release(blocka);
+  release(blockb);
 }
 
