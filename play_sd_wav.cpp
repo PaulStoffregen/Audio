@@ -125,13 +125,11 @@ void AudioPlaySdWav::togglePlayPause(void) {
 	if(state_play >= 8 || state == STATE_STOP) return;
 
 	// toggle back and forth between state_play and STATE_PAUSED
-	switch(state) {
-		case state_play:
-			state = STATE_PAUSED
-			break;
-		case STATE_PAUSED:
-			state = state_play;
-			break;
+	if(state == state_play) {
+		state = STATE_PAUSED
+	}
+	else if(state == STATE_PAUSED)
+		state = state_play;
 	}
 }
 
