@@ -104,12 +104,18 @@ void playFile(const char *filename)
 
     // toggle play/pause state
     playWav1.togglePlayPause();
-    Serial.print("play1Wav.isPlaying() = ");
+    Serial.println(filename);
+    Serial.print("positionMillis() = ");
+    Serial.println(playWav1.positionMillis());
+    Serial.print("lengthMillis()   = ");
+    Serial.println(playWav1.lengthMillis());
+    Serial.print("isPlaying() = ");
     Serial.println(playWav1.isPlaying());
-    Serial.print("play1Wav.isPaused() = ");
+    Serial.print("isPaused()  = ");
     Serial.println(playWav1.isPaused());
-    Serial.print("play1Wav.isStopped() = ");
+    Serial.print("isStopped() = ");
     Serial.println(playWav1.isStopped());
+    Serial.println();
   }
 }
 
