@@ -154,6 +154,7 @@ void AudioOutputI2SQuad::isr(void)
 #if 1
 	memcpy_tointerleaveQuad(dest, src1, src2, src3, src4);
 #else
+	// about this code: https://forum.pjrc.com/threads/64508
 	for (int i=0; i < AUDIO_BLOCK_SAMPLES/2; i++) {
 		*dest++ = *src1++;
 		*dest++ = *src3++;
