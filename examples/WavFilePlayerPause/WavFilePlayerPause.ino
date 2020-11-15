@@ -79,7 +79,7 @@ void setup() {
   }
 }
 
-void playFilePause(const char *filename)
+void playFile(const char *filename)
 {
   Serial.print("Playing file: ");
   Serial.println(filename);
