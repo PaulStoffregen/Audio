@@ -612,7 +612,7 @@ bool AudioPlaySdWav::isStopped(void)
 uint32_t AudioPlaySdWav::positionMillis(void)
 {
 	uint8_t s = *(volatile uint8_t *)&state;
-	if (s >= 8) return 0;
+	if (s >= 8 && s != STATE_PAUSED) return 0;
 	uint32_t tlength = *(volatile uint32_t *)&total_length;
 	uint32_t dlength = *(volatile uint32_t *)&data_length;
 	uint32_t offset = tlength - dlength;
@@ -624,7 +624,7 @@ uint32_t AudioPlaySdWav::positionMillis(void)
 uint32_t AudioPlaySdWav::lengthMillis(void)
 {
 	uint8_t s = *(volatile uint8_t *)&state;
-	if (s >= 8) return 0;
+	if (s >= 8 && s != STATE_PAUSED) return 0;
 	uint32_t tlength = *(volatile uint32_t *)&total_length;
 	uint32_t b2m = *(volatile uint32_t *)&bytes2millis;
 	return ((uint64_t)tlength * b2m) >> 32;
