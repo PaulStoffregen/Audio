@@ -30,7 +30,7 @@
 
 void AudioEffectRectifier::update(void)
 {
-	audio_block_t *block = receiveReadOnly();
+	audio_block_t *block = receiveWritable();
 	if (!block) return;
 
 	int16_t *p = block->data;
