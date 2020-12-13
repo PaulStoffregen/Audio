@@ -42,6 +42,9 @@ DMAMEM __attribute__((aligned(32))) static uint32_t i2s_tx_buffer[AUDIO_BLOCK_SA
 #include "utility/imxrt_hw.h"
 #endif
 
+// high-level explanation of how this I2S & DMA code works:
+// https://forum.pjrc.com/threads/65229?p=263104&viewfull=1#post263104
+
 void AudioOutputI2S::begin(void)
 {
 	dma.begin(true); // Allocate the DMA channel first
