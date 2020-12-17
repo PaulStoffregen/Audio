@@ -48,6 +48,7 @@ DMAChannel AudioOutputPT8211::dma(false);
 
 void AudioOutputPT8211::begin(void)
 {
+	memset(i2s_tx_buffer, 0, sizeof(i2s_tx_buffer));
 	dma.begin(true); // Allocate the DMA channel first
 
 	block_left_1st = NULL;
@@ -77,7 +78,7 @@ void AudioOutputPT8211::begin(void)
 	I2S0_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE | I2S_TCSR_FR;
 	return;
 #elif defined(__IMXRT1052__) || defined(__IMXRT1062__)
-
+	arm_dcache_flush_delete(i2s_tx_buffer, sizeof(i2s_tx_buffer));	
 #if defined(__IMXRT1052__)
 	CORE_PIN6_CONFIG  = 3;  //1:TX_DATA0
 #elif defined(__IMXRT1062__)
