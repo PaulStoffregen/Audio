@@ -49,6 +49,8 @@ DMAChannel AudioOutputPT8211_2::dma(false);
 FLASHMEM
 void AudioOutputPT8211_2::begin(void)
 {
+	memset(i2s_tx_buffer, 0, sizeof(i2s_tx_buffer));
+	arm_dcache_flush_delete(i2s_tx_buffer, sizeof(i2s_tx_buffer));		
 	dma.begin(true); // Allocate the DMA channel first
 
 	block_left_1st = NULL;
