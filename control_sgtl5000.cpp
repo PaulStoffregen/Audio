@@ -1000,6 +1000,7 @@ void calcBiquad(uint8_t filtertype, float fC, float dB_Gain, float Q, uint32_t q
     a0 = (A+1.0F) - ((A-1.0F)*cosw) + (beta*sinw);
     a1 = -2.0F * ((A-1.0F) - ((A+1.0F)*cosw));
     a2 = -((A+1.0F) - ((A-1.0F)*cosw) - (beta*sinw));
+  break;
   default:
     b0 = 0.5;
     b1 = 0.0;
