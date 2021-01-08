@@ -648,19 +648,19 @@ void interleave(const int16_t *dest,const audio_block_t *block_left, const audio
 	uint32_t *end = p + NUM_SAMPLES;
 
 	if (block_left != nullptr && block_right != nullptr) {
-		int16_t *l = (int16_t*)&block_left->data[offset];
-		int16_t *r = (int16_t*)&block_right->data[offset];
+		uint16_t *l = (uint16_t*)&block_left->data[offset];
+		uint16_t *r = (uint16_t*)&block_right->data[offset];
 		do {
-			*p++ = (uint32_t)(*l++) << 16 | (uint32_t)(*r++);
-			*p++ = (uint32_t)(*l++) << 16 | (uint32_t)(*r++);
-			*p++ = (uint32_t)(*l++) << 16 | (uint32_t)(*r++);
-			*p++ = (uint32_t)(*l++) << 16 | (uint32_t)(*r++);
+			*p++ = (((uint32_t)(*l++)) << 16)  | (uint32_t)(*r++);
+			*p++ = (((uint32_t)(*l++)) << 16)  | (uint32_t)(*r++);
+			*p++ = (((uint32_t)(*l++)) << 16)  | (uint32_t)(*r++);
+			*p++ = (((uint32_t)(*l++)) << 16)  | (uint32_t)(*r++);
 		} while (p < end);
 		return;
 	}
 
 	if (block_left != nullptr) {
-		int16_t *l = (int16_t*)&block_left->data[offset];
+		uint16_t *l = (uint16_t*)&block_left->data[offset];
 		do {
 			*p++ = (uint32_t)(*l++) << 16;
 			*p++ = (uint32_t)(*l++) << 16;
@@ -671,7 +671,7 @@ void interleave(const int16_t *dest,const audio_block_t *block_left, const audio
 	}
 
 	if (block_right != nullptr) {
-		int16_t *r = (int16_t*)&block_right->data[offset];
+		uint16_t *r = (uint16_t*)&block_right->data[offset];
 		do {
 			*p++ =(uint32_t)(*r++);
 			*p++ =(uint32_t)(*r++);
