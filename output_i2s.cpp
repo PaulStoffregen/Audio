@@ -606,7 +606,7 @@ void AudioOutputI2S::begin(void)
 	SIM_SCGC6 |= SIM_SCGC6_I2S;//Enable I2S periphal
 
 	// enable MCLK, 16MHZ
-	I2S0_MCR = I2S_MCR_MICS(1) | I2S_MCR_MOE;
+	I2S0_MCR = I2S_MCR_MICS(0) | I2S_MCR_MOE;
 	//MDR is not available on Teensy LC
 
 	// configure transmitter
@@ -614,8 +614,8 @@ void AudioOutputI2S::begin(void)
 	I2S0_TCR1 = I2S_TCR1_TFW(0);
 	I2S0_TCR2 = I2S_TCR2_SYNC(0) | I2S_TCR2_BCP | I2S_TCR2_MSEL(1) | I2S_TCR2_BCD | I2S_TCR2_DIV(16);
 	I2S0_TCR3 = I2S_TCR3_TCE;
-	I2S0_TCR4 = I2S_TCR4_FRSZ(1) | I2S_TCR4_SYWD(31) | I2S_TCR4_MF | I2S_TCR4_FSE | I2S_TCR4_FSP | I2S_TCR4_FSD;
-	I2S0_TCR5 = I2S_TCR5_WNW(31) | I2S_TCR5_W0W(31) | I2S_TCR5_FBT(31);
+	I2S0_TCR4 = I2S_TCR4_FRSZ(1) | I2S_TCR4_SYWD(15) | I2S_TCR4_MF | I2S_TCR4_FSE | I2S_TCR4_FSP | I2S_TCR4_FSD;
+	I2S0_TCR5 = I2S_TCR5_WNW(15) | I2S_TCR5_W0W(15) | I2S_TCR5_FBT(15);
 
 #if 0 //TODO
 	// configure receiver (sync'd to transmitter clocks)
@@ -634,7 +634,7 @@ void AudioOutputI2S::begin(void)
 
 	//configure both DMA channels
 	dma1.sourceBuffer(i2s_tx_buffer1, sizeof(i2s_tx_buffer1));
-	dma1.CFG->DAR = (void *)((uint32_t)&I2S0_TDR0 + 2);
+	dma1.CFG->DAR = (void *)((uint32_t)&I2S0_TDR0);
 	dma1.CFG->DCR = (dma1.CFG->DCR & 0xF0F0F0FF) | DMA_DCR_DSIZE(2);
 	dma1.triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_TX);
 	dma1.interruptAtCompletion();
