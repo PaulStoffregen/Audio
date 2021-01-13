@@ -36,6 +36,9 @@ AudioPlaySdWav           playWav1;
 AudioOutputI2S           audioOutput;
 //AudioOutputSPDIF       audioOutput;
 //AudioOutputAnalog      audioOutput;
+//On Teensy LC, use this for the Teensy Audio Shield:
+//AudioOutputI2Sslave    audioOutput;
+
 AudioConnection          patchCord1(playWav1, 0, audioOutput, 0);
 AudioConnection          patchCord2(playWav1, 1, audioOutput, 1);
 AudioControlSGTL5000     sgtl5000_1;
