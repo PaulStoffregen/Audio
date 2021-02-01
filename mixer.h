@@ -23,6 +23,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+ 
+ // mixer.tpp (the implementaion) is included at the end of this file
 
 #ifndef mixer_h_
 #define mixer_h_
@@ -30,56 +32,69 @@
 #include "Arduino.h"
 #include "AudioStream.h"
 
-class AudioMixer4 : public AudioStream
-{
+#define AudioMixer4 AudioMixer<4>
+
 #if defined(__ARM_ARCH_7EM__)
-public:
-	AudioMixer4(void) : AudioStream(4, inputQueueArray) {
-		for (int i=0; i<4; i++) multiplier[i] = 65536;
-	}
-	virtual void update(void);
-	void gain(unsigned int channel, float gain) {
-		if (channel >= 4) return;
-		if (gain > 32767.0f) gain = 32767.0f;
-		else if (gain < -32767.0f) gain = -32767.0f;
-		multiplier[channel] = gain * 65536.0f; // TODO: proper roundoff?
-	}
-private:
-	int32_t multiplier[4];
-	audio_block_t *inputQueueArray[4];
+
+#define MULTI_UNITYGAIN 65536
+#define MULTI_UNITYGAIN_F 65536.0f
+#define MAX_GAIN 32767.0f
+#define MIN_GAIN -32767.0f
+#define MULT_DATA_TYPE int32_t
 
 #elif defined(KINETISL)
-public:
-	AudioMixer4(void) : AudioStream(4, inputQueueArray) {
-		for (int i=0; i<4; i++) multiplier[i] = 256;
-	}
-	virtual void update(void);
-	void gain(unsigned int channel, float gain) {
-		if (channel >= 4) return;
-		if (gain > 127.0f) gain = 127.0f;
-		else if (gain < -127.0f) gain = -127.0f;
-		multiplier[channel] = gain * 256.0f; // TODO: proper roundoff?
-	}
-private:
-	int16_t multiplier[4];
-	audio_block_t *inputQueueArray[4];
+
+#define MULTI_UNITYGAIN 256
+#define MULTI_UNITYGAIN_F 256.0f
+#define MAX_GAIN 127.0f
+#define MIN_GAIN -127.0f
+#define MULT_DATA_TYPE int16_t
+
 #endif
+
+template <int NN> class AudioMixer : public AudioStream
+{
+public:
+	AudioMixer(void) : AudioStream(NN, inputQueueArray) {
+		for (int i=0; i<NN; i++) multiplier[i] = MULTI_UNITYGAIN;
+	}	
+	void update();
+	/**
+	 * this sets the individual gains
+	 * @param channel
+	 * @param gain
+	 */
+	void gain(unsigned int channel, float gain);
+	/**
+	 * set all channels to specified gain
+	 * @param gain
+	 */
+	void gain(float gain);
+
+private:
+	MULT_DATA_TYPE multiplier[NN];
+	audio_block_t *inputQueueArray[NN];
 };
 
 class AudioAmplifier : public AudioStream
 {
 public:
-	AudioAmplifier(void) : AudioStream(1, inputQueueArray), multiplier(65536) {
+	AudioAmplifier(void) : AudioStream(1, inputQueueArray) {
+		multiplier = MULTI_UNITYGAIN;
 	}
-	virtual void update(void);
-	void gain(float n) {
-		if (n > 32767.0f) n = 32767.0f;
-		else if (n < -32767.0f) n = -32767.0f;
-		multiplier = n * 65536.0f;
-	}
+	void update();
+	/**
+	 * sets the gain for the amplifier 
+	 * if 0 it will transmit nothing
+	 * if 1 it will transmit without any change
+	 * @param gain
+	 */
+	void gain(float gain);
+
 private:
-	int32_t multiplier;
+	MULT_DATA_TYPE multiplier;
 	audio_block_t *inputQueueArray[1];
 };
+#include "mixer.tpp"
 
 #endif
