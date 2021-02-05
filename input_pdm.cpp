@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
- #if !defined(__IMXRT1052__) && !defined(__IMXRT1062__)
+#if defined(KINETISK)
  
 #include <Arduino.h>
 #include "input_pdm.h"
