@@ -37,8 +37,11 @@ public:
 	AudioPlaySdWav(void) : AudioStream(0, NULL), block_left(NULL), block_right(NULL) { begin(); }
 	void begin(void);
 	bool play(const char *filename);
+	void togglePlayPause(void);
 	void stop(void);
 	bool isPlaying(void);
+	bool isPaused(void);
+	bool isStopped(void);
 	uint32_t positionMillis(void);
 	uint32_t lengthMillis(void);
 	virtual void update(void);
