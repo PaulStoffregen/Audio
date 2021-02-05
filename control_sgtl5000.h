@@ -30,6 +30,10 @@
 #include <AudioStream.h>
 #include "AudioControl.h"
 
+// SGTL5000-specific defines for headphones
+#define AUDIO_HEADPHONE_DAC 0
+#define AUDIO_HEADPHONE_LINEIN 1
+
 class AudioControlSGTL5000 : public AudioControl
 {
 public:
@@ -52,6 +56,15 @@ public:
 			return write(0x002A, 0x0173) // mic preamp gain = +40dB
 			 && write(0x0020, 0x088)     // input gain +12dB (is this enough?)
 			 && write(0x0024, ana_ctrl & ~(1<<2)); // enable mic
+		} else {
+			return false;
+		}
+	}
+	bool headphoneSelect(int n) {
+		if (n == AUDIO_HEADPHONE_DAC) {
+			return write(0x0024, ana_ctrl | (1<<6)); // route DAC to headphones out
+		} else if (n == AUDIO_HEADPHONE_LINEIN) {
+			return write(0x0024, ana_ctrl & ~(1<<6)); // route linein to headphones out
 		} else {
 			return false;
 		}
