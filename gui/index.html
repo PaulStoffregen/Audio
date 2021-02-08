@@ -1317,7 +1317,8 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 		<tr class=odd><td align=center>Out 0</td><td>Filtered Audio Output</td></tr>
 	</table>
 	<h3>Functions</h3>
-	<p>This object has no functions to call from the Arduino sketch.  It
+	<p class="func"><span class="keyword">setGain</span>();</p><p class="desc">Use 0 for max sensitivity, or 3 for dealing with loud sounds.  Default gain is 2</p>
+	<p>This object has no other functions to call from the Arduino sketch.  It
 		simply streams data from the PDM data, filters out the high frequency
 		noise and gives you the audio signal.</p>
 	<h3>Hardware</h3>
