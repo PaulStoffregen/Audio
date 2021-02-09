@@ -222,6 +222,7 @@ function generateCPPFile(fileName, formattedName, audioData, sampleRate, encodin
   out += '// Audio data converted from audio file by wav2sketch_js\n\n';
   out += '#include "AudioSample' + formattedName + '.h"\n\n';
   out += '// Converted from ' + fileName + ', using ' + sampleRate + ' Hz, 16 bit ' + encodingType + ' encoding\n';
+  out += 'PROGMEM\n';
   out += 'const unsigned int AudioSample' + formattedName + '[' + audioData.length + '] = {\n';
   out += formatAudioData(audioData) + '\n};';
   return out;
