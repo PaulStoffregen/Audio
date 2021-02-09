@@ -68,8 +68,19 @@ void HNMoog::update(void)
 	blocka = receiveWritable(0);
 	blockb = receiveReadOnly(1);
 	if (!blocka) {
-		if (blockb) release(blockb);
-		return;
+		blocka = allocate();
+		if (!blocka) {
+			if (blockb) release(blockb);
+			return;
+		}
+		// When no data arrives, we must treat it as if zeros had
+		// arrived.  Because of resonance, we need to keep computing
+		// output.  Perhaps we could examine the filter state here
+		// and just return without any work when it's below some
+		// threshold we know produces no more sound/resonance?
+		for (int i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+			blocka->data[i] = 0;
+		}
 	}
 	if (!blockb) FCmodActive = false;
 	for (int i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
