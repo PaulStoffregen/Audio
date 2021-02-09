@@ -15,7 +15,7 @@
 #include <stdint.h>
 #define MOOG_PI 3.14159265358979323846264338327950288
 
-float HNMoog::LPF(float s, int i)
+float AudioFilterLadder::LPF(float s, int i)
 {
 	float ft = s * (1/1.3) + (0.3/1.3) * z0[i] - z1[i];
 	ft = ft * alpha + z1[i];
@@ -24,7 +24,7 @@ float HNMoog::LPF(float s, int i)
 	return ft;
 }
 
-void HNMoog::SetResonance(float res)
+void AudioFilterLadder::resonance(float res)
 {
 	// maps resonance = 0->1 to K = 0 -> 4
 	if (res > 1) {
@@ -35,13 +35,13 @@ void HNMoog::SetResonance(float res)
 	K = 4.0 * res;
 }
 
-void HNMoog::SetCutoff(float c)
+void AudioFilterLadder::frequency(float c)
 {
 	Fbase = c;
 	compute_coeffs(c);
 }
 
-void HNMoog::compute_coeffs(float c)
+void AudioFilterLadder::compute_coeffs(float c)
 {
 	if (c > 0.49 * AUDIO_SAMPLE_RATE_EXACT)
 		c = 0.49 * AUDIO_SAMPLE_RATE_EXACT;
@@ -53,13 +53,13 @@ void HNMoog::compute_coeffs(float c)
 	alpha = 0.9892f * wc - 0.4324f * wc2 + 0.1381f * wc * wc2 - 0.0202f * wc2 * wc2;
 }
 
-inline float fast_tanh(float x)
+static inline float fast_tanh(float x)
 {
 	float x2 = x * x;
 	return x * (27.0 + x2) / (27.0 + 9.0 * x2);
 }
 
-void HNMoog::update(void)
+void AudioFilterLadder::update(void)
 {
 	audio_block_t *blocka, *blockb;
 	float ftot, FCmod;

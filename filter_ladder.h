@@ -15,21 +15,21 @@
 #include "Arduino.h"
 #include "AudioStream.h"
 
-class HNMoog : public AudioStream
+class AudioFilterLadder: public AudioStream
 {
 public:
-	HNMoog() : AudioStream(2,inputQueueArray) {};
-	void SetCutoff(float FC);
-	void SetResonance(float reson);
-	float LPF(float s, int i);
-	void compute_coeffs(float fc);
+	AudioFilterLadder() : AudioStream(2, inputQueueArray) {};
+	void frequency(float FC);
+	void resonance(float reson);
 	virtual void update(void);
 private:
+	float LPF(float s, int i);
+	void compute_coeffs(float fc);
 	float alpha = 1.0;
-	float beta[4] = {0};
-	float z0[4] = {0};
-	float z1[4] = {0};
-	float K;
+	float beta[4] = {0.0, 0.0, 0.0, 0.0};
+	float z0[4] = {0.0, 0.0, 0.0, 0.0};
+	float z1[4] = {0.0, 0.0, 0.0, 0.0};
+	float K = 1.0;
 	float Fbase = 1000;
 	float overdrive = 1.0;
 	audio_block_t *inputQueueArray[2];
