@@ -528,6 +528,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioFilterBiquad","data":{"defaults":{"name":{"value":"new"}},"shortName":"biquad","inputs":1,"outputs":1,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioFilterFIR","data":{"defaults":{"name":{"value":"new"}},"shortName":"fir","inputs":1,"outputs":1,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioFilterStateVariable","data":{"defaults":{"name":{"value":"new"}},"shortName":"filter","inputs":2,"outputs":3,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioFilterLadder","data":{"defaults":{"name":{"value":"new"}},"shortName":"ladder","inputs":3,"outputs":1,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioAnalyzePeak","data":{"defaults":{"name":{"value":"new"}},"shortName":"peak","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioAnalyzeRMS","data":{"defaults":{"name":{"value":"new"}},"shortName":"rms","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioAnalyzeFFT256","data":{"defaults":{"name":{"value":"new"}},"shortName":"fft256","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -4503,7 +4504,7 @@ double s_freq = .0625;</p>
 	</p>
 	<p class=func><span class=keyword>octaveControl</span>(octaves);</p>
 	<p class=desc>Set how much (in octaves) the control signal can alter
-		the filter's corner freqency.  Range is 0 to 7 octaves.  For
+		the filter's corner frequency.  Range is 0 to 7 octaves.  For
 		example, when set to 2.5, a full scale positive signal (1.0) will
 		shift the filter frequency up 2.5 octaves, and a full scale negative
 		signal will shift it down 2.5 octaves.
@@ -4526,6 +4527,69 @@ double s_freq = .0625;</p>
 	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioFilterStateVariable">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+
+<script type="text/x-red" data-help-name="AudioFilterLadder">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>A low pass filter with resonant feedback, meant to approximate the
+		classic "Moog sound".  Both cut-off frequency and resonance level
+		can optionally be controlled by input audio signals.
+		</p>
+	<p align=center><img src="img/ladder.png"></p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Signal to Filter</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Frequency Control</td></tr>
+		<tr class=odd><td align=center>In 2</td><td>Resonance Control</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Low Pass Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>frequency</span>(freq);</p>
+	<p class=desc>Set the filter's corner frequency.  When a signal is
+		connected to the frequency control input, this setting is
+		the corner frequency the filter will implement
+		when the signal is zero.
+	</p>
+	<p class=func><span class=keyword>octaveControl</span>(octaves);</p>
+	<p class=desc>Set how much (in octaves) the control signal can alter
+		the filter's corner frequency.  Range is 0 to 7 octaves.  For
+		example, when set to 2.5, a full scale positive signal (1.0) will
+		shift the filter frequency up 2.5 octaves, and a full scale negative
+		signal will shift it down 2.5 octaves.
+	</p>
+	<p class=func><span class=keyword>resonance</span>(level);</p>
+	<p class=desc>Set the filter's feedback level for resonance.  The
+		usable range is 0 to 1.1, where values over 1.0 can cause
+		the filter to self oscillate.  When an audio signal is present
+		at the resonance control input, it overrides this setting.
+		Only positive signal values are used.  A full scale 1.0 signal
+		creates resonance setting 1.1 (self oscillation).
+		Any negative signal input is treated as zero.
+	</p>
+<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; LadderFilter
+	</p>
+	<h3>Notes</h3>
+	<p>
+		When controlled by a signal, the equation for the filter
+		frequency is:
+	</p>
+	<p>
+		<img src="img/filter_formula.png">
+	</p>
+	<p>This filter uses floating point math.  It is recommended for use
+		on Teensy 4.0 or higher.
+	</p>
+</script>
+<script type="text/x-red" data-template-name="AudioFilterLadder">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
