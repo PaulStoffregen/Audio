@@ -135,7 +135,7 @@ void AudioFilterLadder::update(void)
 		}
 		if (QmodActive) {
 			float Qmod = blockc->data[i] * (1.0f/32768.0f);
-			Ktot = K + (MAX_RESONANCE * 1.1f) * Qmod;
+			Ktot = K + (MAX_RESONANCE * 4.0f) * Qmod;
 			if (Ktot < 0.0f) Ktot = 0.0f;
 		}
 		float u = input - (z1[3] - 0.5f * input) * Ktot;
