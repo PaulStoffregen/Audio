@@ -38,6 +38,7 @@
 #define MOOG_PI ((float)3.14159265358979323846264338327950288)
 
 #define MAX_RESONANCE ((float)1.1)
+#define MAX_FREQUENCY ((float)(AUDIO_SAMPLE_RATE_EXACT * 0.49f))
 
 float AudioFilterLadder::LPF(float s, int i)
 {
@@ -65,10 +66,20 @@ void AudioFilterLadder::frequency(float c)
 	compute_coeffs(c);
 }
 
+void AudioFilterLadder::octaveControl(float octaves)
+{
+	if (octaves > 7.0f) {
+		octaves = 7.0f;
+	} else if (octaves < 0.0f) {
+		octaves = 0.0f;
+	}
+	octaveScale = octaves / 32768.0f;
+}
+
 void AudioFilterLadder::compute_coeffs(float c)
 {
-	if (c > 0.49f * AUDIO_SAMPLE_RATE_EXACT) {
-		c = 0.49f * AUDIO_SAMPLE_RATE_EXACT;
+	if (c > MAX_FREQUENCY) {
+		c = MAX_FREQUENCY;
 	} else if (c < 1.0f) {
 		c = 1.0f;
 	}
@@ -84,6 +95,24 @@ bool AudioFilterLadder::resonating()
 		if (fabsf(z1[i]) > 0.0001f) return true;
 	}
 	return false;
+}
+
+static inline float fast_exp2f(float x)
+{
+	float i;
+	float f = modff(x, &i);
+	f *= 0.693147f / 256.0f;
+	f += 1.0f;
+	f *= f;
+	f *= f;
+	f *= f;
+	f *= f;
+	f *= f;
+	f *= f;
+	f *= f;
+	f *= f;
+	f = ldexpf(f, i);
+	return f;
 }
 
 static inline float fast_tanh(float x)
@@ -128,9 +157,9 @@ void AudioFilterLadder::update(void)
 	for (int i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
 		float input = blocka->data[i] * (1.0f/32768.0f);
 		if (FCmodActive) {
-			float FCmod = blockb->data[i] * (1.0f/32768.0f);
-			// TODO: should this be "volts per octave"?
-			float ftot = Fbase + Fbase * FCmod;
+			float FCmod = blockb->data[i] * octaveScale;
+			float ftot = Fbase * fast_exp2f(FCmod);
+			if (ftot > MAX_FREQUENCY) ftot = MAX_FREQUENCY;
 			if (FCmod != 0) compute_coeffs(ftot);
 		}
 		if (QmodActive) {

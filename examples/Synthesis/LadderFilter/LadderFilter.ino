@@ -3,6 +3,11 @@
 // By Richard van Hoesel
 // https://forum.pjrc.com/threads/60488?p=269756&viewfull=1#post269756
 
+// Ladder filter demo with continuous 3-saw drone into the filter
+// with separate LFOs modulating filter frequency and resonance.
+// By Richard van Hoesel
+// https://forum.pjrc.com/threads/60488?p=269756&viewfull=1#post269756
+
 #include <Audio.h>
 
 AudioSynthWaveform       waveform1;
@@ -32,8 +37,9 @@ void setup() {
   sgtl5000_1.enable();
   sgtl5000_1.volume(0.6);
 
-  filter1.resonance(0.55);
-  filter1.frequency(4000);
+  filter1.resonance(0.55);    // "lfo2" waveform overrides this setting
+  filter1.frequency(800);     // "lfo1" modifies this 800 Hz setting
+  filter1.octaveControl(2.6); // up 2.6 octaves (4850 Hz) & down 2.6 octaves (132 Hz)
   waveform1.frequency(50);
   waveform2.frequency(100.1);
   waveform3.frequency(150.3);
@@ -44,17 +50,22 @@ void setup() {
   waveform2.begin(WAVEFORM_BANDLIMIT_SAWTOOTH);
   waveform3.begin(WAVEFORM_BANDLIMIT_SAWTOOTH);
   lfo1.frequency(0.2);
-  lfo1.amplitude(0.985);
+  lfo1.amplitude(0.99);
   lfo1.phase(270);
+  lfo1.begin(WAVEFORM_TRIANGLE);
   lfo2.frequency(0.07);
   lfo2.amplitude(0.55);
   lfo2.phase(270);
+  lfo2.begin(WAVEFORM_SINE);
 }
 
 void loop() {
-  Serial.print("CPU Usage: ");
+  Serial.print("Filter CPU Usage: ");
+  Serial.print(filter1.processorUsageMax());
+  Serial.print("%, Total CPU Usage: ");
   Serial.print(AudioProcessorUsageMax());
   Serial.println("%");
+  filter1.processorUsageMaxReset();
   AudioProcessorUsageMaxReset();
   delay(1000);
 }

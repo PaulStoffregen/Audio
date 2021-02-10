@@ -42,6 +42,7 @@ public:
 	AudioFilterLadder() : AudioStream(3, inputQueueArray) {};
 	void frequency(float FC);
 	void resonance(float reson);
+	void octaveControl(float octaves);
 	virtual void update(void);
 private:
 	float LPF(float s, int i);
@@ -53,6 +54,7 @@ private:
 	float z1[4] = {0.0, 0.0, 0.0, 0.0};
 	float K = 1.0;
 	float Fbase = 1000;
+	float octaveScale = 1.0f/32768.0f;
 	//float Qbase = 0.5;
 	//float overdrive = 1.0;
 	audio_block_t *inputQueueArray[3];
