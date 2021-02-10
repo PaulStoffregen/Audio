@@ -46,6 +46,7 @@ public:
 private:
 	float LPF(float s, int i);
 	void compute_coeffs(float fc);
+	bool resonating();
 	float alpha = 1.0;
 	float beta[4] = {0.0, 0.0, 0.0, 0.0};
 	float z0[4] = {0.0, 0.0, 0.0, 0.0};

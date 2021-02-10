@@ -77,6 +77,15 @@ void AudioFilterLadder::compute_coeffs(float c)
 	alpha = 0.9892f * wc - 0.4324f * wc2 + 0.1381f * wc * wc2 - 0.0202f * wc2 * wc2;
 }
 
+bool AudioFilterLadder::resonating()
+{
+	for (int i=0; i < 4; i++) {
+		if (fabsf(z0[i]) > 0.0001f) return true;
+		if (fabsf(z1[i]) > 0.0001f) return true;
+	}
+	return false;
+}
+
 static inline float fast_tanh(float x)
 {
 	float x2 = x * x;
@@ -94,17 +103,17 @@ void AudioFilterLadder::update(void)
 	blockb = receiveReadOnly(1);
 	blockc = receiveReadOnly(2);
 	if (!blocka) {
-		blocka = allocate();
+		if (resonating()) {
+			// When no data arrives but the filter is still
+			// resonating, we must continue computing the filter
+			// with zero input to sustain the resonance
+			blocka = allocate();
+		}
 		if (!blocka) {
 			if (blockb) release(blockb);
 			if (blockc) release(blockc);
 			return;
 		}
-		// When no data arrives, we must treat it as if zeros had
-		// arrived.  Because of resonance, we need to keep computing
-		// output.  Perhaps we could examine the filter state here
-		// and just return without any work when it's below some
-		// threshold we know produces no more sound/resonance?
 		for (int i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
 			blocka->data[i] = 0;
 		}
