@@ -24,10 +24,11 @@
 // Huovilainen New Moog (HNM) model as per CMJ jun 2006
 // Implemented as Teensy Audio Library compatible object
 // Richard van Hoesel, Feb. 9 2021
-// v.1.01 now includes FC "CV" modulation input
+// v.1.02 now includes both cutoff and resonance "CV" modulation inputs
 // please retain this header if you use this code.
 //-----------------------------------------------------------
 
+// https://forum.pjrc.com/threads/60488?p=269755&viewfull=1#post269755
 // https://forum.pjrc.com/threads/60488?p=269609&viewfull=1#post269609
 
 #include <Arduino.h>
@@ -48,12 +49,12 @@ float AudioFilterLadder::LPF(float s, int i)
 void AudioFilterLadder::resonance(float res)
 {
 	// maps resonance = 0->1 to K = 0 -> 4
-	if (res > 1) {
-		res = 1;
-	} else if (res < 0) {
-		res = 0;
+	if (res > 1.1f) {
+		res = 1.1f;
+	} else if (res < 0.0f) {
+		res = 0.0f;
 	}
-	K = 4.0 * res;
+	K = 4.0f * res;
 }
 
 void AudioFilterLadder::frequency(float c)
@@ -64,11 +65,11 @@ void AudioFilterLadder::frequency(float c)
 
 void AudioFilterLadder::compute_coeffs(float c)
 {
-	if (c > 0.49f * AUDIO_SAMPLE_RATE_EXACT)
+	if (c > 0.49f * AUDIO_SAMPLE_RATE_EXACT) {
 		c = 0.49f * AUDIO_SAMPLE_RATE_EXACT;
-	else if (c < 1)
-		c = 1;
-
+	} else if (c < 1.0f) {
+		c = 1.0f;
+	}
 	float wc = c * (float)(2.0f * MOOG_PI / AUDIO_SAMPLE_RATE_EXACT);
 	float wc2 = wc * wc;
 	alpha = 0.9892f * wc - 0.4324f * wc2 + 0.1381f * wc * wc2 - 0.0202f * wc2 * wc2;
@@ -82,16 +83,19 @@ static inline float fast_tanh(float x)
 
 void AudioFilterLadder::update(void)
 {
-	audio_block_t *blocka, *blockb;
-	float ftot, FCmod;
+	audio_block_t *blocka, *blockb, *blockc;
+	float Ktot;
 	bool FCmodActive = true;
+	bool QmodActive = true;
 
 	blocka = receiveWritable(0);
 	blockb = receiveReadOnly(1);
+	blockc = receiveReadOnly(2);
 	if (!blocka) {
 		blocka = allocate();
 		if (!blocka) {
 			if (blockb) release(blockb);
+			if (blockc) release(blockc);
 			return;
 		}
 		// When no data arrives, we must treat it as if zeros had
@@ -103,16 +107,27 @@ void AudioFilterLadder::update(void)
 			blocka->data[i] = 0;
 		}
 	}
-	if (!blockb) FCmodActive = false;
+	if (!blockb) {
+		FCmodActive = false;
+	}
+	if (!blockc) {
+		QmodActive = false;
+		Ktot = K;
+	}
 	for (int i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
 		float input = blocka->data[i] * (1.0f/32768.0f);
-		ftot = Fbase;
 		if (FCmodActive) {
-			FCmod = blockb->data[i] * (1.0f/32768.0f);
-			ftot += Fbase * FCmod;
+			float FCmod = blockb->data[i] * (1.0f/32768.0f);
+			// TODO: should this be "volts per octave"?
+			float ftot = Fbase + Fbase * FCmod;
 			if (FCmod != 0) compute_coeffs(ftot);
 		}
-		float u = input - (z1[3] - 0.5f * input) * K;
+		if (QmodActive) {
+			float Qmod = blockc->data[i] * (1.0f/32768.0f);
+			Ktot = K + 4.4f * Qmod;
+			if (Ktot < 0.0f) Ktot = 0.0f;
+		}
+		float u = input - (z1[3] - 0.5f * input) * Ktot;
 		u = fast_tanh(u);
 		float stage1 = LPF(u, 0);
 		float stage2 = LPF(stage1, 1);
@@ -123,5 +138,6 @@ void AudioFilterLadder::update(void)
 	transmit(blocka);
 	release(blocka);
 	if (blockb) release(blockb);
+	if (blockc) release(blockc);
 }
 

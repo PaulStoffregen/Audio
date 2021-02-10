@@ -24,7 +24,7 @@
 // Huovilainen New Moog (HNM) model as per CMJ jun 2006
 // Implemented as Teensy Audio Library compatible object
 // Richard van Hoesel, Feb. 9 2021
-// v.1.01 now includes FC "CV" modulation input
+// v.1.02 now includes both cutoff and resonance "CV" modulation inputs
 // please retain this header if you use this code.
 //-----------------------------------------------------------
 
@@ -39,7 +39,7 @@
 class AudioFilterLadder: public AudioStream
 {
 public:
-	AudioFilterLadder() : AudioStream(2, inputQueueArray) {};
+	AudioFilterLadder() : AudioStream(3, inputQueueArray) {};
 	void frequency(float FC);
 	void resonance(float reson);
 	virtual void update(void);
@@ -52,8 +52,9 @@ private:
 	float z1[4] = {0.0, 0.0, 0.0, 0.0};
 	float K = 1.0;
 	float Fbase = 1000;
-	float overdrive = 1.0;
-	audio_block_t *inputQueueArray[2];
+	//float Qbase = 0.5;
+	//float overdrive = 1.0;
+	audio_block_t *inputQueueArray[3];
 };
 
 #endif
