@@ -37,8 +37,8 @@
 #include <stdint.h>
 #define MOOG_PI ((float)3.14159265358979323846264338327950288)
 
-#define MAX_RESONANCE ((float)1.1)
-#define MAX_FREQUENCY ((float)(AUDIO_SAMPLE_RATE_EXACT * 0.49f))
+#define MAX_RESONANCE ((float)1.07)
+#define MAX_FREQUENCY ((float)(AUDIO_SAMPLE_RATE_EXACT * 0.249f))
 
 float AudioFilterLadder::LPF(float s, int i)
 {
