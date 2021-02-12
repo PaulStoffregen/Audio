@@ -25,6 +25,9 @@
  */
 
 #include <Arduino.h>
+
+#if !defined(KINETISL)
+
 #include "output_tdm.h"
 #include "memcpy_audio.h"
 #include "utility/imxrt_hw.h"
@@ -336,3 +339,4 @@ void AudioOutputTDM::config_tdm(void)
 #endif
 }
 
+#endif
