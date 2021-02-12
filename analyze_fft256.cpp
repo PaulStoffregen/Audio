@@ -31,6 +31,7 @@
 
 
 // 140312 - PAH - slightly faster copy
+__attribute__((unused))
 static void copy_to_fft_buffer(void *destination, const void *source)
 {
 	const uint16_t *src = (const uint16_t *)source;
@@ -41,6 +42,7 @@ static void copy_to_fft_buffer(void *destination, const void *source)
 	}
 }
 
+__attribute__((unused))
 static void apply_window_to_fft_buffer(void *buffer, const void *window)
 {
 	int16_t *buf = (int16_t *)buffer;
