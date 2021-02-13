@@ -37,7 +37,7 @@
 #include <stdint.h>
 #define MOOG_PI ((float)3.14159265358979323846264338327950288)
 
-#define MAX_RESONANCE ((float)1.07)
+#define MAX_RESONANCE ((float)1.2)
 #define MAX_FREQUENCY ((float)(AUDIO_SAMPLE_RATE_EXACT * 0.249f))
 
 float AudioFilterLadder::LPF(float s, int i)
@@ -165,7 +165,11 @@ void AudioFilterLadder::update(void)
 		if (QmodActive) {
 			float Qmod = blockc->data[i] * (1.0f/32768.0f);
 			Ktot = K + (MAX_RESONANCE * 4.0f) * Qmod;
-			if (Ktot < 0.0f) Ktot = 0.0f;
+			if (Ktot > MAX_RESONANCE * 4.0f) {
+				Ktot = MAX_RESONANCE * 4.0f;
+			} else if (Ktot < 0.0f) {
+				Ktot = 0.0f;
+			}
 		}
 		float u = input - (z1[3] - 0.5f * input) * Ktot;
 		u = fast_tanh(u);
