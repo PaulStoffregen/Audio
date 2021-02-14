@@ -23,7 +23,9 @@
 //-----------------------------------------------------------
 // Huovilainen New Moog (HNM) model as per CMJ jun 2006
 // Implemented as Teensy Audio Library compatible object
-// Richard van Hoesel, Feb. 9 2021
+// Richard van Hoesel, v. 1.03, Feb. 14 2021
+// v.1.03 adds oversampling, extended resonance,
+// and exposes parameters input_drive and passband_gain
 // v.1.02 now includes both cutoff and resonance "CV" modulation inputs
 // please retain this header if you use this code.
 //-----------------------------------------------------------
@@ -43,6 +45,8 @@ public:
 	void frequency(float FC);
 	void resonance(float reson);
 	void octaveControl(float octaves);
+	void passband_gain(float passbandgain);
+	void input_drive(float drv);
 	virtual void update(void);
 private:
 	float LPF(float s, int i);
@@ -52,11 +56,14 @@ private:
 	float beta[4] = {0.0, 0.0, 0.0, 0.0};
 	float z0[4] = {0.0, 0.0, 0.0, 0.0};
 	float z1[4] = {0.0, 0.0, 0.0, 0.0};
-	float K = 1.0;
-	float Fbase = 1000;
+	float K = 2.8;
+	float Fbase = 800;
+	float Qadjust = 1.0f;
 	float octaveScale = 1.0f/32768.0f;
-	//float Qbase = 0.5;
-	//float overdrive = 1.0;
+	float pbg = 0.0f;
+	float overdrive = 1.0f;
+	float host_overdrive = 1.0f;
+	float lfkmod = 1.0;
 	audio_block_t *inputQueueArray[3];
 };
 

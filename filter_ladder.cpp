@@ -24,6 +24,8 @@
 // Huovilainen New Moog (HNM) model as per CMJ jun 2006
 // Implemented as Teensy Audio Library compatible object
 // Richard van Hoesel, Feb. 9 2021
+// v.1.03 adds oversampling, extended resonance,
+// and exposes parameters input_drive and passband_gain
 // v.1.02 now includes both cutoff and resonance "CV" modulation inputs
 // please retain this header if you use this code.
 //-----------------------------------------------------------
@@ -37,8 +39,14 @@
 #include <stdint.h>
 #define MOOG_PI ((float)3.14159265358979323846264338327950288)
 
+//#define osTimes 1
+//#define MAX_RESONANCE ((float)1.1)
+//#define MAX_FREQUENCY ((float)(AUDIO_SAMPLE_RATE_EXACT * 0.249f))
+
+#define osTimes 2
 #define MAX_RESONANCE ((float)1.2)
-#define MAX_FREQUENCY ((float)(AUDIO_SAMPLE_RATE_EXACT * 0.249f))
+#define MAX_FREQUENCY ((float)(AUDIO_SAMPLE_RATE_EXACT * 0.38f))
+#define lfq 0.25
 
 float AudioFilterLadder::LPF(float s, int i)
 {
@@ -76,6 +84,27 @@ void AudioFilterLadder::octaveControl(float octaves)
 	octaveScale = octaves / 32768.0f;
 }
 
+void AudioFilterLadder:: passband_gain(float passbandgain)
+{
+	pbg = passbandgain;
+	if (pbg > 0.5f) pbg = 0.5f;
+	if (pbg < 0.0f) pbg = 0.0f;
+	input_drive(host_overdrive);
+}
+
+void AudioFilterLadder::input_drive(float odrv)
+{
+	host_overdrive = odrv;
+	if (host_overdrive > 1.0f) {
+		if (host_overdrive > 4.0f) host_overdrive = 4.0f;
+		// max is 4 when pbg = 0, and 2.5 when pbg is 0.5
+		overdrive = 1.0f + (host_overdrive - 1.0f) * (1.0f - pbg);
+	} else {
+		overdrive = host_overdrive;
+		if (overdrive < 0.0f) overdrive = 0.0f;
+	}
+}
+
 void AudioFilterLadder::compute_coeffs(float c)
 {
 	if (c > MAX_FREQUENCY) {
@@ -83,9 +112,15 @@ void AudioFilterLadder::compute_coeffs(float c)
 	} else if (c < 1.0f) {
 		c = 1.0f;
 	}
+#ifdef lfq
+	if (c < 500.0f) lfkmod = 1.0f + (500.0f - c) * (1.0f/500.0f) * lfq;
+#endif
 	float wc = c * (float)(2.0f * MOOG_PI / AUDIO_SAMPLE_RATE_EXACT);
 	float wc2 = wc * wc;
 	alpha = 0.9892f * wc - 0.4324f * wc2 + 0.1381f * wc * wc2 - 0.0202f * wc2 * wc2;
+	// TODO: we're not using Qadjust, right?
+	//Qadjust = 1.0029f + 0.0526f * wc - 0.0926 * wc2 + 0.0218* wc * wc2;
+	Qadjust = 1.006f + 0.0536f * wc - 0.095 * wc2 ;
 }
 
 bool AudioFilterLadder::resonating()
@@ -124,7 +159,7 @@ static inline float fast_tanh(float x)
 void AudioFilterLadder::update(void)
 {
 	audio_block_t *blocka, *blockb, *blockc;
-	float Ktot;
+	float Ktot, Kmax;
 	bool FCmodActive = true;
 	bool QmodActive = true;
 
@@ -155,7 +190,7 @@ void AudioFilterLadder::update(void)
 		Ktot = K;
 	}
 	for (int i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
-		float input = blocka->data[i] * (1.0f/32768.0f);
+		float input = blocka->data[i] * (1.0f/32768.0f) * overdrive;
 		if (FCmodActive) {
 			float FCmod = blockb->data[i] * octaveScale;
 			float ftot = Fbase * fast_exp2f(FCmod);
@@ -164,20 +199,29 @@ void AudioFilterLadder::update(void)
 		}
 		if (QmodActive) {
 			float Qmod = blockc->data[i] * (1.0f/32768.0f);
-			Ktot = K + (MAX_RESONANCE * 4.0f) * Qmod;
-			if (Ktot > MAX_RESONANCE * 4.0f) {
-				Ktot = MAX_RESONANCE * 4.0f;
-			} else if (Ktot < 0.0f) {
-				Ktot = 0.0f;
-			}
+			Ktot = K + 4.0f * Qmod;
 		}
-		float u = input - (z1[3] - 0.5f * input) * Ktot;
-		u = fast_tanh(u);
-		float stage1 = LPF(u, 0);
-		float stage2 = LPF(stage1, 1);
-		float stage3 = LPF(stage2, 2);
-		float stage4 = LPF(stage3, 3);
-		blocka->data[i] = stage4 * 32767.0f;
+		#ifdef lfq
+		Kmax = MAX_RESONANCE * 4.0f * lfkmod;
+		#else
+		Kmax = MAX_RESONANCE * 4.0f;
+		#endif
+		if (Ktot > Kmax) {
+			Ktot = Kmax;
+		} else if (Ktot < 0.0f) {
+			Ktot = 0.0f;
+		}
+		float total = 0.0f;
+		for(int os = 0; os < osTimes; os++) {
+			float u = input - (z1[3] - pbg * input) * Ktot;
+			u = fast_tanh(u);
+			float stage1 = LPF(u, 0);
+			float stage2 = LPF(stage1, 1);
+			float stage3 = LPF(stage2, 2);
+			float stage4 = LPF(stage3, 3);
+			total += stage4 * (1.0f / (float)osTimes);
+		}
+		blocka->data[i] = total * 32767.0f;
 	}
 	transmit(blocka);
 	release(blocka);
