@@ -160,7 +160,7 @@ void AudioFilterLadder::update(void)
 			float FCmod = blockb->data[i] * octaveScale;
 			float ftot = Fbase * fast_exp2f(FCmod);
 			if (ftot > MAX_FREQUENCY) ftot = MAX_FREQUENCY;
-			if (FCmod != 0) compute_coeffs(ftot);
+			compute_coeffs(ftot);
 		}
 		if (QmodActive) {
 			float Qmod = blockc->data[i] * (1.0f/32768.0f);
