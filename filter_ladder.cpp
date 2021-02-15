@@ -24,6 +24,8 @@
 // Huovilainen New Moog (HNM) model as per CMJ jun 2006
 // Implemented as Teensy Audio Library compatible object
 // Richard van Hoesel, Feb. 9 2021
+// v1.4 FC extended to 18.7kHz, max res to 1.8, 4x oversampling,
+//      and a minor Q-tuning adjustment
 // v.1.03 adds oversampling, extended resonance,
 // and exposes parameters input_drive and passband_gain
 // v.1.02 now includes both cutoff and resonance "CV" modulation inputs
@@ -43,10 +45,14 @@
 //#define MAX_RESONANCE ((float)1.1)
 //#define MAX_FREQUENCY ((float)(AUDIO_SAMPLE_RATE_EXACT * 0.249f))
 
-#define osTimes 2
-#define MAX_RESONANCE ((float)1.2)
-#define MAX_FREQUENCY ((float)(AUDIO_SAMPLE_RATE_EXACT * 0.38f))
-#define lfq 0.25
+//#define osTimes 2
+//#define MAX_RESONANCE ((float)1.2)
+//#define MAX_FREQUENCY ((float)(AUDIO_SAMPLE_RATE_EXACT * 0.38f))
+
+#define osTimes 4
+#define MAX_RESONANCE ((float)1.8)
+#define MAX_FREQUENCY ((float)(AUDIO_SAMPLE_RATE_EXACT * 0.425f))
+//#define lfq 0.25
 
 float AudioFilterLadder::LPF(float s, int i)
 {
@@ -120,7 +126,8 @@ void AudioFilterLadder::compute_coeffs(float c)
 	alpha = 0.9892f * wc - 0.4324f * wc2 + 0.1381f * wc * wc2 - 0.0202f * wc2 * wc2;
 	// TODO: we're not using Qadjust, right?
 	//Qadjust = 1.0029f + 0.0526f * wc - 0.0926 * wc2 + 0.0218* wc * wc2;
-	Qadjust = 1.006f + 0.0536f * wc - 0.095 * wc2 ;
+	//Qadjust = 1.006f + 0.0536f * wc - 0.095 * wc2 ;
+	Qadjust = 1.006f + 0.0536f * wc - 0.095f * wc2 - 0.05f * wc2 * wc2;
 }
 
 bool AudioFilterLadder::resonating()
@@ -187,7 +194,6 @@ void AudioFilterLadder::update(void)
 	}
 	if (!blockc) {
 		QmodActive = false;
-		Ktot = K;
 	}
 	for (int i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
 		float input = blocka->data[i] * (1.0f/32768.0f) * overdrive;
@@ -200,6 +206,8 @@ void AudioFilterLadder::update(void)
 		if (QmodActive) {
 			float Qmod = blockc->data[i] * (1.0f/32768.0f);
 			Ktot = K + 4.0f * Qmod;
+		} else {
+			Ktot = K;
 		}
 		#ifdef lfq
 		Kmax = MAX_RESONANCE * 4.0f * lfkmod;
