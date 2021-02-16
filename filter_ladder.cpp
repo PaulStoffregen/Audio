@@ -121,10 +121,9 @@ void AudioFilterLadder::compute_coeffs(float c)
 #ifdef lfq
 	if (c < 500.0f) lfkmod = 1.0f + (500.0f - c) * (1.0f/500.0f) * lfq;
 #endif
-	float wc = c * (float)(2.0f * MOOG_PI / AUDIO_SAMPLE_RATE_EXACT);
+	float wc = c * (float)(2.0f * MOOG_PI / ((float)osTimes * AUDIO_SAMPLE_RATE_EXACT));
 	float wc2 = wc * wc;
 	alpha = 0.9892f * wc - 0.4324f * wc2 + 0.1381f * wc * wc2 - 0.0202f * wc2 * wc2;
-	// TODO: we're not using Qadjust, right?
 	//Qadjust = 1.0029f + 0.0526f * wc - 0.0926 * wc2 + 0.0218* wc * wc2;
 	//Qadjust = 1.006f + 0.0536f * wc - 0.095 * wc2 ;
 	Qadjust = 1.006f + 0.0536f * wc - 0.095f * wc2 - 0.05f * wc2 * wc2;
@@ -221,7 +220,7 @@ void AudioFilterLadder::update(void)
 		}
 		float total = 0.0f;
 		for(int os = 0; os < osTimes; os++) {
-			float u = input - (z1[3] - pbg * input) * Ktot;
+			float u = input - (z1[3] - pbg * input) * Ktot * Qadjust;
 			u = fast_tanh(u);
 			float stage1 = LPF(u, 0);
 			float stage2 = LPF(stage1, 1);
