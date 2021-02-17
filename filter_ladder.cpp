@@ -115,8 +115,8 @@ void AudioFilterLadder::compute_coeffs(float c)
 {
 	if (c > MAX_FREQUENCY) {
 		c = MAX_FREQUENCY;
-	} else if (c < 1.0f) {
-		c = 1.0f;
+	} else if (c < 5.0f) {
+		c = 5.0f;
 	}
 #ifdef lfq
 	if (c < 500.0f) lfkmod = 1.0f + (500.0f - c) * (1.0f/500.0f) * lfq;
