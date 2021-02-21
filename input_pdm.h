@@ -34,10 +34,22 @@
 class AudioInputPDM : public AudioStream
 {
 public:
+#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
+	AudioInputPDM(bool _use_i2s2) : AudioStream(0, NULL)
+        {
+	  begin(_use_i2s2);
+	}
+	AudioInputPDM(void) : AudioStream(0, NULL) { begin(false); }
+#else
 	AudioInputPDM(void) : AudioStream(0, NULL) { begin(); }
+#endif
 	virtual void update(void);
+#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
+	void begin(bool _use_i2s2);
+#else
 	void begin(void);
-protected:	
+#endif
+protected:
 	static bool update_responsibility;
 	static DMAChannel dma;
 	static void isr(void);
