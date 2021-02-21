@@ -1309,8 +1309,8 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<li>Teensy 3.2
 	<li>Teensy 3.5
 	<li>Teensy 3.6
-	<!--<li>Teensy 4.0
-	<li>Teensy 4.1-->
+	<li>Teensy 4.0
+	<li>Teensy 4.1
 	</ul>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -1324,20 +1324,22 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<h3>Hardware</h3>
 	<p>PDM has been tested with this <a href="https://www.adafruit.com/product/3492">
 		Adafruit MP34DT01-M Microphone Board</a>.
-		</p>
+	</p>
 	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Pin</th><th>Signal</th><th>Direction</th></tr>
-		<tr class=odd><td align=center>9</td><td>CLK</td><td>Output, 2.8235 MHz</td></tr>
-		<tr class=odd><td align=center>13</td><td>DATA</td><td>Input, Data on rising edge</td></tr>
+		<tr class=top><th>T3.x Pin</th><th>T4.x Pin I2S1</th><th>T4.x Pin I2S2</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>9</td><td align=center>21</td><td align=center>4</td><td>CLK</td><td>Output, 2.8235 MHz</td></tr>
+		<tr class=odd><td align=center>13</td><td align=center>8</td><td align=center>5</td><td>DATA</td><td>Input, Data on rising edge</td></tr>
 	</table>
+
 	<p>Data is input on the rising edge.  The SEL pin on MP34DT01-M should be
 		connected LOW for proper data capture.</p>
 	<!--<h3>Examples</h3>-->
 	<h3>Notes</h3>
-	<p>Filtering consumes approximately 39% of the CPU when running at
+	<p>On the T3 filtering consumes approximately 39% of the CPU when running at
 		96 MHz.  The code currently consumes this time inside a high
 		priority interrupt, blocking other libraries.  Perhaps future
-		versions will perform filtering at lower priority.
+	  versions will perform filtering at lower priority.  The CPU usage is less
+	  burdensome for the T4.
 		</p>
 	<p>The filter used is a 512 tap FIR with approx &plusmn;1.1 dB gain
 		flatness to 10 kHz.  While far from audiophile grade, this should
