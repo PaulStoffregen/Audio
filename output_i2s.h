@@ -41,6 +41,7 @@ public:
 	virtual void update(void);
 	void begin(void);
 	friend class AudioInputI2S;
+	friend class AudioInputPDM;
 #if defined(__IMXRT1062__)
 	friend class AudioOutputI2SQuad;
 	friend class AudioInputI2SQuad;
@@ -51,7 +52,7 @@ public:
 #endif
 protected:
 	AudioOutputI2S(int dummy): AudioStream(2, inputQueueArray) {} // to be used only inside AudioOutputI2Sslave !!
-	static void config_i2s(void);
+	static void config_i2s(bool only_bclk = false);
 	static audio_block_t *block_left_1st;
 	static audio_block_t *block_right_1st;
 	static bool update_responsibility;
