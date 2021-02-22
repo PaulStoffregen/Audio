@@ -24,21 +24,20 @@
  * THE SOFTWARE.
  */
 
-#ifndef _input_pdm_h_
-#define _input_pdm_h_
+#ifndef _input_pdm_i2s2_h_
+#define _input_pdm_i2s2_h_
 
 #include "Arduino.h"
 #include "AudioStream.h"
 #include "DMAChannel.h"
 
-class AudioInputPDM : public AudioStream
+class AudioInputPDM2 : public AudioStream
 {
 public:
-	AudioInputPDM(void) : AudioStream(0, NULL) { begin(); }
+	AudioInputPDM2(void) : AudioStream(0, NULL) { begin(); }
 
 	virtual void update(void);
 	void begin(void);
-
 protected:
 	static bool update_responsibility;
 	static DMAChannel dma;

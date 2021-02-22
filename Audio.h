@@ -101,6 +101,7 @@
 #include "input_tdm.h"
 #include "input_tdm2.h"
 #include "input_pdm.h"
+#include "input_pdm_i2s2.h"
 #include "input_spdif3.h"
 #include "mixer.h"
 #include "output_dac.h"
