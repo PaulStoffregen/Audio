@@ -48,6 +48,7 @@ public:
 	friend class AudioInputI2SHex;
 	friend class AudioOutputI2SOct;
 	friend class AudioInputI2SOct;
+	friend class AudioInputPDM;
 #endif
 protected:
 	AudioOutputI2S(int dummy): AudioStream(2, inputQueueArray) {} // to be used only inside AudioOutputI2Sslave !!
