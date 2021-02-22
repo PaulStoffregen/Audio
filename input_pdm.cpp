@@ -122,7 +122,7 @@ void AudioInputPDM::begin(bool use_i2s2)
   }
   else
   {
-    AudioOutputI2S::config_i2s() ;
+    AudioOutputI2S::config_i2s(true) ;
     int rsync = 0;
     int tsync = 1;
     /*
@@ -274,6 +274,8 @@ void AudioInputPDM::begin(void)
 {
 	dma.begin(true); // Allocate the DMA channel first
 
+	AudioOutputI2S::config_i2s(true);
+	/*
 	SIM_SCGC6 |= SIM_SCGC6_I2S;
 	SIM_SCGC7 |= SIM_SCGC7_DMA;
 	SIM_SCGC6 |= SIM_SCGC6_DMAMUX;
@@ -295,18 +297,23 @@ void AudioInputPDM::begin(void)
 
         // configure receiver (sync'd to transmitter clocks)
         I2S0_RMR = 0;
+	*/
         I2S0_RCR1 = I2S_RCR1_RFW(2);
+	/*
         I2S0_RCR2 = I2S_RCR2_SYNC(1) | I2S_TCR2_BCP | I2S_RCR2_MSEL(1)
                 | I2S_RCR2_BCD | I2S_RCR2_DIV(1);
         I2S0_RCR3 = I2S_RCR3_RCE;
+	*/
         I2S0_RCR4 = I2S_RCR4_FRSZ(1) | I2S_RCR4_SYWD(31) | I2S_RCR4_MF
                 /* | I2S_RCR4_FSE */ | I2S_RCR4_FSP | I2S_RCR4_FSD;
+	/*
         I2S0_RCR5 = I2S_RCR5_WNW(31) | I2S_RCR5_W0W(31) | I2S_RCR5_FBT(31);
 
         CORE_PIN9_CONFIG  = PORT_PCR_MUX(6); // pin  9, PTC3, I2S0_TX_BCLK
-	CORE_PIN13_CONFIG = PORT_PCR_MUX(4); // pin 13, PTC5, I2S0_RXD0
-
+	*/
+	
 #if defined(KINETISK)
+	CORE_PIN13_CONFIG = PORT_PCR_MUX(4); // pin 13, PTC5, I2S0_RXD0
 	dma.TCD->SADDR = &I2S0_RDR0;
 	dma.TCD->SOFF = 0;
 	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(2) | DMA_TCD_ATTR_DSIZE(2);
