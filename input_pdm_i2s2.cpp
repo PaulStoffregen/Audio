@@ -24,13 +24,13 @@
  * THE SOFTWARE.
  */
 
+#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
 
 #include <Arduino.h>
 #include "input_pdm_i2s2.h"
 #include "utility/dspinst.h"
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
-#  include "utility/imxrt_hw.h"
-#endif
+#include "utility/imxrt_hw.h"
+
 
 // Decrease this for more mic gain, increase for range to accommodate loud sounds
 #define RSHIFT  2
@@ -66,7 +66,6 @@ DMAChannel AudioInputPDM2::dma(false);
 // T4.x version
 void AudioInputPDM2::begin(void)
 {
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
   dma.begin(true); // Allocate the DMA channel first
 
   CCM_CCGR5 |= CCM_CCGR5_SAI2(CCM_CCGR_ON);
@@ -138,7 +137,6 @@ void AudioInputPDM2::begin(void)
   I2S2_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE | I2S_RCSR_FR;
 
   dma.attachInterrupt(isr);
-#endif
 }
 
 extern const int16_t enormous_pdm_filter_table[];
@@ -153,7 +151,6 @@ void AudioInputPDM2::isr(void)
 	audio_block_t *left;
 
 	//digitalWriteFast(14, HIGH);
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
 	daddr = (uint32_t)(dma.TCD->DADDR);
 	dma.clearInterrupt();
 
@@ -185,7 +182,6 @@ void AudioInputPDM2::isr(void)
 		}
 		//left->data[0] = 0x7FFF;
 	}
-#endif
 	//digitalWriteFast(14, LOW);
 }
 
@@ -203,3 +199,4 @@ void AudioInputPDM2::update(void)
 	}
 }
 
+#endif

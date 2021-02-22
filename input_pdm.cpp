@@ -352,7 +352,7 @@ void AudioInputPDM::isr(void)
 	const uint32_t *src;
 	audio_block_t *left;
 
-	//digitalWriteFast(3, HIGH);
+	//digitalWriteFast(14, HIGH);
 #if defined(KINETISK) || defined(__IMXRT1052__) || defined(__IMXRT1062__)
 	daddr = (uint32_t)(dma.TCD->DADDR);
 	dma.clearInterrupt();
@@ -388,7 +388,7 @@ void AudioInputPDM::isr(void)
 		//left->data[0] = 0x7FFF;
 	}
 #endif
-	//digitalWriteFast(3, LOW);
+	//digitalWriteFast(14, LOW);
 }
 
 void AudioInputPDM::update(void)
