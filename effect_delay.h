@@ -59,8 +59,8 @@ public:
 	}
 	void delay(uint8_t channel, float milliseconds) {
 		if (channel >= 8) return;
-		if (milliseconds < 0.0) milliseconds = 0.0;
-		uint32_t n = (milliseconds*(AUDIO_SAMPLE_RATE_EXACT/1000.0))+0.5;
+		if (milliseconds < 0.0f) milliseconds = 0.0f;
+		uint32_t n = (milliseconds*(AUDIO_SAMPLE_RATE_EXACT/1000.0f))+0.5f;
 		uint32_t nmax = AUDIO_BLOCK_SAMPLES * (DELAY_QUEUE_SIZE-1);
 		if (n > nmax) n = nmax;
 		uint32_t blks = (n + (AUDIO_BLOCK_SAMPLES-1)) / AUDIO_BLOCK_SAMPLES + 1;

@@ -42,28 +42,28 @@ public:
 		state_bandpass = 0;
 	}
 	void frequency(float freq) {
-		if (freq < 20.0) freq = 20.0;
-		else if (freq > AUDIO_SAMPLE_RATE_EXACT/2.5) freq = AUDIO_SAMPLE_RATE_EXACT/2.5;
-		setting_fcenter = (freq * (3.141592654/(AUDIO_SAMPLE_RATE_EXACT*2.0)))
-			* 2147483647.0;
+		if (freq < 20.0f) freq = 20.0f;
+		else if (freq > AUDIO_SAMPLE_RATE_EXACT/2.5f) freq = AUDIO_SAMPLE_RATE_EXACT/2.5f;
+		setting_fcenter = (freq * (3.141592654f/(AUDIO_SAMPLE_RATE_EXACT*2.0f)))
+			* 2147483647.0f;
 		// TODO: should we use an approximation when freq is not a const,
 		// so the sinf() function isn't linked?
-		setting_fmult = sinf(freq * (3.141592654/(AUDIO_SAMPLE_RATE_EXACT*2.0)))
-			* 2147483647.0;
+		setting_fmult = sinf(freq * (3.141592654f/(AUDIO_SAMPLE_RATE_EXACT*2.0f)))
+			* 2147483647.0f;
 	}
 	void resonance(float q) {
-		if (q < 0.7) q = 0.7;
-		else if (q > 5.0) q = 5.0;
+		if (q < 0.7f) q = 0.7f;
+		else if (q > 5.0f) q = 5.0f;
 		// TODO: allow lower Q when frequency is lower
-		setting_damp = (1.0 / q) * 1073741824.0;
+		setting_damp = (1.0f / q) * 1073741824.0f;
 	}
 	void octaveControl(float n) {
 		// filter's corner frequency is Fcenter * 2^(control * N)
 		// where "control" ranges from -1.0 to +1.0
 		// and "N" allows the frequency to change from 0 to 7 octaves
-		if (n < 0.0) n = 0.0;
-		else if (n > 6.9999) n = 6.9999;
-		setting_octavemult = n * 4096.0;
+		if (n < 0.0f) n = 0.0f;
+		else if (n > 6.9999f) n = 6.9999f;
+		setting_octavemult = n * 4096.0f;
 	}
 	virtual void update(void);
 private:

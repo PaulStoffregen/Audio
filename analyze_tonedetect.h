@@ -37,7 +37,7 @@ public:
 	  : AudioStream(1, inputQueueArray), thresh(6554), enabled(false) { }
 	void frequency(float freq, uint16_t cycles=10) {
 		set_params((int32_t)(cos((double)freq
-		  * (2.0 * 3.14159265358979323846 / AUDIO_SAMPLE_RATE_EXACT))
+		  * (2.0 * 3.14159265358979323846 / (double)AUDIO_SAMPLE_RATE_EXACT))
 		  * (double)2147483647.999), cycles,
 		  (float)AUDIO_SAMPLE_RATE_EXACT / freq * (float)cycles + 0.5f);
 	}

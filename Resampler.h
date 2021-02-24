@@ -147,8 +147,8 @@ class Resampler {
                     }
                     fPtr+=_overSamplingFactor;
                 }
-                const float w0=ceil(distScaled)-distScaled;
-                const float w1=1.-w0;
+                const float w0=ceilf(distScaled)-distScaled;
+                const float w1=1.0f-w0;
                 si0Ptr=si0;
                 si1Ptr=si1;
                 for (uint8_t i =0; i< NOCHANNELS; i++){

@@ -40,9 +40,9 @@ public:
 	AudioControlSGTL5000(void) : i2c_addr(0x0A) { }
 	void setAddress(uint8_t level);
 	bool enable(void);//For Teensy LC the SGTL acts as master, for all other Teensys as slave.
-	bool enable(const unsigned extMCLK, const uint32_t pllFreq = (4096.0l * AUDIO_SAMPLE_RATE_EXACT) ); //With extMCLK > 0, the SGTL acts as Master
+	bool enable(const unsigned extMCLK, const uint32_t pllFreq = (4096.0lf * AUDIO_SAMPLE_RATE_EXACT) ); //With extMCLK > 0, the SGTL acts as Master
 	bool disable(void) { return false; }
-	bool volume(float n) { return volumeInteger(n * 129 + 0.499); }
+	bool volume(float n) { return volumeInteger(n * 129 + 0.499f); }
 	bool inputLevel(float n) {return false;}
 	bool muteHeadphone(void) { return write(0x0024, ana_ctrl | (1<<4)); }
 	bool unmuteHeadphone(void) { return write(0x0024, ana_ctrl & ~(1<<4)); }
