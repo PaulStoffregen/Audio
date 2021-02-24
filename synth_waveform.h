@@ -105,46 +105,46 @@ public:
 	}
 
 	void frequency(float freq) {
-		if (freq < 0.0) {
+		if (freq < 0.0f) {
 			freq = 0.0;
-		} else if (freq > AUDIO_SAMPLE_RATE_EXACT / 2) {
-			freq = AUDIO_SAMPLE_RATE_EXACT / 2;
+		} else if (freq > AUDIO_SAMPLE_RATE_EXACT / 2.0f) {
+			freq = AUDIO_SAMPLE_RATE_EXACT / 2.0f;
 		}
-		phase_increment = freq * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT);
+		phase_increment = freq * (4294967296.0f / AUDIO_SAMPLE_RATE_EXACT);
 		if (phase_increment > 0x7FFE0000u) phase_increment = 0x7FFE0000;
 	}
 	void phase(float angle) {
-		if (angle < 0.0) {
+		if (angle < 0.0f) {
 			angle = 0.0;
-		} else if (angle > 360.0) {
-			angle = angle - 360.0;
-			if (angle >= 360.0) return;
+		} else if (angle > 360.0f) {
+			angle = angle - 360.0f;
+			if (angle >= 360.0f) return;
 		}
-		phase_offset = angle * (4294967296.0 / 360.0);
+		phase_offset = angle * (float)(4294967296.0 / 360.0);
 	}
 	void amplitude(float n) {	// 0 to 1.0
 		if (n < 0) {
 			n = 0;
-		} else if (n > 1.0) {
+		} else if (n > 1.0f) {
 			n = 1.0;
 		}
-		magnitude = n * 65536.0;
+		magnitude = n * 65536.0f;
 	}
 	void offset(float n) {
-		if (n < -1.0) {
-			n = -1.0;
-		} else if (n > 1.0) {
-			n = 1.0;
+		if (n < -1.0f) {
+			n = -1.0f;
+		} else if (n > 1.0f) {
+			n = 1.0f;
 		}
-		tone_offset = n * 32767.0;
+		tone_offset = n * 32767.0f;
 	}
 	void pulseWidth(float n) {	// 0.0 to 1.0
 		if (n < 0) {
 			n = 0;
-		} else if (n > 1.0) {
-			n = 1.0;
+		} else if (n > 1.0f) {
+			n = 1.0f;
 		}
-		pulse_width = n * 4294967296.0;
+		pulse_width = n * 4294967296.0f;
 	}
 	void begin(short t_type) {
 		phase_offset = 0;
@@ -191,29 +191,29 @@ public:
 	}
 
 	void frequency(float freq) {
-		if (freq < 0.0) {
+		if (freq < 0.0f) {
 			freq = 0.0;
-		} else if (freq > AUDIO_SAMPLE_RATE_EXACT / 2) {
-			freq = AUDIO_SAMPLE_RATE_EXACT / 2;
+		} else if (freq > AUDIO_SAMPLE_RATE_EXACT / 2.0f) {
+			freq = AUDIO_SAMPLE_RATE_EXACT / 2.0f;
 		}
-		phase_increment = freq * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT);
+		phase_increment = freq * (4294967296.0f / AUDIO_SAMPLE_RATE_EXACT);
 		if (phase_increment > 0x7FFE0000u) phase_increment = 0x7FFE0000;
 	}
 	void amplitude(float n) {	// 0 to 1.0
 		if (n < 0) {
 			n = 0;
-		} else if (n > 1.0) {
-			n = 1.0;
+		} else if (n > 1.0f) {
+			n = 1.0f;
 		}
-		magnitude = n * 65536.0;
+		magnitude = n * 65536.0f;
 	}
 	void offset(float n) {
-		if (n < -1.0) {
-			n = -1.0;
-		} else if (n > 1.0) {
-			n = 1.0;
+		if (n < -1.0f) {
+			n = -1.0f;
+		} else if (n > 1.0f) {
+			n = 1.0f;
 		}
-		tone_offset = n * 32767.0;
+		tone_offset = n * 32767.0f;
 	}
 	void begin(short t_type) {
 		tone_type = t_type;
@@ -233,21 +233,21 @@ public:
 		arbdata = data;
 	}
 	void frequencyModulation(float octaves) {
-		if (octaves > 12.0) {
-			octaves = 12.0;
-		} else if (octaves < 0.1) {
-			octaves = 0.1;
+		if (octaves > 12.0f) {
+			octaves = 12.0f;
+		} else if (octaves < 0.1f) {
+			octaves = 0.1f;
 		}
-		modulation_factor = octaves * 4096.0;
+		modulation_factor = octaves * 4096.0f;
 		modulation_type = 0;
 	}
 	void phaseModulation(float degrees) {
-		if (degrees > 9000.0) {
-			degrees = 9000.0;
-		} else if (degrees < 30.0) {
-			degrees = 30.0;
+		if (degrees > 9000.0f) {
+			degrees = 9000.0f;
+		} else if (degrees < 30.0f) {
+			degrees = 30.0f;
 		}
-		modulation_factor = degrees * (65536.0 / 180.0);
+		modulation_factor = degrees * (float)(65536.0 / 180.0);
 		modulation_type = 1;
 	}
 	virtual void update(void);

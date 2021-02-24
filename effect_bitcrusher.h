@@ -42,7 +42,7 @@ public:
 		crushBits = b;
 	}
         void sampleRate(float hz) {
-		int n = (AUDIO_SAMPLE_RATE_EXACT / hz) + 0.5;
+		int n = (AUDIO_SAMPLE_RATE_EXACT / hz) + 0.5f;
 		if (n < 1) n = 1;
 		else if (n > 64) n = 64;
 		sampleStep = n;

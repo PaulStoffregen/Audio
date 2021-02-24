@@ -70,7 +70,7 @@ public:
 	}
 	float read(unsigned int binNumber) {
 		if (binNumber > 127) return 0.0;
-		return (float)(output[binNumber]) * (1.0 / 16384.0);
+		return (float)(output[binNumber]) * (1.0f / 16384.0f);
 	}
 	float read(unsigned int binFirst, unsigned int binLast) {
 		if (binFirst > binLast) {
@@ -84,7 +84,7 @@ public:
 		do {
 			sum += output[binFirst++];
 		} while (binFirst <= binLast);
-		return (float)sum * (1.0 / 16384.0);
+		return (float)sum * (1.0f / 16384.0f);
 	}
 	void averageTogether(uint8_t n) {
 #if AUDIO_BLOCK_SAMPLES == 128

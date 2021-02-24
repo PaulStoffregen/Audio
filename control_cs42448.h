@@ -65,15 +65,15 @@ private:
 	bool inputLevelInteger(int chnnel, int32_t n);
 	// convert level to volume byte, section 6.9.1, page 50
 	uint32_t volumebyte(float level) {
-		if (level >= 1.0) return 0;
-		if (level <= 0.0000003981) return 128;
-		return roundf(log10f(level) * -20.0);
+		if (level >= 1.0f) return 0;
+		if (level <= 0.0000003981f) return 128;
+		return roundf(log10f(level) * -20.0f);
 	}
 	// convert level to input gain, section 6.11.1, page 51
 	int32_t inputlevelbyte(float level) {
-		if (level > 15.8489) return 48;
-		if (level < 0.00063095734) return -128;
-		return roundf(log10f(level) * 40.0);
+		if (level > 15.8489f) return 48;
+		if (level < 0.00063095734f) return -128;
+		return roundf(log10f(level) * 40.0f);
 	}
 	bool write(uint32_t address, uint32_t data);
 	bool write(uint32_t address, const void *data, uint32_t len);

@@ -37,12 +37,12 @@ class AudioControlCS4272 : public AudioControl
 public:
 	bool enable(void);
 	bool disable(void) { return false; }
-	bool volume(float n) { return volumeInteger(n * 127 + 0.499); }
+	bool volume(float n) { return volumeInteger(n * 127 + 0.499f); }
 	bool inputLevel(float n) { return false; }
 	bool inputSelect(int n) { return false; }
 
 	bool volume(float left, float right);
-	bool dacVolume(float n) { return volumeInteger(n * 127 + 0.499); }
+	bool dacVolume(float n) { return volumeInteger(n * 127 + 0.499f); }
 	bool dacVolume(float left, float right);
 
 	bool muteOutput(void);
