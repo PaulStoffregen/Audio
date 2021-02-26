@@ -337,7 +337,7 @@ void AudioOutputI2S::update(void)
 #endif
 
 
-void AudioOutputI2S::config_i2s(bool only_bclk = false)
+void AudioOutputI2S::config_i2s(bool only_bclk)
 {
 #if defined(KINETISK)
 	SIM_SCGC6 |= SIM_SCGC6_I2S;
