@@ -46,7 +46,7 @@ void AudioEffectWaveFolder::update()
     // if in a band where the sense needs to be reverse, detect this
     bool flip1 = ((s1 + 0x8000) >> 16) & 1 ;
     // reverse and truncate to 16 bits
-    s1 = 0xFFFF & (flip1 ? -s1 : +s1) ;
+    s1 = 0xFFFF & (flip1 ? ~s1 : +s1) ;
 
     pa[i] = s1;
   }
