@@ -64,19 +64,22 @@ void AudioFilterLadder::initpoly()
 {
 	if (arm_fir_interpolate_init_f32(&interpolation, INTERPOLATION, interpolation_taps,
 	   interpolation_coeffs, interpolation_state, AUDIO_BLOCK_SAMPLES)) {
-		Serial.println("Init of interpolation failed");
-		while (1);
+		polyCapable = false;
+		return;
 	}
 	if (arm_fir_decimate_init_f32(&decimation, interpolation_taps, INTERPOLATION,
 	   interpolation_coeffs, decimation_state, I_NUM_SAMPLES)) {
-		Serial.println("Init of decimation failed");
-		while (1);
+		polyCapable = false;
+		return;
 	}
+	// TODO: should we fill interpolation_state & decimation_state with zeros?
+	polyCapable = true;
+	polyOn = true;
 }
 
 void AudioFilterLadder::interpMethod(int imethod)
 {
-	if (imethod == FIR_POLY) {
+	if (imethod == FIR_POLY && polyCapable == true) {
 		polyOn = true;
 	} else {
 		polyOn = false;
@@ -221,10 +224,6 @@ void AudioFilterLadder::update(void)
 	}
 	if (!blockc) {
 		QmodActive = false;
-	}
-	if (firstpoly) {
-		initpoly();
-		firstpoly = false;
 	}
 	if (polyOn == true) {
 		/*----------------------- upsample -------------------------*/

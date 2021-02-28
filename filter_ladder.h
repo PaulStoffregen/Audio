@@ -48,14 +48,13 @@
 class AudioFilterLadder: public AudioStream
 {
 public:
-	AudioFilterLadder() : AudioStream(3, inputQueueArray) {};
+	AudioFilterLadder() : AudioStream(3, inputQueueArray) { initpoly(); };
 	void frequency(float FC);
 	void resonance(float reson);
 	void octaveControl(float octaves);
 	void passband_gain(float passbandgain);
 	void input_drive(float drv);
 	void interpMethod(int im);
-	void initpoly();
 	virtual void update(void);
 private:
 	static const int INTERPOLATION = 4;
@@ -67,9 +66,10 @@ private:
 	static float interpolation_coeffs[interpolation_taps];
 	float LPF(float s, int i);
 	void compute_coeffs(float fc);
+	void initpoly();
 	bool resonating();
-	bool  firstpoly=true;
-	bool  polyOn = true;		// linear default
+	bool  polyCapable = false;
+	bool  polyOn = false;		// FIR is default after initpoly()
 	float alpha = 1.0;
 	float beta[4] = {0.0, 0.0, 0.0, 0.0};
 	float z0[4] = {0.0, 0.0, 0.0, 0.0};
