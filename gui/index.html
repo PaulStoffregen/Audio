@@ -529,6 +529,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioEffectWaveshaper","data":{"shortName":"waveshape","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectGranular","data":{"shortName":"granular","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectDigitalCombine","data":{"shortName":"combine","inputs":2,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectWaveFolder","data":{"defaults":{"name":{"value":"new"}},"shortName":"wavefolder","inputs":2,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioFilterBiquad","data":{"defaults":{"name":{"value":"new"}},"shortName":"biquad","inputs":1,"outputs":1,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioFilterFIR","data":{"defaults":{"name":{"value":"new"}},"shortName":"fir","inputs":1,"outputs":1,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioFilterStateVariable","data":{"defaults":{"name":{"value":"new"}},"shortName":"filter","inputs":2,"outputs":3,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -3955,6 +3956,39 @@ double s_freq = .0625;</p>
     </p>
 </script>
 <script type="text/x-red" data-template-name="AudioEffectMultiply">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioEffectWaveFolder">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Multiply two signals together and apply wavefolding, useful for modulatable distortion;
+           use one input as a depth control from LFO or DC signal.  Rather than saturating the signal
+           folds back on itself when overloaded - extra gain means the modulating signal starts to cause
+           folding of a full-scale waveform at about 6% modulation, allowing a maximum folding factor of 16.
+	</p>
+	<p align=center><img src="img/wavefolder.png"><br><small>70 Hz sine wave distorted with wave-folding.</small></p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Signal Input</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Modulation Input</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Signal with Folding Applied</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>There are no functions to call from the Arduino sketch.
+		This object simply combined the 2 signals and then wave-folds
+	</p>
+<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; WaveFolderEffect</p>
+	<h3>Notes</h3>
+	<p>Assumes the AudioShield fitted.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioEffectWaveFolder">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
