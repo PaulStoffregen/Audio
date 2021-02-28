@@ -1,5 +1,4 @@
 #include <Audio.h>
-//#include <effect_wavefolder.h>  // added to Audio.h in the branch now
 
 AudioOutputI2S         i2sout ;
 
