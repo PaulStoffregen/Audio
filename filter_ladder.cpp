@@ -24,6 +24,7 @@
 // Huovilainen New Moog (HNM) model as per CMJ jun 2006
 // Implemented as Teensy Audio Library compatible object
 // Richard van Hoesel, Feb. 9 2021
+// v1.5 adds polyphase FIR or Linear interpolation
 // v1.4 FC extended to 18.7kHz, max res to 1.8, 4x oversampling,
 //      and a minor Q-tuning adjustment
 // v.1.03 adds oversampling, extended resonance,
@@ -32,27 +33,41 @@
 // please retain this header if you use this code.
 //-----------------------------------------------------------
 
-// https://forum.pjrc.com/threads/60488?p=269755&viewfull=1#post269755
-// https://forum.pjrc.com/threads/60488?p=269609&viewfull=1#post269609
+// https://forum.pjrc.com/threads/60488?p=271078&viewfull=1#post271078
 
 #include <Arduino.h>
 #include "filter_ladder.h"
 #include <math.h>
+#include "arm_math.h"
 #include <stdint.h>
 #define MOOG_PI ((float)3.14159265358979323846264338327950288)
 
-//#define osTimes 1
-//#define MAX_RESONANCE ((float)1.1)
-//#define MAX_FREQUENCY ((float)(AUDIO_SAMPLE_RATE_EXACT * 0.249f))
-
-//#define osTimes 2
-//#define MAX_RESONANCE ((float)1.2)
-//#define MAX_FREQUENCY ((float)(AUDIO_SAMPLE_RATE_EXACT * 0.38f))
-
-#define osTimes 4
 #define MAX_RESONANCE ((float)1.8)
 #define MAX_FREQUENCY ((float)(AUDIO_SAMPLE_RATE_EXACT * 0.425f))
-//#define lfq 0.25
+
+
+void AudioFilterLadder::initpoly()
+{
+	if (arm_fir_interpolate_init_f32(&interpolation, INTERPOLATION, interpolation_taps,
+	   interpolation_coeffs, interpolation_state, NUM_SAMPLES)) {
+		Serial.println("Init of interpolation failed");
+		while (1);
+	}
+	if (arm_fir_decimate_init_f32(&decimation, interpolation_taps, INTERPOLATION,
+	   interpolation_coeffs, decimation_state, I_NUM_SAMPLES)) {
+		Serial.println("Init of decimation failed");
+		while (1);
+	}
+}
+
+void AudioFilterLadder::interpMethod(int imethod)
+{
+	if (imethod == FIR_POLY) {
+		polyOn = true;
+	} else {
+		polyOn = false;
+	}
+}
 
 float AudioFilterLadder::LPF(float s, int i)
 {
@@ -118,15 +133,12 @@ void AudioFilterLadder::compute_coeffs(float c)
 	} else if (c < 5.0f) {
 		c = 5.0f;
 	}
-#ifdef lfq
-	if (c < 500.0f) lfkmod = 1.0f + (500.0f - c) * (1.0f/500.0f) * lfq;
-#endif
-	float wc = c * (float)(2.0f * MOOG_PI / ((float)osTimes * AUDIO_SAMPLE_RATE_EXACT));
+	float wc = c * (float)(2.0f * MOOG_PI / ((float)INTERPOLATION * AUDIO_SAMPLE_RATE_EXACT));
 	float wc2 = wc * wc;
 	alpha = 0.9892f * wc - 0.4324f * wc2 + 0.1381f * wc * wc2 - 0.0202f * wc2 * wc2;
 	//Qadjust = 1.0029f + 0.0526f * wc - 0.0926 * wc2 + 0.0218* wc * wc2;
-	//Qadjust = 1.006f + 0.0536f * wc - 0.095 * wc2 ;
 	Qadjust = 1.006f + 0.0536f * wc - 0.095f * wc2 - 0.05f * wc2 * wc2;
+	// revised hfQ (rvh - feb 14 2021)
 }
 
 bool AudioFilterLadder::resonating()
@@ -158,6 +170,8 @@ static inline float fast_exp2f(float x)
 
 static inline float fast_tanh(float x)
 {
+	if (x > 3.0f) return 1.0f;
+	if (x < -3.0f) return -1.0f;
 	float x2 = x * x;
 	return x * (27.0f + x2) / (27.0f + 9.0f * x2);
 }
@@ -165,7 +179,7 @@ static inline float fast_tanh(float x)
 void AudioFilterLadder::update(void)
 {
 	audio_block_t *blocka, *blockb, *blockc;
-	float Ktot, Kmax;
+	float Ktot = K;
 	bool FCmodActive = true;
 	bool QmodActive = true;
 
@@ -194,41 +208,85 @@ void AudioFilterLadder::update(void)
 	if (!blockc) {
 		QmodActive = false;
 	}
-	for (int i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
-		float input = blocka->data[i] * (1.0f/32768.0f) * overdrive;
-		if (FCmodActive) {
-			float FCmod = blockb->data[i] * octaveScale;
-			float ftot = Fbase * fast_exp2f(FCmod);
-			if (ftot > MAX_FREQUENCY) ftot = MAX_FREQUENCY;
-			compute_coeffs(ftot);
+	if (firstpoly) {
+		initpoly();
+		firstpoly = false;
+	}
+	if (polyOn == true) {
+		/*----------------------- upsample -------------------------*/
+		float blockOS[I_NUM_SAMPLES], blockIn[AUDIO_BLOCK_SAMPLES];
+		float blockOutOS[I_NUM_SAMPLES], blockOut[AUDIO_BLOCK_SAMPLES];
+		for (int i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+			blockIn[i] = blocka->data[i] * overdrive * (float)INTERPOLATION / 32768.0f;
 		}
-		if (QmodActive) {
-			float Qmod = blockc->data[i] * (1.0f/32768.0f);
-			Ktot = K + 4.0f * Qmod;
-		} else {
-			Ktot = K;
+		arm_fir_interpolate_f32(&interpolation, blockIn, blockOS, NUM_SAMPLES);
+
+		for (int i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+			if (FCmodActive) {
+				float FCmod = blockb->data[i] * octaveScale;
+				float ftot = Fbase * fast_exp2f(FCmod);
+				if (ftot > MAX_FREQUENCY) ftot = MAX_FREQUENCY;
+				compute_coeffs(ftot);
+			}
+			if (QmodActive) {
+				float Qmod = blockc->data[i] * (1.0f/32768.0f);
+				Ktot = K + 4.0f * Qmod;
+			}
+			if (Ktot > MAX_RESONANCE * 4.0f) {
+				Ktot = MAX_RESONANCE * 4.0f;
+			} else if (Ktot < 0.0f) {
+				Ktot = 0.0f;
+			}
+			for(int os=0; os < INTERPOLATION; os++) {
+				float input = blockOS[i*4 + os];
+				float u = input - (z1[3] - pbg * input) * Ktot * Qadjust;
+				u = fast_tanh(u);
+				float stage1 = LPF(u, 0);
+				float stage2 = LPF(stage1, 1);
+				float stage3 = LPF(stage2, 2);
+				float stage4 = LPF(stage3, 3);
+				blockOutOS[i*4 + os] = stage4;
+			}
 		}
-		#ifdef lfq
-		Kmax = MAX_RESONANCE * 4.0f * lfkmod;
-		#else
-		Kmax = MAX_RESONANCE * 4.0f;
-		#endif
-		if (Ktot > Kmax) {
-			Ktot = Kmax;
-		} else if (Ktot < 0.0f) {
-			Ktot = 0.0f;
+		arm_fir_decimate_f32(&decimation, blockOutOS, blockOut, I_NUM_SAMPLES);
+		for (int i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+			blocka->data[i] = (float)(blockOut[i]) * 32768.0f;
 		}
-		float total = 0.0f;
-		for(int os = 0; os < osTimes; os++) {
-			float u = input - (z1[3] - pbg * input) * Ktot * Qadjust;
-			u = fast_tanh(u);
-			float stage1 = LPF(u, 0);
-			float stage2 = LPF(stage1, 1);
-			float stage3 = LPF(stage2, 2);
-			float stage4 = LPF(stage3, 3);
-			total += stage4 * (1.0f / (float)osTimes);
+	} else {
+		// linear interpolation
+		for (int i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+			float input = blocka->data[i] * overdrive * (1.0f/32768.0f);
+			if (FCmodActive) {
+				float FCmod = blockb->data[i] * octaveScale;
+				float ftot = Fbase * fast_exp2f(FCmod);
+				if (ftot > MAX_FREQUENCY) ftot = MAX_FREQUENCY;
+				compute_coeffs(ftot);
+			}
+			if (QmodActive) {
+				float Qmod = blockc->data[i] * (1.0f/32768.0f);
+				Ktot = K + 4.0f * Qmod;
+			}
+			if (Ktot > MAX_RESONANCE * 4.0f) {
+				Ktot = MAX_RESONANCE * 4.0f;
+			} else if (Ktot < 0.0f) {
+				Ktot = 0.0f;
+			}
+			float total = 0.0f;
+			float interp = 0.0f;
+			for (int os = 0; os < INTERPOLATION; os++) {
+				float u = (interp * oldinput + (1.0f - interp) * input)
+					- (z1[3] - pbg * input) * Ktot * Qadjust;
+				u = fast_tanh(u);
+				float stage1 = LPF(u, 0);
+				float stage2 = LPF(stage1, 1);
+				float stage3 = LPF(stage2, 2);
+				float stage4 = LPF(stage3, 3);
+				total += stage4 * (1.0f / (float)INTERPOLATION);
+				interp += (1.0f / (float)INTERPOLATION);
+			}
+			oldinput = input;
+			blocka->data[i] = total * 32768.0f;
 		}
-		blocka->data[i] = total * 32767.0f;
 	}
 	transmit(blocka);
 	release(blocka);
