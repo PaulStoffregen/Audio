@@ -4679,12 +4679,27 @@ double s_freq = .0625;</p>
 		maximum resonance when the control signal is at its 1.0 maximum
 		amplitude, this setting must be at least 0.8.
 	</p>
+	<p class=func><span class=keyword>inputDrive</span>(level);</p>
+	<p class=desc>TODO: add info here...<br>
+		range is 0 to 4.0
+	</p>
+	<p class=func><span class=keyword>passbandGain</span>(gain);</p>
+	<p class=desc>TODO: add info here...<br>
+		range is 0 to 0.5
+	</p>
+	<p class=func><span class=keyword>interpolationMethod</span>(method);</p>
+	<p class=desc>TODO: add info here...<br>
+		<span class=literal>LADDER_FILTER_INTERPOLATION_FIR_POLY</span><br>
+		<span class=literal>LADDER_FILTER_INTERPOLATION_LINEAR</span><br>
+	</p>
+
 <h3>Examples</h3>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; LadderFilter
 	</p>
 	<h3>Notes</h3>
-	<p>
-		When controlled by a signal, the equation for the filter
+	<p>	Teensy 3.5 is the minimum hardware capable of running this filter.
+	</p>
+	<p>	When controlled by a signal, the equation for the filter
 		frequency is:
 	</p>
 	<p>

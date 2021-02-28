@@ -41,8 +41,11 @@
 #include "Arduino.h"
 #include "AudioStream.h"
 #include "arm_math.h"
-#define LINEAR 0
-#define FIR_POLY 1
+
+enum AudioFilterLadderInterpolation {
+	LADDER_FILTER_INTERPOLATION_LINEAR,
+	LADDER_FILTER_INTERPOLATION_FIR_POLY
+};
 
 
 class AudioFilterLadder: public AudioStream
@@ -52,9 +55,9 @@ public:
 	void frequency(float FC);
 	void resonance(float reson);
 	void octaveControl(float octaves);
-	void passband_gain(float passbandgain);
-	void input_drive(float drv);
-	void interpMethod(int im);
+	void passbandGain(float passbandgain);
+	void inputDrive(float drv);
+	void interpolationMethod(AudioFilterLadderInterpolation im);
 	virtual void update(void);
 private:
 	static const int INTERPOLATION = 4;

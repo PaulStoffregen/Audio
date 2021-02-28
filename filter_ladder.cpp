@@ -77,9 +77,10 @@ void AudioFilterLadder::initpoly()
 	polyOn = true;
 }
 
-void AudioFilterLadder::interpMethod(int imethod)
+void AudioFilterLadder::interpolationMethod(AudioFilterLadderInterpolation imethod)
 {
-	if (imethod == FIR_POLY && polyCapable == true) {
+	if (imethod == LADDER_FILTER_INTERPOLATION_FIR_POLY && polyCapable == true) {
+		// TODO: if polyOn == false, clear interpolation_state & decimation_state ??
 		polyOn = true;
 	} else {
 		polyOn = false;
@@ -122,15 +123,15 @@ void AudioFilterLadder::octaveControl(float octaves)
 	octaveScale = octaves / 32768.0f;
 }
 
-void AudioFilterLadder:: passband_gain(float passbandgain)
+void AudioFilterLadder:: passbandGain(float passbandgain)
 {
 	pbg = passbandgain;
 	if (pbg > 0.5f) pbg = 0.5f;
 	if (pbg < 0.0f) pbg = 0.0f;
-	input_drive(host_overdrive);
+	inputDrive(host_overdrive);
 }
 
-void AudioFilterLadder::input_drive(float odrv)
+void AudioFilterLadder::inputDrive(float odrv)
 {
 	host_overdrive = odrv;
 	if (host_overdrive > 1.0f) {
