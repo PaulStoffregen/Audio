@@ -229,6 +229,7 @@ void Resampler::configure(float fs, float newFs){
 bool Resampler::initialized() const {
     return _initialized;
 }
+
 void Resampler::resample(float* input0, float* input1, uint16_t inputLength, uint16_t& processedLength, float* output0, float* output1,uint16_t outputLength, uint16_t& outputCount) {
     outputCount=0;
     int32_t successorIndex=(int32_t)(ceil(_cPos));  //negative number -> currently the _buffer0 of the last iteration is used
@@ -240,7 +241,7 @@ void Resampler::resample(float* input0, float* input1, uint16_t inputLength, uin
         float dist=successorIndex-_cPos;
             
         const float distScaled=dist*_overSamplingFactor;
-        int32_t rightIndex=abs((int32_t)(ceil(distScaled))-_overSamplingFactor*_halfFilterLength);   
+        int32_t rightIndex=abs((int32_t)(ceilf(distScaled))-_overSamplingFactor*_halfFilterLength);   
         const int32_t indexData=successorIndex-_halfFilterLength;
         if (indexData>=0){
             ip0=input0+indexData;
@@ -256,12 +257,12 @@ void Resampler::resample(float* input0, float* input1, uint16_t inputLength, uin
             si1[1]=*ip1++**fPtr;
             memset(si0, 0, 2*sizeof(float));   
             fPtr-=_overSamplingFactor;          
-            rightIndex=(int32_t)(ceil(distScaled))+_overSamplingFactor;     //needed below  
+            rightIndex=(int32_t)(ceilf(distScaled))+_overSamplingFactor;     //needed below  
         }
         else {
             memset(si0, 0, 2*sizeof(float));
             memset(si1, 0, 2*sizeof(float));
-            rightIndex=(int32_t)(ceil(distScaled));     //needed below
+            rightIndex=(int32_t)(ceilf(distScaled));     //needed below
         }
         for (uint16_t i =0 ; i<_halfFilterLength; i++){
             if(ip0==_endOfBuffer[0]){
@@ -292,8 +293,8 @@ void Resampler::resample(float* input0, float* input1, uint16_t inputLength, uin
             ++ip0;
             ++ip1;
         }
-        const float w0=ceil(distScaled)-distScaled;
-        const float w1=1.-w0;
+        const float w0=ceilf(distScaled)-distScaled;
+        const float w1=1.f-w0;
         *output0++=si0[0]*w0 + si1[0]*w1;
         *output1++=si0[1]*w0 + si1[1]*w1;
 
@@ -363,7 +364,6 @@ bool Resampler::addToSampleDiff(double diff){
     const double slope=_oldDiffs[1]-_oldDiffs[0];
     _sum+=diff;
     double correction=_settings.kp*diff+_settings.kd*slope+_settings.ki*_sum;
-    
     const double oldStepAdapted=_stepAdapted;
     _stepAdapted=_step+correction;
    
