@@ -143,9 +143,9 @@ void getCoefficients(T* coeffs, BiquadType type, double dbGain, double freq, dou
         if(S->numStages==1){
             BTYPE yn;
             for (uint32_t j=0; j<blockSize; j++ ){
-                yn = *b0 * *pSrc + *state;
-                *state = *b1 * *pSrc + *a1Neg * yn + *(state+1);
-                *(state+1) = *b2 * *pSrc++ + *a2Neg * yn;
+                yn = *b0 * (BTYPE)*pSrc + *state;
+                *state = *b1 * (BTYPE)*pSrc + *a1Neg * yn + *(state+1);
+                *(state+1) = *b2 * (BTYPE)*pSrc++ + *a2Neg * yn;
                 *pDst++=(T)yn;
             }
         }
@@ -154,9 +154,9 @@ void getCoefficients(T* coeffs, BiquadType type, double dbGain, double freq, dou
             BTYPE pDstD[blockSize];
             BTYPE* pDstDP=pDstD;
             for (uint32_t j=0; j<blockSize; j++ ){
-                *pDstDP = *b0 * *pSrc + *state;
-                *state = *b1 * *pSrc + *a1Neg * *pDstDP + *(state+1);
-                *(state+1) = *b2 * *pSrc++ + *a2Neg * *pDstDP++;
+                *pDstDP = *b0 * (BTYPE)*pSrc + *state;
+                *state = *b1 * (BTYPE)*pSrc + *a1Neg * *pDstDP + *(state+1);
+                *(state+1) = *b2 * (BTYPE)*pSrc++ + *a2Neg * *pDstDP++;
             }
             b0+=5;
             b1+=5;
@@ -191,8 +191,8 @@ void getCoefficients(T* coeffs, BiquadType type, double dbGain, double freq, dou
         }
     }	
 
-	template <typename B>
-	void preload(const B*  S, double val=0.){
+	template <typename B, typename BTYPE>
+	void preload(const B*  S, BTYPE val=(BTYPE)0){
         // double* b1=B->pCoeffs+1;
         // double* b2=B->pCoeffs+2;
         // double* a1Neg=B->pCoeffs+3;
