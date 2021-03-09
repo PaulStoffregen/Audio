@@ -28,6 +28,7 @@
 #include "play_sd_wav.h"
 #include "spi_interrupt.h"
 
+
 #define STATE_DIRECT_8BIT_MONO		0  // playing mono at native sample rate
 #define STATE_DIRECT_8BIT_STEREO	1  // playing stereo at native sample rate
 #define STATE_DIRECT_16BIT_MONO		2  // playing mono at native sample rate
@@ -41,7 +42,8 @@
 #define STATE_PARSE3			10 // looking for 8 byte data header
 #define STATE_PARSE4			11 // ignoring unknown chunk after "fmt "
 #define STATE_PARSE5			12 // ignoring unknown chunk before "fmt "
-#define STATE_STOP			13
+#define STATE_PAUSED			13
+#define STATE_STOP			14
 
 void AudioPlaySdWav::begin(void)
 {
@@ -62,20 +64,24 @@ void AudioPlaySdWav::begin(void)
 bool AudioPlaySdWav::play(const char *filename)
 {
 	stop();
-#if defined(HAS_KINETIS_SDHC)	
+	bool irq = false;
+	if (NVIC_IS_ENABLED(IRQ_SOFTWARE)) {
+		NVIC_DISABLE_IRQ(IRQ_SOFTWARE);
+		irq = true;
+	}
+#if defined(HAS_KINETIS_SDHC)
 	if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStartUsingSPI();
-#else 	
+#else
 	AudioStartUsingSPI();
 #endif
-	__disable_irq();
 	wavfile = SD.open(filename);
-	__enable_irq();
 	if (!wavfile) {
-	#if defined(HAS_KINETIS_SDHC)	
+#if defined(HAS_KINETIS_SDHC)
 		if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
-	#else 	
+#else
 		AudioStopUsingSPI();
-	#endif			
+#endif
+		if (irq) NVIC_ENABLE_IRQ(IRQ_SOFTWARE);
 		return false;
 	}
 	buffer_length = 0;
@@ -84,39 +90,55 @@ bool AudioPlaySdWav::play(const char *filename)
 	data_length = 20;
 	header_offset = 0;
 	state = STATE_PARSE1;
+	if (irq) NVIC_ENABLE_IRQ(IRQ_SOFTWARE);
 	return true;
 }
 
 void AudioPlaySdWav::stop(void)
 {
-	__disable_irq();
+	bool irq = false;
+	if (NVIC_IS_ENABLED(IRQ_SOFTWARE)) {
+		NVIC_DISABLE_IRQ(IRQ_SOFTWARE);
+		irq = true;
+	}
 	if (state != STATE_STOP) {
 		audio_block_t *b1 = block_left;
 		block_left = NULL;
 		audio_block_t *b2 = block_right;
 		block_right = NULL;
 		state = STATE_STOP;
-		__enable_irq();
 		if (b1) release(b1);
 		if (b2) release(b2);
 		wavfile.close();
-	#if defined(HAS_KINETIS_SDHC)	
+#if defined(HAS_KINETIS_SDHC)
 		if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
-	#else 	
+#else
 		AudioStopUsingSPI();
-	#endif	
-	} else {
-		__enable_irq();
+#endif
 	}
+	if (irq) NVIC_ENABLE_IRQ(IRQ_SOFTWARE);
 }
 
+void AudioPlaySdWav::togglePlayPause(void) {
+	// take no action if wave header is not parsed OR
+	// state is explicitly STATE_STOP
+	if(state_play >= 8 || state == STATE_STOP) return;
+
+	// toggle back and forth between state_play and STATE_PAUSED
+	if(state == state_play) {
+		state = STATE_PAUSED;
+	}
+	else if(state == STATE_PAUSED) {
+		state = state_play;
+	}
+}
 
 void AudioPlaySdWav::update(void)
 {
 	int32_t n;
 
-	// only update if we're playing
-	if (state == STATE_STOP) return;
+	// only update if we're playing and not paused
+	if (state == STATE_STOP || state == STATE_PAUSED) return;
 
 	// allocate the audio blocks to transmit
 	block_left = allocate();
@@ -165,11 +187,11 @@ void AudioPlaySdWav::update(void)
 	}
 end:	// end of file reached or other reason to stop
 	wavfile.close();
-#if defined(HAS_KINETIS_SDHC)	
+#if defined(HAS_KINETIS_SDHC)
 	if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
-#else 	
+#else
 	AudioStopUsingSPI();
-#endif	
+#endif
 	state_play = STATE_STOP;
 	state = STATE_STOP;
 cleanup:
@@ -572,10 +594,25 @@ bool AudioPlaySdWav::isPlaying(void)
 	return (s < 8);
 }
 
+
+bool AudioPlaySdWav::isPaused(void)
+{
+	uint8_t s = *(volatile uint8_t *)&state;
+	return (s == STATE_PAUSED);
+}
+
+
+bool AudioPlaySdWav::isStopped(void)
+{
+	uint8_t s = *(volatile uint8_t *)&state;
+	return (s == STATE_STOP);
+}
+
+
 uint32_t AudioPlaySdWav::positionMillis(void)
 {
 	uint8_t s = *(volatile uint8_t *)&state;
-	if (s >= 8) return 0;
+	if (s >= 8 && s != STATE_PAUSED) return 0;
 	uint32_t tlength = *(volatile uint32_t *)&total_length;
 	uint32_t dlength = *(volatile uint32_t *)&data_length;
 	uint32_t offset = tlength - dlength;
@@ -587,7 +624,7 @@ uint32_t AudioPlaySdWav::positionMillis(void)
 uint32_t AudioPlaySdWav::lengthMillis(void)
 {
 	uint8_t s = *(volatile uint8_t *)&state;
-	if (s >= 8) return 0;
+	if (s >= 8 && s != STATE_PAUSED) return 0;
 	uint32_t tlength = *(volatile uint32_t *)&total_length;
 	uint32_t b2m = *(volatile uint32_t *)&bytes2millis;
 	return ((uint64_t)tlength * b2m) >> 32;

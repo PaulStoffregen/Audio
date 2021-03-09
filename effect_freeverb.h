@@ -36,12 +36,12 @@ public:
 	virtual void update();
 	void roomsize(float n) {
 		if (n > 1.0f) n = 1.0f;
-		else if (n < 0.0) n = 0.0f;
+		else if (n < 0.0f) n = 0.0f;
 		combfeeback = (int)(n * 9175.04f) + 22937;
 	}
 	void damping(float n) {
 		if (n > 1.0f) n = 1.0f;
-		else if (n < 0.0) n = 0.0f;
+		else if (n < 0.0f) n = 0.0f;
 		int x1 = (int)(n * 13107.2f);
 		int x2 = 32768 - x1;
 		__disable_irq();
@@ -96,12 +96,12 @@ public:
 	virtual void update();
 	void roomsize(float n) {
 		if (n > 1.0f) n = 1.0f;
-		else if (n < 0.0) n = 0.0f;
+		else if (n < 0.0f) n = 0.0f;
 		combfeeback = (int)(n * 9175.04f) + 22937;
 	}
 	void damping(float n) {
 		if (n > 1.0f) n = 1.0f;
-		else if (n < 0.0) n = 0.0f;
+		else if (n < 0.0f) n = 0.0f;
 		int x1 = (int)(n * 13107.2f);
 		int x2 = 32768 - x1;
 		__disable_irq();

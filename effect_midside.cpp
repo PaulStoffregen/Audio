@@ -25,6 +25,9 @@
  */
 
 #include <Arduino.h>
+
+#if !defined(KINETISL)
+
 #include "effect_midside.h"
 
 void AudioEffectMidSide::update(void)
@@ -92,3 +95,4 @@ void AudioEffectMidSide::update(void)
 	release(blocka);
 	release(blockb);
 }
+#endif

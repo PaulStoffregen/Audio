@@ -25,6 +25,9 @@
  */
 
 #include <Arduino.h>
+
+#if !defined(KINETISL)
+
 #include "output_tdm.h"
 #include "memcpy_audio.h"
 #include "utility/imxrt_hw.h"
@@ -48,6 +51,8 @@ void AudioOutputTDM::begin(void)
 	for (int i=0; i < 16; i++) {
 		block_input[i] = nullptr;
 	}
+	memset(zeros, 0, sizeof(zeros));
+	memset(tdm_tx_buffer, 0, sizeof(tdm_tx_buffer));
 
 	// TODO: should we set & clear the I2S_TCSR_SR bit here?
 	config_tdm();
@@ -129,7 +134,9 @@ void AudioOutputTDM::isr(void)
 	const uint32_t *src1, *src2;
 	uint32_t i, saddr;
 
+#if defined(KINETISK) || defined(__IMXRT1062__)
 	saddr = (uint32_t)(dma.TCD->SADDR);
+#endif
 	dma.clearInterrupt();
 	if (saddr < (uint32_t)tdm_tx_buffer + sizeof(tdm_tx_buffer) / 2) {
 		// DMA is transmitting the first half of the buffer
@@ -332,3 +339,4 @@ void AudioOutputTDM::config_tdm(void)
 #endif
 }
 
+#endif

@@ -27,9 +27,12 @@
 #ifndef output_i2s_h_
 #define output_i2s_h_
 
-#include "Arduino.h"
-#include "AudioStream.h"
-#include "DMAChannel.h"
+#include <Arduino.h>
+#include <AudioStream.h>
+#include <DMAChannel.h>
+
+
+#if !defined(KINETISL)
 
 class AudioOutputI2S : public AudioStream
 {
@@ -38,6 +41,7 @@ public:
 	virtual void update(void);
 	void begin(void);
 	friend class AudioInputI2S;
+	friend class AudioInputPDM;
 #if defined(__IMXRT1062__)
 	friend class AudioOutputI2SQuad;
 	friend class AudioInputI2SQuad;
@@ -48,7 +52,7 @@ public:
 #endif
 protected:
 	AudioOutputI2S(int dummy): AudioStream(2, inputQueueArray) {} // to be used only inside AudioOutputI2Sslave !!
-	static void config_i2s(void);
+	static void config_i2s(bool only_bclk = false);
 	static audio_block_t *block_left_1st;
 	static audio_block_t *block_right_1st;
 	static bool update_responsibility;
@@ -73,5 +77,47 @@ public:
 protected:
 	static void config_i2s(void);
 };
+
+#elif defined(KINETISL)
+
+/**************************************************************************************
+*       Teensy LC
+***************************************************************************************/
+
+class AudioOutputI2S : public AudioStream
+{
+public:
+	AudioOutputI2S(void) : AudioStream(2, inputQueueArray) { begin(); }
+	virtual void update(void);
+	void begin(void);
+	friend class AudioInputI2S;
+protected:
+	AudioOutputI2S(int dummy): AudioStream(2, inputQueueArray) {} // to be used only inside AudioOutputI2Sslave !!
+	static void config_i2s(void);
+	static audio_block_t *block_left;
+	static audio_block_t *block_right;
+	static bool update_responsibility;
+	static DMAChannel dma1;
+	static DMAChannel dma2;
+	static void isr1(void);
+	static void isr2(void);
+private:
+	audio_block_t *inputQueueArray[2];
+};
+
+
+class AudioOutputI2Sslave : public AudioOutputI2S
+{
+public:
+	AudioOutputI2Sslave(void) : AudioOutputI2S(0) { begin(); } ;
+	void begin(void);
+	friend class AudioInputI2Sslave;
+	friend void dma_ch0_isr(void);
+	friend void dma_ch1_isr(void);
+protected:
+	static void config_i2s(void);
+};
+
+#endif
 
 #endif

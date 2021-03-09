@@ -26,7 +26,15 @@
 
 #include <Arduino.h>
 #include "output_i2s.h"
+
+#if !defined(KINETISL)
+
 #include "memcpy_audio.h"
+
+
+// high-level explanation of how this I2S & DMA code works:
+// https://forum.pjrc.com/threads/65229?p=263104&viewfull=1#post263104
+
 
 audio_block_t * AudioOutputI2S::block_left_1st = NULL;
 audio_block_t * AudioOutputI2S::block_right_1st = NULL;
@@ -274,7 +282,7 @@ void AudioOutputI2S::update(void)
 	}
 }
 
-#if defined(KINETISK) || defined(KINETISL)
+#if defined(KINETISK)
 // MCLK needs to be 48e6 / 1088 * 256 = 11.29411765 MHz -> 44.117647 kHz sample rate
 //
 #if F_CPU == 96000000 || F_CPU == 48000000 || F_CPU == 24000000
@@ -329,16 +337,23 @@ void AudioOutputI2S::update(void)
 #endif
 
 
-void AudioOutputI2S::config_i2s(void)
+void AudioOutputI2S::config_i2s(bool only_bclk)
 {
-#if defined(KINETISK) || defined(KINETISL)
+#if defined(KINETISK)
 	SIM_SCGC6 |= SIM_SCGC6_I2S;
 	SIM_SCGC7 |= SIM_SCGC7_DMA;
 	SIM_SCGC6 |= SIM_SCGC6_DMAMUX;
 
 	// if either transmitter or receiver is enabled, do nothing
-	if (I2S0_TCSR & I2S_TCSR_TE) return;
-	if (I2S0_RCSR & I2S_RCSR_RE) return;
+	if ((I2S0_TCSR & I2S_TCSR_TE) != 0 || (I2S0_RCSR & I2S_RCSR_RE) != 0)
+	{
+	  if (!only_bclk) // if previous transmitter/receiver only activated BCLK, activate the other clock pins now
+	  {
+	    CORE_PIN23_CONFIG = PORT_PCR_MUX(6); // pin 23, PTC2, I2S0_TX_FS (LRCLK)
+	    CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK
+	  }
+	  return ;
+	}
 
 	// enable MCLK output
 	I2S0_MCR = I2S_MCR_MICS(MCLK_SRC) | I2S_MCR_MOE;
@@ -366,18 +381,29 @@ void AudioOutputI2S::config_i2s(void)
 	I2S0_RCR5 = I2S_RCR5_WNW(31) | I2S_RCR5_W0W(31) | I2S_RCR5_FBT(31);
 
 	// configure pin mux for 3 clock signals
-	CORE_PIN23_CONFIG = PORT_PCR_MUX(6); // pin 23, PTC2, I2S0_TX_FS (LRCLK)
+	if (!only_bclk)
+	{
+	  CORE_PIN23_CONFIG = PORT_PCR_MUX(6); // pin 23, PTC2, I2S0_TX_FS (LRCLK)
+	  CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK
+	}
 	CORE_PIN9_CONFIG  = PORT_PCR_MUX(6); // pin  9, PTC3, I2S0_TX_BCLK
-	CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK
 
 #elif defined(__IMXRT1062__)
 
 	CCM_CCGR5 |= CCM_CCGR5_SAI1(CCM_CCGR_ON);
 
 	// if either transmitter or receiver is enabled, do nothing
-	if (I2S1_TCSR & I2S_TCSR_TE) return;
-	if (I2S1_RCSR & I2S_RCSR_RE) return;
-//PLL:
+	if ((I2S1_TCSR & I2S_TCSR_TE) != 0 || (I2S1_RCSR & I2S_RCSR_RE) != 0)
+	{
+	  if (!only_bclk) // if previous transmitter/receiver only activated BCLK, activate the other clock pins now
+	  {
+	    CORE_PIN23_CONFIG = 3;  //1:MCLK
+	    CORE_PIN20_CONFIG = 3;  //1:RX_SYNC (LRCLK)
+	  }
+	  return ;
+	}
+
+	//PLL:
 	int fs = AUDIO_SAMPLE_RATE_EXACT;
 	// PLL between 27*24 = 648MHz und 54*24=1296MHz
 	int n1 = 4; //SAI prescaler 4 => (n1*n2) = multiple of 4
@@ -401,9 +427,12 @@ void AudioOutputI2S::config_i2s(void)
 		& ~(IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL_MASK))
 		| (IOMUXC_GPR_GPR1_SAI1_MCLK_DIR | IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL(0));
 
-	CORE_PIN23_CONFIG = 3;  //1:MCLK
+	if (!only_bclk)
+	{
+	  CORE_PIN23_CONFIG = 3;  //1:MCLK
+	  CORE_PIN20_CONFIG = 3;  //1:RX_SYNC  (LRCLK)
+	}
 	CORE_PIN21_CONFIG = 3;  //1:RX_BCLK
-	CORE_PIN20_CONFIG = 3;  //1:RX_SYNC
 
 	int rsync = 0;
 	int tsync = 1;
@@ -565,3 +594,248 @@ void AudioOutputI2Sslave::config_i2s(void)
 
 #endif
 }
+
+
+#elif defined(KINETISL)
+
+/**************************************************************************************
+*       Teensy LC
+***************************************************************************************/
+
+// added jan 2021, Frank Bösing
+
+audio_block_t * AudioOutputI2S::block_left = NULL;
+audio_block_t * AudioOutputI2S::block_right = NULL;
+bool AudioOutputI2S::update_responsibility = false;
+
+#define NUM_SAMPLES (AUDIO_BLOCK_SAMPLES / 2)
+
+DMAMEM static int16_t i2s_tx_buffer1[NUM_SAMPLES * 2];
+DMAMEM static int16_t i2s_tx_buffer2[NUM_SAMPLES * 2];
+DMAChannel AudioOutputI2S::dma1(false);
+DMAChannel AudioOutputI2S::dma2(false);
+
+void AudioOutputI2S::begin(void)
+{
+
+	memset(i2s_tx_buffer1, 0, sizeof( i2s_tx_buffer1 ) );
+	memset(i2s_tx_buffer2, 0, sizeof( i2s_tx_buffer2 ) );
+
+	dma1.begin(true); // Allocate the DMA channel first
+	dma2.begin(true);
+
+	config_i2s();
+	CORE_PIN22_CONFIG = PORT_PCR_MUX(6); // pin 22, PTC1, I2S0_TXD0
+
+	//configure both DMA channels
+	dma1.sourceBuffer(i2s_tx_buffer1, sizeof(i2s_tx_buffer1));
+	dma1.CFG->DAR = (void *)((uint32_t)&I2S0_TDR0);
+	dma1.CFG->DCR = (dma1.CFG->DCR & 0xF0F0F0FF) | DMA_DCR_DSIZE(2);
+	dma1.triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_TX);
+	dma1.interruptAtCompletion();
+	dma1.disableOnCompletion();
+	dma1.attachInterrupt(isr1);
+
+
+	dma2.sourceBuffer(i2s_tx_buffer2, sizeof(i2s_tx_buffer2));
+	dma2.CFG->DAR = dma1.CFG->DAR;
+	dma2.CFG->DCR = dma1.CFG->DCR;
+	dma2.interruptAtCompletion();
+	dma2.disableOnCompletion();
+	dma2.attachInterrupt(isr2);
+
+	update_responsibility = update_setup();
+	dma1.enable();
+
+	I2S0_TCSR = I2S_TCSR_SR;
+	I2S0_TCSR = I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FWDE;
+
+}
+
+void AudioOutputI2S::config_i2s(void)
+{
+
+	SIM_SCGC6 |= SIM_SCGC6_I2S;//Enable I2S periphal
+
+	// enable MCLK, 16MHZ
+	I2S0_MCR = I2S_MCR_MICS(0) | I2S_MCR_MOE;
+	//MDR is not available on Teensy LC
+
+	// configure transmitter
+	I2S0_TMR = 0;
+	I2S0_TCR2 = I2S_TCR2_SYNC(0) | I2S_TCR2_BCP | I2S_TCR2_MSEL(1) | I2S_TCR2_BCD | I2S_TCR2_DIV(16);
+	I2S0_TCR3 = I2S_TCR3_TCE;
+	I2S0_TCR4 = I2S_TCR4_FRSZ(1) | I2S_TCR4_SYWD(15) | I2S_TCR4_MF | I2S_TCR4_FSE | I2S_TCR4_FSP | I2S_TCR4_FSD;
+	I2S0_TCR5 = I2S_TCR5_WNW(15) | I2S_TCR5_W0W(15) | I2S_TCR5_FBT(15);
+
+	// configure receiver (sync'd to transmitter clocks)
+	I2S0_RMR = 0;
+	I2S0_RCR2 = I2S_RCR2_SYNC(1) | I2S_TCR2_BCP;
+	I2S0_RCR3 = I2S_RCR3_RCE;
+	I2S0_RCR4 = I2S_RCR4_FRSZ(1) | I2S_RCR4_SYWD(15) | I2S_RCR4_MF | I2S_RCR4_FSE | I2S_RCR4_FSP | I2S_RCR4_FSD;
+	I2S0_RCR5 = I2S_RCR5_WNW(15) | I2S_RCR5_W0W(15) | I2S_RCR5_FBT(15);
+
+	// configure pin mux	
+	CORE_PIN23_CONFIG = PORT_PCR_MUX(6); // pin 23, PTC2, I2S0_TX_FS (LRCLK)
+	CORE_PIN9_CONFIG  = PORT_PCR_MUX(6); // pin  9, PTC3, I2S0_TX_BCLK	
+	//No Mclk here - it would be 16MHz
+	//CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK
+}
+
+void AudioOutputI2S::update(void)
+{
+	if (!block_left)  block_left  = receiveReadOnly(0);// input 0 = left channel
+	if (!block_right) block_right = receiveReadOnly(1);// input 1 = right channel
+}
+
+inline __attribute__((always_inline, hot))
+static void interleave(const int16_t *dest,const audio_block_t *block_left, const audio_block_t *block_right, const size_t offset)
+{
+//return;
+	uint32_t *p = (uint32_t*)dest;
+	uint32_t *end = p + NUM_SAMPLES;
+
+	if (block_left != nullptr && block_right != nullptr) {
+		uint16_t *l = (uint16_t*)&block_left->data[offset];
+		uint16_t *r = (uint16_t*)&block_right->data[offset];
+		do {
+			*p++ = (((uint32_t)(*l++)) << 16)  | (uint32_t)(*r++);
+			*p++ = (((uint32_t)(*l++)) << 16)  | (uint32_t)(*r++);
+			*p++ = (((uint32_t)(*l++)) << 16)  | (uint32_t)(*r++);
+			*p++ = (((uint32_t)(*l++)) << 16)  | (uint32_t)(*r++);
+		} while (p < end);
+		return;
+	}
+
+	if (block_left != nullptr) {
+		uint16_t *l = (uint16_t*)&block_left->data[offset];
+		do {
+			*p++ = (uint32_t)(*l++) << 16;
+			*p++ = (uint32_t)(*l++) << 16;
+			*p++ = (uint32_t)(*l++) << 16;
+			*p++ = (uint32_t)(*l++) << 16;
+		} while (p < end);
+		return;
+	}
+
+	if (block_right != nullptr) {
+		uint16_t *r = (uint16_t*)&block_right->data[offset];
+		do {
+			*p++ =(uint32_t)(*r++);
+			*p++ =(uint32_t)(*r++);
+			*p++ =(uint32_t)(*r++);
+			*p++ =(uint32_t)(*r++);
+		} while (p < end);
+		return;
+	}
+
+	do {
+		*p++ = 0;
+		*p++ = 0;
+	} while (p < end);
+
+}
+
+void AudioOutputI2S::isr1(void)
+{	//DMA Channel 1 Interrupt
+
+	//Start Channel 2:
+	dma2.triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_TX);
+	dma2.enable();
+
+	//Reset & Copy Data Channel 1
+	dma1.clearInterrupt();
+	dma1.sourceBuffer(i2s_tx_buffer1, sizeof(i2s_tx_buffer1));
+	interleave(&i2s_tx_buffer1[0], AudioOutputI2S::block_left, AudioOutputI2S::block_right, 0);
+}
+
+void __attribute__((interrupt("IRQ"))) AudioOutputI2S::isr2(void)
+{	//DMA Channel 2 Interrupt
+
+	//Start Channel 1:
+	dma1.triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_TX);
+	dma1.enable();
+
+	//Reset & Copy Data Channel 2
+	dma2.clearInterrupt();
+	dma2.sourceBuffer(i2s_tx_buffer2, sizeof(i2s_tx_buffer2));
+
+	audio_block_t *block_left = AudioOutputI2S::block_left;
+	audio_block_t *block_right = AudioOutputI2S::block_right;
+
+	interleave(&i2s_tx_buffer2[0], block_left, block_right, NUM_SAMPLES);
+
+	if (block_left) AudioStream::release(block_left);
+	if (block_right) AudioStream::release(block_right);
+
+	AudioOutputI2S::block_left = nullptr;
+	AudioOutputI2S::block_right = nullptr;
+
+	if (AudioOutputI2S::update_responsibility) AudioStream::update_all();
+}
+
+void AudioOutputI2Sslave::begin(void)
+{
+	memset(i2s_tx_buffer1, 0, sizeof( i2s_tx_buffer1 ) );
+	memset(i2s_tx_buffer2, 0, sizeof( i2s_tx_buffer2 ) );
+
+	dma1.begin(true); // Allocate the DMA channels first
+	dma2.begin(true);
+	
+	config_i2s();
+	CORE_PIN22_CONFIG = PORT_PCR_MUX(6); // pin 22, PTC1, I2S0_TXD0
+	
+	//configure both DMA channels
+	dma1.sourceBuffer(i2s_tx_buffer1, sizeof(i2s_tx_buffer1));
+	dma1.CFG->DAR = (void *)((uint32_t)&I2S0_TDR0 + 2);
+	dma1.CFG->DCR = (dma1.CFG->DCR & 0xF0F0F0FF) | DMA_DCR_DSIZE(2);
+	dma1.triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_TX);
+	dma1.interruptAtCompletion();
+	dma1.disableOnCompletion();
+	dma1.attachInterrupt(isr1);
+
+	dma2.sourceBuffer(i2s_tx_buffer2, sizeof(i2s_tx_buffer2));
+	dma2.CFG->DAR = dma1.CFG->DAR;
+	dma2.CFG->DCR = dma1.CFG->DCR;
+	dma2.interruptAtCompletion();
+	dma2.disableOnCompletion();
+	dma2.attachInterrupt(isr2);
+
+	update_responsibility = update_setup();
+	dma1.enable();
+
+	I2S0_TCSR = I2S_TCSR_SR;
+	I2S0_TCSR = I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FWDE;
+
+}
+void AudioOutputI2Sslave::config_i2s(void)
+{
+	SIM_SCGC6 |= SIM_SCGC6_I2S;//Enable I2S periphal
+	
+	// enable MCLK, 16MHZ
+	I2S0_MCR = I2S_MCR_MICS(1) | I2S_MCR_MOE;
+	//MDR is not available on Teensy LC
+
+	// configure transmitter
+	I2S0_TMR = 0;
+	I2S0_TCR2 = I2S_TCR2_SYNC(0) | I2S_TCR2_BCP;
+	I2S0_TCR3 = I2S_TCR3_TCE;
+	I2S0_TCR4 = I2S_TCR4_FRSZ(1) | I2S_TCR4_SYWD(31) | I2S_TCR4_MF | I2S_TCR4_FSE | I2S_TCR4_FSP;
+	I2S0_TCR5 = I2S_TCR5_WNW(31) | I2S_TCR5_W0W(31) | I2S_TCR5_FBT(31);
+
+	// configure receiver (sync'd to transmitter clocks)
+	I2S0_RMR = 0;	
+	I2S0_RCR2 = I2S_RCR2_SYNC(1) | I2S_TCR2_BCP;
+	I2S0_RCR3 = I2S_RCR3_RCE;
+	I2S0_RCR4 = I2S_RCR4_FRSZ(1) | I2S_RCR4_SYWD(31) | I2S_RCR4_MF | I2S_RCR4_FSE | I2S_RCR4_FSP;
+	I2S0_RCR5 = I2S_RCR5_WNW(31) | I2S_RCR5_W0W(31) | I2S_RCR5_FBT(31);
+	
+	// configure pin mux
+	CORE_PIN23_CONFIG = PORT_PCR_MUX(6); // pin 23, PTC2, I2S0_TX_FS (LRCLK)
+	CORE_PIN9_CONFIG  = PORT_PCR_MUX(6); // pin  9, PTC3, I2S0_TX_BCLK
+	CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK  	!!16MHz!!
+	
+}
+
+#endif
+

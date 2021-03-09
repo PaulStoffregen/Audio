@@ -139,10 +139,10 @@ void wav2c(FILE *in, FILE *out, FILE *outh)
 	total_length += arraylen;
 
 	// output a minimal header, just the length, #bits and sample rate
-	fprintf(outh, "extern const unsigned int AudioSample%s[%d];\n", samplename, arraylen);
+	fprintf(outh, "extern const unsigned int AudioSample%s[%d];\n", samplename, arraylen);	
 	fprintf(out, "// Converted from %s, using %d Hz, %s encoding\n", filename, rate,
 	  (pcm_mode ? "16 bit PCM" : "u-law"));
-	fprintf(out, "const unsigned int AudioSample%s[%d] = {\n", samplename, arraylen);
+	fprintf(out, "PROGMEM const unsigned int AudioSample%s[%d] = {\n", samplename, arraylen);
 	fprintf(out, "0x%08X,", length | (format << 24));
 	wcount = 1;
 
@@ -291,6 +291,7 @@ int main(int argc, char **argv)
 		if (outh == NULL) die("unable to write %s\n", buf);
 		fprintf(outh, "%s", title);
 		fprintf(outc, "%s", title);
+		fprintf(outc, "#include <Arduino.h>\n");
 		fprintf(outc, "#include \"%s\"\n\n", buf);
 		wav2c(fp, outc, outh);
 		//wav2c(fp, stdout, stdout);
@@ -353,4 +354,3 @@ void die(const char *format, ...)
 	fprintf(stderr, "\n");
 	exit(1);
 }
-

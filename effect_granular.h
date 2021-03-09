@@ -29,17 +29,17 @@ public:
 	AudioEffectGranular(void): AudioStream(1,inputQueueArray) { }
 	void begin(int16_t *sample_bank_def, int16_t max_len_def);
 	void setSpeed(float ratio) {
-		if (ratio < 0.125) ratio = 0.125;
-		else if (ratio > 8.0) ratio = 8.0;
-		playpack_rate = ratio * 65536.0 + 0.499;
+		if (ratio < 0.125f) ratio = 0.125f;
+		else if (ratio > 8.0f) ratio = 8.0f;
+		playpack_rate = ratio * 65536.0f + 0.499f;
 	}
 	void beginFreeze(float grain_length) {
-		if (grain_length <= 0.0) return;
-		beginFreeze_int(grain_length * (AUDIO_SAMPLE_RATE_EXACT * 0.001) + 0.5);
+		if (grain_length <= 0.0f) return;
+		beginFreeze_int(grain_length * (AUDIO_SAMPLE_RATE_EXACT * 0.001f) + 0.5f);
 	}
 	void beginPitchShift(float grain_length) {
-		if (grain_length <= 0.0) return;
-		beginPitchShift_int(grain_length * (AUDIO_SAMPLE_RATE_EXACT * 0.001) + 0.5);
+		if (grain_length <= 0.0f) return;
+		beginPitchShift_int(grain_length * (AUDIO_SAMPLE_RATE_EXACT * 0.001f) + 0.5f);
 	}
 	void stop();
 	virtual void update(void);

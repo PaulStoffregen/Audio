@@ -1,7 +1,7 @@
 Teensy Audio Library
 ====================
 
-16 bit, 44.1 kHz streaming audio library for Teensy 3.x, featuring:
+16 bit, 44.1 kHz streaming audio library for Teensy 3.x and Teensy 4.x, featuring:
 
 * Polyphonic Playback
 * Recording

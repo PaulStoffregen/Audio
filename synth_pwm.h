@@ -37,14 +37,14 @@ public:
 	AudioSynthWaveformPWM() : AudioStream(1, inputQueueArray), magnitude(0), elapsed(0) {}
 	void frequency(float freq) {
 		if (freq < 1.0) freq = 1.0;
-		else if (freq > AUDIO_SAMPLE_RATE_EXACT/4) freq = AUDIO_SAMPLE_RATE_EXACT/4;
-		//phase_increment = freq * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT);
-		duration = (AUDIO_SAMPLE_RATE_EXACT * 65536.0 + freq) / (freq * 2.0);
+		else if (freq > AUDIO_SAMPLE_RATE_EXACT/4.0f) freq = AUDIO_SAMPLE_RATE_EXACT/4.0f;
+		//phase_increment = freq * (4294967296.0f / AUDIO_SAMPLE_RATE_EXACT);
+		duration = (AUDIO_SAMPLE_RATE_EXACT * 65536.0f + freq) / (freq * 2.0f);
 	}
 	void amplitude(float n) {
-		if (n < 0) n = 0;
-		else if (n > 1.0) n = 1.0;
-		magnitude = n * 32767.0;
+		if (n < 0.0f) n = 0;
+		else if (n > 1.0f) n = 1.0f;
+		magnitude = n * 32767.0f;
 	}
 	virtual void update(void);
 private:

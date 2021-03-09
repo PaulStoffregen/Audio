@@ -397,10 +397,12 @@ a.brand img {
   stroke: #ff7f0e;
   fill: #eee;
 }
-
 .node_button {
     fill: inherit;
 
+}
+.node_reqerror {
+    cursor:pointer;
 }
 .port {
    fill: #ddd;

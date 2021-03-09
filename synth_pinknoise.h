@@ -41,9 +41,9 @@ public:
 		pdec   = 0x0CCC;
 	}	
 	void amplitude(float n) {
-		if (n < 0.0) n = 0.0;
-		else if (n > 1.0) n = 1.0;
-		level = (int32_t)(n * 65536.0);
+		if (n < 0.0f) n = 0.0;
+		else if (n > 1.0f) n = 1.0f;
+		level = (int32_t)(n * 65536.0f);
 	}
 	virtual void update(void);
 private:
