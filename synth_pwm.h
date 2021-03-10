@@ -36,7 +36,7 @@ class AudioSynthWaveformPWM : public AudioStream
 public:
 	AudioSynthWaveformPWM() : AudioStream(1, inputQueueArray), magnitude(0), elapsed(0) {}
 	void frequency(float freq) {
-		if (freq < 1.0) freq = 1.0;
+		if (freq < 1.0f) freq = 1.0f;
 		else if (freq > AUDIO_SAMPLE_RATE_EXACT/4.0f) freq = AUDIO_SAMPLE_RATE_EXACT/4.0f;
 		//phase_increment = freq * (4294967296.0f / AUDIO_SAMPLE_RATE_EXACT);
 		duration = (AUDIO_SAMPLE_RATE_EXACT * 65536.0f + freq) / (freq * 2.0f);

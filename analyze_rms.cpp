@@ -77,6 +77,6 @@ float AudioAnalyzeRMS::read(void)
 	float meansq = sum / (num * AUDIO_BLOCK_SAMPLES);
 	// TODO: shift down to 32 bits and use sqrt_uint32
 	//       but is that really any more efficient?
-	return sqrtf(meansq) / 32767.0;
+	return sqrtf(meansq) / 32767.0f;
 }
 

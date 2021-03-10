@@ -108,33 +108,33 @@ void loop() {
 
 void strum_up(const float *chord, float velocity)
 {
-  if (chord[0] > 20.0) string1.noteOn(chord[0], velocity);
+  if (chord[0] > 20.0f) string1.noteOn(chord[0], velocity);
   delay(finger_delay);
-  if (chord[1] > 20.0) string2.noteOn(chord[1], velocity);
+  if (chord[1] > 20.0f) string2.noteOn(chord[1], velocity);
   delay(finger_delay);
-  if (chord[2] > 20.0) string3.noteOn(chord[2], velocity);
+  if (chord[2] > 20.0f) string3.noteOn(chord[2], velocity);
   delay(finger_delay);
-  if (chord[3] > 20.0) string4.noteOn(chord[3], velocity);
+  if (chord[3] > 20.0f) string4.noteOn(chord[3], velocity);
   delay(finger_delay);
-  if (chord[4] > 20.0) string5.noteOn(chord[4], velocity);
+  if (chord[4] > 20.0f) string5.noteOn(chord[4], velocity);
   delay(finger_delay);
-  if (chord[5] > 20.0) string6.noteOn(chord[5], velocity);
+  if (chord[5] > 20.0f) string6.noteOn(chord[5], velocity);
   delay(finger_delay);
 }
 
 void strum_dn(const float *chord, float velocity)
 {
-  if (chord[5] > 20.0) string1.noteOn(chord[5], velocity);
+  if (chord[5] > 20.0f) string1.noteOn(chord[5], velocity);
   delay(finger_delay);
-  if (chord[4] > 20.0) string2.noteOn(chord[4], velocity);
+  if (chord[4] > 20.0f) string2.noteOn(chord[4], velocity);
   delay(finger_delay);
-  if (chord[3] > 20.0) string3.noteOn(chord[3], velocity);
+  if (chord[3] > 20.0f) string3.noteOn(chord[3], velocity);
   delay(finger_delay);
-  if (chord[2] > 20.0) string4.noteOn(chord[2], velocity);
+  if (chord[2] > 20.0f) string4.noteOn(chord[2], velocity);
   delay(finger_delay);
-  if (chord[1] > 20.0) string5.noteOn(chord[1], velocity);
+  if (chord[1] > 20.0f) string5.noteOn(chord[1], velocity);
   delay(finger_delay);
-  if (chord[0] > 20.0) string6.noteOn(chord[0], velocity);
+  if (chord[0] > 20.0f) string6.noteOn(chord[0], velocity);
   delay(finger_delay);
 }
 

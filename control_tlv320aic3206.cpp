@@ -279,17 +279,17 @@ void AudioControlTLV320AIC3206::aic_initADC() {
 
 // set MICPGA volume, 0-47.5dB in 0.5dB setps
 bool AudioControlTLV320AIC3206::setInputGain_dB(float volume) {
-  if (volume < 0.0) {
-    volume = 0.0; // 0.0 dB
+  if (volume < 0.0f) {
+    volume = 0.0f; // 0.0 dB
     Serial.println("controlTLV320AIC3206: WARNING: Attempting to set MIC volume outside range");
   }
-  if (volume > 47.5) {
-    volume = 47.5; // 47.5 dB
+  if (volume > 47.5f) {
+    volume = 47.5f; // 47.5 dB
     Serial.println("controlTLV320AIC3206: WARNING: Attempting to set MIC volume outside range");
   }
 
-  volume = volume * 2.0; // convert to value map (0.5 dB steps)
-  int8_t volume_int = (int8_t) (round(volume)); // round
+  volume = volume * 2.0f; // convert to value map (0.5 dB steps)
+  int8_t volume_int = (int8_t) (roundf(volume)); // round
 
   if (debugToSerial) {
 	Serial.print("INFO: Setting MIC volume to ");
@@ -313,7 +313,7 @@ bool AudioControlTLV320AIC3206::setInputGain_dB(float volume) {
 // value between 0.0 and 1.0.  Set to span -58 to +15 dB
 bool AudioControlTLV320AIC3206::volume(float volume) {
 	volume = max(0.0, min(1.0, volume));
-	float vol_dB = -58.f + (15.0 - (-58.0f)) * volume;
+	float vol_dB = -58.f + (15.0f - (-58.0f)) * volume;
 	volume_dB(vol_dB);
 	return true;
 }
@@ -336,17 +336,19 @@ bool AudioControlTLV320AIC3206::enableAutoMuteDAC(bool enable, uint8_t mute_dela
 bool AudioControlTLV320AIC3206::volume_dB(float volume) {
 
   // Constrain to limits
-  if (volume > 24.0) {
-    volume = 24.0;
-    Serial.println("controlTLV320AIC3206: WARNING: Attempting to set DAC Volume outside range");
+  if (volume > 24.0f) {
+    volume = 24.0f;
+    if (debugToSerial)
+	Serial.println("controlTLV320AIC3206: WARNING: Attempting to set DAC Volume outside range");
   }
-  if (volume < -63.5) {
-    volume = -63.5;
-    Serial.println("controlTLV320AIC3206: WARNING: Attempting to set DAC Volume outside range");
+  if (volume < -63.5f) {
+    volume = -63.5f;
+    if (debugToSerial)
+	Serial.println("controlTLV320AIC3206: WARNING: Attempting to set DAC Volume outside range");
   }
 
-  volume = volume * 2.0; // convert to value map (0.5 dB steps)
-  int8_t volume_int = (int8_t) (round(volume)); // round
+  volume = volume * 2.0f; // convert to value map (0.5 dB steps)
+  int8_t volume_int = (int8_t) (roundf(volume)); // round
 
   if (debugToSerial) {
 	Serial.print("controlTLV320AIC3206: Setting DAC volume to ");
@@ -623,11 +625,11 @@ void computeFirstOrderHPCoeff_F32(float cutoff_Hz, float fs_Hz, float *coeff) {
 	//From https://www.dsprelated.com/showcode/199.php
 	const float pi = 3.141592653589793;
 	float T = 1.0f/fs_Hz; //sample period
-	float w = cutoff_Hz * 2.0 * pi;
-	float A = 1.0f / (tan( (w*T) / 2.0));
-	coeff[0] = A / (1.0 + A); // first b coefficient
+	float w = cutoff_Hz * 2.0f * pi;
+	float A = 1.0f / (tanf( (w*T) / 2.0f));
+	coeff[0] = A / (1.0f + A); // first b coefficient
 	coeff[1] = -coeff[0];     // second b coefficient
-	coeff[2] = (1.0 - A) / (1.0 + A);  //second a coefficient (Matlab sign convention)
+	coeff[2] = (1.0f - A) / (1.0f + A);  //second a coefficient (Matlab sign convention)
 	coeff[2] = -coeff[2];  //flip to be TI sign convention
 }
 #define CONST_2_31_m1  (2147483647)   //2^31 - 1

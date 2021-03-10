@@ -521,9 +521,9 @@ start:
 //  256 byte chunks, speed is 443272 bytes/sec
 //  512 byte chunks, speed is 468023 bytes/sec
 
-#define B2M_44100 (uint32_t)((double)4294967296000.0 / AUDIO_SAMPLE_RATE_EXACT) // 97352592
-#define B2M_22050 (uint32_t)((double)4294967296000.0 / AUDIO_SAMPLE_RATE_EXACT * 2.0)
-#define B2M_11025 (uint32_t)((double)4294967296000.0 / AUDIO_SAMPLE_RATE_EXACT * 4.0)
+#define B2M_44100 (uint32_t)((double)4294967296000.0 / (double)AUDIO_SAMPLE_RATE_EXACT) // 97352592
+#define B2M_22050 (uint32_t)((double)4294967296000.0 / (double)AUDIO_SAMPLE_RATE_EXACT * 2.0)
+#define B2M_11025 (uint32_t)((double)4294967296000.0 / (double)AUDIO_SAMPLE_RATE_EXACT * 4.0)
 
 bool AudioPlaySdWav::parse_format(void)
 {

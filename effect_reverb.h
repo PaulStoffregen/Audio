@@ -49,10 +49,10 @@
 #define LPF3_DLY_LEN 1774
 #define LPF4_DLY_LEN 1947
 
-#define LPF1_DLY_SEC 0.03171 
-#define LPF2_DLY_SEC 0.03711
-#define LPF3_DLY_SEC 0.04023
-#define LPF4_DLY_SEC 0.04414
+#define LPF1_DLY_SEC 0.03171f 
+#define LPF2_DLY_SEC 0.03711f
+#define LPF3_DLY_SEC 0.04023f
+#define LPF4_DLY_SEC 0.04414f
 
 
 class AudioEffectReverb : public AudioStream

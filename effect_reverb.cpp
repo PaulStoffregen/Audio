@@ -150,15 +150,15 @@ AudioEffectReverb::clear_buffers(void)
 void
 AudioEffectReverb::reverbTime(float rt)
 {
-  if (rt <= 0.0)
+  if (rt <= 0)
     return;
 
   reverb_time_sec = rt;
 
-  g1_flt_lpf[0] = powf(10.0, -(3.0*LPF1_DLY_SEC)/(reverb_time_sec));
-  g1_flt_lpf[1] = powf(10.0, -(3.0*LPF2_DLY_SEC)/(reverb_time_sec));
-  g1_flt_lpf[2] = powf(10.0, -(3.0*LPF3_DLY_SEC)/(reverb_time_sec));
-  g1_flt_lpf[3] = powf(10.0, -(3.0*LPF4_DLY_SEC)/(reverb_time_sec));
+  g1_flt_lpf[0] = powf(10.0f, -(3.0f*LPF1_DLY_SEC)/(reverb_time_sec));
+  g1_flt_lpf[1] = powf(10.0f, -(3.0f*LPF2_DLY_SEC)/(reverb_time_sec));
+  g1_flt_lpf[2] = powf(10.0f, -(3.0f*LPF3_DLY_SEC)/(reverb_time_sec));
+  g1_flt_lpf[3] = powf(10.0f, -(3.0f*LPF4_DLY_SEC)/(reverb_time_sec));
 
   arm_float_to_q31(g1_flt_lpf, g1_q31_lpf, 4);
 
