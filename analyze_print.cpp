@@ -39,7 +39,7 @@ void AudioAnalyzePrint::update(void)
 	//uint32_t remain, n;
 
 	block = receiveReadOnly();
-	if (!block) return;
+	//if (!block) return;
 	//bknum++;
 
 	do
@@ -77,7 +77,10 @@ void AudioAnalyzePrint::update(void)
 				//Serial.print(' ');
 				//Serial.print(count);
 				//Serial.print(' ');
-				Serial.println(block->data[offset]);
+				if (block) // real data, use it
+					Serial.println(block->data[offset]);
+				else // treat NULL as block of zeros - DON'T just ignore it!
+					Serial.println(0);
 				count--;
 				offset += decimate_length;
 			}
@@ -90,7 +93,9 @@ void AudioAnalyzePrint::update(void)
 			break;
 		}
 	} while (offset < AUDIO_BLOCK_SAMPLES);
-	release(block);
+	
+	if (block) // not safe to release(NULL), for some reason
+		release(block);
 }
 
 void AudioAnalyzePrint::trigger(void)
