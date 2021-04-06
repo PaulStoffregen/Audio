@@ -35,15 +35,18 @@
 void AudioAnalyzePrint::update(void)
 {
 	audio_block_t *block;
-	uint32_t offset = 0;
-	uint32_t remain, n;
+	//uint32_t offset = 0;
+	//uint32_t remain, n;
 
 	block = receiveReadOnly();
 	if (!block) return;
+	//bknum++;
 
-	while (offset < AUDIO_BLOCK_SAMPLES) {
-		remain = AUDIO_BLOCK_SAMPLES - offset;
-		switch (state) {
+	do
+	{
+		//remain = AUDIO_BLOCK_SAMPLES - offset;
+		switch (state) 
+		{
 		  case STATE_WAIT_TRIGGER:
 			// TODO: implement this....
 			offset = AUDIO_BLOCK_SAMPLES;
@@ -51,32 +54,42 @@ void AudioAnalyzePrint::update(void)
 
 		  case STATE_DELAY:
 			//Serial.printf("STATE_DELAY, count = %u\n", count);
-			if (remain < count) {
-				count -= remain;
-				offset = AUDIO_BLOCK_SAMPLES;
-			} else {
-				offset += count;
-				count = print_length;
-				state = STATE_PRINTING;
+			if (count > offset) // still delaying?
+			{
+				count -= offset; 			  // yes, decrement delay count...
+				offset = AUDIO_BLOCK_SAMPLES; // ... and exit
+			} 
+			else 
+			{
+				offset = count;			// index first sample to print
+				count = print_length;	// re-use for sample print count
+				state = STATE_PRINTING;	// start printing on next iteration
+				//bknum = 0;
 			}
 			break;
 
 		  case STATE_PRINTING:
-			n = count;
-			if (n > remain) n = remain;
-			count -= n;
-			while (n > 0) {
-				Serial.println(block->data[offset++]);
-				n--;
+			if (offset >= AUDIO_BLOCK_SAMPLES)
+				offset -= AUDIO_BLOCK_SAMPLES;
+			if (offset < AUDIO_BLOCK_SAMPLES) // may happen if decimate_length > AUDIO_BLOCK_SAMPLES
+			{
+				//Serial.print(bknum);
+				//Serial.print(' ');
+				//Serial.print(count);
+				//Serial.print(' ');
+				Serial.println(block->data[offset]);
+				count--;
+				offset += decimate_length;
 			}
-			if (count == 0) state = STATE_IDLE;
+			if (count == 0) 
+				state = STATE_IDLE;
 			break;
 
 		  default: // STATE_IDLE
 			offset = AUDIO_BLOCK_SAMPLES;
 			break;
 		}
-	}
+	} while (offset < AUDIO_BLOCK_SAMPLES);
 	release(block);
 }
 
@@ -90,12 +103,12 @@ void AudioAnalyzePrint::trigger(void)
 		Serial.print(", delay=");
 		Serial.println(n);
 		count = n;
-		state = 2;
+		state = STATE_DELAY;
 	} else {
 		Serial.print("trigger ");
 		if (myname) Serial.println(myname);
 		count = print_length;
-		state = 3;
+		state = STATE_PRINTING;
 	}
 }
 

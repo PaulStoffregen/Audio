@@ -34,21 +34,25 @@ class AudioAnalyzePrint : public AudioStream
 {
 public:
 	AudioAnalyzePrint(void) : AudioStream(1, inputQueueArray),
-	  myname(NULL), state(0), trigger_edge(0), delay_length(0), print_length(500) {}
+	  myname(NULL), state(0), trigger_edge(0), delay_length(0), print_length(500), decimate_length(1) {}
 	virtual void update(void);
 	void name(const char *str) { myname = str; }
 	void trigger(void);
 	void trigger(float level, int edge);
 	void delay(uint32_t num) { delay_length = num; }
 	void length(uint32_t num) { print_length = num; }
+	void decimate(uint32_t num) { decimate_length = num; }
 private:
 	const char *myname;
 	uint8_t state;
 	uint8_t trigger_edge; // trigger type, 0=none, 2=RISING, 3=FALLING
 	int16_t trigger_level;
-	uint32_t delay_length; // number of samples between trigger and printing
-	uint32_t print_length; // number of samples to print
-	uint32_t count;
+	uint32_t delay_length; 		// number of samples between trigger and printing
+	uint32_t print_length; 		// number of samples to print
+	uint32_t decimate_length;	// number of samples to skip between those printed, -1
+	uint32_t offset;			// offset into current block of sample to print: could be past end
+	uint32_t count; // count of samples to wait after trigger, or remaining to print
+	//uint32_t bknum;
 	audio_block_t *inputQueueArray[1];
 };
 
