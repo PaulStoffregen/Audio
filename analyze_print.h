@@ -41,7 +41,7 @@ public:
 	void trigger(float level, int edge);
 	void delay(uint32_t num) { delay_length = num; }
 	void length(uint32_t num) { print_length = num; }
-	void decimate(uint32_t num) { decimate_length = num; }
+	void decimate(uint32_t num) { if (num > 0) decimate_length = num; }
 private:
 	const char *myname;
 	uint8_t state;
