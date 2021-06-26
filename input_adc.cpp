@@ -44,6 +44,8 @@ int32_t AudioInputAnalog::hpf_x1 = 0;
 bool AudioInputAnalog::update_responsibility = false;
 DMAChannel AudioInputAnalog::dma(false);
 
+static int analogReadADC1(uint8_t pin);
+
 void AudioInputAnalog::init(uint8_t pin)
 {
 	int32_t tmp;
@@ -101,6 +103,81 @@ void AudioInputAnalog::init(uint8_t pin)
 	dma.attachInterrupt(isr);
 }
 
+void AudioInputAnalog::init(uint8_t pin, uint8_t adc_num)
+{
+	if (adc_num == 0) {
+		// ADC0 therefore use default init
+		init(pin);
+	} else if (adc_num == 1) {
+		// Using ADC1
+		// adapted from input_adcs.cpp
+
+		int32_t tmp;
+
+		// Configure the ADC and run at least one software-triggered
+		// conversion.  This completes the self calibration stuff and
+		// leaves the ADC in a state that's mostly ready to use
+		analogReadRes(16);
+		analogReference(INTERNAL); // range 0 to 1.2 volts
+#if F_BUS == 96000000 || F_BUS == 48000000 || F_BUS == 24000000
+		analogReadAveraging(8);
+		ADC1_SC3 = ADC_SC3_AVGE + ADC_SC3_AVGS(1);
+#else
+		analogReadAveraging(4);
+		ADC1_SC3 = ADC_SC3_AVGE + ADC_SC3_AVGS(0);
+#endif
+		// Note for review:
+		// Probably not useful to spin cycles here stabilizing
+		// since DC blocking is similar to te external analog filters
+		tmp = (uint16_t) analogReadADC1(pin);
+		tmp = ( ((int32_t) tmp) << 14);
+		hpf_x1 = tmp;   // With constant DC level x1 would be x0
+		hpf_y1 = 0;     // Output will settle here when stable
+
+		// set the programmable delay block to trigger the ADC at 44.1 kHz
+		//if (!(SIM_SCGC6 & SIM_SCGC6_PDB)
+		//|| (PDB0_SC & PDB_CONFIG) != PDB_CONFIG
+		//|| PDB0_MOD != PDB_PERIOD
+		//|| PDB0_IDLY != 1
+		//|| PDB0_CH0C1 != 0x0101) {
+			SIM_SCGC6 |= SIM_SCGC6_PDB;
+			PDB0_IDLY = 1;
+			PDB0_MOD = PDB_PERIOD;
+			PDB0_SC = PDB_CONFIG | PDB_SC_LDOK;
+			PDB0_SC = PDB_CONFIG | PDB_SC_SWTRIG;
+			PDB0_CH0C1 = 0x0101;
+			PDB0_CH1C1 = 0x0101;
+		//}
+		// enable the ADC for hardware trigger and DMA
+		ADC1_SC2 |= ADC_SC2_ADTRG | ADC_SC2_DMAEN;
+
+		// set up a DMA channel to store the ADC data
+		dma.begin(true);
+		dma.TCD->SADDR = &ADC1_RA;
+		dma.TCD->SOFF = 0;
+		dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
+		dma.TCD->NBYTES_MLNO = 2;
+		dma.TCD->SLAST = 0;
+		dma.TCD->DADDR = analog_rx_buffer;
+		dma.TCD->DOFF = 2;
+		dma.TCD->CITER_ELINKNO = sizeof(analog_rx_buffer) / 2;
+		dma.TCD->DLASTSGA = -sizeof(analog_rx_buffer);
+		dma.TCD->BITER_ELINKNO = sizeof(analog_rx_buffer) / 2;
+		dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
+
+		dma.triggerAtHardwareEvent(DMAMUX_SOURCE_ADC1);
+		update_responsibility = update_setup();
+		dma.enable();
+		dma.attachInterrupt(isr);
+	} else {
+		// Unkown ADC has been specified
+		// TODO: handle cases such as -1 for specifying any ADC
+		// choose correct ADC based off of pin selection
+		
+		// For now simply use default init
+		init(pin);
+	}
+}
 
 void AudioInputAnalog::isr(void)
 {
@@ -208,6 +285,62 @@ void AudioInputAnalog::update(void)
 	// then transmit the AC data
 	transmit(out_left);
 	release(out_left);
+}
+
+#if defined(__MK20DX256__)
+static const uint8_t pin2sc1a[] = {
+        5, 14, 8+128, 9+128, 13, 12, 6, 7, 15, 4, 0, 19, 3, 19+128, // 0-13 -> A0-A13
+        5, 14, 8+128, 9+128, 13, 12, 6, 7, 15, 4, // 14-23 are A0-A9
+        255, 255, // 24-25 are digital only
+        5+192, 5+128, 4+128, 6+128, 7+128, 4+192, // 26-31 are A15-A20
+        255, 255, // 32-33 are digital only
+        0, 19, 3, 19+128, // 34-37 are A10-A13
+        26,     // 38 is temp sensor,
+        18+128, // 39 is vref
+        23      // 40 is A14
+};
+#elif defined(__MK64FX512__) || defined(__MK66FX1M0__)
+static const uint8_t pin2sc1a[] = {
+        5, 14, 8+128, 9+128, 13, 12, 6, 7, 15, 4, 3, 19+128, 14+128, 15+128, // 0-13 -> A0-A13
+        5, 14, 8+128, 9+128, 13, 12, 6, 7, 15, 4, // 14-23 are A0-A9
+        255, 255, 255, 255, 255, 255, 255, // 24-30 are digital only
+        14+128, 15+128, 17, 18, 4+128, 5+128, 6+128, 7+128, 17+128,  // 31-39 are A12-A20
+        255, 255, 255, 255, 255, 255, 255, 255, 255,  // 40-48 are digital only
+        10+128, 11+128, // 49-50 are A23-A24
+        255, 255, 255, 255, 255, 255, 255, // 51-57 are digital only
+        255, 255, 255, 255, 255, 255, // 58-63 (sd card pins) are digital only
+        3, 19+128, // 64-65 are A10-A11
+        23, 23+128,// 66-67 are A21-A22 (DAC pins)
+        1, 1+128,  // 68-69 are A25-A26 (unused USB host port on Teensy 3.5)
+        26,        // 70 is Temperature Sensor
+        18+128     // 71 is Vref
+};
+#endif
+
+static int analogReadADC1(uint8_t pin)
+{
+        ADC1_SC1A = 9;
+        while (1) {
+                if ((ADC1_SC1A & ADC_SC1_COCO)) {
+                        return ADC1_RA;
+                }
+        }
+
+        if (pin >= sizeof(pin2sc1a)) return 0;
+        uint8_t channel = pin2sc1a[pin];
+		if ((channel & 0x80) == 0) return 0;
+        if (channel == 255) return 0;
+        if (channel & 0x40) {
+                ADC1_CFG2 &= ~ADC_CFG2_MUXSEL;
+        } else {
+                ADC1_CFG2 |= ADC_CFG2_MUXSEL;
+        }
+        ADC1_SC1A = channel & 0x3F;
+        while (1) {
+                if ((ADC1_SC1A & ADC_SC1_COCO)) {
+                        return ADC1_RA;
+                }
+        }
 }
 #endif
 
