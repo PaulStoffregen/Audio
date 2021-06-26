@@ -37,10 +37,12 @@ public:
 	AudioInputI2SOct(void) : AudioStream(0, NULL) { begin(); }
 	virtual void update(void);
 	void begin(void);
-private:
+protected:
+	AudioInputI2SOct(int dummy): AudioStream(0, NULL) {} // to be used only inside AudioInputI2SOctslave !!
 	static bool update_responsibility;
 	static DMAChannel dma;
 	static void isr(void);
+private:
 	static audio_block_t *block_ch1;
 	static audio_block_t *block_ch2;
 	static audio_block_t *block_ch3;
@@ -52,5 +54,12 @@ private:
 	static uint16_t block_offset;
 };
 
+class AudioInputI2SOctslave : public AudioInputI2SOct
+{
+public:
+	AudioInputI2SOctslave(void) : AudioInputI2SOct(0) { begin(); }
+	void begin(void);
+	friend void dma_ch1_isr(void);
+};
 
 #endif
