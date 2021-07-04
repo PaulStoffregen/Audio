@@ -52,14 +52,17 @@
 // but its performance should be *much* better than the rapid passband rolloff
 // of Cascaded Integrator Comb (CIC) or moving average filters.
 
+#if defined(__IMXRT1062__) || defined(KINETISK)
 DMAMEM __attribute__((aligned(32))) static uint32_t pdm_buffer[AUDIO_BLOCK_SAMPLES*4];
 static uint32_t leftover[14];
 audio_block_t * AudioInputPDM::block_left = NULL;
 bool AudioInputPDM::update_responsibility = false;
 DMAChannel AudioInputPDM::dma(false);
+#endif
 
 
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
+// Teensy 4.x
+#if defined(__IMXRT1062__)
 
 #include "utility/imxrt_hw.h"
 
@@ -145,7 +148,9 @@ void AudioInputPDM::begin()
   dma.attachInterrupt(isr);
 }
 
-#else  // not T4:
+
+// Teensy 3.x
+#elif defined(KINETISK)
 
 // MCLK needs to be 48e6 / 1088 * 256 = 11.29411765 MHz -> 44.117647 kHz sample rate
 //
@@ -242,7 +247,6 @@ void AudioInputPDM::begin(void)
         CORE_PIN9_CONFIG  = PORT_PCR_MUX(6); // pin  9, PTC3, I2S0_TX_BCLK
 	*/
 	
-#if defined(KINETISK)
 	CORE_PIN13_CONFIG = PORT_PCR_MUX(4); // pin 13, PTC5, I2S0_RXD0
 	dma.TCD->SADDR = &I2S0_RDR0;
 	dma.TCD->SOFF = 0;
@@ -255,7 +259,7 @@ void AudioInputPDM::begin(void)
 	dma.TCD->DLASTSGA = -sizeof(pdm_buffer);
 	dma.TCD->BITER_ELINKNO = sizeof(pdm_buffer) / 4;
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
-#endif
+
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_RX);
 	update_responsibility = update_setup();
 	dma.enable();
@@ -265,6 +269,9 @@ void AudioInputPDM::begin(void)
 	dma.attachInterrupt(isr);
 }
 #endif
+
+
+#if defined(__IMXRT1062__) || defined(KINETISK)
 
 extern const int16_t enormous_pdm_filter_table[];
 
@@ -1773,6 +1780,7 @@ const int16_t enormous_pdm_filter_table[16384] = {
      9,    54,    55,    99,    56,   101,   102,   147,    58,   102,   103,   148,
    105,   149,   151,   195
 };
+#endif
 
 /*
 #! /usr/bin/perl
