@@ -29,6 +29,8 @@
 #ifndef effect_dynamics_h_
 #define effect_dynamics_h_
 
+#if !defined(KINETISL)
+
 #include "Arduino.h"
 #include "AudioStream.h"
 
@@ -174,7 +176,7 @@ private:
 	float aLimitAttack;
 	float aOneMinusLimitAttack;
 	float aLimitRelease;
-	const static unsigned int sampleBufferSize = 4410;
+	const static unsigned int sampleBufferSize = AUDIO_SAMPLE_RATE / 10; // number of samples to use for running RMS calulation = 1/10th of a second 
 	u_int64_t sumOfSamplesSquared = 0;
 	uint32_t samplesSquared[sampleBufferSize] = {0};
 	uint16_t sampleIndex = 0;
@@ -192,5 +194,6 @@ private:
 	
 	virtual void update(void);
 };
+#endif
 
 #endif
