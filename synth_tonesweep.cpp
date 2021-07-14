@@ -60,7 +60,7 @@ if(0) {
   tone_hi = t_hi;
   tone_phase = 0;
 
-  tone_amp = t_amp * 32767.0;
+  tone_amp = t_amp * 32767.0f;
 
   tone_freq = tone_lo*0x100000000LL;
   if (tone_hi >= tone_lo) {

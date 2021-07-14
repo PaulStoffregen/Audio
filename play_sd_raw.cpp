@@ -114,7 +114,7 @@ void AudioPlaySdRaw::update(void)
 	release(block);
 }
 
-#define B2M (uint32_t)((double)4294967296000.0 / AUDIO_SAMPLE_RATE_EXACT / 2.0) // 97352592
+#define B2M (uint32_t)((double)4294967296000.0 / (double)AUDIO_SAMPLE_RATE_EXACT / 2.0) // 97352592
 
 uint32_t AudioPlaySdRaw::positionMillis(void)
 {

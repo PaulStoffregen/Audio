@@ -141,8 +141,8 @@ bool AudioControlCS4272::volume(float left, float right)
 {
 	unsigned int leftInt,rightInt;
 
-	leftInt = left*127 + 0.499;
-	rightInt = right*127 + 0.499;
+	leftInt = left*127 + 0.499f;
+	rightInt = right*127 + 0.499f;
 
 	unsigned int val = 0x7F - (leftInt & 0x7F);
 	write(CS4272_DAC_CHA_VOL,CS4272_DAC_CHA_VOL_VOLUME(val));

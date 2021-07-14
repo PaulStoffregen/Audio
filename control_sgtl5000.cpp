@@ -945,7 +945,7 @@ unsigned short AudioControlSGTL5000::surroundSoundDisable(void)
 unsigned char AudioControlSGTL5000::calcVol(float n, unsigned char range)
 {
 	// n=(n*(((float)range)/100))+0.499;
-	n=(n*(float)range)+0.499;
+	n=(n*(float)range)+0.499f;
 	if ((unsigned char)n>range) n=range;
 	return (unsigned char)n;
 }
@@ -953,7 +953,7 @@ unsigned char AudioControlSGTL5000::calcVol(float n, unsigned char range)
 // DAP_AUDIO_EQ_BASS_BAND0 & DAP_AUDIO_EQ_BAND1 & DAP_AUDIO_EQ_BAND2 etc etc
 unsigned short AudioControlSGTL5000::dap_audio_eq_band(uint8_t bandNum, float n) // by signed percentage -100/+100; dap_audio_eq(3);
 {
-	n=(n*48)+0.499;
+	n=(n*48)+0.499f;
 	if(n<-47) n=-47;
 	if(n>48) n=48;
 	n+=47;
@@ -984,7 +984,7 @@ void calcBiquad(uint8_t filtertype, float fC, float dB_Gain, float Q, uint32_t q
 
   float A;
   if(filtertype<FILTER_PARAEQ) A=pow(10,dB_Gain/20); else A=pow(10,dB_Gain/40);
-  float W0 = 2*3.14159265358979323846*fC/fS;
+  float W0 = (float)(2*3.14159265358979323846)*fC/fS;
   float cosw=cosf(W0);
   float sinw=sinf(W0);
   //float alpha = sinw*sinh((log(2)/2)*BW*W0/sinw);
@@ -1061,14 +1061,14 @@ void calcBiquad(uint8_t filtertype, float fC, float dB_Gain, float Q, uint32_t q
 
   a0=(a0*2)/(float)quantization_unit; // once here instead of five times there...
   b0/=a0;
-  *coef++=(int)(b0+0.499);
+  *coef++=(int)(b0+0.499f);
   b1/=a0;
-  *coef++=(int)(b1+0.499);
+  *coef++=(int)(b1+0.499f);
   b2/=a0;
-  *coef++=(int)(b2+0.499);
+  *coef++=(int)(b2+0.499f);
   a1/=a0;
-  *coef++=(int)(a1+0.499);
+  *coef++=(int)(a1+0.499f);
   a2/=a0;
-  *coef++=(int)(a2+0.499);
+  *coef++=(int)(a2+0.499f);
 }
 

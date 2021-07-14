@@ -53,7 +53,7 @@ void AudioSynthSimpleDrum::secondMix(float level)
   {
     level = 0;
   }
-  else if(level > 1.0)
+  else if(level > 1.0f)
   {
     level = 1.0;
   }
@@ -74,9 +74,9 @@ void AudioSynthSimpleDrum::pitchMod(float depth)
   {
     depth = 0;
   }
-  else if(depth > 1.0)
+  else if(depth > 1.0f)
   {
-    depth = 1.0;
+    depth = 1.0f;
   }
 
   // Depth is float, 0.0..1.0
