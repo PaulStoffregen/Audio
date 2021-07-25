@@ -27,7 +27,7 @@
 #include <Arduino.h>
 #include "input_tdm.h"
 #include "output_tdm.h"
-#if defined(KINETISK) || defined(__IMXRT1052__) || defined(__IMXRT1062__)
+#if defined(KINETISK) || defined(__IMXRT1062__)
 #include "utility/imxrt_hw.h"
 
 DMAMEM __attribute__((aligned(32)))
@@ -66,8 +66,8 @@ void AudioInputTDM::begin(void)
 	I2S0_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE | I2S_RCSR_FR;
 	I2S0_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE; // TX clock enable, because sync'd to TX
 	dma.attachInterrupt(isr);
-#else
-	CORE_PIN7_CONFIG  = 3;  //RX_DATA0
+#elif defined(__IMXRT1062__)
+	CORE_PIN8_CONFIG  = 3;  //RX_DATA0
 	IOMUXC_SAI1_RX_DATA0_SELECT_INPUT = 2;
 	dma.TCD->SADDR = &I2S1_RDR0;
 	dma.TCD->SOFF = 0;
@@ -84,8 +84,7 @@ void AudioInputTDM::begin(void)
 	update_responsibility = update_setup();
 	dma.enable();
 
-	I2S1_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE | I2S_RCSR_FR;
-	I2S1_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE;
+	I2S1_RCSR = I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE | I2S_RCSR_FR;
 	dma.attachInterrupt(isr);	
 #endif	
 }

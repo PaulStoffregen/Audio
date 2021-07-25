@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
+#if defined(__IMXRT1062__)
 #include <Arduino.h>
 #include "output_tdm2.h"
 #include "memcpy_audio.h"
@@ -159,8 +159,11 @@ void AudioOutputTDM2::update(void)
 
 void AudioOutputTDM2::config_tdm(void)
 {
-
 	CCM_CCGR5 |= CCM_CCGR5_SAI2(CCM_CCGR_ON);
+
+	// if either transmitter or receiver is enabled, do nothing
+	if (I2S2_TCSR & I2S_TCSR_TE) return;
+	if (I2S2_RCSR & I2S_RCSR_RE) return;
 //PLL:
 	int fs = AUDIO_SAMPLE_RATE_EXACT; //176.4 khZ
 	// PLL between 27*24 = 648MHz und 54*24=1296MHz
@@ -186,12 +189,6 @@ void AudioOutputTDM2::config_tdm(void)
 	IOMUXC_GPR_GPR1 = (IOMUXC_GPR_GPR1 & ~(IOMUXC_GPR_GPR1_SAI2_MCLK3_SEL_MASK))
 			| (IOMUXC_GPR_GPR1_SAI2_MCLK_DIR | IOMUXC_GPR_GPR1_SAI2_MCLK3_SEL(0));	//Select MCLK
 
-
-
-	// if either transmitter or receiver is enabled, do nothing
-	if (I2S2_TCSR & I2S_TCSR_TE) return;
-	if (I2S2_RCSR & I2S_RCSR_RE) return;
-
 	// configure transmitter
 	int rsync = 1;
 	int tsync = 0;
@@ -215,10 +212,9 @@ void AudioOutputTDM2::config_tdm(void)
 		| I2S_RCR4_FSE | I2S_RCR4_FSD;
 	I2S2_RCR5 = I2S_RCR5_WNW(31) | I2S_RCR5_W0W(31) | I2S_RCR5_FBT(31);
 
-	CORE_PIN5_CONFIG  = 2;  //2:MCLK
+	CORE_PIN33_CONFIG = 2;  //2:MCLK
 	CORE_PIN4_CONFIG  = 2;  //2:TX_BCLK
 	CORE_PIN3_CONFIG  = 2;  //2:TX_SYNC
-
 }
 
 #endif

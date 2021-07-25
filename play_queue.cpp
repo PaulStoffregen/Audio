@@ -52,7 +52,7 @@ void AudioPlayQueue::playBuffer(void)
 
 	if (!userblock) return;
 	h = head + 1;
-	if (h >= 32) h = 0;
+	if (h >= max_buffers) h = 0;
 	while (tail == h) ; // wait until space in the queue
 	queue[h] = userblock;
 	head = h;
@@ -66,7 +66,7 @@ void AudioPlayQueue::update(void)
 
 	t = tail;
 	if (t != head) {
-		if (++t >= 32) t = 0;
+		if (++t >= max_buffers) t = 0;
 		block = queue[t];
 		tail = t;
 		transmit(block);

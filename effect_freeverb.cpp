@@ -71,21 +71,28 @@ AudioEffectFreeverb::AudioEffectFreeverb() : AudioStream(1, inputQueueArray)
 	allpass4index = 0;
 }
 
-#if 1
-#define sat16(n, rshift) signed_saturate_rshift((n), 16, (rshift))
-#else
-static int16_t sat16(int32_t n, int rshift)
-{
-	n = n >> rshift;
-	if (n > 32767) {
-		return 32767;
-	}
-	if (n < -32768) {
-		return -32768;
-	}
-	return n;
+
+// cleaner sat16 by http://www.moseleyinstruments.com/
+__attribute__((unused))
+static int16_t sat16(int32_t n, int rshift) {
+    // we should always round towards 0
+    // to avoid recirculating round-off noise
+    //
+    // a 2s complement positive number is always
+    // rounded down, so we only need to take
+    // care of negative numbers
+    if (n < 0) {
+        n = n + (~(0xFFFFFFFFUL << rshift));
+    }
+    n = n >> rshift;
+    if (n > 32767) {
+        return 32767;
+    }
+    if (n < -32768) {
+        return -32768;
+    }
+    return n;
 }
-#endif
 
 // TODO: move this to one of the data files, use in output_adat.cpp, output_tdm.cpp, etc
 static const audio_block_t zeroblock = {

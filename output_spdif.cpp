@@ -39,8 +39,7 @@ extern uint16_t spdif_bmclookup[256];
 DMAMEM __attribute__((aligned(32)))
 static uint32_t SPDIF_tx_buffer[AUDIO_BLOCK_SAMPLES * 4]; //2 KB
 
-
-#if defined(KINETISK) || defined(__IMXRT1052__) || defined(__IMXRT1062__)
+#if defined(KINETISK) || defined(__IMXRT1062__)
 
 #define PREAMBLE_B  (0xE8) //11101000
 #define PREAMBLE_M  (0xE2) //11100010
@@ -51,9 +50,8 @@ static uint32_t SPDIF_tx_buffer[AUDIO_BLOCK_SAMPLES * 4]; //2 KB
 
 uint32_t  AudioOutputSPDIF::vucp = VUCP_VALID;
 
-#endif
 
-PROGMEM
+FLASHMEM
 void AudioOutputSPDIF::begin(void)
 {
 
@@ -86,8 +84,9 @@ void AudioOutputSPDIF::begin(void)
 
 	I2S0_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE | I2S_TCSR_FR;
 	dma.attachInterrupt(isr);
-#elif defined(__IMXRT1052__) || defined(__IMXRT1062__)
-	CORE_PIN6_CONFIG  = 3;  //1:TX_DATA0
+
+#elif defined(__IMXRT1062__)
+	CORE_PIN7_CONFIG  = 3;  //1:TX_DATA0	
 	const int nbytes_mlno = 2 * 4; // 8 Bytes per minor loop
 
 	dma.TCD->SADDR = SPDIF_tx_buffer;
@@ -132,7 +131,9 @@ void AudioOutputSPDIF::isr(void)
 	uint32_t saddr, offset;
 	uint16_t sample, lo, hi, aux;
 
+#if defined(KINETISK) || defined(__IMXRT1062__)
 	saddr = (uint32_t)(dma.TCD->SADDR);
+#endif
 	dma.clearInterrupt();
 	if (saddr < (uint32_t)SPDIF_tx_buffer + sizeof(SPDIF_tx_buffer) / 2) {
 		// DMA is transmitting the first half of the buffer
@@ -321,12 +322,17 @@ void AudioOutputSPDIF::update(void)
   #define MCLK_MULT 1
   #define MCLK_DIV  17
 #elif F_CPU == 216000000
-  #define MCLK_MULT 8
-  #define MCLK_DIV  153
-  #define MCLK_SRC  0
+  #define MCLK_MULT 12
+  #define MCLK_DIV  17
+  #define MCLK_SRC  1
 #elif F_CPU == 240000000
-  #define MCLK_MULT 4
+  #define MCLK_MULT 2
   #define MCLK_DIV  85
+  #define MCLK_SRC  0
+#elif F_CPU == 256000000
+  #define MCLK_MULT 12
+  #define MCLK_DIV  17
+  #define MCLK_SRC  1
 #elif F_CPU == 16000000
   #define MCLK_MULT 12
   #define MCLK_DIV  17
@@ -343,7 +349,7 @@ void AudioOutputSPDIF::update(void)
 #endif
 #endif
 
-PROGMEM
+FLASHMEM
 void AudioOutputSPDIF::config_SPDIF(void)
 {
 #if defined(KINETISK)
@@ -375,7 +381,7 @@ void AudioOutputSPDIF::config_SPDIF(void)
 	CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK			11.43MHz
 #endif
 
-#elif defined(__IMXRT1052__) || defined(__IMXRT1062__)
+#elif defined(__IMXRT1062__)
 
 	CCM_CCGR5 |= CCM_CCGR5_SAI1(CCM_CCGR_ON);
 //PLL:
@@ -432,6 +438,7 @@ void AudioOutputSPDIF::config_SPDIF(void)
 #endif
 }
 
+#endif // KINETISK || __IMXRT1062__
 
 #if defined(KINETISL)
 

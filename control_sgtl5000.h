@@ -27,16 +27,22 @@
 #ifndef control_sgtl5000_h_
 #define control_sgtl5000_h_
 
+#include <AudioStream.h>
 #include "AudioControl.h"
+
+// SGTL5000-specific defines for headphones
+#define AUDIO_HEADPHONE_DAC 0
+#define AUDIO_HEADPHONE_LINEIN 1
 
 class AudioControlSGTL5000 : public AudioControl
 {
 public:
 	AudioControlSGTL5000(void) : i2c_addr(0x0A) { }
 	void setAddress(uint8_t level);
-	bool enable(void);
+	bool enable(void);//For Teensy LC the SGTL acts as master, for all other Teensys as slave.
+	bool enable(const unsigned extMCLK, const uint32_t pllFreq = (4096.0l * AUDIO_SAMPLE_RATE_EXACT) ); //With extMCLK > 0, the SGTL acts as Master
 	bool disable(void) { return false; }
-	bool volume(float n) { return volumeInteger(n * 129 + 0.499); }
+	bool volume(float n) { return volumeInteger(n * 129 + 0.499f); }
 	bool inputLevel(float n) {return false;}
 	bool muteHeadphone(void) { return write(0x0024, ana_ctrl | (1<<4)); }
 	bool unmuteHeadphone(void) { return write(0x0024, ana_ctrl & ~(1<<4)); }
@@ -50,6 +56,15 @@ public:
 			return write(0x002A, 0x0173) // mic preamp gain = +40dB
 			 && write(0x0020, 0x088)     // input gain +12dB (is this enough?)
 			 && write(0x0024, ana_ctrl & ~(1<<2)); // enable mic
+		} else {
+			return false;
+		}
+	}
+	bool headphoneSelect(int n) {
+		if (n == AUDIO_HEADPHONE_DAC) {
+			return write(0x0024, ana_ctrl | (1<<6)); // route DAC to headphones out
+		} else if (n == AUDIO_HEADPHONE_LINEIN) {
+			return write(0x0024, ana_ctrl & ~(1<<6)); // route linein to headphones out
 		} else {
 			return false;
 		}
@@ -89,6 +104,7 @@ public:
 	unsigned short surroundSoundEnable(void);
 	unsigned short surroundSoundDisable(void);
 	void killAutomation(void) { semi_automated=false; }
+	void setMasterMode(uint32_t freqMCLK_in);
 
 protected:
 	bool muted;

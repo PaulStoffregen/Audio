@@ -35,9 +35,11 @@ class AudioInputPDM : public AudioStream
 {
 public:
 	AudioInputPDM(void) : AudioStream(0, NULL) { begin(); }
+
 	virtual void update(void);
 	void begin(void);
-protected:	
+
+protected:
 	static bool update_responsibility;
 	static DMAChannel dma;
 	static void isr(void);

@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
+#if defined(__IMXRT1062__)
 #include <Arduino.h>
 #include "input_tdm2.h"
 #include "output_tdm2.h"
@@ -47,7 +47,7 @@ void AudioInputTDM2::begin(void)
 	// TODO: should we set & clear the I2S_RCSR_SR bit here?
 	AudioOutputTDM2::config_tdm();
 
-	CORE_PIN33_CONFIG = 2;  //2:RX_DATA0
+	CORE_PIN5_CONFIG = 2;  //2:RX_DATA0
 	IOMUXC_SAI2_RX_DATA0_SELECT_INPUT = 0;
 	dma.TCD->SADDR = &I2S2_RDR0;
 	dma.TCD->SOFF = 0;

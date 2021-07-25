@@ -1,0 +1,16 @@
+% Generate plain formulas to be turned into png files via a pdf. Code hints taken
+% from:
+%
+% https://tex.stackexchange.com/questions/287481/using-latex-to-generate-png-images-of-an-equation/287501
+%
+\documentclass[multi={mymath},border=1pt]{standalone}
+% \usepackage{amsmath}
+\newenvironment{mymath}{$\displaystyle}{$}
+
+\begin{document}
+
+\begin{mymath}
+  F = Fcenter * 2^{(signal * octaves)}
+\end{mymath}
+
+\end{document}

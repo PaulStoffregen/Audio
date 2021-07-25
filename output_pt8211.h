@@ -24,10 +24,17 @@
  * THE SOFTWARE.
  */
 
-//Adapted to PT8211, Frank Bösing.
+//I2S adapted to PT8211, Frank Bösing.
 
 #ifndef output_pt8211_h_
 #define output_pt8211_h_
+
+#include <Arduino.h>
+#include <AudioStream.h>
+#include <DMAChannel.h>
+
+
+#if !defined(KINETISL)
 
 	//uncomment to enable oversampling:
 #define AUDIO_PT8211_OVERSAMPLING
@@ -35,9 +42,6 @@
 // #define AUDIO_PT8211_INTERPOLATION_LINEAR
 #define AUDIO_PT8211_INTERPOLATION_CIC
 
-#include "Arduino.h"
-#include "AudioStream.h"
-#include "DMAChannel.h"
 
 class AudioOutputPT8211 : public AudioStream
 {
@@ -65,6 +69,28 @@ private:
 };
 
 
+#elif defined(KINETISL)
+/**************************************************************************************
+*       Teensy LC
+***************************************************************************************/
+class AudioOutputPT8211 : public AudioStream
+{
+public:
+	AudioOutputPT8211(void) : AudioStream(2, inputQueueArray) { begin(); }
+	virtual void update(void);
+	void begin(void);
+	
+protected:	
+	static audio_block_t *block_left;
+	static audio_block_t *block_right;
+	static DMAChannel dma1;
+	static DMAChannel dma2;
+	audio_block_t *inputQueueArray[2];
+	static void isr1(void);
+	static void isr2(void);
+	static bool update_responsibility;	
+};
 
+#endif
 
 #endif

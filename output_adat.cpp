@@ -56,7 +56,7 @@ uint16_t  AudioOutputADAT::ch8_offset = 0;
 bool AudioOutputADAT::update_responsibility = false;
 //uint32_t  AudioOutputADAT::vucp = VUCP_VALID;
 
-DMAMEM static uint32_t ADAT_tx_buffer[AUDIO_BLOCK_SAMPLES * 8]; //4 KB, AUDIO_BLOCK_SAMPLES is usually 128
+DMAMEM __attribute__((aligned(32))) static uint32_t ADAT_tx_buffer[AUDIO_BLOCK_SAMPLES * 8]; //4 KB, AUDIO_BLOCK_SAMPLES is usually 128
 
 DMAChannel AudioOutputADAT::dma(false);
 
@@ -699,6 +699,9 @@ void AudioOutputADAT::setI2SFreq(int freq) {
 #elif (F_PLL==216000000)
   const tmclk clkArr[numfreqs] = {{32, 3375}, {49, 3750}, {64, 3375}, {49, 1875}, {128, 3375}, {98, 1875}, {8, 153}, {64, 1125}, {196, 1875}, {16, 153}, {128, 1125}, {226, 1081}, {32, 153}, {147, 646} };
 #elif (F_PLL==240000000)
+  const tmclk clkArr[numfreqs] = {{16, 1875}, {29, 2466}, {32, 1875}, {89, 3784}, {64, 1875}, {147, 3125}, {4, 85}, {32, 625}, {205, 2179}, {8, 85}, {64, 625}, {89, 473}, {16, 85}, {128, 625} };
+#elif (F_PLL==256000000)
+  // TODO: fix these...
   const tmclk clkArr[numfreqs] = {{16, 1875}, {29, 2466}, {32, 1875}, {89, 3784}, {64, 1875}, {147, 3125}, {4, 85}, {32, 625}, {205, 2179}, {8, 85}, {64, 625}, {89, 473}, {16, 85}, {128, 625} };
 #endif
 

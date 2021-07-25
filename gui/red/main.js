@@ -241,6 +241,10 @@ var RED = (function() {
 		var server = false && patt.test(location.protocol);
 
 		if (!server) {
+			
+			var metaData = $.parseJSON($("script[data-container-name|='InputOutputCompatibilityMetadata']").html());
+			requirements = metaData["requirements"];
+			
 			var data = $.parseJSON($("script[data-container-name|='NodeDefinitions']").html());
 			var nodes = data["nodes"];
 			$.each(nodes, function (key, val) {

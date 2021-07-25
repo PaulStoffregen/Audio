@@ -33,16 +33,20 @@ public:
 	AudioOutputSPDIF3(void) : AudioStream(2, inputQueueArray) { begin(); }
 	virtual void update(void);
 	void begin(void);
-	//friend class AudioInputSPDIF;
+	friend class AudioInputSPDIF3;
+	friend class AsyncAudioInputSPDIF3;
 	static void mute_PCM(const bool mute);
+	static bool pll_locked(void);
 protected:
 	//AudioOutputSPDIF3(int dummy): AudioStream(2, inputQueueArray) {}
+	static void config_spdif3(void);
 	static audio_block_t *block_left_1st;
 	static audio_block_t *block_right_1st;
 	static bool update_responsibility;
 	static DMAChannel dma;
-	static void isr(void);
+	static void isr(void);	
 private:
+	static uint32_t dpll_Gain() __attribute__ ((const));
 	static audio_block_t *block_left_2nd;
 	static audio_block_t *block_right_2nd;
 	static audio_block_t block_silent;

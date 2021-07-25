@@ -164,6 +164,7 @@ void AudioSynthWavetable::setFrequency(float freq) {
  *
  */
 void AudioSynthWavetable::update(void) {
+#if defined(KINETISK) || defined(__IMXRT1062__)
 	// exit if nothing to do
 	if (env_state == STATE_IDLE || (current_sample->LOOP == false && tone_phase >= current_sample->MAX_PHASE)) {
 		env_state = STATE_IDLE;
@@ -420,4 +421,5 @@ void AudioSynthWavetable::update(void) {
 
 	transmit(block);
 	release(block);
+#endif
 }

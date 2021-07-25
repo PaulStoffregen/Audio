@@ -30,7 +30,7 @@
 
 #if defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
 
-DMAMEM static uint16_t dac_buffer[AUDIO_BLOCK_SAMPLES*2];
+DMAMEM __attribute__((aligned(32))) static uint16_t dac_buffer[AUDIO_BLOCK_SAMPLES*2];
 audio_block_t * AudioOutputAnalog::block_left_1st = NULL;
 audio_block_t * AudioOutputAnalog::block_left_2nd = NULL;
 bool AudioOutputAnalog::update_responsibility = false;
@@ -160,17 +160,16 @@ void AudioOutputAnalog::isr(void)
 DMAMEM static uint16_t dac_buffer1[AUDIO_BLOCK_SAMPLES];
 DMAMEM static uint16_t dac_buffer2[AUDIO_BLOCK_SAMPLES];
 audio_block_t * AudioOutputAnalog::block_left_1st = NULL;
+audio_block_t * AudioOutputAnalog::block_left_2nd = NULL;
 bool AudioOutputAnalog::update_responsibility = false;
 DMAChannel AudioOutputAnalog::dma1(false);
-DMAChannel AudioOutputAnalog::dma2(false);
 
 void AudioOutputAnalog::begin(void)
 {
 	dma1.begin(true); // Allocate the DMA channels first
-	dma2.begin(true); // Allocate the DMA channels first
 
-	delay(2500);
-	Serial.println("AudioOutputAnalog begin");
+	//delay(2500);
+	//Serial.println("AudioOutputAnalog begin");
 	delay(10);
 
 	SIM_SCGC6 |= SIM_SCGC6_DAC0;
@@ -184,58 +183,64 @@ void AudioOutputAnalog::begin(void)
 	// commandeer FTM1 for timing (PWM on pin 3 & 4 will become 22 kHz)
 	FTM1_SC = 0;
 	FTM1_CNT = 0;
-	FTM1_MOD = (uint32_t)((F_PLL/2) / AUDIO_SAMPLE_RATE_EXACT + 0.5);
-	FTM1_SC = FTM_SC_CLKS(1);
+	FTM1_MOD = (uint32_t)((F_PLL/2) / 44117.64706/*AUDIO_SAMPLE_RATE_EXACT*/ + 0.5);
+	FTM1_SC = FTM_SC_CLKS(1) | FTM_SC_DMA;
 
 	dma1.sourceBuffer(dac_buffer1, sizeof(dac_buffer1));
 	dma1.destination(*(int16_t *)&DAC0_DAT0L);
 	dma1.interruptAtCompletion();
 	dma1.disableOnCompletion();
-	dma1.triggerAtCompletionOf(dma2);
 	dma1.triggerAtHardwareEvent(DMAMUX_SOURCE_FTM1_OV);
 	dma1.attachInterrupt(isr1);
 
-	dma2.sourceBuffer(dac_buffer2, sizeof(dac_buffer2));
-	dma2.destination(*(int16_t *)&DAC0_DAT0L);
-	dma2.interruptAtCompletion();
-	dma2.disableOnCompletion();
-	dma2.triggerAtCompletionOf(dma1);
-	dma2.triggerAtHardwareEvent(DMAMUX_SOURCE_FTM1_OV);
-	dma2.attachInterrupt(isr2);
-
 	update_responsibility = update_setup();
-/*
-	dma.TCD->SADDR = dac_buffer;
-	dma.TCD->SOFF = 2;
-	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
-	dma.TCD->NBYTES_MLNO = 2;
-	dma.TCD->SLAST = -sizeof(dac_buffer);
-	dma.TCD->DADDR = &DAC0_DAT0L;
-	dma.TCD->DOFF = 0;
-	dma.TCD->CITER_ELINKNO = sizeof(dac_buffer) / 2;
-	dma.TCD->DLASTSGA = 0;
-	dma.TCD->BITER_ELINKNO = sizeof(dac_buffer) / 2;
-	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
-	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_PDB);
-	update_responsibility = update_setup();
-	dma.enable();
-	dma.attachInterrupt(isr);
-*/
+	// Enable DMA transfers on timer
+	dma1.enable();
 }
 
 void AudioOutputAnalog::isr1(void)
 {
+	if(!dma1.complete()) return;
 	dma1.clearInterrupt();
-
+	// Point DMA to the other buffer (which also resets the number of bytes to transfer)
+	bool finishedFirst = (dma1.sourceAddress() == (void *)&dac_buffer1[AUDIO_BLOCK_SAMPLES]);
+	if(finishedFirst) {
+		// Just finished copying the first block, set up the second
+		dma1.sourceBuffer(dac_buffer2, sizeof(dac_buffer2));
+	} else {
+		// Just finished the second buffer, set up the first
+		dma1.sourceBuffer(dac_buffer1, sizeof(dac_buffer1));
+	}
+	// restart DMA on timer calls
+	dma1.enable();
+	// Then refill the buffer
+	int16_t *dest;
+	const int16_t * end;
+	if(finishedFirst) {
+		dest = (int16_t *)dac_buffer1;
+		end = (int16_t *)&dac_buffer1[AUDIO_BLOCK_SAMPLES];
+	} else {
+		dest = (int16_t *)dac_buffer2;
+		end = (int16_t *)&dac_buffer2[AUDIO_BLOCK_SAMPLES];
+	}
+	const int16_t *src;
+	audio_block_t *block;
+	block = AudioOutputAnalog::block_left_1st;
+	if (block) {
+		src = block->data;
+		do {
+			*dest++ = ((*src++) >> 4) + 0x800;
+		} while (dest < end);
+		AudioStream::release(block);
+		AudioOutputAnalog::block_left_1st = AudioOutputAnalog::block_left_2nd;
+		AudioOutputAnalog::block_left_2nd = NULL;
+	} else {
+		do {
+			*dest++ = 0x800;
+		} while (dest < end);
+	}
+	if (AudioOutputAnalog::update_responsibility) AudioStream::update_all();
 }
-
-void AudioOutputAnalog::isr2(void)
-{
-	dma2.clearInterrupt();
-
-
-}
-
 
 void AudioOutputAnalog::update(void)
 {
@@ -246,9 +251,13 @@ void AudioOutputAnalog::update(void)
 		if (block_left_1st == NULL) {
 			block_left_1st = block;
 			__enable_irq();
+		} else if (block_left_2nd == NULL) {
+			block_left_2nd = block;
+			__enable_irq();
 		} else {
 			audio_block_t *tmp = block_left_1st;
-			block_left_1st = block;
+			block_left_1st = block_left_2nd;
+			block_left_2nd = block;
 			__enable_irq();
 			release(tmp);
 		}
@@ -272,6 +281,3 @@ void AudioOutputAnalog::update(void)
 }
 
 #endif // defined(__MK20DX256__)
-
-
-

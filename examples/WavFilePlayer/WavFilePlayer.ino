@@ -36,6 +36,9 @@ AudioPlaySdWav           playWav1;
 AudioOutputI2S           audioOutput;
 //AudioOutputSPDIF       audioOutput;
 //AudioOutputAnalog      audioOutput;
+//On Teensy LC, use this for the Teensy Audio Shield:
+//AudioOutputI2Sslave    audioOutput;
+
 AudioConnection          patchCord1(playWav1, 0, audioOutput, 0);
 AudioConnection          patchCord2(playWav1, 1, audioOutput, 1);
 AudioControlSGTL5000     sgtl5000_1;
@@ -89,7 +92,7 @@ void playFile(const char *filename)
   playWav1.play(filename);
 
   // A brief delay for the library read WAV info
-  delay(5);
+  delay(25);
 
   // Simply wait for the file to finish playing.
   while (playWav1.isPlaying()) {

@@ -1,0 +1,26 @@
+<html>
+  <head>
+    <title>wav2sketch</title>
+  </head>
+  <body>
+    <h1>Teensy Audio Wav2Sketch Utility</h1>
+    <p>Upload an audio file to convert it into Teensy audio format.</p>
+    <form>
+      <label>Output sample rate</label>
+      <select id="sampleRate">
+        <option value="auto">Auto</option>
+        <option value="44100">44100</option>
+        <option value="22050">22050</option>
+        <option value="11025">11025</option>
+      </select><br/><br/>
+      <label>Encoding</label>
+      <select id="encoding">
+        <option value="u-law">u-law</option>
+        <option value="PCM">PCM</option>
+      </select><br/><br/>
+      <input id="audioFileChooser" name="audioFileChooser" type="file" accept="audio/*" multiple>
+      <div id="outputFileHolder"></div>
+    </form>
+    <script type="text/javascript" src="wav2sketch.js"></script>
+  </body>
+</html>
