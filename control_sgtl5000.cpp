@@ -690,11 +690,11 @@ bool AudioControlSGTL5000::micGain(unsigned int dB)
 // 13: 0.34 Volts p-p
 // 14: 0.29 Volts p-p
 // 15: 0.24 Volts p-p
-bool AudioControlSGTL5000::lineInLevel(uint8_t left, uint8_t right)
+bool AudioControlSGTL5000::lineInLevel(uint8_t left, uint8_t right, uint8_t att)
 {
 	if (left > 15) left = 15;
 	if (right > 15) right = 15;
-	return write(CHIP_ANA_ADC_CTRL, (left << 4) | right);
+	return write(CHIP_ANA_ADC_CTRL, (left << 4) | right | (att & 1) <<8);
 }
 
 // CHIP_LINE_OUT_VOL
