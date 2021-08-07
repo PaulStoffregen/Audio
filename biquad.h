@@ -43,7 +43,7 @@ void getCoefficients(T* coeffs, BiquadType type, double dbGain, double freq, dou
 	const double omega = 2 * M_PI * freq / srate;
 	const double sn = sin(omega);
 	const double cs = cos(omega);
-	double alpha;
+	double alpha(0.);
 
 	if (!isBandwidthOrS) // Q
 		alpha = sn / (2 * bandwidthOrQOrS);
@@ -54,7 +54,7 @@ void getCoefficients(T* coeffs, BiquadType type, double dbGain, double freq, dou
 
 	const double beta = 2 * sqrt(A) * alpha;
 
-	double b0, b1, b2, a0Inv, a1, a2;
+	double b0(0.), b1(0.), b2(0.), a0Inv(0.), a1(0.), a2(0.);
 
 	switch (type)
 	{

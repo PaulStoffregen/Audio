@@ -46,7 +46,7 @@ Resampler::Resampler(float attenuation, int32_t minHalfFilterLength, int32_t max
         *xSq++=(1.-x*x);
     }
 }
-void Resampler::getKaiserExact(float beta){
+void Resampler::getKaiserExact(double beta){
     const double thres=1e-10;   
     double* winS=&kaiserWindowSamples[1];
     double* t=tempRes;
@@ -55,7 +55,7 @@ void Resampler::getKaiserExact(float beta){
         *t++=1.;
     }
     double denomLastSummand=1.;
-    const double halfBetaSq=(double)beta*(double)beta/4.;
+    const double halfBetaSq=beta*beta/4.;
     double denom=1.;
     double i=1.;
     while(i < 1000){
@@ -86,7 +86,7 @@ void Resampler::getKaiserExact(float beta){
     }
 }
     
-void Resampler::setKaiserWindow(float beta, int32_t noSamples){
+void Resampler::setKaiserWindow(double beta, int32_t noSamples){
     getKaiserExact(beta);
     double step=(double)(NO_EXACT_KAISER_SAMPLES-1)/(double)(noSamples-1);
     double xPos=step;
@@ -113,16 +113,16 @@ void Resampler::setKaiserWindow(float beta, int32_t noSamples){
     *filterCoeff=*windowUpper;
 }
 
-void Resampler::setFilter(int32_t halfFiltLength,int32_t overSampling, float cutOffFrequ, float kaiserBeta){
+void Resampler::setFilter(int32_t halfFiltLength,int32_t overSampling, double cutOffFrequ, double kaiserBeta){
 
     const int32_t noSamples=halfFiltLength*overSampling+1;
     setKaiserWindow(kaiserBeta, noSamples);  
     
     float* filterCoeff=filter;
-    *filterCoeff++=cutOffFrequ;
+    *filterCoeff++=(float)cutOffFrequ;
     double step=halfFiltLength/(noSamples-1.);
     double xPos=step;
-    double factor=M_PI*(double)cutOffFrequ;
+    double factor=M_PI*cutOffFrequ;
     for (int32_t i = 0; i<noSamples-1; i++ ){
         *filterCoeff++*=(float)((sin(xPos*factor)/(xPos*M_PI)));        
         xPos+=step;
@@ -151,7 +151,7 @@ void Resampler::configure(float fs, float newFs){
         return;
     }
 	_attenuation=_targetAttenuation;
-    _step=(double)(fs/newFs);
+    _step=(double)fs/(double)newFs;
     _configuredStep=_step;
     _stepAdapted=_step;
     _sum=0.;
@@ -161,17 +161,17 @@ void Resampler::configure(float fs, float newFs){
         memset(_buffer[i], 0, sizeof(float)*_maxHalfFilterLength*2);
     }
 
-    float cutOffFrequ, kaiserBeta;
+    double kaiserBeta, cutOffFrequ;
     _overSamplingFactor=1024;
     if (fs <= newFs){
 		_attenuation=0;
         cutOffFrequ=1.;
-        kaiserBeta=10;
-        _halfFilterLength=min(_minHalfFilterLength,_maxHalfFilterLength);
+        kaiserBeta=10.;
+        _halfFilterLength=_minHalfFilterLength;
     }
     else{
         cutOffFrequ=newFs/fs;
-        double b=(double)(2.f*(0.5f*newFs-20000.f)/fs);   //this transition band width causes aliasing. However the generated frequencies are above 20kHz
+        double b=(2.*(0.5*(double)newFs-20000.)/(double)fs);   //this transition band width causes aliasing. However the generated frequencies are above 20kHz
 #ifdef DEBUG_RESAMPLER
         Serial.print("b: ");
         Serial.println(b);
@@ -189,13 +189,13 @@ void Resampler::configure(float fs, float newFs){
             _attenuation=((2.*(double)_halfFilterLength+1.)-1.)*(2.285*TWO_PI*b)+8.;
         }
         if (_attenuation>50.){
-            kaiserBeta=(float)(0.1102*(_attenuation-8.7));
+            kaiserBeta=0.1102*(_attenuation-8.7);
         }
         else if (21.<=_attenuation && _attenuation<=50.){
-            kaiserBeta=0.5842f*(float)pow(_attenuation-21.,0.4)+0.07886*(_attenuation-21.);
+            kaiserBeta=0.5842*pow(_attenuation-21.,0.4)+0.07886*(_attenuation-21.);
         }
         else{
-            kaiserBeta=0.f;
+            kaiserBeta=0.;
         }
         int32_t noSamples=_halfFilterLength*_overSamplingFactor+1;
         if (noSamples > MAX_FILTER_SAMPLES){

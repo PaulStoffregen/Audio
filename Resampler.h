@@ -197,9 +197,9 @@ class Resampler {
             }
         }
     private:
-        void getKaiserExact(float beta);
-        void setKaiserWindow(float beta, int32_t noSamples);
-        void setFilter(int32_t halfFiltLength,int32_t overSampling, float cutOffFrequ, float kaiserBeta);
+        void getKaiserExact(double beta);
+        void setKaiserWindow(double beta, int32_t noSamples);
+        void setFilter(int32_t halfFiltLength,int32_t overSampling, double cutOffFrequ, double kaiserBeta);
         float filter[MAX_FILTER_SAMPLES];
         double kaiserWindowSamples[NO_EXACT_KAISER_SAMPLES];
         double tempRes[NO_EXACT_KAISER_SAMPLES-1];
