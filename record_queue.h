@@ -30,6 +30,8 @@
 #include "Arduino.h"
 #include "AudioStream.h"
 
+#define SILENT_BLOCK_FLAG ((audio_block_t*) 1)
+
 class AudioRecordQueue : public AudioStream
 {
 private:
