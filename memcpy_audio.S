@@ -9,10 +9,10 @@
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
  *
- * 1. The above copyright notice and this permission notice shall be 
+ * 1. The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
  *
- * 2. If the Software is incorporated into a build system that allows 
+ * 2. If the Software is incorporated into a build system that allows
  * selection among a list of target devices, then similar target
  * devices manufactured by PJRC.COM must be included in the list of
  * target devices and selectable in the same manner.
@@ -43,7 +43,9 @@
 	@ r0: dst
 	@ r1: srcL
 	@ r2: srcR
-
+#if defined(__IMXRT1062__)
+    PLD [r1]
+#endif
 #if AUDIO_BLOCK_SAMPLES > 8
 	push	{r4-r11,r14}
 	add r14,r0,#(AUDIO_BLOCK_SAMPLES*2)
@@ -51,7 +53,7 @@
 .loopLR:
 	//Load 2*4 words
 	ldmia r1!, {r5,r7,r9,r11}  //1+4
-	ldmia r2!, {r6,r8,r10,r12} //1+4	
+	ldmia r2!, {r6,r8,r10,r12} //1+4
 
 	pkhbt r3,r5,r6,LSL #16	//1
 	pkhtb r4,r6,r5,ASR #16	//1
@@ -66,14 +68,14 @@
 	pkhtb r10,r12,r11,ASR #16	//1
 
 	//Write 8 Words
-	stmia r0!, {r3,r4,r5,r6,r7,r8,r9,r10}	//1+8 -> 5+5+8+9 = 27 Cycles to interleave 32 bytes. 
-	
+	stmia r0!, {r3,r4,r5,r6,r7,r8,r9,r10}	//1+8 -> 5+5+8+9 = 27 Cycles to interleave 32 bytes.
+
 	cmp r14, r0
 	bne .loopLR
 
-	pop	{r4-r11,r14}	
+	pop	{r4-r11,r14}
 #elif AUDIO_BLOCK_SAMPLES == 8
-	push	{r4-r8,r14}	
+	push	{r4-r8,r14}
 
 	ldmia r1!, {r5,r7}
 	ldmia r2!, {r6,r8}
@@ -85,11 +87,11 @@
 	pkhtb r6,r8,r7,ASR #16
 
 	stmia r0!, {r3,r4,r5,r6}
-	pop	{r4-r8,r14}	
+	pop	{r4-r8,r14}
 #endif
 	BX lr
-	
-	
+
+
 /* void memcpy_tointerleaveL(short *dst, short *srcL); */
  .global	memcpy_tointerleaveL
 .thumb_func
@@ -97,9 +99,12 @@
 
 	@ r0: dst
 	@ r1: srcL
-	
+
+#if defined(__IMXRT1062__)
+    PLD [r1]
+#endif
 	mov r2, #0
-	
+
 #if AUDIO_BLOCK_SAMPLES > 8
 	push	{r4-r11}
 	add r12,r0,#(AUDIO_BLOCK_SAMPLES*2)
@@ -130,7 +135,7 @@
 	pop	{r4-r11}
 #elif AUDIO_BLOCK_SAMPLES == 8
 	push	{r4-r7}
-	
+
 	ldmia r1!, {r5,r7}
 
 	pkhbt r3,r5,r2
@@ -140,12 +145,12 @@
 	pkhtb r6,r2,r7,ASR #16
 
 	stmia r0!, {r3,r4,r5,r6}
-	
+
 	pop	{r4-r7}
-#endif	
+#endif
 	BX lr
 
-	
+
 /* void memcpy_tointerleaveL(short *dst, short *srcR); */
  .global	memcpy_tointerleaveR
 .thumb_func
@@ -153,7 +158,9 @@
 
 	@ r0: dst
 	@ r1: srcR
-
+#if defined(__IMXRT1062__)
+    PLD [r1]
+#endif
 	mov r2, #0
 #if AUDIO_BLOCK_SAMPLES > 8
 	push	{r4-r11}
@@ -183,9 +190,9 @@
 	bne .loopR
 
 	pop	{r4-r11}
-#elif AUDIO_BLOCK_SAMPLES == 8	
+#elif AUDIO_BLOCK_SAMPLES == 8
 	push	{r4-r7}
-	
+
 	ldmia r1!, {r5,r7}
 
 	pkhbt r3,r2,r5,LSL #16
@@ -193,12 +200,12 @@
 
 	pkhbt r5,r2,r7,LSL #16
 	pkhtb r6,r7,r2
-	
+
 	stmia r0!, {r3,r4,r5,r6}
 
 	pop	{r4-r7}
 
-#endif	
+#endif
 	BX lr
 
 
@@ -213,7 +220,9 @@
 	@ r2: src2
 	@ r3: src3
 	@ r4: src4
-
+#if defined(__IMXRT1062__)
+    PLD [r1]
+#endif
 	push	{r4-r11}
 	ldr r4, [sp, #(0+32)] //5th parameter is saved on the stack
 	add r11,r0,#(AUDIO_BLOCK_SAMPLES*4)
