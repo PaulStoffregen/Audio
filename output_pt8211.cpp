@@ -342,12 +342,7 @@ void AudioOutputPT8211::isr(void)
 			offsetR += AUDIO_BLOCK_SAMPLES / 2;
 		#endif //defined(AUDIO_PT8211_OVERSAMPLING)
 	} else {
-		#if defined(AUDIO_PT8211_OVERSAMPLING)
-			memset(dest,0,AUDIO_BLOCK_SAMPLES*8);
-		#else
-			memset(dest,0,AUDIO_BLOCK_SAMPLES*2);
-		#endif
-		return;
+		memset(dest,0,sizeof(i2s_tx_buffer) / 2);
 	}
 
 	arm_dcache_flush_delete(dest_copy, sizeof(i2s_tx_buffer) / 2);
