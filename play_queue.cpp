@@ -28,6 +28,15 @@
 #include "play_queue.h"
 #include "utility/dspinst.h"
 
+void AudioPlayQueue::setMaxBuffers(uint8_t maxb)
+{
+  if (maxb < 1)
+    maxb = 1 ;
+  if (maxb > MAX_BUFFERS)
+    maxb = MAX_BUFFERS ;
+  max_buffers = maxb ;
+}
+
 bool AudioPlayQueue::available(void)
 {
         if (userblock) return true;
