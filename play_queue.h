@@ -40,13 +40,7 @@ private:
 #endif
 public:
 	AudioPlayQueue(void) : AudioStream(0, NULL),
-	  userblock(NULL), uptr(0), head(0), tail(0),
-#if defined(__IMXRT1062__) || defined(__MK66FX1M0__) || defined(__MK64FX512__)
-  	  max_buffers(80)
-#else
-  	  max_buffers(32)
-#endif
-	  { }
+	  userblock(NULL), uptr(0), head(0), tail(0), max_buffers(MAX_BUFFERS) { }
 	void play(int16_t data);
 	void play(const int16_t *data, uint32_t len);
 	bool available(void);
