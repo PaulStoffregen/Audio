@@ -34,13 +34,13 @@ class AudioPlayQueue : public AudioStream
 {
 private:
 #if defined(__IMXRT1062__) || defined(__MK66FX1M0__) || defined(__MK64FX512__)
-	static const int MAX_BUFFERS = 80;
+	static const unsigned int MAX_BUFFERS = 80;
 #else
-	static const int MAX_BUFFERS = 32;
+	static const unsigned int MAX_BUFFERS = 32;
 #endif
 public:
 	AudioPlayQueue(void) : AudioStream(0, NULL),
-	  userblock(NULL), head(0), tail(0),
+	  userblock(NULL), uptr(0), head(0), tail(0),
 #if defined(__IMXRT1062__) || defined(__MK66FX1M0__) || defined(__MK64FX512__)
   	  max_buffers(80)
 #else
@@ -59,8 +59,9 @@ public:
 private:
 	audio_block_t *queue[MAX_BUFFERS];
 	audio_block_t *userblock;
+	unsigned int uptr;
 	volatile uint8_t head, tail;
-	volatile int max_buffers;
+	volatile unsigned int max_buffers;
 };
 
 #endif

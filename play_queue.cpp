@@ -68,6 +68,37 @@ void AudioPlayQueue::playBuffer(void)
 	userblock = NULL;
 }
 
+void AudioPlayQueue::play(int16_t data)
+{
+  int16_t * buf = getBuffer() ;
+  buf [uptr++] = data ;
+  if (uptr >= AUDIO_BLOCK_SAMPLES)
+  {
+    playBuffer() ;
+    uptr = 0 ;
+  }
+}
+
+void AudioPlayQueue::play(const int16_t *data, uint32_t len)
+{
+  while (len > 0)
+  {
+    unsigned int avail_in_userblock = AUDIO_BLOCK_SAMPLES - uptr ;
+    unsigned int to_copy = avail_in_userblock > len ? len : avail_in_userblock ;
+    int16_t * buf = getBuffer();
+    memcpy ((void*)(buf+uptr), (void*)data, to_copy * sizeof(int16_t)) ;
+    uptr += to_copy ;
+
+    data += to_copy ;
+    len -= to_copy ;
+    if (uptr >= AUDIO_BLOCK_SAMPLES)
+    {
+      playBuffer() ;
+      uptr = 0 ;
+    }
+  }
+}
+
 void AudioPlayQueue::update(void)
 {
 	audio_block_t *block;
