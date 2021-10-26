@@ -30,8 +30,8 @@
 
 void AudioPlayQueue::setMaxBuffers(uint8_t maxb)
 {
-  if (maxb < 1)
-    maxb = 1 ;
+  if (maxb < 2)
+    maxb = 2 ;
   if (maxb > MAX_BUFFERS)
     maxb = MAX_BUFFERS ;
   max_buffers = maxb ;

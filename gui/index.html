@@ -2848,9 +2848,9 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	</table>
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>setMaxBuffers</span>(uint8);</p>
-	<p class=desc>Set the maximum buffer count for the queue to limit its size - by default 32 buffers are used on Teensy3's
+	<p class=desc>Set the maximum buffer block count for the queue to limit its size - by default 32 blocks are used on Teensy3's
 	  and 80 on Teeny 4's - this allows the value to be reduced so that the queue cannot get too far ahead, nor use up lots of
-	  audio blocks you might want for other purposes.
+	  audio blocks you might want for other purposes.  The minimum number of buffer blocks is 2.
 	</p>
 	<p class=func><span class=keyword>play</span>(int16);</p>
 	<p class=desc>add a single sample to the queue - no need to use getBuffer() or playBuffer() as this
