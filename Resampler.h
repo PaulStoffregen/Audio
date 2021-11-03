@@ -88,7 +88,7 @@ class Resampler {
                 float dist=successorIndex-_cPos;
                     
                 float distScaled=dist*_overSamplingFactor;
-                int32_t rightIndex=abs((int32_t)(ceil(distScaled))-_overSamplingFactor*_halfFilterLength);   
+                int32_t rightIndex=abs((int32_t)(ceilf(distScaled))-_overSamplingFactor*_halfFilterLength);   
                 const int32_t indexData=successorIndex-_halfFilterLength;
                 if (indexData>=0){
                     for (uint8_t i =0; i< NOCHANNELS; i++){
@@ -108,11 +108,11 @@ class Resampler {
                         *(si1Ptr++)=*ip[i]++**fPtr;
                     }
                     fPtr-=_overSamplingFactor;          
-                    rightIndex=(int32_t)(ceil(distScaled))+_overSamplingFactor;     //needed below  
+                    rightIndex=(int32_t)(ceilf(distScaled))+_overSamplingFactor;     //needed below  
                 }
                 else {
                     memset(si1, 0, NOCHANNELS*sizeof(float));
-                    rightIndex=(int32_t)(ceil(distScaled));     //needed below
+                    rightIndex=(int32_t)(ceilf(distScaled));     //needed below
                 }
                 for (uint16_t i =0 ; i<_halfFilterLength; i++){
                     if(ip[0]==_endOfBuffer[0]){
@@ -197,9 +197,9 @@ class Resampler {
             }
         }
     private:
-        void getKaiserExact(float beta);
-        void setKaiserWindow(float beta, int32_t noSamples);
-        void setFilter(int32_t halfFiltLength,int32_t overSampling, float cutOffFrequ, float kaiserBeta);
+        void getKaiserExact(double beta);
+        void setKaiserWindow(double beta, int32_t noSamples);
+        void setFilter(int32_t halfFiltLength,int32_t overSampling, double cutOffFrequ, double kaiserBeta);
         float filter[MAX_FILTER_SAMPLES];
         double kaiserWindowSamples[NO_EXACT_KAISER_SAMPLES];
         double tempRes[NO_EXACT_KAISER_SAMPLES-1];
