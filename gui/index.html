@@ -2847,23 +2847,33 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 		<tr class=odd><td align=center>Out 0</td><td>Sound Output</td></tr>
 	</table>
 	<h3>Functions</h3>
+	<p class=func><span class=keyword>setMaxBuffers</span>(uint8);</p>
+	<p class=desc>Set the maximum buffer block count for the queue to limit its size - by default 32 blocks are used on Teensy3's
+	  and 80 on Teeny 4's - this allows the value to be reduced so that the queue cannot get too far ahead, nor use up lots of
+	  audio blocks you might want for other purposes.  The minimum number of buffer blocks is 2.
+	</p>
 	<p class=func><span class=keyword>play</span>(int16);</p>
-	<p class=desc>not yet implemented
+	<p class=desc>add a single sample to the queue - no need to use getBuffer() or playBuffer() as this
+	  method does the necessary handling.  Note this method may block waiting for a spare buffer if the queue is full
 	</p>
 	<p class=func><span class=keyword>play</span>(int16[], length);</p>
-	<p class=desc>not yet implemented
+	<p class=desc>add multiple samples to the queue - no need to use getBuffer() or playBuffer() as this
+	  method does the necessary handling.  Note this method may block waiting for a spare buffer if the queue is full.
+	  The length should be the number of samples in the array.
 	</p>
 	<p class=func><span class=keyword>getBuffer</span>();</p>
 	<p class=desc>Returns a pointer to an array of 128 int16.  This buffer
-		is within the audio library memory pool, providing the most efficient
-		way to input data to the audio system.  The buffer is likely to be
-		populated by previously used data, so the entire 128 words should be
-		written before calling playBuffer().  Only a single buffer should be
-		requested at a time.  This function may return NULL if no memory is
-		available.
+	  is within the audio library memory pool, providing the most efficient
+	  way to input data to the audio system.  The buffer is likely to be
+	  populated by previously used data, so the entire 128 words should be
+	  written before calling playBuffer().  Only a single buffer should be
+	  requested at a time.  This function may return NULL if no memory is
+	  available.	  
+	</p>
+	<p>You may find it easier to use the play() methods unless performance is crucial.
 	</p>
 	<p class=func><span class=keyword>playBuffer</span>();</p>
-	<p class=desc>Transmit the buffer previously obtained from getBuffer().
+	<p class=desc>Transmit the buffer previously obtained from getBuffer().  If you use the play() methods you should not use this.
 	</p>
 	<h3>Examples</h3>
 		<p><a href="http://community.arm.com/groups/embedded/blog/2014/05/23/led-video-panel-at-maker-faire-2014" target="_blank">4320 LED Video+Sound Project</a>
