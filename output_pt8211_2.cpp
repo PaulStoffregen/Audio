@@ -49,6 +49,8 @@ DMAChannel AudioOutputPT8211_2::dma(false);
 FLASHMEM
 void AudioOutputPT8211_2::begin(void)
 {
+	memset(i2s_tx_buffer, 0, sizeof(i2s_tx_buffer));
+	arm_dcache_flush_delete(i2s_tx_buffer, sizeof(i2s_tx_buffer));		
 	dma.begin(true); // Allocate the DMA channel first
 
 	block_left_1st = NULL;
@@ -206,7 +208,7 @@ void AudioOutputPT8211_2::isr(void)
 					oldL = val;
 				}
 			#elif defined(AUDIO_PT8211_INTERPOLATION_CIC)
-				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; i++, offsetL++, offsetR++) {
+				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; i++, offsetL++) {
 					int32_t valL = blockL->data[offsetL];
 
 					int32_t combL[3] = {0};
@@ -265,7 +267,7 @@ void AudioOutputPT8211_2::isr(void)
 					oldR = val;
 				}
 			#elif defined(AUDIO_PT8211_INTERPOLATION_CIC)
-				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; i++, offsetL++, offsetR++) {
+				for (int i=0; i< AUDIO_BLOCK_SAMPLES / 2; i++, offsetR++) {
 					int32_t valR = blockR->data[offsetR];
 
 					int32_t combR[3] = {0};

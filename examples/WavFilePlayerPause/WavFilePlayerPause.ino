@@ -36,9 +36,6 @@ AudioPlaySdWav           playWav1;
 AudioOutputI2S           audioOutput;
 //AudioOutputSPDIF       audioOutput;
 //AudioOutputAnalog      audioOutput;
-//On Teensy LC, use this for the Teensy Audio Shield:
-//AudioOutputI2Sslave    audioOutput;
-
 AudioConnection          patchCord1(playWav1, 0, audioOutput, 0);
 AudioConnection          patchCord2(playWav1, 1, audioOutput, 1);
 AudioControlSGTL5000     sgtl5000_1;
@@ -92,15 +89,33 @@ void playFile(const char *filename)
   playWav1.play(filename);
 
   // A brief delay for the library read WAV info
-  delay(25);
+  delay(5);
 
   // Simply wait for the file to finish playing.
-  while (playWav1.isPlaying()) {
-    // uncomment these lines if you audio shield
-    // has the optional volume pot soldered
-    //float vol = analogRead(15);
-    //vol = vol / 1024;
-    // sgtl5000_1.volume(vol);
+  while (!playWav1.isStopped()) {
+    if(playWav1.isPlaying()) {
+      // play for 10 seconds
+      delay(10000);
+    }
+    else if(playWav1.isPaused()) {
+      // pause for 2 seconds
+      delay(2000);
+    }
+
+    // toggle play/pause state
+    playWav1.togglePlayPause();
+    Serial.println(filename);
+    Serial.print("positionMillis() = ");
+    Serial.println(playWav1.positionMillis());
+    Serial.print("lengthMillis()   = ");
+    Serial.println(playWav1.lengthMillis());
+    Serial.print("isPlaying() = ");
+    Serial.println(playWav1.isPlaying());
+    Serial.print("isPaused()  = ");
+    Serial.println(playWav1.isPaused());
+    Serial.print("isStopped() = ");
+    Serial.println(playWav1.isStopped());
+    Serial.println();
   }
 }
 

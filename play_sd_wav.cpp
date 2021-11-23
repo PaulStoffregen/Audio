@@ -42,7 +42,8 @@
 #define STATE_PARSE3			10 // looking for 8 byte data header
 #define STATE_PARSE4			11 // ignoring unknown chunk after "fmt "
 #define STATE_PARSE5			12 // ignoring unknown chunk before "fmt "
-#define STATE_STOP			13
+#define STATE_PAUSED			13
+#define STATE_STOP			14
 
 void AudioPlaySdWav::begin(void)
 {
@@ -118,13 +119,26 @@ void AudioPlaySdWav::stop(void)
 	if (irq) NVIC_ENABLE_IRQ(IRQ_SOFTWARE);
 }
 
+void AudioPlaySdWav::togglePlayPause(void) {
+	// take no action if wave header is not parsed OR
+	// state is explicitly STATE_STOP
+	if(state_play >= 8 || state == STATE_STOP) return;
+
+	// toggle back and forth between state_play and STATE_PAUSED
+	if(state == state_play) {
+		state = STATE_PAUSED;
+	}
+	else if(state == STATE_PAUSED) {
+		state = state_play;
+	}
+}
 
 void AudioPlaySdWav::update(void)
 {
 	int32_t n;
 
-	// only update if we're playing
-	if (state == STATE_STOP) return;
+	// only update if we're playing and not paused
+	if (state == STATE_STOP || state == STATE_PAUSED) return;
 
 	// allocate the audio blocks to transmit
 	block_left = allocate();
@@ -580,10 +594,25 @@ bool AudioPlaySdWav::isPlaying(void)
 	return (s < 8);
 }
 
+
+bool AudioPlaySdWav::isPaused(void)
+{
+	uint8_t s = *(volatile uint8_t *)&state;
+	return (s == STATE_PAUSED);
+}
+
+
+bool AudioPlaySdWav::isStopped(void)
+{
+	uint8_t s = *(volatile uint8_t *)&state;
+	return (s == STATE_STOP);
+}
+
+
 uint32_t AudioPlaySdWav::positionMillis(void)
 {
 	uint8_t s = *(volatile uint8_t *)&state;
-	if (s >= 8) return 0;
+	if (s >= 8 && s != STATE_PAUSED) return 0;
 	uint32_t tlength = *(volatile uint32_t *)&total_length;
 	uint32_t dlength = *(volatile uint32_t *)&data_length;
 	uint32_t offset = tlength - dlength;
@@ -595,7 +624,7 @@ uint32_t AudioPlaySdWav::positionMillis(void)
 uint32_t AudioPlaySdWav::lengthMillis(void)
 {
 	uint8_t s = *(volatile uint8_t *)&state;
-	if (s >= 8) return 0;
+	if (s >= 8 && s != STATE_PAUSED) return 0;
 	uint32_t tlength = *(volatile uint32_t *)&total_length;
 	uint32_t b2m = *(volatile uint32_t *)&bytes2millis;
 	return ((uint64_t)tlength * b2m) >> 32;

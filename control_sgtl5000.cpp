@@ -33,7 +33,7 @@
 // 7:0  REVID		0x00 - revision number for SGTL5000.
 
 #define CHIP_DIG_POWER			0x0002
-// 6	ADC_POWERUP	1=Enable, 0=disable the ADC block, both digital & analog, 
+// 6	ADC_POWERUP	1=Enable, 0=disable the ADC block, both digital & analog,
 // 5	DAC_POWERUP	1=Enable, 0=disable the DAC block, both analog and digital
 // 4	DAP_POWERUP	1=Enable, 0=disable the DAP block
 // 1	I2S_OUT_POWERUP	1=Enable, 0=disable the I2S data output
@@ -509,15 +509,35 @@ void AudioControlSGTL5000::setAddress(uint8_t level)
 	}
 }
 
-bool AudioControlSGTL5000::enable(void)
+bool AudioControlSGTL5000::enable(void) {
+#if defined(KINETISL)
+	return enable(16000000); // SGTL as Master with 16MHz MCLK from Teensy LC
+#else	
+	return enable(0);
+#endif	
+}
+
+bool AudioControlSGTL5000::enable(const unsigned extMCLK, const uint32_t pllFreq)
 {
-	muted = true;
+
 	Wire.begin();
 	delay(5);
+	
+	//Check if we are in Master Mode and if the Teensy had a reset:
+	unsigned int n = read(CHIP_I2S_CTRL);
+	if ( (extMCLK > 0) && (n == (0x0030 | (1<<7))) ) {
+		//Yes. Do not initialize.
+		muted = false;
+		semi_automated = true;
+		return true;
+	}
+
 	//Serial.print("chip ID = ");
 	//delay(5);
 	//unsigned int n = read(CHIP_ID);
 	//Serial.println(n, HEX);
+
+        muted = true;
 
 	int r = write(CHIP_ANA_POWER, 0x4060);  // VDDD is externally driven with 1.8V
 	if (!r) return false;
@@ -526,22 +546,51 @@ bool AudioControlSGTL5000::enable(void)
 	write(CHIP_LINE_OUT_CTRL, 0x0F22); // LO_VAGCNTRL=1.65V, OUT_CURRENT=0.54mA
 	write(CHIP_SHORT_CTRL, 0x4446);  // allow up to 125mA
 	write(CHIP_ANA_CTRL, 0x0137);  // enable zero cross detectors
-	write(CHIP_ANA_POWER, 0x40FF); // power up: lineout, hp, adc, dac
+		
+	if (extMCLK > 0) {
+		//SGTL is I2S Master
+		//Datasheet Pg. 14: Using the PLL - Asynchronous SYS_MCLK input
+		if (extMCLK > 17000000) {
+			write(CHIP_CLK_TOP_CTRL, 1);
+		} else {
+			write(CHIP_CLK_TOP_CTRL, 0);
+		}
+
+		uint32_t int_divisor = (pllFreq / extMCLK) & 0x1f;
+		uint32_t frac_divisor = (uint32_t)((((float)pllFreq / extMCLK) - int_divisor) * 2048.0f) & 0x7ff;
+		
+		write(CHIP_PLL_CTRL, (int_divisor << 11) | frac_divisor);		
+		write(CHIP_ANA_POWER, 0x40FF | (1<<10) | (1<<8) ); // power up: lineout, hp, adc, dac, PLL_POWERUP, VCOAMP_POWERUP
+	} else {
+		//SGTL is I2S Slave
+		write(CHIP_ANA_POWER, 0x40FF); // power up: lineout, hp, adc, dac
+	}
+
 	write(CHIP_DIG_POWER, 0x0073); // power up all digital stuff
 	delay(400);
 	write(CHIP_LINE_OUT_VOL, 0x1D1D); // default approx 1.3 volts peak-to-peak
-	write(CHIP_CLK_CTRL, 0x0004);  // 44.1 kHz, 256*Fs
-	write(CHIP_I2S_CTRL, 0x0030); // SCLK=64*Fs, 16bit, I2S format
+	
+	if (extMCLK > 0) { 
+		//SGTL is I2S Master
+		write(CHIP_CLK_CTRL, 0x0004 | 0x03);  // 44.1 kHz, 256*Fs, use PLL
+		write(CHIP_I2S_CTRL, 0x0030 | (1<<7)); // SCLK=64*Fs, 16bit, I2S format
+	} else {
+		//SGTL is I2S Slave
+		write(CHIP_CLK_CTRL, 0x0004);  // 44.1 kHz, 256*Fs
+		write(CHIP_I2S_CTRL, 0x0030); // SCLK=64*Fs, 16bit, I2S format
+	}
+
 	// default signal routing is ok?
 	write(CHIP_SSS_CTRL, 0x0010); // ADC->I2S, I2S->DAC
 	write(CHIP_ADCDAC_CTRL, 0x0000); // disable dac mute
 	write(CHIP_DAC_VOL, 0x3C3C); // digital gain, 0dB
 	write(CHIP_ANA_HP_CTRL, 0x7F7F); // set volume (lowest level)
 	write(CHIP_ANA_CTRL, 0x0036);  // enable zero cross detectors
-	//mute = false;
+
 	semi_automated = true;
 	return true;
 }
+
 
 unsigned int AudioControlSGTL5000::read(unsigned int reg)
 {
@@ -796,7 +845,7 @@ void AudioControlSGTL5000::eqFilter(uint8_t filterNum, int *filterParameters)
 {
 	// TODO: add the part that selects 7 PEQ filters.
 	if(semi_automated) automate(1,1,filterNum+1);
-	modify(DAP_FILTER_COEF_ACCESS,(uint16_t)filterNum,15); 
+	modify(DAP_FILTER_COEF_ACCESS,(uint16_t)filterNum,15);
 	write(DAP_COEF_WR_B0_MSB,(*filterParameters>>4)&65535);
 	write(DAP_COEF_WR_B0_LSB,(*filterParameters++)&15);
 	write(DAP_COEF_WR_B1_MSB,(*filterParameters>>4)&65535);
@@ -816,23 +865,23 @@ void AudioControlSGTL5000::eqFilter(uint8_t filterNum, int *filterParameters)
 	0 - 0 dB
 	1 - 6.0 dB
 	2 - 12 dB
-	
+
 	lbiResponse; Integrator Response
 	0 - 0 mS
 	1 - 25 mS
 	2 - 50 mS
 	3 - 100 mS
-	
+
 	hardLimit
 	0 - Hard limit disabled. AVC Compressor/Expander enabled.
 	1 - Hard limit enabled. The signal is limited to the programmed threshold (signal saturates at the threshold)
-	
+
 	threshold
 	floating point in range 0 to -96 dB
-	
+
 	attack
 	floating point figure is dB/s rate at which gain is increased
-	
+
 	decay
 	floating point figure is dB/s rate at which gain is reduced
 */
@@ -935,12 +984,12 @@ void calcBiquad(uint8_t filtertype, float fC, float dB_Gain, float Q, uint32_t q
 
   float A;
   if(filtertype<FILTER_PARAEQ) A=pow(10,dB_Gain/20); else A=pow(10,dB_Gain/40);
-  float W0 = 2*3.14159265358979323846*fC/fS; 
+  float W0 = 2*3.14159265358979323846*fC/fS;
   float cosw=cosf(W0);
   float sinw=sinf(W0);
   //float alpha = sinw*sinh((log(2)/2)*BW*W0/sinw);
   //float beta = sqrt(2*A);
-  float alpha = sinw / (2 * Q); 
+  float alpha = sinw / (2 * Q);
   float beta = sqrtf(A)/Q;
   float b0,b1,b2,a0,a1,a2;
 
@@ -1000,6 +1049,7 @@ void calcBiquad(uint8_t filtertype, float fC, float dB_Gain, float Q, uint32_t q
     a0 = (A+1.0F) - ((A-1.0F)*cosw) + (beta*sinw);
     a1 = -2.0F * ((A-1.0F) - ((A+1.0F)*cosw));
     a2 = -((A+1.0F) - ((A-1.0F)*cosw) - (beta*sinw));
+  break;
   default:
     b0 = 0.5;
     b1 = 0.0;
