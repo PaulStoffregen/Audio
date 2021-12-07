@@ -85,7 +85,18 @@
 	pkhtb r6,r8,r7,ASR #16
 
 	stmia r0!, {r3,r4,r5,r6}
-	pop	{r4-r8,r14}	
+	pop	{r4-r8,r14}
+#elif AUDIO_BLOCK_SAMPLES == 4
+	push	{r4-r6,r14}
+
+	ldmia r1!, {r5}
+	ldmia r2!, {r6}
+
+	pkhbt r3,r5,r6,LSL #16
+	pkhtb r4,r6,r5,ASR #16
+
+	stmia r0!, {r3,r4}
+	pop	{r4-r6,r14}
 #endif
 	BX lr
 	
@@ -146,7 +157,7 @@
 	BX lr
 
 	
-/* void memcpy_tointerleaveL(short *dst, short *srcR); */
+/* void memcpy_tointerleaveR(short *dst, short *srcR); */
  .global	memcpy_tointerleaveR
 .thumb_func
 	memcpy_tointerleaveR:
