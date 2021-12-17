@@ -1,9 +1,6 @@
-/* Audio Library for Teensy 3.X
- * Copyright (c) 2014, Paul Stoffregen, paul@pjrc.com
+/* Wavefolder effect for Teensy Audio library
  *
- * Development of this audio library was funded by PJRC.COM, LLC by sales of
- * Teensy and Audio Adaptor boards.  Please support PJRC's efforts to develop
- * open source software by purchasing Teensy or other PJRC products.
+ * Copyright (c) 2020, Mark Tillotson
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,29 +21,37 @@
  * THE SOFTWARE.
  */
 
-#ifndef synth_whitenoise_h_
-#define synth_whitenoise_h_
-#include "Arduino.h"
-#include "AudioStream.h"
-#include "utility/dspinst.h"
+#include "effect_wavefolder.h"
 
-class AudioSynthNoiseWhite : public AudioStream
+void AudioEffectWaveFolder::update()
 {
-public:
-	AudioSynthNoiseWhite() : AudioStream(0, NULL) {
-		level = 0;
-		seed = 1 + instance_count++;
-	}
-	void amplitude(float n) {
-		if (n < 0.0f) n = 0.0;
-		else if (n > 1.0f) n = 1.0f;
-		level = (int32_t)(n * 65536.0f);
-	}
-	virtual void update(void);
-private:
-	int32_t  level; // 0=off, 65536=max
-	uint32_t seed;  // must start at 1
-	static uint16_t instance_count;
-};
+  audio_block_t * blocka = receiveWritable (0);
+  if (!blocka)
+    return;
+  audio_block_t * blockb = receiveReadOnly (1);
+  if (!blockb)
+  {
+    release (blocka);
+    return;
+  }
+  int16_t * pa = blocka->data ;
+  int16_t * pb = blockb->data ;
+  for (int i = 0 ; i < AUDIO_BLOCK_SAMPLES ; i++)
+  {
+    int32_t a12 = pa[i];
+    int32_t b12 = pb[i];
 
-#endif
+    // scale upto 16 times input, so that can fold upto 16 times in each polarity
+    int32_t s1 = (a12 * b12 + 0x400) >> 11 ;
+    // if in a band where the sense needs to be reverse, detect this
+    bool flip1 = ((s1 + 0x8000) >> 16) & 1 ;
+    // reverse and truncate to 16 bits
+    s1 = 0xFFFF & (flip1 ? ~s1 : +s1) ;
+
+    pa[i] = s1;
+  }
+  transmit(blocka);
+  release(blocka);
+  release(blockb);
+}
+

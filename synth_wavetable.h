@@ -72,7 +72,7 @@ public:
 		const int32_t MODULATION_AMPLITUDE_SECOND_GAIN;
 	};
 	static const int32_t UNITY_GAIN = INT32_MAX;
-	static constexpr float SAMPLES_PER_MSEC = (AUDIO_SAMPLE_RATE_EXACT/1000.0);
+	static constexpr float SAMPLES_PER_MSEC = (AUDIO_SAMPLE_RATE_EXACT/1000.0f);
 	static const int32_t LFO_SMOOTHNESS = 3;
 	static constexpr float LFO_PERIOD = (AUDIO_BLOCK_SAMPLES/(1 << (LFO_SMOOTHNESS-1)));
 	static const int32_t ENVELOPE_PERIOD = 8;
@@ -119,7 +119,7 @@ public:
 	 * @param v a value between 0.0 and 1.0
 	 */
 	void amplitude(float v) {
-		v = (v < 0.0) ? 0.0 : (v > 1.0) ? 1.0 : v;
+		v = (v < 0.0f) ? 0.0f : (v > 1.0f) ? 1.0f : v;
 		tone_amp = (uint16_t)(UINT16_MAX*v);
 	}
 
@@ -133,7 +133,7 @@ public:
 	static float midi_volume_transform(int midi_amp) {
 		// scale midi_amp which is 0 t0 127 to be between
 		// 0 and 1 using a logarithmic transformation
-		return powf(midi_amp / 127.0, 4);
+		return powf(midi_amp / 127.0f, 4);
 	}
 
 	/**
@@ -144,8 +144,8 @@ public:
 	 * @return a frequency
 	 */
 	static float noteToFreq(int note) {
-		float exp = note * (1.0 / 12.0) + 3.0313597;
-		return powf(2.0, exp);
+		float exp = note * (1.0f / 12.0f) + 3.0313597f;
+		return powf(2.0f, exp);
 	}
 
 	/**
@@ -156,7 +156,7 @@ public:
 	 * @return a MIDI note (between 0 - 127)
 	 */
 	static int freqToNote(float freq) {
-		return 12*log2f(freq) - 35.8763164;
+		return 12*log2f(freq) - 35.8763164f;
 	}
 
 	// Defined in AudioSynthWavetable.cpp

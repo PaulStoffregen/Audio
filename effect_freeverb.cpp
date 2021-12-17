@@ -73,6 +73,7 @@ AudioEffectFreeverb::AudioEffectFreeverb() : AudioStream(1, inputQueueArray)
 
 
 // cleaner sat16 by http://www.moseleyinstruments.com/
+__attribute__((unused))
 static int16_t sat16(int32_t n, int rshift) {
     // we should always round towards 0
     // to avoid recirculating round-off noise
@@ -96,7 +97,10 @@ static int16_t sat16(int32_t n, int rshift) {
 // TODO: move this to one of the data files, use in output_adat.cpp, output_tdm.cpp, etc
 static const audio_block_t zeroblock = {
 0, 0, 0, {
-0, 0, 0, 0, 0, 0, 0, 0, 
+0, 0, 0, 0,
+#if AUDIO_BLOCK_SAMPLES > 4
+0, 0, 0, 0,
+#endif
 #if AUDIO_BLOCK_SAMPLES > 8
 0, 0, 0, 0, 0, 0, 0, 0,
 #endif

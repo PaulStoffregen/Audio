@@ -379,9 +379,12 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioInputAnalogStereo","resource":"ADC1",          "shareable":false},
 		{"type":"AudioInputAnalogStereo","resource":"ADC2",          "shareable":false},
 		{"type":"AudioInputAnalogStereo","resource":"Sample Rate",   "shareable":true,  "setting":"Teensy Control"},
-		{"type":"AudioInputPDM",         "resource":"I2S Device",    "shareable":true,  "setting":"PDM Protocol"},
+		{"type":"AudioInputPDM",         "resource":"I2S Device",    "shareable":true,  "setting":"I2S Master"},
 		{"type":"AudioInputPDM",         "resource":"Sample Rate",   "shareable":true,  "setting":"Teensy Control"},
 		{"type":"AudioInputPDM",         "resource":"IN1 Pin",       "shareable":false},
+		{"type":"AudioInputPDM2",        "resource":"I2S2 Device",   "shareable":true,  "setting":"I2S Master"},
+		{"type":"AudioInputPDM2",        "resource":"Sample Rate",   "shareable":true,  "setting":"Teensy Control"},
+		{"type":"AudioInputPDM2",        "resource":"IN2 Pin",       "shareable":false},
 		{"type":"AudioInputTDM",         "resource":"I2S Device",    "shareable":true,  "setting":"TDM Protocol"},
 		{"type":"AudioInputTDM",         "resource":"Sample Rate",   "shareable":true,  "setting":"Teensy Control"},
 		{"type":"AudioInputTDM",         "resource":"IN1 Pin",       "shareable":false},
@@ -464,6 +467,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioInputAnalog","data":{"defaults":{"name":{"value":"new"}},"shortName":"adc","inputs":0,"outputs":1,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputAnalogStereo","data":{"defaults":{"name":{"value":"new"}},"shortName":"adcs","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputPDM","data":{"defaults":{"name":{"value":"new"}},"shortName":"pdm","inputs":0,"outputs":1,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputPDM2","data":{"defaults":{"name":{"value":"new"}},"shortName":"pdm2","inputs":0,"outputs":1,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputTDM","data":{"defaults":{"name":{"value":"new"}},"shortName":"tdm","inputs":0,"outputs":16,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputTDM2","data":{"defaults":{"name":{"value":"new"}},"shortName":"tdm2","inputs":0,"outputs":16,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputUSB","data":{"defaults":{"name":{"value":"new"}},"shortName":"usb","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -525,9 +529,11 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioEffectWaveshaper","data":{"shortName":"waveshape","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectGranular","data":{"shortName":"granular","inputs":1,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioEffectDigitalCombine","data":{"shortName":"combine","inputs":2,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioEffectWaveFolder","data":{"defaults":{"name":{"value":"new"}},"shortName":"wavefolder","inputs":2,"outputs":1,"category":"effect-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioFilterBiquad","data":{"defaults":{"name":{"value":"new"}},"shortName":"biquad","inputs":1,"outputs":1,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioFilterFIR","data":{"defaults":{"name":{"value":"new"}},"shortName":"fir","inputs":1,"outputs":1,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioFilterStateVariable","data":{"defaults":{"name":{"value":"new"}},"shortName":"filter","inputs":2,"outputs":3,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioFilterLadder","data":{"defaults":{"name":{"value":"new"}},"shortName":"ladder","inputs":3,"outputs":1,"category":"filter-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioAnalyzePeak","data":{"defaults":{"name":{"value":"new"}},"shortName":"peak","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioAnalyzeRMS","data":{"defaults":{"name":{"value":"new"}},"shortName":"rms","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioAnalyzeFFT256","data":{"defaults":{"name":{"value":"new"}},"shortName":"fft256","inputs":1,"outputs":0,"category":"analyze-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -1205,8 +1211,11 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<p>This object has no functions to call from the Arduino sketch.  It
 		simply streams data from the TDM hardware to its 16 output ports.</p>
 	<h3>Hardware</h3>
-	<p>TDM has been tested with this <a href="https://oshpark.com/shared_projects/2Yj6rFaW">
-		CS42448 Circuit Board</a>.  It may also work with
+	<p>TDM has been tested with this
+		<a href="https://oshpark.com/shared_projects/2Yj6rFaW">
+		CS42448 Board for Teensy 3.x</a> and this
+		<a href="https://oshpark.com/shared_projects/gVFy0fWQ">
+		CS42448 Board for Teensy 4.x</a>.  It may also work with
 		<a href="https://forum.pjrc.com/threads/42894">Invensense ICS-52000 microphones</a>.
 		</p>
 	<table class=doc align=center cellpadding=3>
@@ -1214,7 +1223,7 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 		<tr class=odd><td align=center>9</td><td align=center>21</td><td>BCLK</td><td>Output, 11.3 MHz</td></tr>
 		<tr class=odd><td align=center>11</td><td align=center>23</td><td>MCLK</td><td>Output, 22.6 MHz</td></tr>
 		<tr class=odd><td align=center>13</td><td align=center>8</td><td>RX</td><td>Input, 11.3 Mbit/sec</td></tr>
-		<tr class=odd><td align=center>23</td><td align=center>21</td><td>FS</td><td>Output</td></tr>
+		<tr class=odd><td align=center>23</td><td align=center>20</td><td>FS</td><td>Output</td></tr>
 	</table>
 	<p>Audio from
 		master mode TDM may be used in the same project as ADC, DAC and
@@ -1308,8 +1317,8 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<li>Teensy 3.2
 	<li>Teensy 3.5
 	<li>Teensy 3.6
-	<!--<li>Teensy 4.0
-	<li>Teensy 4.1-->
+	<li>Teensy 4.0
+	<li>Teensy 4.1
 	</ul>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -1323,20 +1332,22 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<h3>Hardware</h3>
 	<p>PDM has been tested with this <a href="https://www.adafruit.com/product/3492">
 		Adafruit MP34DT01-M Microphone Board</a>.
-		</p>
+	</p>
 	<table class=doc align=center cellpadding=3>
-		<tr class=top><th>Pin</th><th>Signal</th><th>Direction</th></tr>
-		<tr class=odd><td align=center>9</td><td>CLK</td><td>Output, 2.8235 MHz</td></tr>
-		<tr class=odd><td align=center>13</td><td>DATA</td><td>Input, Data on rising edge</td></tr>
+		<tr class=top><th>T3.x Pin</th><th>T4.x Pin</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>9</td><td align=center>21</td><td>CLK</td><td>Output, 2.8235 MHz</td></tr>
+		<tr class=odd><td align=center>13</td><td align=center>8</td><td>DATA</td><td>Input, Data on rising edge</td></tr>
 	</table>
+
 	<p>Data is input on the rising edge.  The SEL pin on MP34DT01-M should be
 		connected LOW for proper data capture.</p>
 	<!--<h3>Examples</h3>-->
 	<h3>Notes</h3>
-	<p>Filtering consumes approximately 39% of the CPU when running at
+	<p>On the T3 filtering consumes approximately 39% of the CPU when running at
 		96 MHz.  The code currently consumes this time inside a high
 		priority interrupt, blocking other libraries.  Perhaps future
-		versions will perform filtering at lower priority.
+	  versions will perform filtering at lower priority.  The CPU usage is less
+	  burdensome for the T4.
 		</p>
 	<p>The filter used is a 512 tap FIR with approx &plusmn;1.1 dB gain
 		flatness to 10 kHz.  While far from audiophile grade, this should
@@ -1348,6 +1359,60 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 		</p>
 </script>
 <script type="text/x-red" data-template-name="AudioInputPDM">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+
+<script type="text/x-red" data-help-name="AudioInputPDM2">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Receive (and filter) a Pulse Density Modulated bitstream from I2S2 unit.
+		</p>
+	<p align=center><img src="img/pdmmic.jpg"><br><small>PDM MEMS Mic, using I2S2</small></p>
+	</div>
+	<h3>Boards Supported</h3>
+	<ul>
+	<li>Teensy 4.0
+	<li>Teensy 4.1
+	</ul>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Filtered Audio Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams data from the PDM data, filters out the high frequency
+		noise and gives you the audio signal.</p>
+	<h3>Hardware</h3>
+	<p>PDM2 has been tested with this <a href="https://www.adafruit.com/product/3492">
+		Adafruit MP34DT01-M Microphone Board</a>.
+	</p>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>T4.x Pin I2S2</th><th>Signal</th><th>Direction</th></tr>
+		<tr class=odd><td align=center>4</td><td>CLK</td><td>Output, 2.8235 MHz</td></tr>
+		<tr class=odd><td align=center>5</td><td>DATA</td><td>Input, Data on rising edge</td></tr>
+	</table>
+
+	<p>Data is input on the rising edge.  The SEL pin on MP34DT01-M should be
+		connected LOW for proper data capture.</p>
+	<!--<h3>Examples</h3>-->
+	<h3>Notes</h3>
+        <p>This uses the alternate I2S2 unit on the T4, employing the BCLK2 and IN2 pins, 
+	   allowing AudioInputI2S to be run alongside.</p>
+	<p>The filter used is a 512 tap FIR with approx &plusmn;1.1 dB gain
+		flatness to 10 kHz.  While far from audiophile grade, this should
+		perform far better than the rapid rolloff of Cascaded Integrator
+		Comb (CIC) or simple moving average filters commonly used on
+		other microcontrollers.  The filter also consumes 2104 bytes of
+		RAM for buffering and 32K of Flash for a lookup table to optimized
+		the filter computation.
+		</p>
+</script>
+<script type="text/x-red" data-template-name="AudioInputPDM2">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -2248,7 +2313,11 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 		simply streams data from its 16 input ports to the TDM hardware.</p>
 	<h3>Hardware</h3>
 	<p>TDM has been tested with this <a href="https://oshpark.com/shared_projects/2Yj6rFaW">
-		CS42448 Circuit Board</a>.
+		CS42448 Board for Teensy 3.x</a> and this
+		<a href="https://oshpark.com/shared_projects/gVFy0fWQ">
+		CS42448 Board for Teensy 4.x</a> and this
+		<a href="https://oshpark.com/shared_projects/O7iqdcLr">
+		ADAU1966A Board for Teensy 4.x</a>.
 		</p>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>T3.x<br>Pin</th><th>T4.x<br>Pin</th><th>Signal</th><th>Direction</th></tr>
@@ -2778,25 +2847,61 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 		<tr class=odd><td align=center>Out 0</td><td>Sound Output</td></tr>
 	</table>
 	<h3>Functions</h3>
+	<p class=func><span class=keyword>setMaxBuffers</span>(uint8);</p>
+	<p class=desc>Set the maximum buffer block count for the queue to limit its size - by default 32 blocks are used on Teensy 3.x
+	  and 80 on Teensy 4.x - this allows the value to be reduced so that the queue cannot get too far ahead, nor use up lots of
+	  audio blocks you might want for other purposes.  The minimum number of buffer blocks is 2.
+	</p>
 	<p class=func><span class=keyword>play</span>(int16);</p>
-	<p class=desc>not yet implemented
+	<p class=desc>add a single sample to the queue - no need to use getBuffer() or playBuffer() as this
+	  method does the necessary handling.  
+	  		</p>	  
+	  <p class=desc>If the behaviour is set to ORIGINAL then this method may block waiting for a spare buffer if the queue is full.
+	  		</p>	  
+	  <p class=desc>If the behaviour is set to NON_STALLING then this method may return a non-zero value: 
+	  in this case the call must be re-tried, passing in the original sample value.
 	</p>
 	<p class=func><span class=keyword>play</span>(int16[], length);</p>
-	<p class=desc>not yet implemented
+	<p class=desc>add multiple samples to the queue - no need to use getBuffer() or playBuffer() as this
+	  method does the necessary handling.  
+	  The length should be the number of samples in the array, which need not be a multiple of AUDIO_BLOCK_SAMPLES.
+	  <p class=desc>If the behaviour is set to ORIGINAL then this method may block waiting for a spare buffer if the queue is full.
+		</p>	  
+	  <p class=desc>If the behaviour is set to NON_STALLING then this method will return the number of samples unused (due to unavailable
+	  audio blocks or queue space): if non-zero then the call must be re-tried, with an updated array pointer and length.
+		</p>
 	</p>
 	<p class=func><span class=keyword>getBuffer</span>();</p>
-	<p class=desc>Returns a pointer to an array of 128 int16.  This buffer
-		is within the audio library memory pool, providing the most efficient
-		way to input data to the audio system.  The buffer is likely to be
-		populated by previously used data, so the entire 128 words should be
-		written before calling playBuffer().  Only a single buffer should be
-		requested at a time.  This function may return NULL if no memory is
-		available.
+	<p class=desc>Returns a pointer to an array of AUDIO_BLOCK_SAMPLES (usually 128) int16.  This buffer
+	  is within the audio library memory pool, providing the most efficient
+	  way to input data to the audio system.  The buffer is likely to be
+	  populated by previously used data, so the entire AUDIO_BLOCK_SAMPLES samples should be
+	  written before calling playBuffer().  Only a single buffer is allocated at any one time: 
+	  repeated calls to getBuffer() without calling playBuffer() will yield the same address.
+	<p class=desc>
+	  If the behaviour is set to ORIGINAL then this function will wait (possibly forever) for memory to become available. 
+	  If set to NON_STALLING then function may return NULL if no memory is available.			
+		</p>
+	</p>
+	<p>You may find it easier to use the play() methods unless performance is crucial.
 	</p>
 	<p class=func><span class=keyword>playBuffer</span>();</p>
-	<p class=desc>Transmit the buffer previously obtained from getBuffer().
+	<p class=desc>Transmit the buffer previously obtained from getBuffer().  If you use the play() methods you should not use this.
+	</p>
+	<p class=desc>
+	  If the behaviour is set to ORIGINAL then this function will wait (up to 2.9ms) for a queue space to become available. 
+	  If set to NON_STALLING then function may return a non-zero value if no queue space is free: 
+	  in this case the call must be re-tried later, before any further call to getBuffer() is made.
+		</p>
+	<p class=func><span class=keyword>setBehaviour</span>(value);</p>
+	<p class=desc>Value should be AudioPlayQueue::ORIGINAL to preserve the original behaviour of getBuffer() and playBuffer(), 
+		which can both stall until audio blocks or queue entries become available, with consequences for system performance.
+		Setting the value to AudioPlayQueue::NON_STALLING results in all the above functions returning promptly, but possibly
+		with a status indicating failure or a need to re-try. See the PlayQueueDemo example.
 	</p>
 	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Queues &gt; PlayQueueDemo
+	</p>
 		<p><a href="http://community.arm.com/groups/embedded/blog/2014/05/23/led-video-panel-at-maker-faire-2014" target="_blank">4320 LED Video+Sound Project</a>
 		</p>
 	<!--
@@ -3209,12 +3314,16 @@ The actual packets are taken
 		<ul>
 		<li><span class=literal>WAVEFORM_SINE</span></li>
 		<li><span class=literal>WAVEFORM_SAWTOOTH</span></li>
+		<li><span class=literal>WAVEFORM_BANDLIMIT_SAWTOOTH</span></li>
 		<li><span class=literal>WAVEFORM_SAWTOOTH_REVERSE</span></li>
+		<li><span class=literal>WAVEFORM_BANDLIMIT_SAWTOOTH_REVERSE</span></li>
 		<li><span class=literal>WAVEFORM_SQUARE</span></li>
+		<li><span class=literal>WAVEFORM_BANDLIMIT_SQUARE</span></li>
 		<li><span class=literal>WAVEFORM_TRIANGLE</span></li>
 		<li><span class=literal>WAVEFORM_TRIANGLE_VARIABLE</span></li>
 		<li><span class=literal>WAVEFORM_ARBITRARY</span></li>
 		<li><span class=literal>WAVEFORM_PULSE</span></li>
+		<li><span class=literal>WAVEFORM_BANDLIMIT_PULSE</span></li>
 		<li><span class=literal>WAVEFORM_SAMPLE_HOLD</span></li>
 		</ul>
 	</p>
@@ -3896,6 +4005,39 @@ double s_freq = .0625;</p>
 	</div>
 </script>
 
+<script type="text/x-red" data-help-name="AudioEffectWaveFolder">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Multiply two signals together and apply wavefolding, useful for modulatable distortion;
+           use one input as a depth control from LFO or DC signal.  Rather than saturating the signal
+           folds back on itself when overloaded - extra gain means the modulating signal starts to cause
+           folding of a full-scale waveform at about 6% modulation, allowing a maximum folding factor of 16.
+	</p>
+	<p align=center><img src="img/wavefolder.png"><br><small>70 Hz sine wave distorted with wave-folding.</small></p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Signal Input</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Modulation Input</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Signal with Folding Applied</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>There are no functions to call from the Arduino sketch.
+		This object simply combined the 2 signals and then wave-folds
+	</p>
+<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; WaveFolder</p>
+	<h3>Notes</h3>
+	<p>Assumes the AudioShield fitted.</p>
+</script>
+<script type="text/x-red" data-template-name="AudioEffectWaveFolder">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
 <script type="text/x-red" data-help-name="AudioEffectRectifier">
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
@@ -4503,7 +4645,7 @@ double s_freq = .0625;</p>
 	</p>
 	<p class=func><span class=keyword>octaveControl</span>(octaves);</p>
 	<p class=desc>Set how much (in octaves) the control signal can alter
-		the filter's corner freqency.  Range is 0 to 7 octaves.  For
+		the filter's corner frequency.  Range is 0 to 7 octaves.  For
 		example, when set to 2.5, a full scale positive signal (1.0) will
 		shift the filter frequency up 2.5 octaves, and a full scale negative
 		signal will shift it down 2.5 octaves.
@@ -4526,6 +4668,84 @@ double s_freq = .0625;</p>
 	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioFilterStateVariable">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+
+<script type="text/x-red" data-help-name="AudioFilterLadder">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>A low pass filter with resonant feedback, meant to approximate the
+		classic "Moog sound".  Both cut-off frequency and resonance level
+		can optionally be controlled by input audio signals.
+		</p>
+	<p align=center><img src="img/ladder.png"></p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Signal to Filter</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Frequency Control</td></tr>
+		<tr class=odd><td align=center>In 2</td><td>Resonance Control</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Low Pass Output</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>frequency</span>(freq);</p>
+	<p class=desc>Set the filter's corner frequency.  When a signal is
+		connected to the frequency control input, this setting is
+		the corner frequency the filter will implement
+		when the signal is zero.
+	</p>
+	<p class=func><span class=keyword>octaveControl</span>(octaves);</p>
+	<p class=desc>Set how much (in octaves) the control signal can alter
+		the filter's corner frequency.  Range is 0 to 7 octaves.  For
+		example, when set to 2.5, a full scale positive signal (1.0) will
+		shift the filter frequency up 2.5 octaves, and a full scale negative
+		signal will shift it down 2.5 octaves.
+	</p>
+	<p class=func><span class=keyword>resonance</span>(level);</p>
+	<p class=desc>Set the filter's feedback level for resonance.  The
+		usable range is 0 to 1.8, where values over 1.0 can cause
+		the filter to self oscillate.  When an audio signal is present
+		at the resonance control input, it adds to (positive signal)
+		or subtracts from (negative signal) this setting.  To achieve
+		maximum resonance when the control signal is at its 1.0 maximum
+		amplitude, this setting must be at least 0.8.
+	</p>
+	<p class=func><span class=keyword>inputDrive</span>(level);</p>
+	<p class=desc>TODO: add info here...<br>
+		range is 0 to 4.0
+	</p>
+	<p class=func><span class=keyword>passbandGain</span>(gain);</p>
+	<p class=desc>TODO: add info here...<br>
+		range is 0 to 0.5
+	</p>
+	<p class=func><span class=keyword>interpolationMethod</span>(method);</p>
+	<p class=desc>TODO: add info here...<br>
+		<span class=literal>LADDER_FILTER_INTERPOLATION_FIR_POLY</span><br>
+		<span class=literal>LADDER_FILTER_INTERPOLATION_LINEAR</span><br>
+	</p>
+
+<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; LadderFilter
+	</p>
+	<h3>Notes</h3>
+	<p>	Teensy 3.5 is the minimum hardware capable of running this filter.
+	</p>
+	<p>	When controlled by a signal, the equation for the filter
+		frequency is:
+	</p>
+	<p>
+		<img src="img/filter_formula.png">
+	</p>
+	<p>This filter uses floating point math.  It is recommended for use
+		on Teensy 4.0 or higher.
+	</p>
+</script>
+<script type="text/x-red" data-template-name="AudioFilterLadder">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -5488,7 +5708,9 @@ value  frequency
 	</p>
 	<h3>Hardware</h3>
 	<p>Tested with this <a href="https://oshpark.com/shared_projects/2Yj6rFaW">
-		CS42448 Circuit Board</a>.
+		CS42448 Board for Teensy 3.x</a> and this
+		<a href="https://oshpark.com/shared_projects/gVFy0fWQ">
+		CS42448 Board for Teensy 4.x</a>.
 	</p>
 	<p align=center><img src="img/tdm.jpg"></p>
 	</div>

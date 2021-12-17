@@ -73,7 +73,7 @@
 
 	pop	{r4-r11,r14}	
 #elif AUDIO_BLOCK_SAMPLES == 8
-	push	{r4-r8,r14}	
+	push	{r4-r8}
 
 	ldmia r1!, {r5,r7}
 	ldmia r2!, {r6,r8}
@@ -85,7 +85,7 @@
 	pkhtb r6,r8,r7,ASR #16
 
 	stmia r0!, {r3,r4,r5,r6}
-	pop	{r4-r8,r14}	
+	pop	{r4-r8}
 #endif
 	BX lr
 	

@@ -1,5 +1,5 @@
 /* Audio Library for Teensy 3.X
- * Copyright (c) 2014, Paul Stoffregen, paul@pjrc.com
+ * Copyright (c) 2018, Paul Stoffregen, paul@pjrc.com
  *
  * Development of this audio library was funded by PJRC.COM, LLC by sales of
  * Teensy and Audio Adaptor boards.  Please support PJRC's efforts to develop
@@ -24,41 +24,26 @@
  * THE SOFTWARE.
  */
 
-#ifndef play_queue_h_
-#define play_queue_h_
+#ifndef _input_pdm_i2s2_h_
+#define _input_pdm_i2s2_h_
 
 #include "Arduino.h"
 #include "AudioStream.h"
+#include "DMAChannel.h"
 
-class AudioPlayQueue : public AudioStream
+class AudioInputPDM2 : public AudioStream
 {
-private:
-#if defined(__IMXRT1062__) || defined(__MK66FX1M0__) || defined(__MK64FX512__)
-	static const unsigned int MAX_BUFFERS = 80;
-#else
-	static const unsigned int MAX_BUFFERS = 32;
-#endif
 public:
-	AudioPlayQueue(void) : AudioStream(0, NULL),
-	  userblock(NULL), uptr(0), head(0), tail(0), max_buffers(MAX_BUFFERS) { }
-	uint32_t play(int16_t data);
-	uint32_t play(const int16_t *data, uint32_t len);
-	bool available(void);
-	int16_t * getBuffer(void);
-	uint32_t playBuffer(void);
-	void stop(void);
-	void setMaxBuffers(uint8_t);
-	//bool isPlaying(void) { return playing; }
+	AudioInputPDM2(void) : AudioStream(0, NULL) { begin(); }
+
 	virtual void update(void);
-	enum behaviour_e {ORIGINAL,NON_STALLING};
-	void setBehaviour(behaviour_e behave) {behaviour = behave;}
+	void begin(void);
+protected:
+	static bool update_responsibility;
+	static DMAChannel dma;
+	static void isr(void);
 private:
-	audio_block_t *queue[MAX_BUFFERS];
-	audio_block_t *userblock;
-	unsigned int uptr; // actually an index, NOT a pointer!
-	volatile uint8_t head, tail;
-	volatile uint8_t max_buffers;
-	behaviour_e behaviour;
+	static audio_block_t *block_left;
 };
 
 #endif

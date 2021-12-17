@@ -337,7 +337,7 @@ void AudioOutputI2S::update(void)
 #endif
 
 
-void AudioOutputI2S::config_i2s(void)
+void AudioOutputI2S::config_i2s(bool only_bclk)
 {
 #if defined(KINETISK)
 	SIM_SCGC6 |= SIM_SCGC6_I2S;
@@ -345,8 +345,15 @@ void AudioOutputI2S::config_i2s(void)
 	SIM_SCGC6 |= SIM_SCGC6_DMAMUX;
 
 	// if either transmitter or receiver is enabled, do nothing
-	if (I2S0_TCSR & I2S_TCSR_TE) return;
-	if (I2S0_RCSR & I2S_RCSR_RE) return;
+	if ((I2S0_TCSR & I2S_TCSR_TE) != 0 || (I2S0_RCSR & I2S_RCSR_RE) != 0)
+	{
+	  if (!only_bclk) // if previous transmitter/receiver only activated BCLK, activate the other clock pins now
+	  {
+	    CORE_PIN23_CONFIG = PORT_PCR_MUX(6); // pin 23, PTC2, I2S0_TX_FS (LRCLK)
+	    CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK
+	  }
+	  return ;
+	}
 
 	// enable MCLK output
 	I2S0_MCR = I2S_MCR_MICS(MCLK_SRC) | I2S_MCR_MOE;
@@ -374,18 +381,29 @@ void AudioOutputI2S::config_i2s(void)
 	I2S0_RCR5 = I2S_RCR5_WNW(31) | I2S_RCR5_W0W(31) | I2S_RCR5_FBT(31);
 
 	// configure pin mux for 3 clock signals
-	CORE_PIN23_CONFIG = PORT_PCR_MUX(6); // pin 23, PTC2, I2S0_TX_FS (LRCLK)
+	if (!only_bclk)
+	{
+	  CORE_PIN23_CONFIG = PORT_PCR_MUX(6); // pin 23, PTC2, I2S0_TX_FS (LRCLK)
+	  CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK
+	}
 	CORE_PIN9_CONFIG  = PORT_PCR_MUX(6); // pin  9, PTC3, I2S0_TX_BCLK
-	CORE_PIN11_CONFIG = PORT_PCR_MUX(6); // pin 11, PTC6, I2S0_MCLK
 
 #elif defined(__IMXRT1062__)
 
 	CCM_CCGR5 |= CCM_CCGR5_SAI1(CCM_CCGR_ON);
 
 	// if either transmitter or receiver is enabled, do nothing
-	if (I2S1_TCSR & I2S_TCSR_TE) return;
-	if (I2S1_RCSR & I2S_RCSR_RE) return;
-//PLL:
+	if ((I2S1_TCSR & I2S_TCSR_TE) != 0 || (I2S1_RCSR & I2S_RCSR_RE) != 0)
+	{
+	  if (!only_bclk) // if previous transmitter/receiver only activated BCLK, activate the other clock pins now
+	  {
+	    CORE_PIN23_CONFIG = 3;  //1:MCLK
+	    CORE_PIN20_CONFIG = 3;  //1:RX_SYNC (LRCLK)
+	  }
+	  return ;
+	}
+
+	//PLL:
 	int fs = AUDIO_SAMPLE_RATE_EXACT;
 	// PLL between 27*24 = 648MHz und 54*24=1296MHz
 	int n1 = 4; //SAI prescaler 4 => (n1*n2) = multiple of 4
@@ -409,9 +427,12 @@ void AudioOutputI2S::config_i2s(void)
 		& ~(IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL_MASK))
 		| (IOMUXC_GPR_GPR1_SAI1_MCLK_DIR | IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL(0));
 
-	CORE_PIN23_CONFIG = 3;  //1:MCLK
+	if (!only_bclk)
+	{
+	  CORE_PIN23_CONFIG = 3;  //1:MCLK
+	  CORE_PIN20_CONFIG = 3;  //1:RX_SYNC  (LRCLK)
+	}
 	CORE_PIN21_CONFIG = 3;  //1:RX_BCLK
-	CORE_PIN20_CONFIG = 3;  //1:RX_SYNC
 
 	int rsync = 0;
 	int tsync = 1;

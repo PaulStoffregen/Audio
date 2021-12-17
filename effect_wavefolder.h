@@ -1,9 +1,6 @@
-/* Audio Library for Teensy 3.X
- * Copyright (c) 2014, Paul Stoffregen, paul@pjrc.com
+/* Wavefolder effect for Teensy Audio library
  *
- * Development of this audio library was funded by PJRC.COM, LLC by sales of
- * Teensy and Audio Adaptor boards.  Please support PJRC's efforts to develop
- * open source software by purchasing Teensy or other PJRC products.
+ * Copyright (c) 2020, Mark Tillotson
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,29 +21,20 @@
  * THE SOFTWARE.
  */
 
-#ifndef synth_whitenoise_h_
-#define synth_whitenoise_h_
+#ifndef effect_wavefolder_h_
+#define effect_wavefolder_h_
+
 #include "Arduino.h"
 #include "AudioStream.h"
-#include "utility/dspinst.h"
 
-class AudioSynthNoiseWhite : public AudioStream
+class AudioEffectWaveFolder : public AudioStream
 {
 public:
-	AudioSynthNoiseWhite() : AudioStream(0, NULL) {
-		level = 0;
-		seed = 1 + instance_count++;
-	}
-	void amplitude(float n) {
-		if (n < 0.0f) n = 0.0;
-		else if (n > 1.0f) n = 1.0f;
-		level = (int32_t)(n * 65536.0f);
-	}
-	virtual void update(void);
+  AudioEffectWaveFolder() : AudioStream(2, inputQueueArray) {}
+  virtual void update() ;
+
 private:
-	int32_t  level; // 0=off, 65536=max
-	uint32_t seed;  // must start at 1
-	static uint16_t instance_count;
+  audio_block_t * inputQueueArray[2] ;
 };
 
 #endif

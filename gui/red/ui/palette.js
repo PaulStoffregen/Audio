@@ -149,7 +149,7 @@ RED.palette = (function() {
 			$("#palette-search-clear").show();
 		}
 		
-		var re = new RegExp(val);
+		var re = new RegExp(val, "i");
 		$(".palette_node").each(function(i,el) {
 			if (val === "" || re.test(el.id)) {
 				$(this).show();

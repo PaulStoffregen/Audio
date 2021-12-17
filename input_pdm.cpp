@@ -24,10 +24,10 @@
  * THE SOFTWARE.
  */
 
-#if defined(KINETISK)
- 
+
 #include <Arduino.h>
 #include "input_pdm.h"
+#include "output_i2s.h"
 #include "utility/dspinst.h"
 
 // Decrease this for more mic gain, increase for range to accommodate loud sounds
@@ -52,11 +52,105 @@
 // but its performance should be *much* better than the rapid passband rolloff
 // of Cascaded Integrator Comb (CIC) or moving average filters.
 
+#if defined(__IMXRT1062__) || defined(KINETISK)
 DMAMEM __attribute__((aligned(32))) static uint32_t pdm_buffer[AUDIO_BLOCK_SAMPLES*4];
 static uint32_t leftover[14];
 audio_block_t * AudioInputPDM::block_left = NULL;
 bool AudioInputPDM::update_responsibility = false;
 DMAChannel AudioInputPDM::dma(false);
+#endif
+
+
+// Teensy 4.x
+#if defined(__IMXRT1062__)
+
+#include "utility/imxrt_hw.h"
+
+// T4.x version
+void AudioInputPDM::begin()
+{
+  dma.begin(true); // Allocate the DMA channel first
+
+  AudioOutputI2S::config_i2s(true) ;
+  int rsync = 0;
+  /*
+    int tsync = 1;
+    CCM_CCGR5 |= CCM_CCGR5_SAI1(CCM_CCGR_ON);
+    //PLL:
+    int fs = AUDIO_SAMPLE_RATE_EXACT;
+    // PLL between 27*24 = 648MHz und 54*24=1296MHz
+    int n1 = 4; //SAI prescaler 4 => (n1*n2) = multiple of 4
+    int n2 = 1 + (24000000 * 27) / (fs * 256 * n1);
+
+    double C = ((double)fs * 256 * n1 * n2) / 24000000;
+    int c0 = C;
+    int c2 = 10000;
+    int c1 = C * c2 - (c0 * c2);
+    set_audioClock(c0, c1, c2);
+
+    // clear SAI1_CLK register locations
+    CCM_CSCMR1 = (CCM_CSCMR1 & ~(CCM_CSCMR1_SAI1_CLK_SEL_MASK))
+      | CCM_CSCMR1_SAI1_CLK_SEL(2); // &0x03 // (0,1,2): PLL3PFD0, PLL5, PLL4
+    CCM_CS1CDR = (CCM_CS1CDR & ~(CCM_CS1CDR_SAI1_CLK_PRED_MASK | CCM_CS1CDR_SAI1_CLK_PODF_MASK))
+      | CCM_CS1CDR_SAI1_CLK_PRED(n1-1) // &0x07
+      | CCM_CS1CDR_SAI1_CLK_PODF(n2-1); // &0x3f
+
+    // Select MCLK
+    IOMUXC_GPR_GPR1 = (IOMUXC_GPR_GPR1 & ~(IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL_MASK))
+      | (IOMUXC_GPR_GPR1_SAI1_MCLK_DIR | IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL(0));
+
+    // all the pins for SAI1 seem to be ALT3 io-muxed
+    //// CORE_PIN23_CONFIG = 3;  //1:MCLK
+    CORE_PIN21_CONFIG = 3;  //1:RX_BCLK
+    //// CORE_PIN20_CONFIG = 3;  //1:RX_SYNC  // LRCLK
+
+
+    I2S1_TMR = 0;
+    //I2S1_TCSR = (1<<25); //Reset
+    I2S1_TCR1 = I2S_TCR1_RFW(1);
+    I2S1_TCR2 = I2S_TCR2_SYNC(tsync) | I2S_TCR2_BCP | (I2S_TCR2_BCD | I2S_TCR2_DIV((1)) | I2S_TCR2_MSEL(1)); // sync=0; tx is async;
+    I2S1_TCR3 = I2S_TCR3_TCE;
+    I2S1_TCR4 = I2S_TCR4_FRSZ((2-1)) | I2S_TCR4_SYWD((32-1)) | I2S_TCR4_MF | I2S_TCR4_FSD | I2S_TCR4_FSE | I2S_TCR4_FSP;
+    I2S1_TCR5 = I2S_TCR5_WNW((32-1)) | I2S_TCR5_W0W((32-1)) | I2S_TCR5_FBT((32-1));
+  */
+  I2S1_RMR = 0;
+  //I2S1_RCSR = (1<<25); //Reset
+  I2S1_RCR1 = I2S_RCR1_RFW(2);  // 2 not 1
+  I2S1_RCR2 = I2S_RCR2_SYNC(rsync) | I2S_RCR2_BCP | (I2S_RCR2_BCD | I2S_RCR2_DIV((1)) | I2S_RCR2_MSEL(1));  // sync=0; rx is async;
+  I2S1_RCR3 = I2S_RCR3_RCE;
+  I2S1_RCR4 = I2S_RCR4_FRSZ((2-1)) | I2S_RCR4_SYWD((32-1)) | I2S_RCR4_MF /* | I2S_RCR4_FSE */ | I2S_RCR4_FSP | I2S_RCR4_FSD;
+  I2S1_RCR5 = I2S_RCR5_WNW((32-1)) | I2S_RCR5_W0W((32-1)) | I2S_RCR5_FBT((32-1));
+
+  CORE_PIN8_CONFIG  = 3;  //1:RX_DATA0
+  IOMUXC_SAI1_RX_DATA0_SELECT_INPUT = 2;
+
+  dma.TCD->SADDR = &I2S1_RDR0;
+  dma.TCD->SOFF = 0;
+  dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(2) | DMA_TCD_ATTR_DSIZE(2);
+  dma.TCD->NBYTES_MLNO = 4;
+  dma.TCD->SLAST = 0;
+  dma.TCD->DADDR = pdm_buffer;
+  dma.TCD->DOFF = 4;
+  dma.TCD->CITER_ELINKNO = sizeof(pdm_buffer) / 4;
+  dma.TCD->DLASTSGA = -sizeof(pdm_buffer);
+  dma.TCD->BITER_ELINKNO = sizeof(pdm_buffer) / 4;
+  dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
+
+  dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI1_RX);
+  
+  update_responsibility = update_setup();
+  dma.enable();
+
+  I2S1_RCSR = I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE | I2S_RCSR_FR;
+  //I2S1_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE | I2S_RCSR_FR;
+  //I2S1_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE; // TX clock enable, because sync'd to TX
+
+  dma.attachInterrupt(isr);
+}
+
+
+// Teensy 3.x
+#elif defined(KINETISK)
 
 // MCLK needs to be 48e6 / 1088 * 256 = 11.29411765 MHz -> 44.117647 kHz sample rate
 //
@@ -110,10 +204,13 @@ DMAChannel AudioInputPDM::dma(false);
 #endif
 #endif
 
+// T3.x version
 void AudioInputPDM::begin(void)
 {
 	dma.begin(true); // Allocate the DMA channel first
 
+	AudioOutputI2S::config_i2s(true);
+	/*
 	SIM_SCGC6 |= SIM_SCGC6_I2S;
 	SIM_SCGC7 |= SIM_SCGC7_DMA;
 	SIM_SCGC6 |= SIM_SCGC6_DMAMUX;
@@ -135,18 +232,22 @@ void AudioInputPDM::begin(void)
 
         // configure receiver (sync'd to transmitter clocks)
         I2S0_RMR = 0;
+	*/
         I2S0_RCR1 = I2S_RCR1_RFW(2);
+	/*
         I2S0_RCR2 = I2S_RCR2_SYNC(1) | I2S_TCR2_BCP | I2S_RCR2_MSEL(1)
                 | I2S_RCR2_BCD | I2S_RCR2_DIV(1);
         I2S0_RCR3 = I2S_RCR3_RCE;
+	*/
         I2S0_RCR4 = I2S_RCR4_FRSZ(1) | I2S_RCR4_SYWD(31) | I2S_RCR4_MF
                 /* | I2S_RCR4_FSE */ | I2S_RCR4_FSP | I2S_RCR4_FSD;
+	/*
         I2S0_RCR5 = I2S_RCR5_WNW(31) | I2S_RCR5_W0W(31) | I2S_RCR5_FBT(31);
 
         CORE_PIN9_CONFIG  = PORT_PCR_MUX(6); // pin  9, PTC3, I2S0_TX_BCLK
+	*/
+	
 	CORE_PIN13_CONFIG = PORT_PCR_MUX(4); // pin 13, PTC5, I2S0_RXD0
-
-#if defined(KINETISK)
 	dma.TCD->SADDR = &I2S0_RDR0;
 	dma.TCD->SOFF = 0;
 	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(2) | DMA_TCD_ATTR_DSIZE(2);
@@ -158,7 +259,7 @@ void AudioInputPDM::begin(void)
 	dma.TCD->DLASTSGA = -sizeof(pdm_buffer);
 	dma.TCD->BITER_ELINKNO = sizeof(pdm_buffer) / 4;
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
-#endif
+
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_RX);
 	update_responsibility = update_setup();
 	dma.enable();
@@ -167,10 +268,14 @@ void AudioInputPDM::begin(void)
 	I2S0_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE; // TX clock enable, because sync'd to TX
 	dma.attachInterrupt(isr);
 }
+#endif
 
-extern const int16_t enormous_pdm_filter_table[16384];
 
-static int filter(const uint32_t *buf)
+#if defined(__IMXRT1062__) || defined(KINETISK)
+
+extern const int16_t enormous_pdm_filter_table[];
+
+int pdm_filter(const uint32_t *buf)
 {
 	const int16_t *table = enormous_pdm_filter_table;
 	int sum = 0;
@@ -198,7 +303,7 @@ static int filter(const uint32_t *buf)
 	return signed_saturate_rshift(sum, 16, RSHIFT);
 }
 
-static int filter(const uint32_t *buf1, unsigned int n, const uint32_t *buf2)
+int pdm_filter(const uint32_t *buf1, unsigned int n, const uint32_t *buf2)
 {
 	const int16_t *table = enormous_pdm_filter_table;
 	int sum = 0;
@@ -254,10 +359,9 @@ void AudioInputPDM::isr(void)
 	const uint32_t *src;
 	audio_block_t *left;
 
-	//digitalWriteFast(3, HIGH);
-#if defined(KINETISK)
+	//digitalWriteFast(14, HIGH);
+#if defined(KINETISK) || defined(__IMXRT1052__) || defined(__IMXRT1062__)
 	daddr = (uint32_t)(dma.TCD->DADDR);
-#endif
 	dma.clearInterrupt();
 
 	if (daddr < (uint32_t)pdm_buffer + sizeof(pdm_buffer) / 2) {
@@ -276,18 +380,22 @@ void AudioInputPDM::isr(void)
 		// the lower priority update.  This burns ~40% of the CPU
 		// time in a high priority interrupt.  Not ideal.  :(
 		int16_t *dest = left->data;
+#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
+		arm_dcache_delete ((void*) src, sizeof (pdm_buffer) >> 1);
+#endif
 		for (unsigned int i=0; i < 14; i += 2) {
-			*dest++ = filter(leftover + i, 7 - (i >> 1), src);
+			*dest++ = pdm_filter(leftover + i, 7 - (i >> 1), src);
 		}
 		for (unsigned int i=0; i < AUDIO_BLOCK_SAMPLES*2-14; i += 2) {
-			*dest++ = filter(src + i);
+			*dest++ = pdm_filter(src + i);
 		}
 		for (unsigned int i=0; i < 14; i++) {
 			leftover[i] = src[AUDIO_BLOCK_SAMPLES*2 - 14 + i];
 		}
 		//left->data[0] = 0x7FFF;
 	}
-	//digitalWriteFast(3, LOW);
+#endif
+	//digitalWriteFast(14, LOW);
 }
 
 void AudioInputPDM::update(void)
@@ -1672,6 +1780,7 @@ const int16_t enormous_pdm_filter_table[16384] = {
      9,    54,    55,    99,    56,   101,   102,   147,    58,   102,   103,   148,
    105,   149,   151,   195
 };
+#endif
 
 /*
 #! /usr/bin/perl
@@ -1719,4 +1828,3 @@ for ($n=0; $n < 512; $n += 8) {
 print "\n};\n";
 print "// max=$max, min=$min\n";
 */
-#endif

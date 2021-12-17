@@ -40,22 +40,22 @@ class AudioSynthWaveformSine : public AudioStream
 public:
 	AudioSynthWaveformSine() : AudioStream(0, NULL), magnitude(16384) {}
 	void frequency(float freq) {
-		if (freq < 0.0) freq = 0.0;
-		else if (freq > AUDIO_SAMPLE_RATE_EXACT/2) freq = AUDIO_SAMPLE_RATE_EXACT/2;
-		phase_increment = freq * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT);
+		if (freq < 0.0f) freq = 0.0;
+		else if (freq > AUDIO_SAMPLE_RATE_EXACT/2.0f) freq = AUDIO_SAMPLE_RATE_EXACT/2.0f;
+		phase_increment = freq * (4294967296.0f / AUDIO_SAMPLE_RATE_EXACT);
 	}
 	void phase(float angle) {
-		if (angle < 0.0) angle = 0.0;
-		else if (angle > 360.0) {
-			angle = angle - 360.0;
-			if (angle >= 360.0) return;
+		if (angle < 0.0f) angle = 0.0f;
+		else if (angle > 360.0f) {
+			angle = angle - 360.0f;
+			if (angle >= 360.0f) return;
 		}
-		phase_accumulator = angle * (4294967296.0 / 360.0);
+		phase_accumulator = angle * (float)(4294967296.0 / 360.0);
 	}
 	void amplitude(float n) {
-		if (n < 0) n = 0;
-		else if (n > 1.0) n = 1.0;
-		magnitude = n * 65536.0;
+		if (n < 0.0f) n = 0;
+		else if (n > 1.0f) n = 1.0f;
+		magnitude = n * 65536.0f;
 	}
 	virtual void update(void);
 private:
@@ -70,22 +70,22 @@ class AudioSynthWaveformSineHires : public AudioStream
 public:
 	AudioSynthWaveformSineHires() : AudioStream(0, NULL), magnitude(16384) {}
 	void frequency(float freq) {
-		if (freq < 0.0) freq = 0.0;
-		else if (freq > AUDIO_SAMPLE_RATE_EXACT/2) freq = AUDIO_SAMPLE_RATE_EXACT/2;
-		phase_increment = freq * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT);
+		if (freq < 0.0f) freq = 0.0;
+		else if (freq > AUDIO_SAMPLE_RATE_EXACT/2.0f) freq = AUDIO_SAMPLE_RATE_EXACT/2.0f;
+		phase_increment = freq * (4294967296.0f / AUDIO_SAMPLE_RATE_EXACT);
 	}
 	void phase(float angle) {
-		if (angle < 0.0) angle = 0.0;
-		else if (angle > 360.0) {
-			angle = angle - 360.0;
-			if (angle >= 360.0) return;
+		if (angle < 0.0f) angle = 0.0f;
+		else if (angle > 360.0f) {
+			angle = angle - 360.0f;
+			if (angle >= 360.0f) return;
 		}
-		phase_accumulator = angle * (4294967296.0 / 360.0);
+		phase_accumulator = angle * (float)(4294967296.0 / 360.0);
 	}
 	void amplitude(float n) {
-		if (n < 0) n = 0;
-		else if (n > 1.0) n = 1.0;
-		magnitude = n * 65536.0;
+		if (n < 0.0f) n = 0;
+		else if (n > 1.0f) n = 1.0f;
+		magnitude = n * 65536.0f;
 	}
 	virtual void update(void);
 private:
@@ -103,22 +103,22 @@ public:
 	// input = +1.0 doubles carrier
 	// input = -1.0 DC output
 	void frequency(float freq) {
-		if (freq < 0.0) freq = 0.0;
-		else if (freq > AUDIO_SAMPLE_RATE_EXACT/4) freq = AUDIO_SAMPLE_RATE_EXACT/4;
-		phase_increment = freq * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT);
+		if (freq < 0.0f) freq = 0.0f;
+		else if (freq > AUDIO_SAMPLE_RATE_EXACT/4.0f) freq = AUDIO_SAMPLE_RATE_EXACT/4.0f;
+		phase_increment = freq * (4294967296.0f / AUDIO_SAMPLE_RATE_EXACT);
 	}
 	void phase(float angle) {
-		if (angle < 0.0) angle = 0.0;
-		else if (angle > 360.0) {
-			angle = angle - 360.0;
-			if (angle >= 360.0) return;
+		if (angle < 0.0f) angle = 0.0;
+		else if (angle > 360.0f) {
+			angle = angle - 360.0f;
+			if (angle >= 360.0f) return;
 		}
-		phase_accumulator = angle * (4294967296.0 / 360.0);
+		phase_accumulator = angle * (float)(4294967296.0 / 360.0);
 	}
 	void amplitude(float n) {
-		if (n < 0) n = 0;
-		else if (n > 1.0) n = 1.0;
-		magnitude = n * 65536.0;
+		if (n < 0.0f) n = 0;
+		else if (n > 1.0f) n = 1.0f;
+		magnitude = n * 65536.0f;
 	}
 	virtual void update(void);
 private:

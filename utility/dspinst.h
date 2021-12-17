@@ -58,10 +58,12 @@ static inline int16_t saturate16(int32_t val)
 	int16_t out;
 	int32_t tmp;
 	asm volatile("ssat %0, %1, %2" : "=r" (tmp) : "I" (16), "r" (val) );
-	out = (int16_t) (tmp & 0xffff); // not sure if the & 0xffff is necessary. test.
+	out = (int16_t) (tmp);
 	return out;
-#elif defined(KINETISL)
-	return 0; // TODO....
+#else
+    if (val > 32767) val = 32767;
+    else if (val < -32768) val = -32768;
+    return val;
 #endif
 }
 

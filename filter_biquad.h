@@ -53,9 +53,9 @@ public:
 
 	// Compute common filter functions
 	// http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt
-	void setLowpass(uint32_t stage, float frequency, float q = 0.7071) {
+	void setLowpass(uint32_t stage, float frequency, float q = 0.7071f) {
 		int coef[5];
-		double w0 = frequency * (2 * 3.141592654 / AUDIO_SAMPLE_RATE_EXACT);
+		double w0 = frequency * (2.0f * 3.141592654f / AUDIO_SAMPLE_RATE_EXACT);
 		double sinW0 = sin(w0);
 		double alpha = sinW0 / ((double)q * 2.0);
 		double cosW0 = cos(w0);
@@ -69,7 +69,7 @@ public:
 	}
 	void setHighpass(uint32_t stage, float frequency, float q = 0.7071) {
 		int coef[5];
-		double w0 = frequency * (2 * 3.141592654 / AUDIO_SAMPLE_RATE_EXACT);
+		double w0 = frequency * (2.0f * 3.141592654f / AUDIO_SAMPLE_RATE_EXACT);
 		double sinW0 = sin(w0);
 		double alpha = sinW0 / ((double)q * 2.0);
 		double cosW0 = cos(w0);
@@ -83,7 +83,7 @@ public:
 	}
 	void setBandpass(uint32_t stage, float frequency, float q = 1.0) {
 		int coef[5];
-		double w0 = frequency * (2 * 3.141592654 / AUDIO_SAMPLE_RATE_EXACT);
+		double w0 = frequency * (2.0f * 3.141592654f / AUDIO_SAMPLE_RATE_EXACT);
 		double sinW0 = sin(w0);
 		double alpha = sinW0 / ((double)q * 2.0);
 		double cosW0 = cos(w0);
@@ -97,7 +97,7 @@ public:
 	}
 	void setNotch(uint32_t stage, float frequency, float q = 1.0) {
 		int coef[5];
-		double w0 = frequency * (2 * 3.141592654 / AUDIO_SAMPLE_RATE_EXACT);
+		double w0 = frequency * (2.0f * 3.141592654f / AUDIO_SAMPLE_RATE_EXACT);
 		double sinW0 = sin(w0);
 		double alpha = sinW0 / ((double)q * 2.0);
 		double cosW0 = cos(w0);
@@ -111,13 +111,13 @@ public:
 	}
 	void setLowShelf(uint32_t stage, float frequency, float gain, float slope = 1.0f) {
 		int coef[5];
-		double a = pow(10.0, gain/40.0);
-		double w0 = frequency * (2 * 3.141592654 / AUDIO_SAMPLE_RATE_EXACT);
+		double a = pow(10.0, gain/40.0f);
+		double w0 = frequency * (2.0f * 3.141592654f / AUDIO_SAMPLE_RATE_EXACT);
 		double sinW0 = sin(w0);
 		//double alpha = (sinW0 * sqrt((a+1/a)*(1/slope-1)+2) ) / 2.0;
 		double cosW0 = cos(w0);
 		//generate three helper-values (intermediate results):
-		double sinsq = sinW0 * sqrt( (pow(a,2.0)+1.0)*(1.0/slope-1.0)+2.0*a );
+		double sinsq = sinW0 * sqrt( (pow(a,2.0)+1.0)*(1.0/(double)slope-1.0)+2.0*a );
 		double aMinus = (a-1.0)*cosW0;
 		double aPlus = (a+1.0)*cosW0;
 		double scale = 1073741824.0 / ( (a+1.0) + aMinus + sinsq);
@@ -130,13 +130,13 @@ public:
 	}
 	void setHighShelf(uint32_t stage, float frequency, float gain, float slope = 1.0f) {
 		int coef[5];
-		double a = pow(10.0, gain/40.0);
-		double w0 = frequency * (2 * 3.141592654 / AUDIO_SAMPLE_RATE_EXACT);
+		double a = pow(10.0, gain/40.0f);
+		double w0 = frequency * (2.0f * 3.141592654f / AUDIO_SAMPLE_RATE_EXACT);
 		double sinW0 = sin(w0);
 		//double alpha = (sinW0 * sqrt((a+1/a)*(1/slope-1)+2) ) / 2.0;
 		double cosW0 = cos(w0);
 		//generate three helper-values (intermediate results):
-		double sinsq = sinW0 * sqrt( (pow(a,2.0)+1.0)*(1.0/slope-1.0)+2.0*a );
+		double sinsq = sinW0 * sqrt( (pow(a,2.0)+1.0)*(1.0/(double)slope-1.0)+2.0*a );
 		double aMinus = (a-1.0)*cosW0;
 		double aPlus = (a+1.0)*cosW0;
 		double scale = 1073741824.0 / ( (a+1.0) - aMinus + sinsq);
