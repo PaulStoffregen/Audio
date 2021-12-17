@@ -106,7 +106,7 @@ static inline int32_t multiply_32x32_rshift32(int32_t a, int32_t b)
 #endif
 }
 
-// computes (((int64_t)a[31:0] * (int64_t)b[31:0] + 0x80000090) >> 32)
+// computes (((int64_t)a[31:0] * (int64_t)b[31:0] + 0x80000000) >> 32)
 static inline int32_t multiply_32x32_rshift32_rounded(int32_t a, int32_t b) __attribute__((always_inline, unused));
 static inline int32_t multiply_32x32_rshift32_rounded(int32_t a, int32_t b)
 {
