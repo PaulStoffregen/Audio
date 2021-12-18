@@ -32,79 +32,86 @@
 
 Resampler::Resampler(float attenuation, int32_t minHalfFilterLength, int32_t maxHalfFilterLength, StepAdaptionParameters settings): _targetAttenuation(attenuation)
 {
+   kaiserWindowXsq = new float[NO_EXACT_KAISER_SAMPLES-1];
+
 	_maxHalfFilterLength=max(1, min(MAX_HALF_FILTER_LENGTH, maxHalfFilterLength));
 	_minHalfFilterLength=max(1, min(maxHalfFilterLength, minHalfFilterLength));
 #ifdef DEBUG_RESAMPLER
 	while (!Serial);
 #endif
     _settings=settings;
-    kaiserWindowSamples[0]=1.;
-    double step=1./(NO_EXACT_KAISER_SAMPLES-1);
-    double* xSq=kaiserWindowXsq;
+
+    double step=1./(NO_EXACT_KAISER_SAMPLES-1.);
+    float* xSq=kaiserWindowXsq;
     for (uint16_t i = 1; i <NO_EXACT_KAISER_SAMPLES; i++){
-        double x=(double)i*step;
-        *xSq++=(1.-x*x);
+        double x=i*step;
+        *xSq++= (float)(1.-x*x);
     }
 }
-void Resampler::getKaiserExact(double beta){
-    const double thres=1e-10;   
-    double* winS=&kaiserWindowSamples[1];
-    double* t=tempRes;
+Resampler::~Resampler(){
+    delete [] kaiserWindowXsq;
+}
+void Resampler::getKaiserExact(float*kaiserWindowSamples, double beta){
+    const float thres=0.00000001f;   
+    float* winS=kaiserWindowSamples;
+    *winS++ =1.f;
+    float tempRes[NO_EXACT_KAISER_SAMPLES-1];
+    float* t=tempRes;
     for (uint16_t i = 1; i <NO_EXACT_KAISER_SAMPLES; i++){
-        *winS++=1.;
-        *t++=1.;
+        *winS++=1.f;
+        *t++=1.f;
     }
-    double denomLastSummand=1.;
-    const double halfBetaSq=beta*beta/4.;
-    double denom=1.;
-    double i=1.;
+    float denomLastSummand=1.f;
+    const float halfBetaSq=beta*beta*0.25f;
+    float denom=1.f;
+    float i=1.f;
     while(i < 1000){
         denomLastSummand*=(halfBetaSq/(i*i));
-        i+=1.;
+        i+=1.f;
         denom+=denomLastSummand;
         t=tempRes;
-        winS=&kaiserWindowSamples[1];
-        double* xSq=kaiserWindowXsq;
+        winS=kaiserWindowSamples+1;
+        float* xSq=kaiserWindowXsq;
         for (uint16_t j=0; j<  NO_EXACT_KAISER_SAMPLES-1;j++){
             (*t)*=(*xSq);
-            double summand=(denomLastSummand*(*t));
-            (*winS)+=summand;
+            float summand=(denomLastSummand* *t++);
+            *winS+=summand;
             if (summand< thres){
                 break;
             }
             ++winS;
-            ++t;
             ++xSq;
         }  
         if (denomLastSummand< thres){
             break;
         }
     }
-    winS=&kaiserWindowSamples[1];
+    winS=kaiserWindowSamples+1;
+    denom=1.f/denom;
     for (int32_t i = 0; i <NO_EXACT_KAISER_SAMPLES-1; i++){
-        *winS++/=denom;
+        *winS++*=denom;
     }
 }
     
 void Resampler::setKaiserWindow(double beta, int32_t noSamples){
-    getKaiserExact(beta);
+    float kaiserWindowSamples[NO_EXACT_KAISER_SAMPLES];
+    getKaiserExact(kaiserWindowSamples, beta);
     double step=(double)(NO_EXACT_KAISER_SAMPLES-1)/(double)(noSamples-1);
     double xPos=step;
     float* filterCoeff=filter;
-    *filterCoeff=1.;
-    ++filterCoeff;
-    int32_t lower=(int)(xPos);
-    double* windowLower=&kaiserWindowSamples[lower];
-    double* windowUpper=&kaiserWindowSamples[lower+1];
+    *filterCoeff++=1.f;
+    int32_t lower=(int32_t)(xPos);
+    float* windowLower=&kaiserWindowSamples[lower];
+    float* windowUpper=&kaiserWindowSamples[lower+1];
     for (int32_t i =0; i< noSamples-2; i++){
-        double lambda=xPos-lower;
-        if (lambda > 1.){
-            lambda-=1.;
+        float lambda=(float)xPos-(float)lower;
+        if (lambda > 1.f){
+            lambda-=1.f;
             ++windowLower;
             ++windowUpper;
             lower++;
         }
-        *filterCoeff++=(float)(lambda*(*windowUpper)+(1.-lambda)*(*windowLower));
+        *filterCoeff++=(lambda*(*windowUpper)+(1.f-lambda)*(*windowLower));
         xPos+=step;
         if (xPos>=NO_EXACT_KAISER_SAMPLES-1 || lower >=NO_EXACT_KAISER_SAMPLES-1){
             break;
@@ -116,19 +123,26 @@ void Resampler::setKaiserWindow(double beta, int32_t noSamples){
 void Resampler::setFilter(int32_t halfFiltLength,int32_t overSampling, double cutOffFrequ, double kaiserBeta){
 
     const int32_t noSamples=halfFiltLength*overSampling+1;
-    setKaiserWindow(kaiserBeta, noSamples);  
+    
+	//uint32_t beforKaiser=ARM_DWT_CYCCNT;
+    setKaiserWindow(kaiserBeta, noSamples); 
+	//uint32_t afterKaiser=ARM_DWT_CYCCNT; 
+    //if(Serial){
+    //    Serial.print("time for Kaiser: ");
+    //    double d=(afterKaiser-beforKaiser)/(double)F_CPU_ACTUAL;
+    //    Serial.println(d*1e6);
+    //}
     
     float* filterCoeff=filter;
     *filterCoeff++=(float)cutOffFrequ;
     double step=halfFiltLength/(noSamples-1.);
     double xPos=step;
     double factor=M_PI*cutOffFrequ;
-    for (int32_t i = 0; i<noSamples-1; i++ ){
+    for (int32_t i = 1; i<noSamples; i++ ){
         *filterCoeff++*=(float)((sin(xPos*factor)/(xPos*M_PI)));        
         xPos+=step;
     } 
 }
-
 double Resampler::getStep() const {
     return  _stepAdapted;
 }
@@ -141,17 +155,21 @@ int32_t Resampler::getHalfFilterLength() const{
 void Resampler::reset(){
     _initialized=false;
 }
-void Resampler::configure(float fs, float newFs){
-    // Serial.print("configure, fs: ");
-    // Serial.println(fs);
-    if (fs<=0.f || newFs <=0.f){
+void Resampler::configure(double fs, double newFs){
+    
+    if (fs<=0. || newFs * 0.5 <= 20000.){
+#ifdef DEBUG_RESAMPLER
+        if (Serial){
+            Serial.print("initialization of resampler failed");
+        }
+#endif
 		_attenuation=0.;
 		_halfFilterLength=0;
         _initialized=false;
         return;
     }
-	_attenuation=_targetAttenuation;
-    _step=(double)fs/(double)newFs;
+	_attenuation=(double)_targetAttenuation;
+    _step=fs/newFs;
     _configuredStep=_step;
     _stepAdapted=_step;
     _sum=0.;
@@ -164,17 +182,26 @@ void Resampler::configure(float fs, float newFs){
     double kaiserBeta, cutOffFrequ;
     _overSamplingFactor=1024;
     if (fs <= newFs){
-		_attenuation=0;
         cutOffFrequ=1.;
-        kaiserBeta=10.;
-        _halfFilterLength=_minHalfFilterLength;
+        kaiserBeta=_settings.kaiserBetaDefault;//20
+        _attenuation=kaiserBeta/0.1102+8.7;
+        if (fs*0.5 > 20000){
+            //no aliasing in the audible frequency range
+            _halfFilterLength=_minHalfFilterLength;
+        }
+        else {
+            //there will be aliasing in the audible frequency range, but we try to minimize it and choose the filter as long as possible
+            _halfFilterLength=_maxHalfFilterLength;    
+        }
     }
     else{
         cutOffFrequ=newFs/fs;
-        double b=(2.*(0.5*(double)newFs-20000.)/(double)fs);   //this transition band width causes aliasing. However the generated frequencies are above 20kHz
+        double b=(2.*(0.5*newFs-20000.)/fs);   //this transition band width causes aliasing. However the generated frequencies are above 20kHz
 #ifdef DEBUG_RESAMPLER
-        Serial.print("b: ");
-        Serial.println(b);
+        if (Serial){
+            Serial.print("b: ");
+            Serial.println(b);
+        }
 #endif
         int32_t hfl=(int32_t)((_attenuation-8.)/(2.*2.285*TWO_PI*b)+0.5);
         if (hfl >= _minHalfFilterLength && hfl <= _maxHalfFilterLength){
@@ -197,6 +224,12 @@ void Resampler::configure(float fs, float newFs){
         else{
             kaiserBeta=0.;
         }
+        if (newFs*0.5 - 20000 > (fs -newFs)*0.5 && kaiserBeta < _settings.kaiserBetaDefault){
+            //newFs is smaller than fs, but no aliasing below 20kHz
+            double l=((fs -newFs)*0.5)/(newFs*0.5 - 20000.);  //we know that numerator and denominator are larger than zero
+            kaiserBeta=l*kaiserBeta +(1.-l)*_settings.kaiserBetaDefault;
+            _attenuation=kaiserBeta/0.1102+8.7;  
+        }
         int32_t noSamples=_halfFilterLength*_overSamplingFactor+1;
         if (noSamples > MAX_FILTER_SAMPLES){
             int32_t f = (noSamples-1)/(MAX_FILTER_SAMPLES-1)+1;
@@ -204,21 +237,30 @@ void Resampler::configure(float fs, float newFs){
         }
     }
 
-#ifdef DEBUG_RESAMPLER
-    Serial.print("fs: ");
-    Serial.println(fs);
-    Serial.print("cutOffFrequ: ");
-    Serial.println(cutOffFrequ);
-    Serial.print("filter length: ");
-    Serial.println(2*_halfFilterLength+1);
-    Serial.print("overSampling: ");
-    Serial.println(_overSamplingFactor);
-    Serial.print("kaiserBeta: ");
-    Serial.println(kaiserBeta, 12);
-    Serial.print("_step: ");
-    Serial.println(_step, 12);
+#ifdef DEBUG_RESAMPLER    
+    if (Serial){
+        Serial.print("fs: ");
+        Serial.println(fs);
+        Serial.print("cutOffFrequ: ");
+        Serial.println(cutOffFrequ);
+        Serial.print("filter length: ");
+        Serial.println(2*_halfFilterLength+1);
+        Serial.print("overSampling: ");
+        Serial.println(_overSamplingFactor);
+        Serial.print("kaiserBeta: ");
+        Serial.println(kaiserBeta, 12);
+        Serial.print("_step: ");
+        Serial.println(_step, 12);
+    }
 #endif
+    //uint32_t beforKaiser=ARM_DWT_CYCCNT;
     setFilter(_halfFilterLength, _overSamplingFactor, cutOffFrequ, kaiserBeta);
+	// uint32_t afterKaiser=ARM_DWT_CYCCNT; 
+    // if(Serial){
+    //    Serial.print("time for filter: ");
+    //    double d=(afterKaiser-beforKaiser)/(double)F_CPU_ACTUAL;
+    //    Serial.println(d*1e6);
+    // }
     _filterLength=_halfFilterLength*2;
     for (uint8_t i =0; i< MAX_NO_CHANNELS; i++){
         _endOfBuffer[i]=&_buffer[i][_filterLength];
@@ -229,8 +271,8 @@ void Resampler::configure(float fs, float newFs){
 bool Resampler::initialized() const {
     return _initialized;
 }
-
-void Resampler::resample(float* input0, float* input1, uint16_t inputLength, uint16_t& processedLength, float* output0, float* output1,uint16_t outputLength, uint16_t& outputCount) {
+#ifdef OLDIMPLEMENTATION
+void Resampler::resample(float* input0, float* input1, int32_t inputLength, int32_t& processedLength, float* output0, float* output1,int32_t outputLength, int32_t& outputCount) {
     outputCount=0;
     int32_t successorIndex=(int32_t)(ceil(_cPos));  //negative number -> currently the _buffer0 of the last iteration is used
     float* ip0, *ip1, *fPtr;
@@ -248,8 +290,8 @@ void Resampler::resample(float* input0, float* input1, uint16_t inputLength, uin
             ip1=input1+indexData;
         }  
         else {
-            ip0=_buffer[0]+indexData+_filterLength; 
-            ip1=_buffer[1]+indexData+_filterLength; 
+            ip0=_endOfBuffer[0]+indexData; 
+            ip1=_endOfBuffer[1]+indexData; 
         }       
         fPtr=filter+rightIndex;
         if (rightIndex==_overSamplingFactor*_halfFilterLength){
@@ -310,7 +352,7 @@ void Resampler::resample(float* input0, float* input1, uint16_t inputLength, uin
         processedLength=inputLength;
     }
     else{
-        processedLength=min(inputLength, (int16_t)floor(_cPos + _halfFilterLength));
+        processedLength=min(inputLength, (int32_t)floor(_cPos + _halfFilterLength));
     }
     //fill _buffer
     const int32_t indexData=processedLength-_filterLength;
@@ -340,8 +382,168 @@ void Resampler::resample(float* input0, float* input1, uint16_t inputLength, uin
         _cPos=-_halfFilterLength;
     }
 }
+#else
+void Resampler::resample(float* input0, float* input1, int32_t inputLength, int32_t& processedLength, float* output0, float* output1, int32_t outputLength, int32_t& outputCount) {
+    outputCount=0;
+    int32_t successorIndex=(int32_t)(ceil(_cPos));  //negative number -> currently the _buffer0 of the last iteration is used
+   
+    const int32_t halfFLengthUpsampledM1 = (_halfFilterLength-1)*_overSamplingFactor;
+    const int32_t overSamplingFactorM1=_overSamplingFactor-1;
+    const float *ipR0, *ipR1, *ipL0, *ipL1;
 
-void Resampler::fixStep(){
+    float res0, res1;
+    const uint16_t hfl = _halfFilterLength;
+    
+    while (floor(_cPos + hfl) < inputLength && outputCount < outputLength){        
+       
+        // construction of the filter
+        float dist=(float)(successorIndex-_cPos);
+        int32_t rightWingIndex = successorIndex+hfl-1;
+        int32_t leftWingIndex = successorIndex-hfl;
+
+        if (dist == 0.f){     
+            ipR0=input0+rightWingIndex+1;               
+            ipR1=input1+rightWingIndex+1;       
+        }
+        else { 
+            ipR0=input0+rightWingIndex;               
+            ipR1=input1+rightWingIndex; 
+        }  
+        res0=0.f;
+        res1=0.f;
+        
+        if (_cPos < 0.){
+            //leftWingIndex + _halfFilterLength must still be negative -> the left wing sum only uses data from the buffer
+            //rightWingIndex is always greater or equal to zero -> after rightWingIndex iterations, the right wing reaches the first sample of the input data             
+            ipL0=_endOfBuffer[0]+leftWingIndex; 
+            ipL1=_endOfBuffer[1]+leftWingIndex; 
+            
+            leftWingIndex=1; //important: prevents entering the if-statement below
+        }
+        else if (leftWingIndex < 0){
+            //rightWingIndex is always greater or equal to zero -> after rightWingIndex iterations, the right wing reaches the first sample of the input data 
+            ipL0=_endOfBuffer[0]+leftWingIndex; 
+            ipL1=_endOfBuffer[1]+leftWingIndex; 
+            rightWingIndex = -2;//important: prevents entering the if-statement below
+        }
+        else {
+            //we left the buffer region completely
+            ipL0=input0+leftWingIndex; 
+            ipL1=input1+leftWingIndex; 
+            rightWingIndex = -2;//important: prevents entering the if-statement below
+            leftWingIndex=1; //important: prevents entering the if-statement below
+        }
+
+        if (dist == 0.f){
+            if (_cPos >= 0. || rightWingIndex != hfl-1){
+                rightWingIndex++;
+            }
+            const float* fPtr = filter + hfl*_overSamplingFactor;
+            for (uint16_t i =0; i< hfl; i++){
+                res0 += (*ipL0++ + *ipR0--) * *fPtr;
+                res1 += (*ipL1++ + *ipR1--) * *fPtr;
+                
+                fPtr-=_overSamplingFactor;  
+                if (i == rightWingIndex){
+                    //from now on both wings use data from the buffer
+                    ipR0=_endOfBuffer[0]-1;               
+                    ipR1=_endOfBuffer[1]-1;
+                }
+                else if (i==(-leftWingIndex-1)){
+                    //from now on both wings use data from the buffer
+                    ipL0=input0; 
+                    ipL1=input1; 
+                }
+                
+            }
+            res0 += *filter * *ipR0;
+            res1 += *filter * *ipR1;     
+            *output0++ =res0;
+            *output1++ =res1;       
+        }
+        else{ 
+            float distScaled=dist*_overSamplingFactor;
+            int32_t successorIndexFilterR = (int32_t)ceilf(distScaled);
+            int32_t successorIndexFilterL = -(successorIndexFilterR - _overSamplingFactor -1);              
+            float w0 = (float)successorIndexFilterR - distScaled;
+            float w1 = 1.f-w0;
+            
+            const float* fPtrRight = filter + successorIndexFilterR+halfFLengthUpsampledM1;
+            const float* fPtrLeft = filter + successorIndexFilterL+halfFLengthUpsampledM1;
+        
+            for (uint16_t i =0; i< hfl; i++){
+                float rightWingCoeff= w1 * *fPtrRight--;
+                rightWingCoeff += w0 * *fPtrRight;
+                float leftWingCoeff= w0 * *fPtrLeft--;
+                leftWingCoeff += w1 * *fPtrLeft;
+
+                res0 += *ipL0++ * leftWingCoeff;
+                res0 += *ipR0-- * rightWingCoeff;
+                res1 += *ipL1++ * leftWingCoeff;
+                res1 += *ipR1-- * rightWingCoeff;
+                
+                fPtrRight-=overSamplingFactorM1;
+                fPtrLeft-=overSamplingFactorM1;
+                if (i == rightWingIndex){
+                    //from now on both wings use data from the buffer
+                    ipR0=_endOfBuffer[0]-1;               
+                    ipR1=_endOfBuffer[1]-1;
+                }
+                else if (i==(-leftWingIndex-1)){
+                    //from now on both wings use data from the buffer
+                    ipL0=input0; 
+                    ipL1=input1; 
+                }
+            }            
+            
+            *output0++ =res0;//*w0 +res01*w1;
+            *output1++ =res1;//*w0 +res11*w1;
+        }
+        outputCount++;
+
+        _cPos+=_stepAdapted;
+        while (_cPos >successorIndex){
+            successorIndex++;
+        }
+    }
+    if(outputCount < outputLength){
+        //ouput vector not full -> we ran out of input samples
+        processedLength=inputLength;
+    }
+    else{
+        processedLength=min(inputLength, (int32_t)floor(_cPos + hfl));
+    }
+    //fill _buffer
+    const int32_t indexData=processedLength-_filterLength;
+    if (indexData>=0){
+        float* ip0=input0+indexData;
+        float* ip1=input1+indexData;
+        const unsigned long long bytesToCopy= _filterLength*sizeof(float);
+        memcpy((void *)_buffer[0], (void *)ip0, bytesToCopy);
+        memcpy((void *)_buffer[1], (void *)ip1, bytesToCopy);    
+    }  
+    else {
+        float* b0=_buffer[0];
+        float* b1=_buffer[1];
+        float* ip0=_endOfBuffer[0]+indexData; 
+        float* ip1=_endOfBuffer[1]+indexData;
+        for (int32_t i =0; i< _filterLength; i++){
+            if(ip0==_endOfBuffer[0]){
+                ip0=input0;
+                ip1=input1;
+            }        
+            *b0++ = *ip0++;
+            *b1++ = *ip1++;
+        }  
+    }
+    _cPos-=processedLength;
+    if (_cPos < -hfl){
+        _cPos=-hfl;
+    }
+}
+#endif
+
+void Resampler::fixIncrement(){
     if (!_initialized){
         return;
     }
@@ -350,21 +552,26 @@ void Resampler::fixStep(){
     _oldDiffs[0]=0.;
     _oldDiffs[1]=0.;
 }
-void Resampler::addToPos(double val){
-    if(val < 0){
-        return;
+void Resampler::setPos(double val){
+    if(val < 0.){
+        val=0.;
     }
-    _cPos+=val;
+    else if (val >=1.){     
+        val=0.999;
+    }   
+     _cPos=val-(double)_halfFilterLength;
 }
 
-bool Resampler::addToSampleDiff(double diff){
+bool Resampler::updateIncrement(double diff){
    
-    _oldDiffs[0]=_oldDiffs[1];
-    _oldDiffs[1]=(1.-_settings.alpha)*_oldDiffs[1]+_settings.alpha*diff;
-    const double slope=_oldDiffs[1]-_oldDiffs[0];
     _sum+=diff;
-    double correction=_settings.kp*diff+_settings.kd*slope+_settings.ki*_sum;
-    const double oldStepAdapted=_stepAdapted;
+    double correction=_settings.kp*diff+_settings.ki*_sum;
+     if (abs(diff) > 2.*_settings.kpIncreaseThrs){
+        correction+= 2.*_settings.kp*(diff-_settings.kpIncreaseThrs);
+    }
+    else if (abs(diff) > _settings.kpIncreaseThrs){
+        correction+= _settings.kp*(diff-_settings.kpIncreaseThrs);
+    }
     _stepAdapted=_step+correction;
    
     if (abs(_stepAdapted/_configuredStep-1.) > _settings.maxAdaption){
@@ -373,13 +580,18 @@ bool Resampler::addToSampleDiff(double diff){
     }
    
     bool settled=false;
-    
-    if ((abs(oldStepAdapted- _stepAdapted)/_stepAdapted < _settledThrs*abs(diff) && abs(diff) > 1.5*1e-6)) {
+    _oldDiffs[0]=_oldDiffs[1];
+    _oldDiffs[1]=(1.-_settings.alpha)*_oldDiffs[1]+_settings.alpha*diff;
+    const double slope=_oldDiffs[1]-_oldDiffs[0];
+    if ((abs(slope/(double)_settings.periodeLength) < _settledThrs*abs(diff) &&
+        abs(diff) > 2.*1e-6)) { 
         settled=true;
     }
+   
     return settled;
 }
 
 double Resampler::getXPos() const{
+    //0. <= _cPos < 1.  unit: input sample
     return _cPos+(double)_halfFilterLength;
 }
