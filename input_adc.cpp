@@ -209,7 +209,7 @@ void AudioInputAnalog::update(void)
 	transmit(out_left);
 	release(out_left);
 }
-#endif
+#endif  // KINETISK
 
 
 
@@ -424,6 +424,19 @@ void AudioInputAnalog::update(void)
 	release(output);
 }
 
+#endif // __IMXRT1062__
 
 
-#endif
+#if defined(KINETISL)
+
+// TODO: ADC implementation needed for Teensy LC
+
+void AudioInputAnalog::init(uint8_t pin)
+{
+}
+
+void AudioInputAnalog::update(void)
+{
+}
+
+#endif // KINETISL
