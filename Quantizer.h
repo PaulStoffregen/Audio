@@ -40,9 +40,9 @@ public:
     ///@param audio_sample_rate currently only 44.1kHz and 48kHz are supported
     Quantizer(float audio_sample_rate);
     void configure(bool noiseShaping, bool dither, float factor);
-    void quantize(float* input, int16_t* output, uint16_t length);
+    void quantize(float* input, int16_t* output, int32_t length);
     //attention outputInterleaved must have length 2*length
-    void quantize(float* input0, float* input1, int32_t* outputInterleaved, uint16_t length);
+    void quantize(float* input0, float* input1, int32_t* outputInterleaved, int32_t length);
     void reset();
         
 private:

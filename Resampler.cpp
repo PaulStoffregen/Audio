@@ -64,15 +64,13 @@ void Resampler::getKaiserExact(float*kaiserWindowSamples, double beta){
     float denomLastSummand=1.f;
     const float halfBetaSq=beta*beta*0.25f;
     float denom=1.f;
-    float i=1.f;
-    while(i < 1000){
-        denomLastSummand*=(halfBetaSq/(i*i));
-        i+=1.f;
+    for (uint32_t i =1; i < 1000; i++){
+        denomLastSummand*=(halfBetaSq/(float)(i*i));
         denom+=denomLastSummand;
         t=tempRes;
         winS=kaiserWindowSamples+1;
         float* xSq=kaiserWindowXsq;
-        for (uint16_t j=0; j<  NO_EXACT_KAISER_SAMPLES-1;j++){
+        for (uint16_t j=1; j<  NO_EXACT_KAISER_SAMPLES;j++){
             (*t)*=(*xSq);
             float summand=(denomLastSummand* *t++);
             *winS+=summand;
@@ -126,12 +124,12 @@ void Resampler::setFilter(int32_t halfFiltLength,int32_t overSampling, double cu
     
 	//uint32_t beforKaiser=ARM_DWT_CYCCNT;
     setKaiserWindow(kaiserBeta, noSamples); 
-	//uint32_t afterKaiser=ARM_DWT_CYCCNT; 
-    //if(Serial){
+	// uint32_t afterKaiser=ARM_DWT_CYCCNT; 
+    // if(Serial){
     //    Serial.print("time for Kaiser: ");
     //    double d=(afterKaiser-beforKaiser)/(double)F_CPU_ACTUAL;
     //    Serial.println(d*1e6);
-    //}
+    // }
     
     float* filterCoeff=filter;
     *filterCoeff++=(float)cutOffFrequ;
@@ -253,7 +251,7 @@ void Resampler::configure(double fs, double newFs){
         Serial.println(_step, 12);
     }
 #endif
-    //uint32_t beforKaiser=ARM_DWT_CYCCNT;
+    // uint32_t beforKaiser=ARM_DWT_CYCCNT;
     setFilter(_halfFilterLength, _overSamplingFactor, cutOffFrequ, kaiserBeta);
 	// uint32_t afterKaiser=ARM_DWT_CYCCNT; 
     // if(Serial){

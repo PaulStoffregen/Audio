@@ -107,7 +107,7 @@ void Quantizer::reset(){
      memset(_buffer0, 0, NOISE_SHAPE_F_LENGTH*sizeof(float));
      memset(_buffer1, 0, NOISE_SHAPE_F_LENGTH*sizeof(float));
 }
-void Quantizer::quantize(float* input, int16_t* output, uint16_t length){
+void Quantizer::quantize(float* input, int16_t* output, int32_t length){
     float xn, xnD, error;
     const float f2 = 1.f/1000000.f;
 #ifdef DEBUG_QUANTIZER
@@ -115,7 +115,7 @@ void Quantizer::quantize(float* input, int16_t* output, uint16_t length){
     const float factor=(powf(2.f, 15.f)-1.f)/debugFF;
 #endif
 
-    for (uint16_t i =0; i< length; i++){
+    for (int32_t i =0; i< length; i++){
         xn= SAMPLEINVALID(*input) ? 0.f : *input*_factor; //-_fOutputLastIt0 according to paper     
         ++input;
         if (_noiseShaping){
@@ -166,14 +166,14 @@ void Quantizer::quantize(float* input, int16_t* output, uint16_t length){
     }
 }
 
-void Quantizer::quantize(float* input0, float* input1, int32_t* outputInterleaved, uint16_t length){
+void Quantizer::quantize(float* input0, float* input1, int32_t* outputInterleaved, int32_t length){
     float xn0, xnD0, error0,xnDR0, xn1, xnD1, error1,xnDR1;
     const float f2 = 1.f/1000000.f;
 #ifdef DEBUG_QUANTIZER
     float debugFF=1024.f;
     const float factor=(powf(2.f, 15.f)-1.f)/debugFF;
 #endif
-    for (uint16_t i =0; i< length; i++){
+    for (int32_t i =0; i< length; i++){
         xn0= SAMPLEINVALID(*input0) ? 0.f : *input0*_factor; //-_fOutputLastIt0 according to paper        
         ++input0;
         xn1= SAMPLEINVALID(*input1) ? 0.f : *input1*_factor; //-_fOutputLastIt0 according to paper  
