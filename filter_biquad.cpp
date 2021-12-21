@@ -114,4 +114,8 @@ void AudioFilterBiquad::update(void)
 	if (block) release(block);
 }
 
+void AudioFilterBiquad::setCoefficients(uint32_t stage, const int *coefficients)
+{
+}
+
 #endif

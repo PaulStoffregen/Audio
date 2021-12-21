@@ -167,5 +167,13 @@ void AudioAnalyzeToneDetect::update(void)
 	if (block) release(block);
 }
 
+void AudioAnalyzeToneDetect::set_params(int32_t coef, uint16_t cycles, uint16_t len)
+{
+}
+
+float AudioAnalyzeToneDetect::read(void)
+{
+	return 0;
+}
 #endif
 
