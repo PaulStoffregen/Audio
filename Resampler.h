@@ -54,7 +54,7 @@ class Resampler {
             double kaiserBetaDefault=18.;
             int32_t periodeLength = 128;        // number of output samples between consecutive calls of 'updateIncrement'
         };
-        Resampler(float attenuation=100, int32_t minHalfFilterLength=25, int32_t maxHalfFilterLength=80, StepAdaptionParameters settings=StepAdaptionParameters());
+        Resampler(float attenuation=100, int32_t minHalfFilterLength=20, int32_t maxHalfFilterLength=80, StepAdaptionParameters settings=StepAdaptionParameters());
         ~Resampler();
         void reset();
         ///@param attenuation target attenuation [dB] of the anti-aliasing filter. Only used if newFs<fs. The attenuation can't be reached if the needed filter length exceeds 2*MAX_FILTER_SAMPLES+1
