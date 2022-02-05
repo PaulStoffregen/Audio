@@ -6,7 +6,7 @@
 
 AudioPlaySdWav           playWav1;
 AudioOutputUSB           audioOutput; // must set Tools > USB Type to Audio
-AudioOutputAnalog        dac;
+AudioOutputAnalog        dac; // change this to AudioOutputI2S for boards without DAC output
 AudioConnection          patchCord1(playWav1, 0, audioOutput, 0);
 AudioConnection          patchCord2(playWav1, 1, audioOutput, 1);
 AudioConnection          patchCord3(playWav1, 0, dac, 0);

@@ -2848,34 +2848,60 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	</table>
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>setMaxBuffers</span>(uint8);</p>
-	<p class=desc>Set the maximum buffer block count for the queue to limit its size - by default 32 blocks are used on Teensy3's
-	  and 80 on Teeny 4's - this allows the value to be reduced so that the queue cannot get too far ahead, nor use up lots of
+	<p class=desc>Set the maximum buffer block count for the queue to limit its size - by default 32 blocks are used on Teensy 3.x
+	  and 80 on Teensy 4.x - this allows the value to be reduced so that the queue cannot get too far ahead, nor use up lots of
 	  audio blocks you might want for other purposes.  The minimum number of buffer blocks is 2.
 	</p>
 	<p class=func><span class=keyword>play</span>(int16);</p>
 	<p class=desc>add a single sample to the queue - no need to use getBuffer() or playBuffer() as this
-	  method does the necessary handling.  Note this method may block waiting for a spare buffer if the queue is full
+	  method does the necessary handling.  
+	  		</p>	  
+	  <p class=desc>If the behaviour is set to ORIGINAL then this method may block waiting for a spare buffer if the queue is full.
+	  		</p>	  
+	  <p class=desc>If the behaviour is set to NON_STALLING then this method may return a non-zero value: 
+	  in this case the call must be re-tried, passing in the original sample value.
 	</p>
 	<p class=func><span class=keyword>play</span>(int16[], length);</p>
 	<p class=desc>add multiple samples to the queue - no need to use getBuffer() or playBuffer() as this
-	  method does the necessary handling.  Note this method may block waiting for a spare buffer if the queue is full.
-	  The length should be the number of samples in the array.
+	  method does the necessary handling.  
+	  The length should be the number of samples in the array, which need not be a multiple of AUDIO_BLOCK_SAMPLES.
+	  <p class=desc>If the behaviour is set to ORIGINAL then this method may block waiting for a spare buffer if the queue is full.
+		</p>	  
+	  <p class=desc>If the behaviour is set to NON_STALLING then this method will return the number of samples unused (due to unavailable
+	  audio blocks or queue space): if non-zero then the call must be re-tried, with an updated array pointer and length.
+		</p>
 	</p>
 	<p class=func><span class=keyword>getBuffer</span>();</p>
-	<p class=desc>Returns a pointer to an array of 128 int16.  This buffer
+	<p class=desc>Returns a pointer to an array of AUDIO_BLOCK_SAMPLES (usually 128) int16.  This buffer
 	  is within the audio library memory pool, providing the most efficient
 	  way to input data to the audio system.  The buffer is likely to be
-	  populated by previously used data, so the entire 128 words should be
-	  written before calling playBuffer().  Only a single buffer should be
-	  requested at a time.  This function may return NULL if no memory is
-	  available.	  
+	  populated by previously used data, so the entire AUDIO_BLOCK_SAMPLES samples should be
+	  written before calling playBuffer().  Only a single buffer is allocated at any one time: 
+	  repeated calls to getBuffer() without calling playBuffer() will yield the same address.
+	<p class=desc>
+	  If the behaviour is set to ORIGINAL then this function will wait (possibly forever) for memory to become available. 
+	  If set to NON_STALLING then function may return NULL if no memory is available.			
+		</p>
 	</p>
 	<p>You may find it easier to use the play() methods unless performance is crucial.
 	</p>
 	<p class=func><span class=keyword>playBuffer</span>();</p>
 	<p class=desc>Transmit the buffer previously obtained from getBuffer().  If you use the play() methods you should not use this.
 	</p>
+	<p class=desc>
+	  If the behaviour is set to ORIGINAL then this function will wait (up to 2.9ms) for a queue space to become available. 
+	  If set to NON_STALLING then function may return a non-zero value if no queue space is free: 
+	  in this case the call must be re-tried later, before any further call to getBuffer() is made.
+		</p>
+	<p class=func><span class=keyword>setBehaviour</span>(value);</p>
+	<p class=desc>Value should be AudioPlayQueue::ORIGINAL to preserve the original behaviour of getBuffer() and playBuffer(), 
+		which can both stall until audio blocks or queue entries become available, with consequences for system performance.
+		Setting the value to AudioPlayQueue::NON_STALLING results in all the above functions returning promptly, but possibly
+		with a status indicating failure or a need to re-try. See the PlayQueueDemo example.
+	</p>
 	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Queues &gt; PlayQueueDemo
+	</p>
 		<p><a href="http://community.arm.com/groups/embedded/blog/2014/05/23/led-video-panel-at-maker-faire-2014" target="_blank">4320 LED Video+Sound Project</a>
 		</p>
 	<!--

@@ -26,7 +26,7 @@
 /*
  by Alexander Walch
  */
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
+#if defined(__IMXRT1062__)
 
 #include "async_input_spdif3.h"
 #include "output_spdif3.h"
@@ -436,6 +436,27 @@ double AsyncAudioInputSPDIF3::getAttenuation() const{
 int32_t AsyncAudioInputSPDIF3::getHalfFilterLength() const{
 	return _resampler.getHalfFilterLength();
 }
+
+#endif // __IMXRT1062__
+
+
+#if defined(__MK66FX1M0__) || defined(__MK64FX512__) || defined(__MK20DX256__) || defined(__MKL26Z64__)
+// empty code to allow compile (but no sound input) on other Teensy models
+
+#include "async_input_spdif3.h"
+AsyncAudioInputSPDIF3::AsyncAudioInputSPDIF3(bool dither, bool noiseshaping,float attenuation, int32_t minHalfFilterLength, int32_t maxHalfFilterLength):
+	AudioStream(0, NULL), _resampler(attenuation, minHalfFilterLength, maxHalfFilterLength)
+	{ }
+void AsyncAudioInputSPDIF3::begin() { }
+void AsyncAudioInputSPDIF3::update(void) { }
+double AsyncAudioInputSPDIF3::getBufferedTime() const { return 0; }
+double AsyncAudioInputSPDIF3::getInputFrequency() const { return 0; }
+bool AsyncAudioInputSPDIF3::isLocked() { return false; }
+double AsyncAudioInputSPDIF3::getTargetLantency() const { return 0; }
+double AsyncAudioInputSPDIF3::getAttenuation() const { return 0; }
+int32_t AsyncAudioInputSPDIF3::getHalfFilterLength() const { return 0; }
+AsyncAudioInputSPDIF3::~AsyncAudioInputSPDIF3() { }
+
 
 #endif
 

@@ -24,11 +24,11 @@
  https://www.mikrocontroller.net/articles/S/PDIF
  https://en.wikipedia.org/wiki/S/PDIF
 */
-
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
-
 #include <Arduino.h>
 #include "output_spdif3.h"
+
+#if defined(__IMXRT1062__)
+
 #include "utility/imxrt_hw.h"
 #include "memcpy_audio.h"
 #include <math.h>
@@ -219,7 +219,7 @@ uint32_t AudioOutputSPDIF3::dpll_Gain(void)
 	return spdif_gain[SPDIF_DPLL_GAIN];
 }
 
-PROGMEM
+FLASHMEM
 void AudioOutputSPDIF3::config_spdif3(void)
 {
 	delay(1); //WHY IS THIS NEEDED?
@@ -284,5 +284,16 @@ void AudioOutputSPDIF3::config_spdif3(void)
 		SPDIF_STC_TXCLK_SOURCE(1) |	//tx_clk input (from SPDIF0_CLK_ROOT)
 		SPDIF_STC_TXCLK_DF(clkdiv - 1);
 }
+
+#endif // __IMXRT1062__
+
+
+#if defined(__MK66FX1M0__) || defined(__MK64FX512__) || defined(__MK20DX256__) || defined(__MKL26Z64__)
+// empty code to allow compile (but no sound output) on other Teensy models
+
+void AudioOutputSPDIF3::update(void) { }
+void AudioOutputSPDIF3::begin(void) { }
+void AudioOutputSPDIF3::mute_PCM(const bool mute) { }
+bool AudioOutputSPDIF3::pll_locked(void) { return false; }
 
 #endif
