@@ -3211,7 +3211,8 @@ The actual packets are taken
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
 	<p>Create a modulated sine wave, using any audio signal to continuously
-		modulate the sine wave frequency.</p>
+		modulate the sine wave frequency.  Note: limited modulation range,
+		use waveformMod for FM synthesis needing wide modulation range.</p>
 	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -3244,7 +3245,14 @@ The actual packets are taken
 	</p>
 -->
 	<h3>Notes</h3>
-	<p></p>
+	<p>This modulated sine wave offers only limited range, and the control
+		input scales differently than "volt per octave" commonly used
+		with FM synthesis.  Use the newer AudioSynthWaveformModulated
+		(waveformMod) waveform when wide range is needed.  This simple
+		sine wave uses a very simple algorithm, written in the earliest
+		versions of the Teensy Audio Library.  The newer waveformMod
+		offers up to 12 octaves modulation with control input mapped
+		to modulation in the way commonly used by audio synthesis.</p>
 </script>
 <script type="text/x-red" data-template-name="AudioSynthWaveformSineModulated">
 	<div class="form-row">
