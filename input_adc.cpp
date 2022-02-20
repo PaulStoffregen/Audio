@@ -24,7 +24,6 @@
  * THE SOFTWARE.
  */
 
- 
 #include <Arduino.h>
 #include "input_adc.h"
 #include "utility/dspinst.h"
@@ -213,20 +212,19 @@ void AudioInputAnalog::update(void)
 
 
 
-#if defined(__IMXRT1062__)
+
+
+#if defined(__IMXRT1062__) // Teensy 4.0, 4.1, MicroMod
 
 #include <Arduino.h>
 #include "input_adc.h"
 
 extern "C" void xbar_connect(unsigned int input, unsigned int output);
 
-#define FILTERLEN 15
-
 DMAChannel AudioInputAnalog::dma(false);
-// TODO: how much extra space is needed to avoid wrap-around timing?  200 seems a safe guess
+// need at least FILTERLEN extra samples, but add a safety margin so the DMA won't
+// overwrite the oldest samples if we have some latency before calling update()
 static __attribute__((aligned(32))) uint16_t adc_buffer[AUDIO_BLOCK_SAMPLES*4+200];
-static int16_t capture_buffer[AUDIO_BLOCK_SAMPLES*4+FILTERLEN];
-// TODO: these big buffers should be in DMAMEM, rather than consuming precious DTCM
 
 PROGMEM static const uint8_t adc2_pin_to_channel[] = {
 	7,      // 0/A0  AD_B1_02
@@ -275,24 +273,29 @@ PROGMEM static const uint8_t adc2_pin_to_channel[] = {
 #endif
 };
 
-static const int16_t filter[FILTERLEN] = {
-	1449,
-	3676,
-	6137,
-	9966,
-	13387,
-	16896,
-	18951,
-	19957,
-	18951,
-	16896,
-	13387,
-	9966,
-	6137,
-	3676,
-	1449
+
+// http://t-filter.engineerjs.com/  (use 176400 sample freq, int 18 bit output)
+static const int16_t filter[] = {
+#if 1
+33, 125, 299, 591, 979, 1420, 1798, 1971, 1784, 1136, 26, -1391, -2811,
+-3802, -3906, -2743, -142, 3778, 8586, 13593, 17981, 20983, 22050, 20983,
+17981, 13593, 8586, 3778, -142, -2743, -3906, -3802, -2811, -1391, 26,
+1136, 1784, 1971, 1798, 1420, 979, 591, 299, 125, 33
+#else
+-12, -40, -95, -179, -282, -382, -443, -424, -298, -65, 239, 537, 736,
+755, 561, 192, -240, -577, -671, -445, 61, 686, 1189, 1337, 999, 226,
+-739, -1528, -1776, -1276, -92, 1410, 2657, 3062, 2259, 299, -2280,
+-4549, -5441, -4098, -190, 5901, 13108, 19919, 24783, 26547, 24783, 19919,
+13108, 5901, -190, -4098, -5441, -4549, -2280, 299, 2259, 3062, 2657,
+1410, -92, -1276, -1776, -1528, -739, 226, 999, 1337, 1189, 686, 61, -445,
+-671, -577, -240, 192, 561, 755, 736, 537, 239, -65, -298, -424, -443,
+-382, -282, -179, -95, -40, -12
+#endif
 };
 
+#define FILTERLEN (sizeof(filter)/2)
+
+static int16_t capture_buffer[AUDIO_BLOCK_SAMPLES*4+FILTERLEN];
 
 void AudioInputAnalog::init(uint8_t pin)
 {
@@ -300,10 +303,12 @@ void AudioInputAnalog::init(uint8_t pin)
 	const uint8_t adc_channel = adc2_pin_to_channel[pin];
 	if (adc_channel == 255) return;
 
+	//analogReadResolution(12);
+	//while (!Serial);
+	//for (int i=0; i < 16; i++) Serial.println(analogRead(pin));
+
 	// configure a timer to trigger ADC
-	// TODO: sample rate should be slightly lower than 4X AUDIO_SAMPLE_RATE_EXACT
-	//       linear interpolation is supposed to resample it to exactly 4X
-	//       the sample rate, so we avoid artifacts boundaries between captures
+	// sample rate should be very close to 4X AUDIO_SAMPLE_RATE_EXACT
 	const int comp1 = ((float)F_BUS_ACTUAL) / (AUDIO_SAMPLE_RATE_EXACT * 4.0f) / 2.0f + 0.5f;
 	TMR4_ENBL &= ~(1<<3);
 	TMR4_SCTRL3 = TMR_SCTRL_OEN | TMR_SCTRL_FORCE;
@@ -338,11 +343,22 @@ void AudioInputAnalog::init(uint8_t pin)
 		ADC_ETC_TRIG_CHAIN_CSEL0(adc2_pin_to_channel[pin]) | ADC_ETC_TRIG_CHAIN_B2B0;
 
 	// set up ADC2 for 12 bit mode, hardware trigger
-	Serial.printf("ADC2_CFG = %08X\n", ADC2_CFG);
-	ADC2_CFG |= ADC_CFG_ADTRG;
-	ADC2_CFG = ADC_CFG_MODE(2) | ADC_CFG_ADSTS(3) | ADC_CFG_ADLSMP | ADC_CFG_ADTRG |
-		ADC_CFG_ADICLK(1) | ADC_CFG_ADIV(0) /*| ADC_CFG_ADHSC*/;
-	ADC2_GC &= ~ADC_GC_AVGE; // single sample, no averaging
+	//  ADLPC=0, ADHSC=1, 12 bit mode, 40 MHz max ADC clock
+	//  ADLPC=0, ADHSC=0, 12 bit mode, 30 MHz max ADC clock
+	//  ADLPC=1, ADHSC=0, 12 bit mode, 20 MHz max ADC clock
+
+	uint32_t cfg = ADC_CFG_ADTRG;
+	cfg |= ADC_CFG_MODE(2);  // 2 = 12 bits
+	cfg |= ADC_CFG_AVGS(0);  // number of samples to average
+	cfg |= ADC_CFG_ADSTS(3); // sampling time, 0-3
+	//cfg |= ADC_CFG_ADLSMP;   // long sample time
+	cfg |= ADC_CFG_ADHSC;    // high speed conversion
+	//cfg |= ADC_CFG_ADLPC;    // low power
+	cfg |= ADC_CFG_ADICLK(0);// 0:ipg, 1=ipg/2, 3=adack (10 or 20 MHz)
+	cfg |= ADC_CFG_ADIV(2);  // 0:div1, 1=div2, 2=div4, 3=div8
+	ADC2_CFG = cfg;
+	//ADC2_GC &= ~ADC_GC_AVGE; // single sample, no averaging
+	ADC2_GC |= ADC_GC_AVGE; // use averaging
 	ADC2_HC0 = ADC_HC_ADCH(16); // 16 = controlled by ADC_ETC
 
 	// use a DMA channel to capture ADC_ETC output
@@ -361,7 +377,7 @@ void AudioInputAnalog::init(uint8_t pin)
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_ADC_ETC);
 	dma.enable();
 
-	// TODO: configure I2S1 to interrupt every 128 audio samples
+	// TODO: configure I2S1 to interrupt every 128 audio samples, run 1st half of update
 }
 
 static int16_t fir(const int16_t *data, const int16_t *impulse, int len)
@@ -372,11 +388,20 @@ static int16_t fir(const int16_t *data, const int16_t *impulse, int len)
 		sum += *data++ * *impulse++; // TODO: optimize with DSP inst and filter symmetry
 		len --;
 	}
-	sum = sum >> 15; // TODO: adjust filter coefficients for proper gain, 12 to 16 bits
-	if (sum > 32767) return 32767;
-	if (sum < -32768) return -32768;
-	return sum;
+	return signed_saturate_rshift(sum, 16, 13);
 }
+
+// simple stats for troubleshooting
+//volatile int capture_min=65535;
+//volatile int capture_max=0;
+//volatile int ac_only_min=65535;
+//volatile int ac_only_max=0;
+//volatile int filter_min=65535;
+//volatile int filter_max=0;
+//volatile int samples_count=0;
+
+int32_t AudioInputAnalog::hpf_y1 = 0;
+int32_t AudioInputAnalog::hpf_x1 = 0;
 
 void AudioInputAnalog::update(void)
 {
@@ -384,41 +409,122 @@ void AudioInputAnalog::update(void)
 	output = allocate();
 	if (output == NULL) return;
 
+	const int adc_buffer_len = sizeof(adc_buffer)/2;
+	static uint16_t *prior_p = adc_buffer;
 	uint16_t *p = (uint16_t *)dma.TCD->DADDR;
-	//int offset = p - adc_buffer;
-	//if (--offset < 0) offset = sizeof(adc_buffer) / 2 - 1;
-	//Serial.printf("offset = %4d, val = %4d\n", offset + 1, adc_buffer[offset]);
+	// TODO: check if DADDR points to most recently written (as used here)
+	// or if DADDR really points to next place to write, and we would need to
+	// back up 1 location to avoid reusing stale oldest data
+	if (--p < adc_buffer) p = adc_buffer + adc_buffer_len - 1;
 
-	// copy adc buffer to capture buffer
-	//  FIXME: this should be done from the I2S interrupt, for precise capture timing
-	const unsigned int capture_len = sizeof(capture_buffer) / 2;
-	for (unsigned int i=0; i < capture_len; i++) {
-		// TODO: linear interpolate to exactly 4X sample rate
-		if (--p < adc_buffer) p = adc_buffer + (sizeof(adc_buffer) / 2 - 1);
+	// First, copy raw samples from adc_buffer[] to capture_buffer[].
+	// Perhaps a future version could avoid this memory-to-memory copy and
+	// the extra memory used by capture_buffer[] by redesigning the DC offset
+	// removal and FIR filter to be able to work within the wrap-around
+	// adc_buffer[].
+	const int capture_buffer_len = sizeof(capture_buffer)/2;
+	int new_samples, recycle_samples;
+	if (p >= prior_p) {
+		// new raw ADC samples are contiguous within adc_buffer[]
+		new_samples = p - prior_p; // must be close to AUDIO_BLOCK_SAMPLES*4
+		if (new_samples > capture_buffer_len) {
+			new_samples = capture_buffer_len;
+		}
+		recycle_samples = capture_buffer_len - new_samples;
+		if (recycle_samples > 0) {
+			memmove(capture_buffer, capture_buffer + new_samples, recycle_samples * 2);
+		}
+		memcpy(capture_buffer + recycle_samples, prior_p, new_samples * 2);
+		//Serial.printf("recycle = %d, num = %d\n", recycle_samples, new_samples);
+	} else {
+		// new raw ADC samples wrap around from end to start of adc_buffer[]
+		int new_samples1 = (adc_buffer + adc_buffer_len) - prior_p;
+		int new_samples2 = p - adc_buffer;
+		new_samples = new_samples1 + new_samples2; // must be ~AUDIO_BLOCK_SAMPLES*4
+		if (new_samples > capture_buffer_len) {
+			if (new_samples1 >= capture_buffer_len) {
+				new_samples1 = capture_buffer_len;
+				new_samples2 = 0;
+			} else {
+				new_samples2 = capture_buffer_len - new_samples1;
+			}
+			new_samples = capture_buffer_len;
+		}
+		recycle_samples = capture_buffer_len - new_samples;
+		if (recycle_samples > 0) {
+			memmove(capture_buffer, capture_buffer + new_samples, recycle_samples * 2);
+		}
+		memcpy(capture_buffer + recycle_samples, prior_p, new_samples1 * 2);
+		memcpy(capture_buffer + recycle_samples + new_samples1,
+			adc_buffer, new_samples2 * 2);
+		//Serial.printf("recycle = %d, num = %d (%d + %d)\n", recycle_samples,
+			//new_samples, new_samples1, new_samples2);
+	}
+	//samples_count = new_samples;
+	if (++p >= adc_buffer + adc_buffer_len) p = adc_buffer;
+	prior_p = p;
+	if (new_samples < AUDIO_BLOCK_SAMPLES*4 - 3) {
+		// if the ADC didn't collect enough raw samples, give up
+		// now rather than creating horribly choppy sounds.
+		// Normally this shouldn't happen, but wrong ADC settings
+		// can cause it to run too slow.
+		release(output);
+		//Serial.println("AudioInputAnalog, ADC running too slow");
+		return;
+	}
 
-		// remove DC offset
-		// TODO: very slow low pass filter for DC offset
-		int dc_offset = 550; // FIXME: quick kludge for testing!!
-
-		int n = (int)*p - dc_offset;
+	// Remove DC offset from newly added samples
+	int16_t *s = capture_buffer + recycle_samples;
+	const int16_t *end = capture_buffer + capture_buffer_len;
+	while (s < end) {
+		//if (*s > capture_max) capture_max = *s;
+		//if (*s < capture_min) capture_min = *s;
+#if 0
+		// just subtract a constant, for testing only!!
+		int dc_offset = 1950;
+		int n = (int)*s - dc_offset;
 		if (n > 4095) n = 4095;
 		if (n < -4095) n = -4095;
-
-		capture_buffer[i] = n;
+#endif
+#if 0
+		// https://forum.pjrc.com/threads/69542
+		#define pole ((int16_t)32767*0.995)
+		#define Q15Mul(a,b) ((int16_t)((int32_t)a*b)>>15)
+		static int xm1=0, ym1=0;
+		ym1 = *s - xm1 + Q15Mul(pole,ym1);
+		xm1 = *s;
+		int n = ym1;
+#endif
+#if 1
+		#define COEF_HPF_DCBLOCK    (1048300<<10)
+		int32_t tmp = *s;
+		tmp = ( ((int32_t) tmp) << 14);
+		int32_t acc = hpf_y1 - hpf_x1;
+		acc += tmp;
+		hpf_y1 = FRACMUL_SHL(acc, COEF_HPF_DCBLOCK, 1);
+		hpf_x1 = tmp;
+		int n = signed_saturate_rshift(hpf_y1, 16, 14);
+#endif
+		// TODO: try this? https://www.dsprelated.com/showarticle/58.php
+		//if (n > ac_only_max) ac_only_max = n;
+		//if (n < ac_only_min) ac_only_min = n;
+		*s++ = n;
 	}
-	//printbuf(capture_buffer, 8);
 
-	// low pass filter and subsample (this part belongs here)
-	int16_t *dest = output->data + AUDIO_BLOCK_SAMPLES - 1;
+	// Low pass filter and subsample
+	int16_t *dest = output->data;
 	for (int i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
 #if 1
 		// proper low-pass filter sounds pretty good
-		*dest-- = fir(capture_buffer + i * 4, filter, sizeof(filter)/2);
+		*dest++ = fir(capture_buffer + i * 4, filter, sizeof(filter)/2);
 #else
-		// just averge 4 samples together, lower quality but much faster
-		*dest-- = capture_buffer[i * 4] + capture_buffer[i * 4 + 1]
-			+ capture_buffer[i * 4 + 2] + capture_buffer[i * 4 + 3];
+		// just averge 4 samples together, lower quality but less math
+		*dest++ = (capture_buffer[i * 4] + capture_buffer[i * 4 + 1]
+			+ capture_buffer[i * 4 + 2] + capture_buffer[i * 4 + 3]) << 2;
 #endif
+		//int x = output->data[i];
+		//if (x > filter_max) filter_max = x;
+		//if (x < filter_min) filter_min = x;
 	}
 	transmit(output);
 	release(output);
