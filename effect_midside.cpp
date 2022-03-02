@@ -25,30 +25,22 @@
  */
 
 #include <Arduino.h>
-
-#if !defined(KINETISL)
-
 #include "effect_midside.h"
 
 void AudioEffectMidSide::update(void)
 {
-	audio_block_t *blocka, *blockb;
-
-	uint32_t *pa, *pb, *end;
-	uint32_t a12, a34; //, a56, a78;
-	uint32_t b12, b34; //, b56, b78;
-
-	blocka = receiveWritable(0); // left (encoding) or  mid (decoding)
-	blockb = receiveWritable(1); // right (encoding) or side (decoding)
+	audio_block_t *blocka = receiveWritable(0); // left (encoding) or  mid (decoding)
+	audio_block_t *blockb = receiveWritable(1); // right (encoding) or side (decoding)
 	if (!blocka || !blockb) {
 		if (blocka) release(blocka); // maybe an extra if statement here but if one
 		if (blockb) release(blockb); // of the blocks is NULL then it's trouble anyway
 		return;
 	}
 #if defined(__ARM_ARCH_7EM__)
-	pa = (uint32_t *)(blocka->data);
-	pb = (uint32_t *)(blockb->data);
-	end = pa + AUDIO_BLOCK_SAMPLES/2;
+	uint32_t a12, a34, b12, b34;
+	uint32_t *pa = (uint32_t *)(blocka->data);
+	uint32_t *pb = (uint32_t *)(blockb->data);
+	uint32_t *end = pa + AUDIO_BLOCK_SAMPLES/2;
 
 	if (encoding) {
 		while (pa < end) {
@@ -95,4 +87,3 @@ void AudioEffectMidSide::update(void)
 	release(blocka);
 	release(blockb);
 }
-#endif

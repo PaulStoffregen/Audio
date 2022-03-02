@@ -119,14 +119,33 @@ bool AudioControlCS42448::volumeInteger(int channel, uint32_t n)
 
 bool AudioControlCS42448::inputLevelInteger(int32_t n)
 {
-
-	return true;
+	uint8_t data[7];
+	data[0] = 0;
+	for (int i=1; i < 7; i++) {
+		data[i] = n;
+	}
+	return write(CS42448_DAC_Channel_Invert, data, 7);
 }
 
 bool AudioControlCS42448::inputLevelInteger(int chnnel, int32_t n)
 {
 
 	return true;
+}
+
+bool AudioControlCS42448::filterFreeze(void)
+{
+	return write(CS42448_ADC_Control_DAC_DeEmphasis, 0xDC); // disable internal high-pass filter and freeze current dc offset
+}
+
+bool AudioControlCS42448::invertDAC(uint32_t data)
+{
+	return write(CS42448_DAC_Channel_Invert, data); // these bits will invert the signal polarity of their respective DAC channels (1-8)
+}
+
+bool AudioControlCS42448::invertADC(uint32_t data)
+{
+	return write(CS42448_ADC_Channel_Invert, data); // these bits will invert the signal polarity of their respective ADC channels (1-6)
 }
 
 bool AudioControlCS42448::write(uint32_t address, uint32_t data)
