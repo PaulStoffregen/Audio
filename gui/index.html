@@ -575,7 +575,8 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<h3>Functions</h3>
 	<p>This object has no functions to call from the Arduino sketch.  It
 		simply streams data from the I2S hardware to its 2 output ports.</p>
-	<h3>Hardware</h3>
+	<h3>Hardware Teensy 4</h3>
+	<h3>Hardware Teensy 3</h3>
 	<p align=center><img src="img/audioshield_backside.jpg"></p>
 	<p>The I2S signals are used in "master" mode, where Teensy creates
 		all 3 clock signals and controls all data timing.</p>
@@ -990,8 +991,8 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<li>Teensy 3.2
 	<li>Teensy 3.5
 	<li>Teensy 3.6
-	<li>Teensy 4.0 - experimental
-	<li>Teensy 4.1 - experimental
+	<li>Teensy 4.0
+	<li>Teensy 4.1
 	</ul>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -1001,7 +1002,17 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<h3>Functions</h3>
 	<p>This object has no functions to call from the Arduino sketch.  It
 		simply streams data from the ADC to its output port.</p>
-	<h3>Hardware</h3>
+	<h3>Hardware Teensy 4</h3>
+	<p>Pin A2 is used by default for audio input.</p>
+	<p>The same circuitry as Teensy 3 can be used (see schematic below),
+		but the 10K resistor should be changed to 2.2K.
+	<p>Signal range is 0 to 3.3V.</p>
+	<p>Low impedance (strong) drive is required.  The ADC pin picks up
+		a lot of noise from inside the chip.  A strong signal is
+		needed to overcome this noise coupling.  DO NOT leave the
+		input pin disconnected.  Strong noise will occur if the
+		ADC input pin is left floating!</p>
+	<h3>Hardware Teensy 3</h3>
 	<p>Pin A2 is used for audio input.  This circuitry is recommended.</p>
 	<p align=center><img src="img/adccircuit.png"></p>
 	<p>Signal range is 0 to 1.2V</p>
@@ -1021,11 +1032,14 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<p class=exam>File &gt; Examples &gt; OctoWS2811 &gt; SpectrumAnalyzer
 	</p>
 	<h3>Notes</h3>
-	<p><b>analogRead() must not be used</b>, because AudioInputAnalog is regularly
+	<p><b>analogRead() must not be used</b>, on Teensy 3.x because AudioInputAnalog
+		is regularly
 		accessing the ADC hardware.  If both access the hardware at the same
 		moment, analogRead() can end up waiting forever, which effectively
 		crashes your program.
 	</p>
+	<p><b>analogRead()</b> can be used on Teensy 4.x while AudioInputAnalog is
+		running, as long as pins 26/A12, 27/A13, 38/A14, 39/A15 are not used.</p>
 	<p>A different pin may be used, but adding it as an parameter
 		to the AudioInputAnalog object definition.
 	</p>
@@ -1033,13 +1047,22 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	</p>
 	<p class=desc><span class=keyword>AudioInputAnalog</span>  adc1(<span class=literal>A3</span>);
 	</p>
+	<p>On Teensy 4, analog pins 24/A10 and 25/A11 are not supported.</p>
 
 	<p>Noise due to high source impedance, which allows rapidly switching digital signals
 		to capacitively couple... avoiding higher analog impedance is the solution.</p>
 	<p>Power Supply rejection issue with simple DC bias (bigger capacitor may be needed if 3.3V has low frequency noise)</p>
 	<p>Algorithm for automatic DC bias tracking</p>
-	<p>TODO: actual noise measurements with different input circuitry
-		(it's not as quiet as the audio shield)</p>
+	<p>Noise coupling from digital circuitry inside the chip is always a problem when using
+		ADC inputs pin.  It's never as quiet as the audio shield and any good quality
+		audio ADC chip.  Stong low impedance drive to the analog input pin is critical
+		to minimizing noise coupling.  If an opamp is used, connect a low value resistor
+		(eg, 100 to 1000 ohms)
+		between the opamp output and ADC input pin, and a 1nF capacitor from the ADC pin
+		to GND or AGND.  The capacitor lowers the impedance for high frequency noise,
+		and most opamps require a resistor to avoid oscillation when driving a
+		capacitive load.  Strong drive from an opamp, 100 ohm resistor and 1nF
+		capacitor can greatly reduce the digital noise coupling.</p>
 </script>
 <script type="text/x-red" data-template-name="AudioInputAnalog">
 	<div class="form-row">
@@ -3211,7 +3234,8 @@ The actual packets are taken
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
 	<p>Create a modulated sine wave, using any audio signal to continuously
-		modulate the sine wave frequency.</p>
+		modulate the sine wave frequency.  Note: limited modulation range,
+		use waveformMod for FM synthesis needing wide modulation range.</p>
 	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -3244,7 +3268,14 @@ The actual packets are taken
 	</p>
 -->
 	<h3>Notes</h3>
-	<p></p>
+	<p>This modulated sine wave offers only limited range, and the control
+		input scales differently than "volt per octave" commonly used
+		with FM synthesis.  Use the newer AudioSynthWaveformModulated
+		(waveformMod) waveform when wide range is needed.  This simple
+		sine wave uses a very simple algorithm, written in the earliest
+		versions of the Teensy Audio Library.  The newer waveformMod
+		offers up to 12 octaves modulation with control input mapped
+		to modulation in the way commonly used by audio synthesis.</p>
 </script>
 <script type="text/x-red" data-template-name="AudioSynthWaveformSineModulated">
 	<div class="form-row">

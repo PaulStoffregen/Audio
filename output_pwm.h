@@ -51,7 +51,7 @@ public:
 	AudioOutputPWM(void) : AudioStream(1, inputQueueArray) { begin(); }
 	virtual void update(void);
 private:
-	static bool update_responsibility;
+	static volatile bool update_responsibility;
 	audio_block_t *inputQueueArray[1];
 	static void isr(void);
 	void begin(void);
@@ -66,7 +66,7 @@ public:
 	AudioOutputPWM(uint8_t pin1, uint8_t pin2) : AudioStream(1, inputQueueArray) { begin(pin1, pin2); }
 private: 
 	void begin(uint8_t pin1, uint8_t pin2); //FlexPWM pins only
-	static audio_block_t *block;
+	static volatile audio_block_t *block;
 	static DMAChannel dma[2];
 	static _audio_info_flexpwm apins[2];
 #endif
