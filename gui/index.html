@@ -2501,7 +2501,7 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	</table>
 	<h3>Functions</h3>
 	<p>This object has no functions to call from the Arduino sketch.  It
-		simply streams from it's 2 input ports to the USB.</p>
+		simply streams from its 2 input ports to the USB.</p>
 	<!--
 	<h3>Hardware</h3>
 	-->
@@ -4132,7 +4132,7 @@ double s_freq = .0625;</p>
 	<p class=func><span class=keyword>disable</span>(channel);</p>
 	<p class=desc>Disable a channel.  The output of this channel becomes
 		silent.  If this channel is the longest delay, memory usage is
-		automatically reduced to accomodate only the remaining channels used.
+		automatically reduced to accommodate only the remaining channels used.
 	</p>
 	<h3>Examples</h3>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Delay
@@ -4183,16 +4183,17 @@ double s_freq = .0625;</p>
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>delay</span>(channel, milliseconds);</p>
 	<p class=desc>Set output channel (0 to 7) to delay the signals by
-		milliseconds.  The maximum delay is approx 1.5 seconds for each 23LC1024 chip.
+		milliseconds.  The maximum delay is approx 1.5 seconds for a 1Mb / 128kB 23LC1024 chip.
+		A 64Mb / 8MB PSRAM gives ~95s max delay, and so on.
 		The actual delay
 		is rounded to the nearest sample.  Each channel can be configured for
-		any delay.  There is no requirement to configure the "taps" in increasing
+		any delay, up to the maximum value specified when the delay obejct was defined.  
+		There is no requirement to configure the "taps" in increasing
 		delay order.
 	</p>
 	<p class=func><span class=keyword>disable</span>(channel);</p>
 	<p class=desc>Disable a channel.  The output of this channel becomes
-		silent.  If this channel is the longest delay, memory usage is
-		automatically reduced to accomodate only the remaining channels used.
+		silent.  Memory usage is not affected by this.
 	</p>
 	<h3>Hardware</h3>
 	<p>By default, or when <span class=literal>AUDIO_MEMORY_23LC1024</span> is used (see below),
@@ -4254,17 +4255,40 @@ double s_freq = .0625;</p>
 		<a href="http://www.pjrc.com/teensy/td_libs_AudioProcessorUsage.html">AudioProcessorUsageMax</a>
 		function may be used to monitor how much CPU time is consumed.
 	</p>
-	<p>You may specify the type of hardware to be used by editing the code.  AUDIO_MEMORY_23LC1024
-		specifies a single 23LC1024 chip.  AUDIO_MEMORY_MEMORYBOARD allows using up to 6 of these
-		chips.
+	<p>You may specify the type of hardware to be used by editing the exported code.  AUDIO_MEMORY_23LC1024
+		specifies a single 23LC1024 chip, AUDIO_MEMORY_MEMORYBOARD allows using up to 6 of these
+		chips, and so on.
 	</p>
-	<p class=desc><span class=keyword>AudioEffectDelayExternal</span>  delayExt1(<span class=literal>AUDIO_MEMORY_23LC1024</span>);
+		<p class=desc><span class=keyword>AudioEffectDelayExternal</span>  delayExt1(<span class=literal>AUDIO_MEMORY_23LC1024</span>);
 	</p>
-	<p>You may also create more than one delay using the same hardware, where the memory is partitioned
+	<p>You may create more than one delay using the same hardware, where the memory is partitioned
 		by specifying a maximum delay in milliseconds.  This can be useful if you wish to delay both
 		channels of a stereo signal.
 
 	<p class=desc><span class=keyword>AudioEffectDelayExternal</span>  delayExt1(<span class=literal>AUDIO_MEMORY_23LC1024</span>, 700);<br><span class=keyword>AudioEffectDelayExternal</span>  delayExt2(<span class=literal>AUDIO_MEMORY_23LC1024</span>, 700);
+	</p>
+	<p>You may also create more than one delay using different hardware.  
+	This can be useful if you wish to use extremely long delay times.
+
+	<p class=desc><span class=keyword>AudioEffectDelayExternal</span>  delayExt1(<span class=literal>AUDIO_MEMORY_PSRAM64</span>);<br><span class=keyword>AudioEffectDelayExternal</span>  delayExt2(<span class=literal>AUDIO_MEMORY_EXTMEM</span>, 190000.0f);
+	</p>
+	<p>
+	Available hardware options are:
+	    <table class=doc align=center cellpadding=3>
+        <tr class=top><th>Option</th><th>Size (MB)</th><th>Max total delay (s)</th></tr>
+        <tr class=odd><td align=center>AUDIO_MEMORY_23LC1024</td><td>0.125</td><td>1.485</td></tr>
+        <tr class=odd><td align=center>AUDIO_MEMORY_CY15B104</td><td>0.5</td><td>5.944</td></tr>
+        <tr class=odd><td align=center>AUDIO_MEMORY_MEMORYBOARD</td><td>0.75 (max)</td><td>8.916 (max)</td></tr>
+        <tr class=odd><td align=center>AUDIO_MEMORY_PSRAM64</td><td>8</td><td>95.1</td></tr>
+        <tr class=odd><td align=center>AUDIO_MEMORY_EXTMEM*</td><td>8 / 16</td><td>95.1 / 190.2</td></tr>
+        <tr class=odd><td align=center>AUDIO_MEMORY_HEAP**</td><td>(variable)</td><td>(variable)</td></tr>
+    </table>
+	* depends on whether you have 1 or 2 PSRAM chips fitted to your Teensy.<br>
+	** depends on heap remaining 
+	</p>
+	<p>
+	Using EXTMEM is faster than the other SPI-based hardware due to a higher clock speed and 4-bit 
+	data bus, and heap is of course much faster still.
 	</p>
 	<p>When using CY15B104, you
 		<a href="https://forum.pjrc.com/threads/45872-Memory-Chip-for-Audio-Adaptor-Board?p=151839&viewfull=1#post151839">may need to add a capacitor between 3.3V & GND</a>
@@ -5111,7 +5135,7 @@ double s_freq = .0625;</p>
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
 	<p>Print raw audio data to the Arduino Serial Monitor.  This
-		object creates massive output quickly, and should not normally be used.</p>
+		object can create massive output quickly, and should not normally be used.</p>
 	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -5120,19 +5144,20 @@ double s_freq = .0625;</p>
 	</table>
 	<h3>Functions</h3>
 	<p class=func><span class=keyword>name</span>(string);</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Set name so you know which instance of the object has caused the output
 	</p>
 	<p class=func><span class=keyword>trigger</span>();</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Cause output to start, possibly after delay if that's been set
 	</p>
 	<p class=func><span class=keyword>trigger</span>(level, edge);</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Not currently implemented
 	</p>
 	<p class=func><span class=keyword>delay</span>(samples);</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Delay this many samples before output begins
 	</p>
 	<p class=func><span class=keyword>length</span>(samples);</p>
-	<p class=desc>blah blah blah blah
+	<p class=desc>Total number of samples to output before going idle again
+
 	</p>
 	<!--
 <h3>Examples</h3>
