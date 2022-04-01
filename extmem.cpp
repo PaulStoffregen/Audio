@@ -54,8 +54,9 @@
 
 static const uint32_t NOT_ENOUGH_MEMORY = 0xFFFFFFFF;
 
-//uint32_t AudioExtMem::allocated[AUDIO_MEMORY_UNDEFINED] = {0};
-const uint32_t AudioExtMem::memSizeSamples[] = {65536,393216,262144,4194304,8000};
+// This memory size array needs to match the sizes of 
+// the entries in AudioEffectDelayMemoryType_t
+const uint32_t AudioExtMem::memSizeSamples[AUDIO_MEMORY_UNDEFINED] = {65536,393216,262144,4194304,8000};
 AudioExtMem* AudioExtMem::first[AUDIO_MEMORY_UNDEFINED] = {nullptr};
 
 

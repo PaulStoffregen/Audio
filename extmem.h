@@ -38,16 +38,20 @@
 // SPI PSRAM	19% (20MHz SPI clock)
 
 enum AudioEffectDelayMemoryType_t {
-	AUDIO_MEMORY_23LC1024 = 0,	// 128k x 8 S-RAM (1.48s @ 44kHz / 16 bit)
-	AUDIO_MEMORY_MEMORYBOARD = 1, // 6x 128k x 8 (8.9s @ 44kHz / 16 bit)
-	AUDIO_MEMORY_CY15B104 = 2,	// 512k x 8 F-RAM	(5.9s @ 44kHz / 16 bit)
-	AUDIO_MEMORY_PSRAM64 = 3,	// 64Mb / 8MB PSRAM (95s @ 44kHz / 16 bit)
-	AUDIO_MEMORY_INTERNAL = 4,  // 8000 samples (181ms), for test only!
-	AUDIO_MEMORY_HEAP,
-	AUDIO_MEMORY_EXTMEM,
+	AUDIO_MEMORY_23LC1024 	 = 0,	// 128k x 8 S-RAM (1.48s @ 44kHz / 16 bit)
+	AUDIO_MEMORY_MEMORYBOARD = 1, 	// 6x 128k x 8 (8.9s @ 44kHz / 16 bit)
+	AUDIO_MEMORY_CY15B104 	 = 2,	// 512k x 8 F-RAM	(5.9s @ 44kHz / 16 bit)
+	AUDIO_MEMORY_PSRAM64 	 = 3,	// 64Mb / 8MB PSRAM (95s @ 44kHz / 16 bit)
+	AUDIO_MEMORY_INTERNAL 	 = 4,	// 8000 samples (181ms), for test only!
+	AUDIO_MEMORY_HEAP 	  	 = 5,
+	AUDIO_MEMORY_EXTMEM 	 = 6,
 	AUDIO_MEMORY_UNDEFINED
 };
 
+#define IS_SPI_TYPE (AUDIO_MEMORY_23LC1024 == memory_type || \
+					 AUDIO_MEMORY_MEMORYBOARD == memory_type || \
+					 AUDIO_MEMORY_CY15B104 == memory_type || \
+					 AUDIO_MEMORY_PSRAM64 == memory_type)
 
 class AudioExtMem
 {

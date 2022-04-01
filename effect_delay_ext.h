@@ -52,14 +52,14 @@ public:
 			n = memory_length - AUDIO_BLOCK_SAMPLES;
 		delay_length[channel] = n;
 		uint8_t mask = activemask;
-		if (activemask == 0) AudioStartUsingSPI();
+		if (activemask == 0 && IS_SPI_TYPE) AudioStartUsingSPI();
 		activemask = mask | (1<<channel);
 	}
 	void disable(uint8_t channel) {
 		if (channel >= 8) return;
 		uint8_t mask = activemask & ~(1<<channel);
 		activemask = mask;
-		if (mask == 0) AudioStopUsingSPI();
+		if (mask == 0 && IS_SPI_TYPE) AudioStopUsingSPI();
 	}
 	virtual void update(void);
 private:
