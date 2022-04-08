@@ -70,7 +70,7 @@ private:
 	// convert level to volume byte, section 6.9.1, page 50
 	uint32_t volumebyte(float level) {
 		if (level >= 1.0f) return 0;
-		if (level <= 0.0000003981f) return 255;
+		if (level <= 0.0000003981f) return 128;
 		return roundf(log10f(level) * -20.0f);
 	}
 	// convert level to input gain, section 6.11.1, page 51

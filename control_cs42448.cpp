@@ -115,22 +115,22 @@ bool AudioControlCS42448::volumeInteger(int channel, uint32_t n)
 {
 	write(CS42448_DAC_Channel_Mute, 0); 			     // unmute all channels
 	return write(CS42448_AOUT1_Volume_Control + channel -1, n); // set this channel
-	
 }
 
 bool AudioControlCS42448::inputLevelInteger(int32_t n)
 {
-	uint8_t data[6];
-	for (int i = 0; i < 6; i++) 
-              data[i] = n;
-	return	write(CS42448_AIN1_Volume_Control, data, 6); // set all channels (not 7 & 8)
-	
+	uint8_t data[7];
+	data[0] = 0;
+	for (int i=1; i < 7; i++) {
+		data[i] = n;
+	}
+	return write(CS42448_DAC_Channel_Invert, data, 7);
 }
 
 bool AudioControlCS42448::inputLevelInteger(int channel, int32_t n)
 {
+
 	return write(CS42448_AIN1_Volume_Control + channel -1, n); // set this channel
-	return true;
 }
 
 bool AudioControlCS42448::filterFreeze(void)
@@ -169,5 +169,4 @@ bool AudioControlCS42448::write(uint32_t address, const void *data, uint32_t len
 	if (Wire.endTransmission() == 0) return true;
 	return false;
 }
-
 
