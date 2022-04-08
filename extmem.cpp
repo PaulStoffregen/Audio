@@ -37,7 +37,7 @@
 //
 // Timing analysis and info is here:
 // https://forum.pjrc.com/threads/29276-Limits-of-delay-effect-in-audio-library?p=97506&viewfull=1#post97506
-#define SPISETTING SPISettings(40000000, MSBFIRST, SPI_MODE0)
+#define SPISETTING SPISettings(20'000'000, MSBFIRST, SPI_MODE0)
 
 // Use these with the audio adaptor board  (should be adjustable by the user...)
 #define SPIRAM_MOSI_PIN  7
