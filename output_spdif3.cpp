@@ -61,6 +61,7 @@ FLASHMEM
 void AudioOutputSPDIF3::begin(void)
 {
 
+	memset(SPDIF_tx_buffer,0,sizeof SPDIF_tx_buffer); // ensure we start with silence
 	dma.begin(true); // Allocate the DMA channel first
 
 	block_left_1st = nullptr;
@@ -127,22 +128,26 @@ void AudioOutputSPDIF3::isr(void)
 	src_right = (const int16_t *)(block_right->data);
 
 	do {
+		*dest++ = (*src_left++) << 8;
+		*dest++ = (*src_right++) << 8;
+
+		*dest++ = (*src_left++) << 8;
+		*dest++ = (*src_right++) << 8;
+
+		*dest++ = (*src_left++) << 8;
+		*dest++ = (*src_right++) << 8;
+
+		*dest++ = (*src_left++) << 8;
+		*dest++ = (*src_right++) << 8;
+	
+		// Flush the cache every 32 bytes as we go along, as suggested in forum post 
+		// https://forum.pjrc.com/threads/54711-Teensy-4-0-First-Beta-Test?p=194676&viewfull=1#post194676
+		// Experience suggests it works better to flush 
+		// after the copy, rather than before...
 		#if IMXRT_CACHE_ENABLED >= 2
-		SCB_CACHE_DCCIMVAC = (uintptr_t) dest;
+		SCB_CACHE_DCCIMVAC = (uintptr_t) &(dest[-8]);
 		asm volatile("dsb");
 		#endif
-		
-		*dest++ = (*src_left++) << 8;
-		*dest++ = (*src_right++) << 8;
-
-		*dest++ = (*src_left++) << 8;
-		*dest++ = (*src_right++) << 8;
-
-		*dest++ = (*src_left++) << 8;
-		*dest++ = (*src_right++) << 8;
-
-		*dest++ = (*src_left++) << 8;
-		*dest++ = (*src_right++) << 8;
 
 	} while (dest < end);
 
