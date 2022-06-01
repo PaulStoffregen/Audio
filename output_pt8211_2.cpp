@@ -383,7 +383,9 @@ void AudioOutputPT8211_2::update(void)
 	}
 }
 
-FLASHMEM
+// using FLASHMEM here causes issues, but why?
+// https://forum.pjrc.com/threads/69224?p=306968&viewfull=1#post306968
+//FLASHMEM
 void AudioOutputPT8211_2::config_i2s(void)
 {
 
