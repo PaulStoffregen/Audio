@@ -66,15 +66,15 @@ void AudioOutputTDM2::begin(void)
 	dma.TCD->DLASTSGA = 0;
 	dma.TCD->BITER_ELINKNO = sizeof(tdm_tx_buffer) / 4;
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
+	
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI2_TX);
 
 	update_responsibility = update_setup();
+	dma.attachInterrupt(isr);
 	dma.enable();
 
 	//I2S2_RCSR |= I2S_RCSR_RE;
 	I2S2_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
-
-	dma.attachInterrupt(isr);
 }
 
 // TODO: needs optimization...

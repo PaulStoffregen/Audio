@@ -67,13 +67,14 @@ void AudioOutputI2S2::begin(void)
 	dma.TCD->BITER_ELINKNO = sizeof(i2s2_tx_buffer) / 2;
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
 	dma.TCD->DADDR = (void *)((uint32_t)&I2S2_TDR0 + 2);
+	
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI2_TX);
+	
+	update_responsibility = update_setup();
+	dma.attachInterrupt(isr);
 	dma.enable();
 
 	I2S2_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE | I2S_TCSR_FR;
-
-	update_responsibility = update_setup();
-	dma.attachInterrupt(isr);
 }
 
 void AudioOutputI2S2::isr(void)
@@ -269,14 +270,14 @@ void AudioOutputI2S2slave::begin(void)
 	dma.TCD->BITER_ELINKNO = sizeof(i2s2_tx_buffer) / 2;
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
 	dma.TCD->DADDR = (void *)((uint32_t)&I2S2_TDR0 + 2);
+	
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI2_TX);
-	dma.enable();
-
-	I2S2_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE | I2S_TCSR_FR;
 
 	update_responsibility = update_setup();
 	dma.attachInterrupt(isr);
+	dma.enable();
 
+	I2S2_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE | I2S_TCSR_FR;
 }
 
 void AudioOutputI2S2slave::config_i2s(void)

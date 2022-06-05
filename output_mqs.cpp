@@ -66,12 +66,14 @@ void AudioOutputMQS::begin(void)
 	dma.TCD->BITER_ELINKNO = sizeof(I2S3_tx_buffer) / 2;
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
 	dma.TCD->DADDR = (void *)((uint32_t)&I2S3_TDR0 + 0);
+	
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI3_TX);
 
-	I2S3_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
 	update_responsibility = update_setup();
 	dma.attachInterrupt(isr);
 	dma.enable();
+	
+	I2S3_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
 }
 
 void AudioOutputMQS::isr(void)

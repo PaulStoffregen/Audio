@@ -80,26 +80,6 @@ void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
     hpf_x1[1] = tmp;   // With constant DC level x1 would be x0
     hpf_y1[1] = 0;     // Output will settle here when stable
 
-
-	// set the programmable delay block to trigger the ADC at 44.1 kHz
-	//if (!(SIM_SCGC6 & SIM_SCGC6_PDB)
-	  //|| (PDB0_SC & PDB_CONFIG) != PDB_CONFIG
-	  //|| PDB0_MOD != PDB_PERIOD
-	  //|| PDB0_IDLY != 1
-	  //|| PDB0_CH0C1 != 0x0101) {
-		SIM_SCGC6 |= SIM_SCGC6_PDB;
-		PDB0_IDLY = 1;
-		PDB0_MOD = PDB_PERIOD;
-		PDB0_SC = PDB_CONFIG | PDB_SC_LDOK;
-		PDB0_SC = PDB_CONFIG | PDB_SC_SWTRIG;
-		PDB0_CH0C1 = 0x0101;
-		PDB0_CH1C1 = 0x0101;
-	//}
-
-	// enable the ADC for hardware trigger and DMA
-	ADC0_SC2 |= ADC_SC2_ADTRG | ADC_SC2_DMAEN;
-	ADC1_SC2 |= ADC_SC2_ADTRG | ADC_SC2_DMAEN;
-
 	// set up a DMA channel to store the ADC data
 	dma0.begin(true);
 	dma1.begin(true);
@@ -133,11 +113,32 @@ void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
 	//dma1.triggerAtHardwareEvent(DMAMUX_SOURCE_ADC1);
 	dma1.triggerAtTransfersOf(dma0);
 	dma1.triggerAtCompletionOf(dma0);
+	
 	update_responsibility = update_setup();
-	dma0.enable();
-	dma1.enable();
 	dma0.attachInterrupt(isr0);
 	dma1.attachInterrupt(isr1);
+	dma0.enable();
+	dma1.enable();
+	
+	// set the programmable delay block to trigger the ADC at 44.1 kHz
+	//if (!(SIM_SCGC6 & SIM_SCGC6_PDB)
+	  //|| (PDB0_SC & PDB_CONFIG) != PDB_CONFIG
+	  //|| PDB0_MOD != PDB_PERIOD
+	  //|| PDB0_IDLY != 1
+	  //|| PDB0_CH0C1 != 0x0101) {
+		SIM_SCGC6 |= SIM_SCGC6_PDB;
+		PDB0_IDLY = 1;
+		PDB0_MOD = PDB_PERIOD;
+		PDB0_SC = PDB_CONFIG | PDB_SC_LDOK;
+		PDB0_SC = PDB_CONFIG | PDB_SC_SWTRIG;
+		PDB0_CH0C1 = 0x0101;
+		PDB0_CH1C1 = 0x0101;
+	//}
+
+	// enable the ADC for hardware trigger and DMA
+	ADC0_SC2 |= ADC_SC2_ADTRG | ADC_SC2_DMAEN;
+	ADC1_SC2 |= ADC_SC2_ADTRG | ADC_SC2_DMAEN;
+
 }
 
 

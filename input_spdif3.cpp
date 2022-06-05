@@ -63,6 +63,7 @@ void AudioInputSPDIF3::begin(void)
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
 
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SPDIF_RX);
+	
 	update_responsibility = update_setup();
 	dma.attachInterrupt(isr);
 	dma.enable();

@@ -88,8 +88,8 @@ void AudioOutputSPDIF3::begin(void)
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SPDIF_TX);
 
 	update_responsibility = update_setup();
-	dma.enable();
 	dma.attachInterrupt(isr);
+	dma.enable();
 
 	CORE_PIN14_CONFIG = 3;  //3:SPDIF_OUT
 	SPDIF_SCR |= SPDIF_SCR_DMA_TX_EN;
