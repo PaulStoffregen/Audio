@@ -144,7 +144,7 @@ void AudioOutputSPDIF3::isr(void)
 		// Experience suggests it works better to flush 
 		// after the copy, rather than before...
 		#if IMXRT_CACHE_ENABLED >= 2
-		arm_dcache_flush_delete(dest-8,8 * sizeof *dest);
+		arm_dcache_flush(dest-8,8 * sizeof *dest);
 		#endif
 	} while (dest < end);
 
