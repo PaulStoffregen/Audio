@@ -99,7 +99,6 @@ void AudioOutputSPDIF3::begin(void)
 
 void AudioOutputSPDIF3::isr(void)
 {
-
 	const int16_t *src_left, *src_right;
 	const int32_t *end;
 	int32_t *dest;
@@ -145,10 +144,8 @@ void AudioOutputSPDIF3::isr(void)
 		// Experience suggests it works better to flush 
 		// after the copy, rather than before...
 		#if IMXRT_CACHE_ENABLED >= 2
-		SCB_CACHE_DCCIMVAC = (uintptr_t) &(dest[-8]);
-		asm volatile("dsb");
+		arm_dcache_flush_delete(dest-8,8 * sizeof *dest);
 		#endif
-
 	} while (dest < end);
 
 	if (block_left != &block_silent) {
