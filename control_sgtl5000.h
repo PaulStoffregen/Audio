@@ -29,6 +29,7 @@
 
 #include <AudioStream.h>
 #include "AudioControl.h"
+#include "Wire.h"
 
 // SGTL5000-specific defines for headphones
 #define AUDIO_HEADPHONE_DAC 0
@@ -37,8 +38,10 @@
 class AudioControlSGTL5000 : public AudioControl
 {
 public:
-	AudioControlSGTL5000(void) : i2c_addr(0x0A) { }
+	AudioControlSGTL5000(void) : i2c_addr(0x0A), wire{wires[0]} { }
 	void setAddress(uint8_t level);
+	void setWire(uint8_t wnum = 0, uint8_t level = LOW);
+	void setWire(TwoWire& wref = Wire, uint8_t level = LOW);
 	bool enable(void);//For Teensy LC the SGTL acts as master, for all other Teensys as slave.
 	bool enable(const unsigned extMCLK, const uint32_t pllFreq = (4096.0l * AUDIO_SAMPLE_RATE_EXACT) ); //With extMCLK > 0, the SGTL acts as Master
 	bool disable(void) { return false; }
@@ -120,6 +123,8 @@ private:
 	bool semi_automated;
 	void automate(uint8_t dap, uint8_t eq);
 	void automate(uint8_t dap, uint8_t eq, uint8_t filterCount);
+	static TwoWire* wires[3];
+	TwoWire* wire;
 };
 
 //For Filter Type: 0 = LPF, 1 = HPF, 2 = BPF, 3 = NOTCH, 4 = PeakingEQ, 5 = LowShelf, 6 = HighShelf
