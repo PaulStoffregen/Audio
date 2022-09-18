@@ -990,6 +990,38 @@ RED.view = (function() {
 		resetMouseVars();
 	}
 
+	function markConflict(d,n2,s,s2) {
+		var msg = "Conflict: "+ d.name + " setting['"+s+"'] and "+n2.name+" setting['"+s2+"']";
+		console.log(msg);
+		msg = n2.name + " has different settings: " + s + " ./. " + s2;
+		d.conflicts.push(msg);
+		d.requirementError = true;
+	}
+	
+	function matchSettings(s,s2) {
+		var gotMatch = false;
+		if (Array.isArray(s)) {
+			for (let i=0; i < s.length && !gotMatch;i++) {
+				gotMatch = matchSettings(s[i],s2);
+			}
+		}
+		else {
+			if (Array.isArray(s2)) {
+				for (let i=0; i < s2.length && !gotMatch;i++) {
+					gotMatch = matchSettings(s,s2[i]);
+				}
+			}
+			else
+				gotMatch = s == s2;
+		}
+		
+		return gotMatch;
+	}
+	
+	function checkSetting(d,n2,s,s2) {
+		
+		if (!matchSettings(s,s2)) markConflict(d,n2,s,s2);
+	}
 	
 	function checkRequirements(d) {
 		//Add requirements
@@ -1014,13 +1046,7 @@ RED.view = (function() {
 								d.requirementError = true;
 							}
 							//else
-							if (r["setting"] != r2["setting"]) {
-								var msg = "Conflict: "+ d.name + " setting['"+r["setting"]+"'] and "+n2.name+" setting['"+r2["setting"]+"']";
-								console.log(msg);
-								msg = n2.name + " has different settings: " + r["setting"] + " ./. " + r2["setting"];
-								d.conflicts.push(msg);
-								d.requirementError = true;
-							}
+							checkSetting(d,n2,r["setting"],r2["setting"]);
 						}
 					});
 				}

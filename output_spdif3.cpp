@@ -38,6 +38,7 @@ audio_block_t * AudioOutputSPDIF3::block_right_1st = nullptr;
 audio_block_t * AudioOutputSPDIF3::block_left_2nd = nullptr;
 audio_block_t * AudioOutputSPDIF3::block_right_2nd = nullptr;
 bool AudioOutputSPDIF3::update_responsibility = false;
+bool AudioOutputSPDIF3::syncToInput = false;
 DMAChannel AudioOutputSPDIF3::dma(false);
 
 DMAMEM  __attribute__((aligned(32)))
@@ -222,7 +223,7 @@ uint32_t AudioOutputSPDIF3::dpll_Gain(void)
 }
 
 FLASHMEM
-void AudioOutputSPDIF3::config_spdif3(void)
+void AudioOutputSPDIF3::config_spdif3(bool extSync /* = false */)
 {
 	delay(1); //WHY IS THIS NEEDED?
 
@@ -250,20 +251,37 @@ void AudioOutputSPDIF3::config_spdif3(void)
 
 	CCM_CCGR5 |= CCM_CCGR5_SPDIF(CCM_CCGR_ON); //Clock gate on
 
-	if (!(SPDIF_SCR & (SPDIF_SCR_DMA_RX_EN | SPDIF_SCR_DMA_TX_EN))) {
+	if (!(SPDIF_SCR & (SPDIF_SCR_DMA_RX_EN | SPDIF_SCR_DMA_TX_EN))) // not yet configured...
+	{
 		//Serial.print("Reset SPDIF3");
-		SPDIF_SCR = SPDIF_SCR_SOFT_RESET;		//Reset SPDIF
+		SPDIF_SCR = SPDIF_SCR_SOFT_RESET;				// ...reset SPDIF
 		while (SPDIF_SCR & SPDIF_SCR_SOFT_RESET) {;}	//Wait for Reset (takes 8 cycles)
-	} else return;
+	} 
+	else // already configured ...
+	{
+		if (extSync && !syncToInput) // ...but not completely
+		{
+			syncToInput = true;
+			SPDIF_SCR = (SPDIF_SCR & ~SPDIF_SCR_TXSEL(7)) | SPDIF_SCR_TXSEL(1); // Feed-though SPDIFIN
+		}
+		return; // because for some reason configuring twice crashes it
+	}
+
+	// Set flag to say we want S/PDIF output rate to sync with the
+	// input. We don't know which object gets initialised first, so
+	// we ensure it "sticks" in sync even if the output object is
+	// the second to be configured.
+	if (extSync)
+		syncToInput = true;
 
 	SPDIF_SCR =
 		SPDIF_SCR_RXFIFOFULL_SEL(0) |	// Full interrupt if at least 1 sample in Rx left and right FIFOs
 		SPDIF_SCR_RXAUTOSYNC |
 		SPDIF_SCR_TXAUTOSYNC |
-		SPDIF_SCR_TXFIFOEMPTY_SEL(2) |	// Empty interrupt if at most 8 samples in Tx left and right FIFOs
-		SPDIF_SCR_TXFIFO_CTRL(1) |	// 0:Send zeros 1: normal operation
-		SPDIF_SCR_VALCTRL |		// Outgoing Validity always clear
-		SPDIF_SCR_TXSEL(5) |		// 0:off and output 0, 1:Feed-though SPDIFIN, 5:Tx Normal operation
+		SPDIF_SCR_TXFIFOEMPTY_SEL(2) |		// Empty interrupt if at most 8 samples in Tx left and right FIFOs
+		SPDIF_SCR_TXFIFO_CTRL(1) |			// 0: Send zeros; 1: normal operation
+		SPDIF_SCR_VALCTRL |					// Outgoing Validity always clear
+		SPDIF_SCR_TXSEL(syncToInput?1:5) |	// 0: off and output 0; 1: Feed-though SPDIFIN; 5: Tx Normal operation
 		SPDIF_SCR_USRC_SEL(3);
 
 	SPDIF_SRPC =
