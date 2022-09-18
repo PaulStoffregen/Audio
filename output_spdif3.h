@@ -37,7 +37,6 @@ public:
 	friend class AsyncAudioInputSPDIF3;
 	static void mute_PCM(const bool mute);
 	static bool pll_locked(void);
-	static bool syncToInput; // use S/PDIF input to provide Tx clock: avoids glitches
 protected:
 	//AudioOutputSPDIF3(int dummy): AudioStream(2, inputQueueArray) {}
 	static void config_spdif3(bool extSync=false);
@@ -47,6 +46,7 @@ protected:
 	static DMAChannel dma;
 	static void isr(void);	
 private:
+	static bool syncToInput; // use S/PDIF input to provide Tx clock: avoids glitches
 	static uint32_t dpll_Gain() __attribute__ ((const));
 	static audio_block_t *block_left_2nd;
 	static audio_block_t *block_right_2nd;
