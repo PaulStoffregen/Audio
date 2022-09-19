@@ -860,6 +860,8 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>Receive S/PDIF digital audio, at the rate of the external digital audio source.</p>
 	<p><span style="color:red">This input is incompatible with most other inputs and outputs</span>
 		which run at a speed controlled by Teensy's internal sample rate.</p>
+		<p>It is compatible with the AudioOutputSPDIF3 output: when used together the audio system
+		will run at the external source's sample rate.</p>
 	</div>
 	<h3>Boards Supported</h3>
 	<ul>
@@ -1894,7 +1896,13 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 <script type="text/x-red" data-help-name="AudioOutputSPDIF3">
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
-	<p>Transmit 16 bit stereo audio as Digital S/PDIF by use of the native S/PDIF port.</p>
+		<p>Transmit 16 bit stereo audio as Digital S/PDIF by use of the native S/PDIF port.</p>
+		<p>It is compatible with the AudioInputSPDIF3 input: when used together the audio system
+		will run at the external source's sample rate, in which case other audio input or output
+		objects which use the internal clock should not be used.</p>	
+		<p>If AudioInputSPDIF3 is not used then the S/PDIF sample rate will be governed
+		by the audio system clock as usual, and other I/O objects can be used. 
+		In this case S/PDIF	input can still be achieved by use of the AsyncAudioInputSPDIF3 object.</p>
 	</div>
 	<h3>Boards Supported</h3>
 	<ul>
