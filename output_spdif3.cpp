@@ -264,6 +264,12 @@ void AudioOutputSPDIF3::config_spdif3(bool extSync /* = false */)
 		{
 			syncToInput = true;
 			AudioOutputI2S::config_i2s(false,true);
+			
+			// switch the clock source to sync to S/PDIF input
+			SPDIF_STC = (SPDIF_STC & ~(SPDIF_STC_TXCLK_SOURCE(0x7) | SPDIF_STC_TXCLK_DF(0x7F))) | 
+				SPDIF_STC_TXCLK_SOURCE(2) |	// tx_clk input (from SAI1 / MCLK3 = SPDIF in)
+				SPDIF_STC_TXCLK_DF(0); 		// /2 clock division factor			
+
 			I2S1_RCSR |= I2S_RCSR_RE;
 		}
 		return; // because for some reason configuring twice crashes it
