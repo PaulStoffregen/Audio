@@ -403,7 +403,7 @@ void AudioOutputI2S::config_i2s(bool only_bclk /* = false */, bool SPDIF_sync /*
 	// if not setting up new SPDIF sync, and
 	// either transmitter or receiver is enabled, do nothing
 	if (!SPDIF_sync &&
-	    ((I2S1_TCSR & I2S_TCSR_TE) != 0 || (I2S1_RCSR & I2S_RCSR_RE) != 0)
+	    ((I2S1_TCSR & I2S_TCSR_TE) != 0 || (I2S1_RCSR & (I2S_RCSR_RE | I2S_RCSR_BCE) == (I2S_RCSR_RE | I2S_RCSR_BCE)))
 		)
 	{
 	  if (!only_bclk) // if previous transmitter/receiver only activated BCLK, activate the other clock pins now
@@ -443,12 +443,12 @@ void AudioOutputI2S::config_i2s(bool only_bclk /* = false */, bool SPDIF_sync /*
 	// only set up I/O pins if we're not syncing to SPDIF
 	if (!SPDIF_sync)
 	{
-	if (!only_bclk)
-	{
-	  CORE_PIN23_CONFIG = 3;  //1:MCLK
-	  CORE_PIN20_CONFIG = 3;  //1:RX_SYNC  (LRCLK)
-	}
-	CORE_PIN21_CONFIG = 3;  //1:RX_BCLK
+		if (!only_bclk)
+		{
+		  CORE_PIN23_CONFIG = 3;  //1:MCLK
+		  CORE_PIN20_CONFIG = 3;  //1:RX_SYNC  (LRCLK)
+		}
+		CORE_PIN21_CONFIG = 3;  //1:RX_BCLK
 	}
 
 	int rsync = 0;
