@@ -860,7 +860,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>Receive S/PDIF digital audio, at the rate of the external digital audio source.</p>
 	<p><span style="color:red">This input is incompatible with most other inputs and outputs</span>
 		which run at a speed controlled by Teensy's internal sample rate.</p>
-		<p>It is compatible with the AudioOutputSPDIF3 output: when used together the audio system
+		<p>It is compatible with the AudioOutputSPDIF3 output and the I2S (but not I2S2) objects: when used together the audio system
 		will run at the external source's sample rate.</p>
 	</div>
 	<h3>Boards Supported</h3>
@@ -896,7 +896,8 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<h3>Notes</h3>
 	<p>This input tries to force the entire audio library to run at the
 		sample rate of the incoming data.  It usually can not be combined
-		with most other inputs and outputs which run at specific speeds.</p>
+		with most other inputs and outputs which run at specific speeds. I2S and
+		the SPDIF3 output can be used.</p>
 </script>
 <script type="text/x-red" data-template-name="AudioInputSPDIF3">
 	<div class="form-row">
@@ -1897,7 +1898,7 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
 		<p>Transmit 16 bit stereo audio as Digital S/PDIF by use of the native S/PDIF port.</p>
-		<p>It is compatible with the AudioInputSPDIF3 input: when used together the audio system
+		<p>It is compatible with the AudioInputSPDIF3 input and I2S objects (but not I2S2): when used together the audio system
 		will run at the external source's sample rate, in which case other audio input or output
 		objects which use the internal clock should not be used.</p>	
 		<p>If AudioInputSPDIF3 is not used then the S/PDIF sample rate will be governed
@@ -1937,7 +1938,7 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<p><a href="https://github.com/FrankBoesing" target="_blank">Frank Boesing</a>
 		developed the AudioOutputSPDIF3 code.
 	<h3>Notes</h3>
-	<p>Native S/PDIF hardware is used, which is more efficient that use of I2S ports.</p>
+	<p>Native S/PDIF hardware is used, which is more efficient than use of I2S ports.</p>
 	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioOutputSPDIF3">
