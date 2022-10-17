@@ -665,11 +665,7 @@ bool AudioControlSGTL5000::micGain(unsigned int dB)
 	} else {
 		preamp_gain = 0;
 	}
-	input_gain = (dB * 2) / 3;
-	if (input_gain > 15) input_gain = 15;
-
 	return write(CHIP_MIC_CTRL, 0x0170 | preamp_gain)
-	    && write(CHIP_ANA_ADC_CTRL, (input_gain << 4) | input_gain);
 }
 
 // CHIP_ANA_ADC_CTRL
