@@ -228,7 +228,7 @@ void AudioOutputSPDIF3::config_spdif3(bool extSync /* = false */)
 {
 	delay(1); //WHY IS THIS NEEDED?
 
-	uint32_t fs = AUDIO_SAMPLE_RATE_EXACT;
+	uint32_t fs = AUDIO_SAMPLE_RATE_EXACT-60; // as committed, changing this modifies the "static" sounding clicking
 	// PLL between 27*24 = 648MHz und 54*24=1296MHz
 	// n1, n2 choosen for compatibility with I2S (same PLL frequency) :
 	int n1 = 4; //SAI prescaler 4 => (n1*n2) = multiple of 4

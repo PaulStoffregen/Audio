@@ -411,6 +411,7 @@ void AudioOutputI2S::config_i2s(bool only_bclk /* = false */, bool SPDIF_sync /*
 	    CORE_PIN23_CONFIG = 3;  //1:MCLK
 	    CORE_PIN20_CONFIG = 3;  //1:RX_SYNC (LRCLK)
 	  }
+	  CORE_PIN21_CONFIG = 3;  //1:RX_BCLK
 	  return ;
 	}
 
@@ -464,6 +465,10 @@ void AudioOutputI2S::config_i2s(bool only_bclk /* = false */, bool SPDIF_sync /*
 			 oldRE = I2S1_RCSR & I2S_RCSR_RE;
 	I2S1_TCSR &= ~I2S_TCSR_TE; // can't touch TCR2 if TE is set
 	I2S1_RCSR &= ~I2S_RCSR_RE; // can't touch RCR2 if RE is set
+	while (I2S1_TCSR & I2S_TCSR_TE) // wait for end of Tx
+		;
+	while (I2S1_RCSR & I2S_RCSR_RE) // wait for end of Rx
+		;
 	
 	I2S1_TMR = 0;
 	//I2S1_TCSR = (1<<25); //Reset
@@ -472,15 +477,15 @@ void AudioOutputI2S::config_i2s(bool only_bclk /* = false */, bool SPDIF_sync /*
 	if (SPDIF_is_master)
 	{
 		div_and_mclk = I2S_TCR2_DIV((0)) | I2S_TCR2_MSEL(3); // MCLK[3] / 2
-//*/		
+/*/		
 		IOMUXC_GPR_GPR1 = (IOMUXC_GPR_GPR1
 			& ~(IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL_MASK))
-			|   IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL(1)
+			|   IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL(1) // select wrong clock
 			;
 // nope			& ~(IOMUXC_GPR_GPR1_SAI1_MCLK_DIR));
 			//*/
-//*/
-		CCM_ANALOG_PLL_AUDIO &= ~(CCM_ANALOG_PLL_AUDIO_ENABLE);
+/*/
+		CCM_ANALOG_PLL_AUDIO &= ~(CCM_ANALOG_PLL_AUDIO_ENABLE); // disable PLL
 //		CCM_ANALOG_PLL_AUDIO |=  (CCM_ANALOG_PLL_AUDIO_POWERDOWN);
 //*/
 	}
