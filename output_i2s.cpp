@@ -475,20 +475,7 @@ void AudioOutputI2S::config_i2s(bool only_bclk /* = false */, bool SPDIF_sync /*
 	I2S1_TCR1 = I2S_TCR1_RFW(1);
 	
 	if (SPDIF_is_master)
-	{
 		div_and_mclk = I2S_TCR2_DIV((0)) | I2S_TCR2_MSEL(3); // MCLK[3] / 2
-/*/		
-		IOMUXC_GPR_GPR1 = (IOMUXC_GPR_GPR1
-			& ~(IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL_MASK))
-			|   IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL(1) // select wrong clock
-			;
-// nope			& ~(IOMUXC_GPR_GPR1_SAI1_MCLK_DIR));
-			//*/
-/*/
-		CCM_ANALOG_PLL_AUDIO &= ~(CCM_ANALOG_PLL_AUDIO_ENABLE); // disable PLL
-//		CCM_ANALOG_PLL_AUDIO |=  (CCM_ANALOG_PLL_AUDIO_POWERDOWN);
-//*/
-	}
 	else
 		div_and_mclk = I2S_TCR2_DIV((1)) | I2S_TCR2_MSEL(1); // MCLK[1] / 4
 		

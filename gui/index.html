@@ -590,6 +590,13 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>Audio from
 		master mode I2S may be used in the same project as ADC, DAC and
 		PWM signals, because all remain in sync to Teensy's timing</p>
+	<p>With some degradation in quality, 
+	audio from master mode I2S may be used in the same project as
+	AudioInputSPDIF3 on a Teensy 4.x, in which case the audio update clock will derive from
+	the input S/PDIF sample rate. Note that this may also result in a pitch
+	shift for synth objects, and incorrect frequency response for filters,
+	if the sample rates are significantly different.
+	</p>
 	<p>Compatible CODEC Chips:
 		<ul>
 		<li><a href="https://www.pjrc.com/store/teensy3_audio.html">STGL5000</a>
@@ -689,6 +696,13 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>Audio from
 		master mode I2S may be used in the same project as ADC, DAC and
 		PWM signals, because all remain in sync to Teensy's timing</p>
+	<p>With some degradation in quality, 
+	audio from master mode I2S may be used in the same project as
+	AudioInputSPDIF3 on a Teensy 4.x, in which case the audio update clock will derive from
+	the input S/PDIF sample rate. Note that this may also result in a pitch
+	shift for synth objects, and incorrect frequency response for filters,
+	if the sample rates are significantly different.
+	</p>
 	<h3>Examples</h3>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughQuad
 	</p>
@@ -741,6 +755,13 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		<tr class=odd><td align=center>9</td><td>RX (ch 5+6)</td><td>Input</td></tr>
 		<tr class=odd><td align=center>20</td><td>LRCLK</td><td>Output</td></tr>
 	</table>
+	<p>With some degradation in quality, 
+	audio from master mode I2S may be used in the same project as
+	AudioInputSPDIF3, in which case the audio update clock will derive from
+	the input S/PDIF sample rate. Note that this may also result in a pitch
+	shift for synth objects, and incorrect frequency response for filters,
+	if the sample rates are significantly different.
+	</p>	
 	<h3>Examples</h3>
 	<!--<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughQuad
 	</p>-->
@@ -786,6 +807,13 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<h3>Hardware</h3>
 	<p>The I2S signals are used in "master" mode, where Teensy creates
 		all 3 clock signals and controls all data timing.</p>
+	<p>With some degradation in quality, 
+	audio from master mode I2S may be used in the same project as
+	AudioInputSPDIF3, in which case the audio update clock will derive from
+	the input S/PDIF sample rate. Note that this may also result in a pitch
+	shift for synth objects, and incorrect frequency response for filters,
+	if the sample rates are significantly different.
+	</p>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Teensy<br>4.x Pin</th><th>Signal</th><th>Direction</th></tr>
 		<tr class=odd><td align=center>21</td><td>BCLK</td><td>Output</td></tr>
@@ -861,7 +889,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p><span style="color:red">This input is incompatible with most other inputs and outputs</span>
 		which run at a speed controlled by Teensy's internal sample rate.</p>
 		<p>It is compatible with the AudioOutputSPDIF3 output and the I2S (but not I2S2) objects: when used together the audio system
-		will run at the external source's sample rate.</p>
+		will run at the external source's sample rate. See the AudioOutputI2S documentation for more detail.</p>
 	</div>
 	<h3>Boards Supported</h3>
 	<ul>
@@ -1535,6 +1563,13 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<p>Audio from
 		master mode I2S may be used in the same project as ADC, DAC and
 		PWM signals, because all remain in sync to Teensy's timing</p>
+	<p>With some degradation in quality, 
+	audio from master mode I2S may be used in the same project as
+	AudioInputSPDIF3 on a Teensy 4.x, in which case the audio update clock will derive from
+	the input S/PDIF sample rate. Note that this may also result in a pitch
+	shift for synth objects, and incorrect frequency response for filters,
+	if the sample rates are significantly different.
+	</p>
 	<p>Compatible CODEC Chips:
 		<ul>
 		<li><a href="https://www.pjrc.com/store/teensy3_audio.html">STGL5000</a>
@@ -1622,6 +1657,13 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<p>Audio from
 		master mode I2S may be used in the same project as ADC, DAC and
 		PWM signals, because all remain in sync to Teensy's timing</p>
+	<p>With some degradation in quality, 
+	audio from master mode I2S may be used in the same project as
+	AudioInputSPDIF3 on a Teensy 4.x, in which case the audio update clock will derive from
+	the input S/PDIF sample rate. Note that this may also result in a pitch
+	shift for synth objects, and incorrect frequency response for filters,
+	if the sample rates are significantly different.
+	</p>
 	<h3>Examples</h3>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughQuad
 	</p>
@@ -1664,6 +1706,13 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<h3>Hardware</h3>
 	<p>The I2S signals are used in "master" mode, where Teensy creates
 		all 3 clock signals and controls all data timing.</p>
+	<p>With some degradation in quality, 
+	audio from master mode I2S may be used in the same project as
+	AudioInputSPDIF3, in which case the audio update clock will derive from
+	the input S/PDIF sample rate. Note that this may also result in a pitch
+	shift for synth objects, and incorrect frequency response for filters,
+	if the sample rates are significantly different.
+	</p>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Teensy<br>4.x Pin</th><th>Signal</th><th>Direction</th></tr>
 		<tr class=odd><td align=center>21</td><td>BCLK</td><td>Output</td></tr>
@@ -1716,6 +1765,13 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<h3>Hardware</h3>
 	<p>The I2S signals are used in "master" mode, where Teensy creates
 		all 3 clock signals and controls all data timing.</p>
+	<p>With some degradation in quality, 
+	audio from master mode I2S may be used in the same project as
+	AudioInputSPDIF3, in which case the audio update clock will derive from
+	the input S/PDIF sample rate. Note that this may also result in a pitch
+	shift for synth objects, and incorrect frequency response for filters,
+	if the sample rates are significantly different.
+	</p>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>Teensy<br>4.x Pin</th><th>Signal</th><th>Direction</th></tr>
 		<tr class=odd><td align=center>21</td><td>BCLK</td><td>Output</td></tr>
@@ -1898,9 +1954,9 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
 		<p>Transmit 16 bit stereo audio as Digital S/PDIF by use of the native S/PDIF port.</p>
-		<p>It is compatible with the AudioInputSPDIF3 input and I2S objects (but not I2S2): when used together the audio system
+		<p>It is compatible with the AudioInputSPDIF3 input (and I2S, but not I2S2, objects): when used together the audio system
 		will run at the external source's sample rate, in which case other audio input or output
-		objects which use the internal clock should not be used.</p>	
+		objects which use the internal clock should not be used. See the AudioOutputI2S documentation for more detail.</p>	
 		<p>If AudioInputSPDIF3 is not used then the S/PDIF sample rate will be governed
 		by the audio system clock as usual, and other I/O objects can be used. 
 		In this case S/PDIF	input can still be achieved by use of the AsyncAudioInputSPDIF3 object.</p>
