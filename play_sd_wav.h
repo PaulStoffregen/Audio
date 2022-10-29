@@ -31,6 +31,16 @@
 #include "AudioStream.h"
 #include "SD.h"
 
+// Need to buffer at least two audio blocks of samples, for stereo files,
+// but if AUDIO_BLOCK_SAMPLES has been set to a small value (<128 samples)
+// then it's better to buffer 2*128 samples, which happens to be an SD
+// card sector.
+#if AUDIO_BLOCK_SAMPLES < 128
+	#define BUFFER_BYTES 2*128*sizeof(int16_t)
+#else
+	#define BUFFER_BYTES 2*AUDIO_BLOCK_SAMPLES*sizeof(int16_t)
+#endif // AUDIO_BLOCK_SAMPLES < 128
+
 class AudioPlaySdWav : public AudioStream
 {
 public:
@@ -56,7 +66,7 @@ private:
 	audio_block_t *block_left;
 	audio_block_t *block_right;
 	uint16_t block_offset;		// how much data is in block_left & block_right
-	uint8_t buffer[512];		// buffer one block of data
+	uint8_t buffer[BUFFER_BYTES];	// buffer at least two audio blocks of data
 	uint16_t buffer_offset;		// where we're at consuming "buffer"
 	uint16_t buffer_length;		// how much data is in "buffer" (512 until last read)
 	uint8_t header_offset;		// number of bytes in header[]
