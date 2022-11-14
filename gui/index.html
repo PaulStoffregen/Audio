@@ -689,6 +689,12 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>Audio from
 		master mode I2S may be used in the same project as ADC, DAC and
 		PWM signals, because all remain in sync to Teensy's timing</p>
+	<p>With some degradation in quality, on a Teensy 4.x
+	audio from master mode I2S may be used in the same project as
+	AudioInputSPDIF3, in which case the audio update clock will derive from
+	the input S/PDIF sample rate. Note that this may also result in a pitch
+	shift if the sample rates are significantly different.
+	</p>
 	<h3>Examples</h3>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughQuad
 	</p>
