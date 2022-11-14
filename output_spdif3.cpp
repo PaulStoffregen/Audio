@@ -228,7 +228,14 @@ void AudioOutputSPDIF3::config_spdif3(bool extSync /* = false */)
 {
 	delay(1); //WHY IS THIS NEEDED?
 
-	uint32_t fs = AUDIO_SAMPLE_RATE_EXACT;
+	// Changing this modifies the "static" sounding clicking on I2S outputs
+	// when they're clocked from S/PDIF input. It's unclear why this is the
+	// case, as the internal clock source should not be in use under those
+	// conditions. The clicking seems to result from insertion or deletion
+	// of a single sample at a rate related (equal?) to the difference 
+	// between the bit clocks' frequencies.
+	uint32_t fs = AUDIO_SAMPLE_RATE_EXACT; 
+	
 	// PLL between 27*24 = 648MHz und 54*24=1296MHz
 	// n1, n2 choosen for compatibility with I2S (same PLL frequency) :
 	int n1 = 4; //SAI prescaler 4 => (n1*n2) = multiple of 4

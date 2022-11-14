@@ -403,7 +403,7 @@ void AudioOutputI2S::config_i2s(bool only_bclk /* = false */, bool SPDIF_sync /*
 	// if not setting up new SPDIF sync, and
 	// either transmitter or receiver is enabled, do nothing
 	if (!SPDIF_sync &&
-	    ((I2S1_TCSR & I2S_TCSR_TE) != 0 || (I2S1_RCSR & (I2S_RCSR_RE | I2S_RCSR_BCE) == (I2S_RCSR_RE | I2S_RCSR_BCE)))
+	    ((I2S1_TCSR & I2S_TCSR_TE) != 0 || ((I2S1_RCSR & (I2S_RCSR_RE | I2S_RCSR_BCE)) == (I2S_RCSR_RE | I2S_RCSR_BCE)))
 		)
 	{
 	  if (!only_bclk) // if previous transmitter/receiver only activated BCLK, activate the other clock pins now
@@ -411,14 +411,15 @@ void AudioOutputI2S::config_i2s(bool only_bclk /* = false */, bool SPDIF_sync /*
 	    CORE_PIN23_CONFIG = 3;  //1:MCLK
 	    CORE_PIN20_CONFIG = 3;  //1:RX_SYNC (LRCLK)
 	  }
+	  CORE_PIN21_CONFIG = 3;  //1:RX_BCLK
 	  return ;
 	}
 
 	//PLL:
-	int fs = AUDIO_SAMPLE_RATE_EXACT;
+	double fs = AUDIO_SAMPLE_RATE_EXACT;
 	// PLL between 27*24 = 648MHz und 54*24=1296MHz
 	int n1 = 4; //SAI prescaler 4 => (n1*n2) = multiple of 4
-	int n2 = 1 + (24000000 * 27) / (fs * 256 * n1);
+	int n2 = 1 + (24000000 * 27) / ((int) fs * 256 * n1);
 
 	double C = ((double)fs * 256 * n1 * n2) / 24000000;
 	int c0 = C;
@@ -459,6 +460,16 @@ void AudioOutputI2S::config_i2s(bool only_bclk /* = false */, bool SPDIF_sync /*
 	if (SPDIF_sync)
 		SPDIF_is_master = true;
 
+	// I2S1 / SAI1 registers
+	uint32_t oldTE = I2S1_TCSR & I2S_TCSR_TE,
+			 oldRE = I2S1_RCSR & I2S_RCSR_RE;
+	I2S1_TCSR &= ~I2S_TCSR_TE; // can't touch TCR2 if TE is set
+	I2S1_RCSR &= ~I2S_RCSR_RE; // can't touch RCR2 if RE is set
+	while (I2S1_TCSR & I2S_TCSR_TE) // wait for end of Tx
+		;
+	while (I2S1_RCSR & I2S_RCSR_RE) // wait for end of Rx
+		;
+	
 	I2S1_TMR = 0;
 	//I2S1_TCSR = (1<<25); //Reset
 	I2S1_TCR1 = I2S_TCR1_RFW(1);
@@ -490,6 +501,9 @@ void AudioOutputI2S::config_i2s(bool only_bclk /* = false */, bool SPDIF_sync /*
 	I2S1_RCR4 = I2S_RCR4_FRSZ((2-1)) | I2S_RCR4_SYWD((32-1)) | I2S_RCR4_MF
 		    | I2S_RCR4_FSE | I2S_RCR4_FSP | I2S_RCR4_FSD;
 	I2S1_RCR5 = I2S_RCR5_WNW((32-1)) | I2S_RCR5_W0W((32-1)) | I2S_RCR5_FBT((32-1));
+	
+	I2S1_TCSR |= oldTE; // restore old Transmit Enable...
+	I2S1_RCSR |= oldRE; // ...and Receive Enable
 
 #endif
 }
