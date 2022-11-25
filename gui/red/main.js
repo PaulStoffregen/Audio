@@ -76,6 +76,8 @@ var RED = (function() {
 					cpp += "//xy=" + n.x + "," + n.y + "\n";
 				}
 			}
+			cpp += "\n";
+			
 			// generate code for all connections (aka wires or links)
 			var cordcount = 1;
 			for (var i=0; i<nns.length; i++) {
@@ -107,6 +109,8 @@ var RED = (function() {
 					}
 				}
 			}
+			cpp += "\n";
+			
 			// generate code for all control nodes (no inputs or outputs)
 			for (var i=0; i<nns.length; i++) {
 				var n = nns[i];
@@ -114,7 +118,7 @@ var RED = (function() {
 				if (node && node.outputs == 0 && node._def.inputs == 0) {
 					cpp += n.type + " ";
 					for (var j=n.type.length; j<24; j++) cpp += " ";
-					cpp += n.id + "; ";
+					cpp += make_name(n) + "; ";
 					for (var j=n.id.length; j<14; j++) cpp += " ";
 					cpp += "//xy=" + n.x + "," + n.y + "\n";
 				}

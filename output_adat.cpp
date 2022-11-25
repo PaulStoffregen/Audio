@@ -148,6 +148,10 @@ void AudioOutputADAT::isr(void)
 		dest = (uint32_t *)ADAT_tx_buffer;
 		end = (uint32_t *)&ADAT_tx_buffer[AUDIO_BLOCK_SAMPLES * 8/2];
 	}
+#if IMXRT_CACHE_ENABLED >= 2
+	uint32_t *toFlush = dest;
+	uint32_t flushLen = sizeof ADAT_tx_buffer / 2;
+#endif
 
 	src1 = (block_ch1_1st) ? block_ch1_1st->data + ch1_offset : zeros;
 	src2 = (block_ch2_1st) ? block_ch2_1st->data + ch2_offset : zeros;
@@ -305,6 +309,11 @@ void AudioOutputADAT::isr(void)
 
 		dest+=8;
 	} while (dest < end);
+	
+#if IMXRT_CACHE_ENABLED >= 2
+	arm_dcache_flush_delete(toFlush, flushLen);
+#endif // IMXRT_CACHE_ENABLED >= 2
+
 	/*
 	block = AudioOutputADAT::block_ch1_1st;
 	if (block) {

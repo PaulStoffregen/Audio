@@ -99,14 +99,14 @@ void AudioOutputPT8211::begin(void)
 	dma.TCD->BITER_ELINKNO = sizeof(i2s_tx_buffer) / 2;
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
 	dma.TCD->DADDR = (void *)((uint32_t)&I2S1_TDR0);
+	dma.attachInterrupt(isr);
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI1_TX);
+	dma.enable();
 
 	I2S1_RCSR |= I2S_RCSR_RE;
 	I2S1_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
 
 	update_responsibility = update_setup();
-	dma.attachInterrupt(isr);
-	dma.enable();
 	return;
 #endif
 }
