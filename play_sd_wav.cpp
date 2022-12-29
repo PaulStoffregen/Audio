@@ -61,8 +61,9 @@ void AudioPlaySdWav::begin(void)
 }
 
 
-bool AudioPlaySdWav::play(const char *filename)
+bool AudioPlaySdWav::play(const char *filename, FS *pfs)
 {
+	if (!pfs) return false;
 	stop();
 	bool irq = false;
 	if (NVIC_IS_ENABLED(IRQ_SOFTWARE)) {
@@ -74,7 +75,7 @@ bool AudioPlaySdWav::play(const char *filename)
 #else
 	AudioStartUsingSPI();
 #endif
-	wavfile = SD.open(filename);
+	wavfile = pfs->open(filename);
 	if (!wavfile) {
 #if defined(HAS_KINETIS_SDHC)
 		if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
