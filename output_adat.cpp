@@ -125,8 +125,8 @@ void AudioOutputADAT::isr(void)
 	const int16_t *src1, *src2, *src3, *src4,*src5, *src6, *src7, *src8;
 	const int16_t *zeros = (const int16_t *)zerodata;
 
-	uint32_t *end, *dest, *toFlush;
-	uint32_t saddr, flushLen;
+	uint32_t *end, *dest;
+	uint32_t saddr;
 	uint32_t sample1, sample2, sample3, sample4, sample5, sample6, sample7, sample8;
 
 	static uint32_t previousnrzi_highlow = 0; //this is used for the NZRI encoding to remember the last state.
@@ -148,8 +148,10 @@ void AudioOutputADAT::isr(void)
 		dest = (uint32_t *)ADAT_tx_buffer;
 		end = (uint32_t *)&ADAT_tx_buffer[AUDIO_BLOCK_SAMPLES * 8/2];
 	}
-	toFlush = dest;
-	flushLen = sizeof ADAT_tx_buffer / 2;
+#if IMXRT_CACHE_ENABLED >= 2
+	uint32_t *toFlush = dest;
+	uint32_t flushLen = sizeof ADAT_tx_buffer / 2;
+#endif
 
 	src1 = (block_ch1_1st) ? block_ch1_1st->data + ch1_offset : zeros;
 	src2 = (block_ch2_1st) ? block_ch2_1st->data + ch2_offset : zeros;
