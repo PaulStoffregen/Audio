@@ -140,7 +140,7 @@ void loop() {
           if (0 == len)
           {
             len = random(10,COUNT_OF(samples)); // be deliberately awkward
-            for (int i=0;i<len;i++) // pre-fill the buffer
+            for (unsigned int i=0;i<len;i++) // pre-fill the buffer
               samples[i] = nextSample();
             sptr = samples;
           }
