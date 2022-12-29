@@ -161,8 +161,10 @@ void loop() {
   // Play the note on 'chan'
   if(opcode == CMD_PLAYNOTE) {
     unsigned char note = *sp++;
-    unsigned char velocity = *sp++;
+    sp++; // skip velocity data
     wavetable[chan].playNote((byte)note);
+    // for synthesis using velocity, use these 2 lines instead:
+    //unsigned char velocity = *sp++;
     //OnNoteOn(chan, (byte)note, (byte)velocity);
     return;
   }

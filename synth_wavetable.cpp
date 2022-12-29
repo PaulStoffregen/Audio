@@ -79,8 +79,12 @@ void AudioSynthWavetable::stop(void) {
 	cli();
 	if (env_state != STATE_IDLE) {
 		env_state = STATE_RELEASE;
-		env_count = current_sample->RELEASE_COUNT;
-		if (env_count == 0) env_count = 1;
+		if (nullptr != current_sample)
+			env_count = current_sample->RELEASE_COUNT;
+		else
+			env_count = 1;
+		if (env_count == 0) 
+			env_count = 1;
 		env_incr = -(env_mult) / (env_count * ENVELOPE_PERIOD);
 	}
 	PRINT_ENV(STATE_RELEASE);
@@ -118,9 +122,14 @@ void AudioSynthWavetable::setState(int note, int amp, float freq) {
 	cli();
 	int i;
 	env_state = STATE_IDLE;
-	// note ranges calculated by sound font decoder
-	for (i = 0; note > instrument->sample_note_ranges[i]; i++);
-	current_sample = &instrument->samples[i];
+	current_sample = nullptr;
+	if (nullptr != instrument)
+	{
+		// note ranges calculated by sound font decoder
+		for (i = 0; note > instrument->sample_note_ranges[i]; i++)
+			;
+		current_sample = &instrument->samples[i];
+	}
 	if (current_sample == NULL) {
 		sei();
 		return;
@@ -149,24 +158,29 @@ void AudioSynthWavetable::setState(int note, int amp, float freq) {
  * @param freq frequency of the generated output (between 0 and the board-specific sample rate)
  */
 void AudioSynthWavetable::setFrequency(float freq) {
-	float tone_incr_temp = freq * current_sample->PER_HERTZ_PHASE_INCREMENT;
-	tone_incr = tone_incr_temp;
-	vib_pitch_offset_init = tone_incr_temp * current_sample->VIBRATO_PITCH_COEFFICIENT_INITIAL;
-	vib_pitch_offset_scnd = tone_incr_temp * current_sample->VIBRATO_PITCH_COEFFICIENT_SECOND;
-	mod_pitch_offset_init = tone_incr_temp * current_sample->MODULATION_PITCH_COEFFICIENT_INITIAL;
-	mod_pitch_offset_scnd = tone_incr_temp * current_sample->MODULATION_PITCH_COEFFICIENT_SECOND;
+	if (nullptr != current_sample)
+	{
+		float tone_incr_temp = freq * current_sample->PER_HERTZ_PHASE_INCREMENT;
+		tone_incr = tone_incr_temp;
+		vib_pitch_offset_init = tone_incr_temp * current_sample->VIBRATO_PITCH_COEFFICIENT_INITIAL;
+		vib_pitch_offset_scnd = tone_incr_temp * current_sample->VIBRATO_PITCH_COEFFICIENT_SECOND;
+		mod_pitch_offset_init = tone_incr_temp * current_sample->MODULATION_PITCH_COEFFICIENT_INITIAL;
+		mod_pitch_offset_scnd = tone_incr_temp * current_sample->MODULATION_PITCH_COEFFICIENT_SECOND;
+	}
 }
 
 /**
  * @brief Called by the AudioStream library to fill the audio output buffer.
- * The major parts are the interpoalation stage, and the volume envelope stage.
+ * The major parts are the interpolation stage, and the volume envelope stage.
  * Further details on implementation included inline.
  *
  */
 void AudioSynthWavetable::update(void) {
 #if defined(KINETISK) || defined(__IMXRT1062__)
 	// exit if nothing to do
-	if (env_state == STATE_IDLE || (current_sample->LOOP == false && tone_phase >= current_sample->MAX_PHASE)) {
+	if (env_state == STATE_IDLE || 
+		nullptr == current_sample ||
+	   (current_sample->LOOP == false && tone_phase >= current_sample->MAX_PHASE)) {
 		env_state = STATE_IDLE;
 		return;
 	}
