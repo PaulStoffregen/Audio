@@ -3029,26 +3029,39 @@ The actual packets are taken
 		<tr class=odd><td align=center>Out 0</td><td>Output</td></tr>
 	</table>
 	<h3>Functions</h3>
+		<p>Note that "amplitude" is treated inconsistently within this object, 
+		and inconsistently with the general approach of the Audio library, 
+		which is to use values between 0.0 and 1.0
+		</p>
 	<p class=func><span class=keyword>setInstrument</span>(instrument);</p>
-	<p class=desc>blah blah
+	<p class=desc>Set sample set to instrument (reference to AudioSynthWavetable::instrument_data)
 	</p>
 	<p class=func><span class=keyword>amplitude</span>(volume);</p>
-	<p class=desc>blah blah
+	<p class=desc>Change amplitude. Volume is float in the range 0.0-1.0.
 	</p>
 	<p class=func><span class=keyword>setFrequency</span>(freq);</p>
-	<p class=desc>blah blah
+	<p class=desc>Set frequency of playing note (freq is float in Hz). Note that this
+	will not necessarily have the same sound as a note played at the given frequency, as
+	the sample is use is not changed.
 	</p>
 	<p class=func><span class=keyword>playFrequency</span>(freq, amplitude);</p>
-	<p class=desc>blah blah
+	<p class=desc>Play a note at a given frequency (float, Hz) and amplitude (integer, 0 - 127).
+	</p>
+	<p class=func><span class=keyword>playNote</span>(noteNumber, amplitude);</p>
+	<p class=desc>Play a note at a given MIDI note number (int, 0 - 127) and amplitude (integer, 0 - 127).
 	</p>
 	<p class=func><span class=keyword>stop</span>();</p>
-	<p class=desc>blah blah
+	<p class=desc>Stop playing a note. The sound will typically not stop immediately, but
+	decay away according to the release parameter of the wavetable. Use isPlaying()
+	to determine if the note has finished.
 	</p>
 	<p class=func><span class=keyword>isPlaying</span>();</p>
-	<p class=desc>blah blah
+	<p class=desc>Returns true if a note is playing.
 	</p>
 	<p class=func><span class=keyword>getEnvState</span>();</p>
-	<p class=desc>blah blah
+	<p class=desc>Return AudioSynthWavetable::envelopeStateEnum value giving current
+	state of the envelope generator. One of STATE_IDLE, STATE_DELAY, STATE_ATTACK, 
+	STATE_HOLD, STATE_DECAY, STATE_SUSTAIN, STATE_RELEASE 
 	</p>
 	<h3>Examples</h3>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; Wavetable &gt; MidiSynth

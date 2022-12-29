@@ -31,7 +31,7 @@
 #error "Teensyduino version 1.20 or later is required to compile the Audio library."
 #endif
 #ifdef __AVR__
-#error "The Audio Library only works with Teensy 3.X.  Teensy 2.0 is unsupported."
+#error "The Audio Library only works with 32 bit Teensy models.  Teensy 2.0 is unsupported."
 #endif
 
 #include "DMAChannel.h"
