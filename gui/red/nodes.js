@@ -406,6 +406,13 @@ RED.nodes = (function() {
 			} else {
 				var names = [];
 				var yPos = [];
+				
+				// may have imported a definition whose initializer has 
+				// commas in it; don't confuse this with a definition of
+				// more than one object!
+				while (name.match(/\([^)]*\)/)) // find stuff in matching brackets
+				  name = name.replace(/\([^()]*\)/,'') // and remove it, including the brackets
+				
 				if (name.indexOf(",") >= 0) {
 					names = name.split(",");
 				} else {
