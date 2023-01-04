@@ -406,6 +406,13 @@ RED.nodes = (function() {
 			} else {
 				var names = [];
 				var yPos = [];
+				
+				// may have imported a definition whose initializer has 
+				// commas in it; don't confuse this with a definition of
+				// more than one object!
+				while (name.match(/\([^)]*\)/)) // find stuff in matching brackets
+				  name = name.replace(/\([^()]*\)/,'') // and remove it, including the brackets
+				
 				if (name.indexOf(",") >= 0) {
 					names = name.split(",");
 				} else {
@@ -417,8 +424,8 @@ RED.nodes = (function() {
 					var def = node_defs[type];
 					var dW = Math.max(RED.view.defaults.width, RED.view.calculateTextWidth(name) + (def.inputs > 0 ? 7 : 0));
 					var dH = Math.max(RED.view.defaults.height,(Math.max(def.outputs, def.inputs)||0) * 15);
-					var newX = parseInt(coords ? coords[0] : 0);
-					var newY = parseInt(coords ? coords[1] : 0);
+					var newX = parseInt(coords ? coords[0] : 0) + n*20;
+					var newY = parseInt(coords ? coords[1] : 0) + n*20;
 					//newY = newY == 0 ? lastY + (dH * n) + gap : newY;
 					//lastY = Math.max(lastY, newY);
 					var node = new Object({"order": n, "id": name, "name": name, "type": type, "x": newX, "y": newY, "z": 0, "wires": []});
