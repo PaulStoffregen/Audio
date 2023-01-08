@@ -20,7 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
+#ifndef effect_granular_h_
+#define effect_granular_h_
+#include <Arduino.h>
 #include "AudioStream.h"
 
 class AudioEffectGranular : public AudioStream
@@ -63,3 +65,4 @@ private:
 	bool sample_req;
 };
 
+#endif
