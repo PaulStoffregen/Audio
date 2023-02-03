@@ -217,6 +217,9 @@ void AudioExtMem::initialize(AudioEffectDelayMemoryType_t type, uint32_t samples
 	head_offset = 0;
 	memory_type = type;
 
+	// This takes advantage of the fact that for Teensy 4.x
+	// the alternate settings are invalid, so the defaults
+	// actually remain unchanged.
 	SPI.setMOSI(SPIRAM_MOSI_PIN);
 	SPI.setMISO(SPIRAM_MISO_PIN);
 	SPI.setSCK(SPIRAM_SCK_PIN);
