@@ -15,14 +15,22 @@
 
 
 
-
-
-#define TFT_DC      20
-#define TFT_CS      21
+// Use these with the Teensy 4.x and Audio Shield Rev D or D2
+#define TFT_DC       9
+#define TFT_CS      22
 #define TFT_RST    255  // 255 = unused, connect to 3.3V
-#define TFT_MOSI     7
-#define TFT_SCLK    14
+#define TFT_MOSI    11
+#define TFT_SCLK    13
 #define TFT_MISO    12
+
+// Use these with the Teensy 3.2 and Audio Shield Rev C
+//#define TFT_DC      20
+//#define TFT_CS      21
+//#define TFT_RST    255  // 255 = unused, connect to 3.3V
+//#define TFT_MOSI     7
+//#define TFT_SCLK    14
+//#define TFT_MISO    12
+
 ILI9341_t3 tft = ILI9341_t3(TFT_CS, TFT_DC, TFT_RST, TFT_MOSI, TFT_SCLK, TFT_MISO);
 
 
@@ -44,6 +52,7 @@ ILI9341_t3 tft = ILI9341_t3(TFT_CS, TFT_DC, TFT_RST, TFT_MOSI, TFT_SCLK, TFT_MIS
 void setup() {
   Serial.begin(9600);
   delay(500);
+  tft.setClock(16000000);
   tft.begin();
   tft.fillScreen(ILI9341_BLACK);
   tft.setTextColor(ILI9341_YELLOW);

@@ -41,7 +41,6 @@ void setup() {
       delay(500);
     }
   }
-  pinMode(13, OUTPUT); // LED on pin 13
   mixer1.gain(0, 0.5);
   mixer1.gain(1, 0.5);
   mixer2.gain(0, 0.5);

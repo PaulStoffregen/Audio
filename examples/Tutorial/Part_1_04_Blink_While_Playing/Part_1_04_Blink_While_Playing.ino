@@ -38,6 +38,9 @@ AudioControlSGTL5000     sgtl5000_1;
 //#define SDCARD_MOSI_PIN  11
 //#define SDCARD_SCK_PIN   13
 
+#define LED_PIN    5
+//#define LED_PIN 13
+
 void setup() {
   Serial.begin(9600);
   AudioMemory(8);
@@ -51,7 +54,7 @@ void setup() {
       delay(500);
     }
   }
-  pinMode(13, OUTPUT); // LED on pin 13
+  pinMode(LED_PIN, OUTPUT); // LED on pin 13
   delay(1000);
 }
 
@@ -68,9 +71,9 @@ void loop() {
   Serial.println(" ms");
 
   // blink LED and print info while playing
-  digitalWrite(13, HIGH);
+  digitalWrite(LED_PIN, HIGH);
   delay(250);
-  digitalWrite(13, LOW);
+  digitalWrite(LED_PIN, LOW);
   delay(250);
 
   // read the knob position (analog input A2)

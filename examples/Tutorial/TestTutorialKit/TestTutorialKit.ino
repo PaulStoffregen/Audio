@@ -60,6 +60,9 @@ Bounce button2 = Bounce(2, 15);
 //#define SDCARD_MOSI_PIN  11
 //#define SDCARD_SCK_PIN   13
 
+#define LED_PIN    5
+//#define LED_PIN 13
+
 int mode;
 int count=1;
 int a1=0, a2=0, a3=0;
@@ -73,6 +76,7 @@ void setup() {
   pinMode(0, INPUT_PULLUP);
   pinMode(1, INPUT_PULLUP);
   pinMode(2, INPUT_PULLUP);
+  pinMode(LED_PIN, OUTPUT);
   Serial.begin(115200);
   SPI.setMOSI(SDCARD_MOSI_PIN);
   SPI.setSCK(SDCARD_SCK_PIN);
@@ -212,11 +216,13 @@ void loop() {
       count = count + 1;
       waveform1.frequency(440);
       waveform1.amplitude(0.35);
+      digitalWrite(LED_PIN, HIGH);
       msec = 0;
       mode = 46;
     } else if (mode == 46) {
       if (msec > 250) {
         waveform1.amplitude(0);
+        digitalWrite(LED_PIN, LOW);
         msec = 0;
         mode = 47;
       }
