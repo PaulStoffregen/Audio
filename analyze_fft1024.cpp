@@ -45,7 +45,7 @@ static void copy_to_fft_buffer(void *destination, const void *source)
 static void apply_window_to_fft_buffer(void *buffer, const void *window)
 {
 	int16_t *buf = (int16_t *)buffer;
-	const int16_t *win = (int16_t *)window;;
+	const int16_t *win = (int16_t *)window;
 
 	for (int i=0; i < 1024; i++) {
 		int32_t val = *buf * *win++;
@@ -65,37 +65,11 @@ void AudioAnalyzeFFT1024::update(void)
 	if (!block) return;
 
 #if defined(__ARM_ARCH_7EM__)
-	switch (state) {
-	case 0:
-		blocklist[0] = block;
-		state = 1;
-		break;
-	case 1:
-		blocklist[1] = block;
-		state = 2;
-		break;
-	case 2:
-		blocklist[2] = block;
-		state = 3;
-		break;
-	case 3:
-		blocklist[3] = block;
-		state = 4;
-		break;
-	case 4:
-		blocklist[4] = block;
-		state = 5;
-		break;
-	case 5:
-		blocklist[5] = block;
-		state = 6;
-		break;
-	case 6:
-		blocklist[6] = block;
-		state = 7;
-		break;
-	case 7:
-		blocklist[7] = block;
+	blocklist[state] = block;
+	state++;
+
+	if (state > 7)
+	{
 		// TODO: perhaps distribute the work over multiple update() ??
 		//       github pull requsts welcome......
 		copy_to_fft_buffer(buffer+0x000, blocklist[0]->data);
@@ -107,7 +81,7 @@ void AudioAnalyzeFFT1024::update(void)
 		copy_to_fft_buffer(buffer+0x600, blocklist[6]->data);
 		copy_to_fft_buffer(buffer+0x700, blocklist[7]->data);
 		if (window) apply_window_to_fft_buffer(buffer, window);
-		arm_cfft_radix4_q15(&fft_inst, buffer);
+		arm_cfft_q15(fft_inst, buffer, 0, 1);
 		// TODO: support averaging multiple copies
 		for (int i=0; i < 512; i++) {
 			uint32_t tmp = *((uint32_t *)buffer + i); // real & imag
@@ -124,7 +98,6 @@ void AudioAnalyzeFFT1024::update(void)
 		blocklist[2] = blocklist[6];
 		blocklist[3] = blocklist[7];
 		state = 4;
-		break;
 	}
 #else
 	release(block);
