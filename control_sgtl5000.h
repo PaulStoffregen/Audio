@@ -72,7 +72,8 @@ public:
 	bool volume(float left, float right);
 	bool micGain(unsigned int dB);
 	bool lineInLevel(uint8_t n) { return lineInLevel(n, n); }
-	bool lineInLevel(uint8_t left, uint8_t right);
+	bool lineInLevel(uint8_t left, uint8_t right) { return lineInLevel(left,right,0); }
+	bool lineInLevel(uint8_t left, uint8_t right, uint8_t att);
 	unsigned short lineOutLevel(uint8_t n);
 	unsigned short lineOutLevel(uint8_t left, uint8_t right);
 	unsigned short dacVolume(float n);
