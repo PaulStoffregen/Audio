@@ -45,6 +45,8 @@ public:
 	~AudioEffectDelayExternal() {}
 	void delay(uint8_t channel, float milliseconds) {
 		if (channel >= 8 || memory_type >= AUDIO_MEMORY_UNDEFINED) return;
+		if (!initialisationDone)
+			initialize();
 		if (milliseconds < 0.0f) milliseconds = 0.0f;
 		uint32_t n = (milliseconds*(AUDIO_SAMPLE_RATE_EXACT/1000.0f))+0.5f;
 		n += AUDIO_BLOCK_SAMPLES;
@@ -57,6 +59,8 @@ public:
 	}
 	void disable(uint8_t channel) {
 		if (channel >= 8) return;
+		if (!initialisationDone)
+			initialize();
 		uint8_t mask = activemask & ~(1<<channel);
 		activemask = mask;
 		if (mask == 0 && IS_SPI_TYPE) AudioStopUsingSPI();

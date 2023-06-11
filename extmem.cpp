@@ -37,7 +37,8 @@
 //
 // Timing analysis and info is here:
 // https://forum.pjrc.com/threads/29276-Limits-of-delay-effect-in-audio-library?p=97506&viewfull=1#post97506
-#define SPISETTING SPISettings(20'000'000, MSBFIRST, SPI_MODE0)
+#define SPISETTING 		SPISettings(20'000'000, MSBFIRST, SPI_MODE0)
+#define SPISETTING_PS 	SPISettings(72'000'000, MSBFIRST, SPI_MODE0) // you actually get 30MHz, but it seems the best achievable
 
 // Use these with the audio adaptor board  (should be adjustable by the user...)
 #define SPIRAM_MOSI_PIN  7
@@ -46,9 +47,27 @@
 
 #define SPIRAM_CS_PIN    6
 
+// Chip selects for 6x 23LC1024 board
 #define MEMBOARD_CS0_PIN 2
 #define MEMBOARD_CS1_PIN 3
 #define MEMBOARD_CS2_PIN 4
+
+// Chip selects for 8x PSRAM board
+// The chip numbering on the PCB is slightly misleading. You'd expect
+// Y0 to enable IC1, Y1 => IC2 and so on, but in fact it's:
+// Y0 => IC7
+// Y1 => IC5
+// Y2 => IC3
+// Y3 => IC1
+// Y4 => IC8
+// Y5 => IC5
+// Y6 => IC4
+// Y7 => IC2
+// Could be of use if you want to make a partially populated board.
+#define MEMBRD8M_CS0_PIN 4 
+#define MEMBRD8M_CS1_PIN 3
+#define MEMBRD8M_CS2_PIN 2
+#define MEMBRD8M_ENL_PIN 5 // enable pin, active low
 
 #define SIZEOF_SAMPLE (sizeof(((audio_block_t*) 0)->data[0]))
 
@@ -56,8 +75,9 @@ static const uint32_t NOT_ENOUGH_MEMORY = 0xFFFFFFFF;
 
 // This memory size array needs to match the sizes of 
 // the entries in AudioEffectDelayMemoryType_t
-const uint32_t AudioExtMem::memSizeSamples[AUDIO_MEMORY_UNDEFINED] = {65536,393216,262144,4194304,8000};
-AudioExtMem* AudioExtMem::first[AUDIO_MEMORY_UNDEFINED] = {nullptr};
+const uint32_t AudioExtMem::memSizeSamples[AUDIO_MEMORY_UNDEFINED+1] = {65536,65536*6,262144,4194304,8000,0,0,4194304*8};
+bool AudioExtMem::chipResetNeeded[AUDIO_MEMORY_UNDEFINED+1] = {0,0,0,1,0,0,0,1};
+AudioExtMem* AudioExtMem::first[AUDIO_MEMORY_UNDEFINED+1] = {nullptr};
 
 
 AudioExtMem::~AudioExtMem() 
@@ -206,30 +226,50 @@ uint32_t AudioExtMem::findMaxSpace(AudioEffectDelayMemoryType_t memory_type)
 }
 
 
-void AudioExtMem::initialize(AudioEffectDelayMemoryType_t type, uint32_t samples)
+/**
+ * Prepare to initialise memory, but don't necessarily so it.
+ * Due to the "C++ static initialization fiasco" we can't guarantee the SPI
+ * object is initialised, so if the memory type in use is SPI-based we
+ * wait until the first delay() call is made.
+ */
+void AudioExtMem::preInitialize(AudioEffectDelayMemoryType_t type, uint32_t samples)
 {
-	//uint32_t memsize, avail;
+	memory_type = type;
+	memory_length = samples;
+	
+	if (!IS_SPI_TYPE)
+		initialize();
+}
+
+void AudioExtMem::initialize(void)
+{
 	uint32_t avail;
 	void* mem;
+	AudioEffectDelayMemoryType_t type = memory_type;
+	uint32_t samples = memory_length;
 	
 #if defined(INTERNAL_TEST)
 	type = AUDIO_MEMORY_INTERNAL;
 #endif // defined(INTERNAL_TEST)
 	
 	head_offset = 0;
-	memory_type = type;
 
-	// This takes advantage of the fact that for Teensy 4.x
-	// the alternate settings are invalid, so the defaults
-	// actually remain unchanged.
-	SPI.setMOSI(SPIRAM_MOSI_PIN);
-	SPI.setMISO(SPIRAM_MISO_PIN);
-	SPI.setSCK(SPIRAM_SCK_PIN);
+	if (IS_SPI_TYPE)
+	{
+		// This takes advantage of the fact that for Teensy 4.x
+		// the alternate settings are invalid, so the defaults
+		// actually remain unchanged.
+		SPI.setMOSI(SPIRAM_MOSI_PIN);
+		SPI.setMISO(SPIRAM_MISO_PIN);
+		SPI.setSCK(SPIRAM_SCK_PIN);
 
-	SPI.begin();
-	//memsize = memSizeSamples[type];
-	//Serial.printf("Requested %d samples\n",samples);
+		SPI.begin();
+	}
 	
+	// might need to do chip reset
+	if (chipResetNeeded[type])
+		chipReset(type);
+		
 	switch (type)
 	{
 		case AUDIO_MEMORY_PSRAM64:
@@ -246,8 +286,17 @@ void AudioExtMem::initialize(AudioEffectDelayMemoryType_t type, uint32_t samples
 			digitalWriteFast(MEMBOARD_CS0_PIN, LOW);
 			digitalWriteFast(MEMBOARD_CS1_PIN, LOW);
 			digitalWriteFast(MEMBOARD_CS2_PIN, LOW);		
-			pinMode(SPIRAM_CS_PIN, OUTPUT);
-			digitalWriteFast(SPIRAM_CS_PIN, HIGH);
+			break;
+			
+		case AUDIO_MEMORY_PSRAM64_X8:
+			pinMode(MEMBRD8M_CS0_PIN, OUTPUT);
+			pinMode(MEMBRD8M_CS1_PIN, OUTPUT);
+			pinMode(MEMBRD8M_CS2_PIN, OUTPUT);
+			pinMode(MEMBRD8M_ENL_PIN, OUTPUT);
+			digitalWriteFast(MEMBRD8M_CS0_PIN, LOW);
+			digitalWriteFast(MEMBRD8M_CS1_PIN, LOW);
+			digitalWriteFast(MEMBRD8M_CS2_PIN, LOW);		
+			digitalWriteFast(MEMBRD8M_ENL_PIN, LOW);		
 			break;
 			
 		case AUDIO_MEMORY_INTERNAL:
@@ -282,6 +331,7 @@ void AudioExtMem::initialize(AudioEffectDelayMemoryType_t type, uint32_t samples
 		case AUDIO_MEMORY_23LC1024:
 		case AUDIO_MEMORY_CY15B104:
 		case AUDIO_MEMORY_MEMORYBOARD:
+		case AUDIO_MEMORY_PSRAM64_X8:
 			avail = findMaxSpace(type);
 			if (samples > avail)
 				samples = avail;
@@ -326,6 +376,8 @@ void AudioExtMem::initialize(AudioEffectDelayMemoryType_t type, uint32_t samples
 	}
 	else
 		memory_length = 0;
+	
+	initialisationDone = true;
 }
 
 
@@ -362,6 +414,41 @@ void AudioExtMem::SPIwriteMany(const int16_t* data, uint32_t samples)
 	}		
 }
 
+/**
+ * Internal functions to set multiplexer for multi-chip boards
+ */
+static void setMuxMEMORYBOARD(int chip) //!< chip number, or -1 to de-select
+{
+	if (chip >= 0)
+	{
+		digitalWriteFast(MEMBOARD_CS0_PIN, chip & 1);
+		digitalWriteFast(MEMBOARD_CS1_PIN, chip & 2);
+		digitalWriteFast(MEMBOARD_CS2_PIN, chip & 4);
+	}
+	else
+	{
+		digitalWriteFast(MEMBOARD_CS0_PIN, 0);
+		digitalWriteFast(MEMBOARD_CS1_PIN, 0);
+		digitalWriteFast(MEMBOARD_CS2_PIN, 0);
+	}
+}
+
+static void setMuxPSRAMx8(int chip) //!< chip number, or -1 to de-select
+{
+	if (chip >= 0)
+	{
+		digitalWriteFast(MEMBRD8M_CS0_PIN, chip & 1);
+		digitalWriteFast(MEMBRD8M_CS1_PIN, ~chip & 2);
+		digitalWriteFast(MEMBRD8M_CS2_PIN, ~chip & 4);
+		digitalWriteFast(MEMBRD8M_ENL_PIN, LOW);
+	}
+	else
+	{
+		digitalWriteFast(MEMBRD8M_ENL_PIN, HIGH);
+	}
+}		
+
+
 void AudioExtMem::read(uint32_t offset, uint32_t count, int16_t *data)
 {
 	uint32_t addr = memory_begin + offset;
@@ -387,22 +474,39 @@ void AudioExtMem::read(uint32_t offset, uint32_t count, int16_t *data)
 		case AUDIO_MEMORY_MEMORYBOARD:
 			SPI.beginTransaction(SPISETTING);
 			while (count) {
-				uint32_t chip = (addr >> 16) + 1;
-				digitalWriteFast(MEMBOARD_CS0_PIN, chip & 1);
-				digitalWriteFast(MEMBOARD_CS1_PIN, chip & 2);
-				digitalWriteFast(MEMBOARD_CS2_PIN, chip & 4);
+				uint32_t chip = (addr >> 16) + 1; // mux uses 1..6
+				setMuxMEMORYBOARD(chip);
 				uint32_t chipaddr = (addr & 0xFFFF) * SIZEOF_SAMPLE;
 				SPI.transfer16((0x03 << 8) | (chipaddr >> 16));
 				SPI.transfer16(chipaddr & 0xFFFF);
 				uint32_t num = 0x10000 - (addr & 0xFFFF);
+				
 				if (num > count) num = count;
 				count -= num;
 				addr += num;
 				SPIreadMany(data,num);
 			}
-			digitalWriteFast(MEMBOARD_CS0_PIN, LOW);
-			digitalWriteFast(MEMBOARD_CS1_PIN, LOW);
-			digitalWriteFast(MEMBOARD_CS2_PIN, LOW);
+			setMuxMEMORYBOARD(-1);
+			SPI.endTransaction();
+			break;
+					
+		case AUDIO_MEMORY_PSRAM64_X8:
+			SPI.beginTransaction(SPISETTING_PS);
+			while (count) {
+				uint32_t chip = (addr >> 22);
+				setMuxPSRAMx8(chip);
+				uint32_t chipaddr = (addr & 0x3FFFFF) * SIZEOF_SAMPLE;
+				SPI.transfer16((0x0B << 8) | (chipaddr >> 16)); // using fast read...
+				SPI.transfer16(chipaddr & 0xFFFF);
+				SPI.transfer((uint8_t) 0x0); // ...put in the 8 wait cycles (datasheet rev 2.3, figure 7)
+				uint32_t num = 0x400000 - (addr & 0x3FFFFF);
+				
+				if (num > count) num = count;
+				count -= num;
+				addr += num;				
+				SPIreadMany(data,num);
+			}
+			setMuxPSRAMx8(-1);
 			SPI.endTransaction();
 			break;
 			
@@ -462,21 +566,37 @@ void AudioExtMem::write(uint32_t offset, uint32_t count, const int16_t *data)
 			SPI.beginTransaction(SPISETTING);
 			while (count) {
 				uint32_t chip = (addr >> 16) + 1;
-				digitalWriteFast(MEMBOARD_CS0_PIN, chip & 1);
-				digitalWriteFast(MEMBOARD_CS1_PIN, chip & 2);
-				digitalWriteFast(MEMBOARD_CS2_PIN, chip & 4);
+				setMuxMEMORYBOARD(chip);
 				uint32_t chipaddr = (addr & 0xFFFF) * SIZEOF_SAMPLE;
 				SPI.transfer16((0x02 << 8) | (chipaddr >> 16));
 				SPI.transfer16(chipaddr & 0xFFFF);
 				uint32_t num = 0x10000 - (addr & 0xFFFF);
+				
+				if (num > count) num = count;
+				count -= num;
+				addr += num;				
+				SPIwriteMany(data,num);
+			}
+				setMuxMEMORYBOARD(-1);
+			SPI.endTransaction();
+			break;
+			
+		case AUDIO_MEMORY_PSRAM64_X8:		
+			SPI.beginTransaction(SPISETTING_PS);
+			while (count) {
+				uint32_t chip = (addr >> 22);
+				setMuxPSRAMx8(chip);
+				uint32_t chipaddr = (addr & 0x3FFFFF) * SIZEOF_SAMPLE;
+				SPI.transfer16((0x02 << 8) | (chipaddr >> 16));
+				SPI.transfer16(chipaddr & 0xFFFF);
+				uint32_t num = 0x400000 - (addr & 0x3FFFFF);
+				
 				if (num > count) num = count;
 				count -= num;
 				addr += num;
 				SPIwriteMany(data,num);
 			}
-			digitalWriteFast(MEMBOARD_CS0_PIN, LOW);
-			digitalWriteFast(MEMBOARD_CS1_PIN, LOW);
-			digitalWriteFast(MEMBOARD_CS2_PIN, LOW);
+			setMuxPSRAMx8(-1);
 			SPI.endTransaction();
 			break;
 			
@@ -495,4 +615,43 @@ void AudioExtMem::write(uint32_t offset, uint32_t count, const int16_t *data)
 			break;
 	}
 #endif
+}
+
+
+/**
+ * Do reset sequence for a memory type, and mark as no longer needed.
+ * Reset is documented for PSRAM parts, not clear if it's needed or
+ * just useful to reduce power consumption.
+ */
+void AudioExtMem::chipReset(AudioEffectDelayMemoryType_t type)
+{
+	switch (type)
+	{
+		default: 
+			break;
+		
+		case AUDIO_MEMORY_PSRAM64_X8:
+			for (int chip = 0;chip < 8;chip++)
+			{
+				SPI.beginTransaction(SPISETTING_PS);
+				setMuxPSRAMx8(chip);
+				SPI.transfer(0x66);
+				SPI.transfer(0x99);
+				setMuxPSRAMx8(-1);
+				SPI.endTransaction();
+				delayMicroseconds(1);
+			}
+			chipResetNeeded[type] = false;
+			break;
+			
+		case AUDIO_MEMORY_PSRAM64:
+			SPI.beginTransaction(SPISETTING);
+			digitalWriteFast(SPIRAM_CS_PIN, LOW);
+			SPI.transfer(0x66);
+			SPI.transfer(0x99);
+			digitalWriteFast(SPIRAM_CS_PIN, HIGH);
+			SPI.endTransaction();
+			chipResetNeeded[type] = false;
+			break;
+	}
 }

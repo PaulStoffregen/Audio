@@ -36,9 +36,11 @@ void AudioEffectDelayExternal::update(void)
 
 	// grab incoming data and put it into the memory
 	block = receiveReadOnly();
-	if (memory_type >= AUDIO_MEMORY_UNDEFINED) {
+	if (memory_type >= AUDIO_MEMORY_UNDEFINED
+	 || !initialisationDone) {
 		// ignore input and do nothing if undefined memory type
-		release(block);
+		if (nullptr != block)
+			release(block);
 		return;
 	}
 	if (block) {
