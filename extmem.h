@@ -59,7 +59,7 @@ class AudioExtMem
 {
 public:
 	AudioExtMem(AudioEffectDelayMemoryType_t type, uint32_t samples = AUDIO_SAMPLE_RATE_EXACT)
-		: initialisationDone(false), memory_begin(0)
+		: memory_begin(0), initialisationDone(false)
 	{
 		preInitialize(type, samples);
 	}
@@ -84,7 +84,6 @@ private:
 	void chipReset(AudioEffectDelayMemoryType_t type);
 	
 protected:	
-public:
 	void initialize(void); //!< finish off initialisation when SPI object is ready
 	void read(uint32_t address, uint32_t count, int16_t *data);
 	void write(uint32_t address, uint32_t count, const int16_t *data);
