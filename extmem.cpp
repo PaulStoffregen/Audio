@@ -60,14 +60,15 @@
 // Y2 => IC3
 // Y3 => IC1
 // Y4 => IC8
-// Y5 => IC5
+// Y5 => IC6
 // Y6 => IC4
 // Y7 => IC2
 // Could be of use if you want to make a partially populated board.
-#define MEMBRD8M_CS0_PIN 4 
+// setMuxPSRAMx8() does bit-twiddling to address from IC1 upwards
+#define MEMBRD8M_CS0_PIN 2 
 #define MEMBRD8M_CS1_PIN 3
-#define MEMBRD8M_CS2_PIN 2
-#define MEMBRD8M_ENL_PIN 5 // enable pin, active low
+#define MEMBRD8M_CS2_PIN 4
+#define MEMBRD8M_ENL_PIN 5 // enable pin, active low: marked CS3
 
 #define SIZEOF_SAMPLE (sizeof(((audio_block_t*) 0)->data[0]))
 
@@ -433,13 +434,17 @@ static void setMuxMEMORYBOARD(int chip) //!< chip number, or -1 to de-select
 	}
 }
 
+
+// This function ensures the PSRAM chips are addressed in ascending order,
+// so a partially populated board can be assembled with the lowest numbered
+// chips only.
 static void setMuxPSRAMx8(int chip) //!< chip number, or -1 to de-select
 {
 	if (chip >= 0)
 	{
-		digitalWriteFast(MEMBRD8M_CS0_PIN, chip & 1);
-		digitalWriteFast(MEMBRD8M_CS1_PIN, ~chip & 2);
-		digitalWriteFast(MEMBRD8M_CS2_PIN, ~chip & 4);
+		digitalWriteFast(MEMBRD8M_CS0_PIN, ~chip & 2);
+		digitalWriteFast(MEMBRD8M_CS1_PIN, ~chip & 4);
+		digitalWriteFast(MEMBRD8M_CS2_PIN,  chip & 1);
 		digitalWriteFast(MEMBRD8M_ENL_PIN, LOW);
 	}
 	else
