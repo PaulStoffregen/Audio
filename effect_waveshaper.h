@@ -31,7 +31,7 @@
 class AudioEffectWaveshaper : public AudioStream
 {
   public:
-    AudioEffectWaveshaper(void): AudioStream(1, inputQueueArray) {}
+    AudioEffectWaveshaper(void): AudioStream(1, inputQueueArray), waveshape(nullptr) {}
     ~AudioEffectWaveshaper();
     virtual void update(void);
     void shape(float* waveshape, int length);
