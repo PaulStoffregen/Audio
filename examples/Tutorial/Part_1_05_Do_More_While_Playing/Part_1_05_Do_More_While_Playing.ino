@@ -6,7 +6,7 @@
 // Part 1-5: Respond to Pushbuttons & Volume Knob
 //
 // Do more while playing.  Monitor pushbuttons and adjust
-// the volume.  Whe the buttons are pressed, stop playing
+// the volume.  When the buttons are pressed, stop playing
 // the current file and skip to the next or previous.
 
 #include <Audio.h>
@@ -27,10 +27,10 @@ Bounce button2 = Bounce(2, 15);  // 15 = 15 ms debounce time
 
 // Use these with the Teensy Audio Shield
 #define SDCARD_CS_PIN    10
-#define SDCARD_MOSI_PIN  7
-#define SDCARD_SCK_PIN   14
+#define SDCARD_MOSI_PIN  7   // Teensy 4 ignores this, uses pin 11
+#define SDCARD_SCK_PIN   14  // Teensy 4 ignores this, uses pin 13
 
-// Use these with the Teensy 3.5 & 3.6 SD card
+// Use these with the Teensy 3.5 & 3.6 & 4.1 SD card
 //#define SDCARD_CS_PIN    BUILTIN_SDCARD
 //#define SDCARD_MOSI_PIN  11  // not actually used
 //#define SDCARD_SCK_PIN   13  // not actually used
@@ -39,6 +39,9 @@ Bounce button2 = Bounce(2, 15);  // 15 = 15 ms debounce time
 //#define SDCARD_CS_PIN    4
 //#define SDCARD_MOSI_PIN  11
 //#define SDCARD_SCK_PIN   13
+
+#define LED_PIN    5
+//#define LED_PIN 13
 
 void setup() {
   Serial.begin(9600);
@@ -53,7 +56,7 @@ void setup() {
       delay(500);
     }
   }
-  pinMode(13, OUTPUT); // LED on pin 13
+  pinMode(LED_PIN, OUTPUT);
   pinMode(0, INPUT_PULLUP);
   pinMode(2, INPUT_PULLUP);
   delay(1000);
@@ -81,9 +84,9 @@ void loop() {
   
   // blink the LED without delays
   if (blinkTime < 250) {
-    digitalWrite(13, LOW);
+    digitalWrite(LED_PIN, LOW);
   } else if (blinkTime < 500) {
-    digitalWrite(13, HIGH);
+    digitalWrite(LED_PIN, HIGH);
   } else {
     blinkTime = 0; // start blink cycle over again
   }
