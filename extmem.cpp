@@ -233,12 +233,12 @@ uint32_t AudioExtMem::findMaxSpace(AudioEffectDelayMemoryType_t memory_type)
  * object is initialised, so if the memory type in use is SPI-based we
  * wait until the first delay() call is made.
  */
-void AudioExtMem::preInitialize(AudioEffectDelayMemoryType_t type, uint32_t samples)
+void AudioExtMem::preInitialize(AudioEffectDelayMemoryType_t type, uint32_t samples, bool forceInitialize)
 {
 	memory_type = type;
 	memory_length = samples;
 	
-	if (!IS_SPI_TYPE)
+	if (!IS_SPI_TYPE || forceInitialize)
 		initialize();
 }
 

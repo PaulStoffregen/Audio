@@ -58,17 +58,19 @@ enum AudioEffectDelayMemoryType_t {
 class AudioExtMem
 {
 public:
-	AudioExtMem(AudioEffectDelayMemoryType_t type, uint32_t samples = AUDIO_SAMPLE_RATE_EXACT)
+	AudioExtMem(AudioEffectDelayMemoryType_t type, 
+				uint32_t samples = AUDIO_SAMPLE_RATE_EXACT,
+				bool forceInitialize = true)
 		: memory_begin(0), initialisationDone(false)
 	{
-		preInitialize(type, samples);
+		preInitialize(type, samples, forceInitialize);
 	}
 	AudioExtMem() :	AudioExtMem(AUDIO_MEMORY_23LC1024, 65536) {}
 	~AudioExtMem();
 	float getMaxDelay(void) {return (float) memory_length * 1000.0f / AUDIO_SAMPLE_RATE_EXACT;}
 	
 private:	
-	void preInitialize(AudioEffectDelayMemoryType_t type, uint32_t samples);
+	void preInitialize(AudioEffectDelayMemoryType_t type, uint32_t samples, bool forceInitialize);
 	inline static void SPIreadMany(int16_t* data, uint32_t samples);
 	inline static void SPIwriteMany(const int16_t* data, uint32_t samples);
 	//static uint32_t allocated[AUDIO_MEMORY_UNDEFINED];
