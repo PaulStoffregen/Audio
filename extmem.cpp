@@ -386,10 +386,37 @@ void AudioExtMem::initialize(void)
 static int16_t testmem[8000]; // testing only
 #endif
 
-void AudioExtMem::SPIreadMany(int16_t* data, uint32_t samples)
+/**
+ * Read multiple samples from SPI memory.
+ * This version will use the transfer32() capability of the
+ * Teensy 4.x SPI library to give a speed improvement
+ * of ~10% (122us read time for 128 samples vs 136us
+ * for the 16-bit-only option).
+ */
+void AudioExtMem::SPIreadMany(int16_t* data, 	//!< data destination, or NULL for dummy transfer
+							  uint32_t samples)	//!< number of samples to read
 {
 	if (nullptr != data)
 	{
+#if defined(__IMXRT1062__)
+		// get data pointer on a 4-byte boundary
+		if (0 != (((uint32_t) data) & 2) && samples > 0)
+		{
+			*data++ = (int16_t)(SPI.transfer16(0));
+			samples--;
+		}
+		
+		// do as many 32-bit transfers as possible
+		uint32_t* data32 = (uint32_t*) data;
+		while (samples > 1)
+		{
+			*data32++ = (uint32_t)(SPI.transfer32(0));
+			samples -= 2;
+		}
+		
+		// drop out to mop up any remaining 16-bit reads
+		data = (int16_t*) data32;
+#endif // defined(__IMXRT1062__)
 		while (samples--) 
 			*data++ = (int16_t)(SPI.transfer16(0));
 	}
@@ -401,10 +428,33 @@ void AudioExtMem::SPIreadMany(int16_t* data, uint32_t samples)
 }
 
 
+/**
+ * Write multiple samples to SPI memory.
+ * Similar structure to SPIreadMany().
+ */
 void AudioExtMem::SPIwriteMany(const int16_t* data, uint32_t samples)
 {
 	if (nullptr != data)
 	{
+#if defined(__IMXRT1062__)
+		// get data pointer on a 4-byte boundary
+		if (0 != (((uint32_t) data) & 2) && samples > 0)
+		{
+			SPI.transfer16(*data++);
+			samples--;
+		}
+		
+		// do as many 32-bit transfers as possible
+		uint32_t* data32 = (uint32_t*) data;
+		while (samples > 1)
+		{
+			SPI.transfer32(*data32++);
+			samples -= 2;
+		}
+		
+		// drop out to mop up any remaining 16-bit reads
+		data = (int16_t*) data32;
+#endif // defined(__IMXRT1062__)		
 		while (samples--) 
 			SPI.transfer16(*data++);
 	}
@@ -529,6 +579,37 @@ void AudioExtMem::read(uint32_t offset, uint32_t count, int16_t *data)
 	}
 #endif
 }
+
+
+void AudioExtMem::readWrap(uint32_t offset, uint32_t count, int16_t *data)
+{
+	if (offset+count < memory_length)
+		read(offset,count,data);
+	else
+	{
+		uint32_t esz = memory_length - offset; // number of samples we can fit in at the end
+		read(offset,esz,data);
+		if (nullptr != data) // get null pointer when discarding
+			data += esz;
+		read(0,count - esz,data);
+	}
+}
+
+
+void AudioExtMem::writeWrap(uint32_t offset, uint32_t count, const int16_t *data)
+{
+	if (offset+count < memory_length)
+		write(offset,count,data);
+	else
+	{
+		uint32_t esz = memory_length - offset; // number of samples we can fit in at the end
+		write(offset,esz,data);
+		if (nullptr != data) // get null pointer when zeroing
+			data += esz;
+		write(0,count - esz,data);
+	}
+}
+
 
 void AudioExtMem::write(uint32_t offset, uint32_t count, const int16_t *data)
 {
