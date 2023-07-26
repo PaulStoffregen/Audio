@@ -34,17 +34,20 @@
 
 class AudioEffectDelayExternal : public AudioStream, public AudioExtMem
 {
+	static const int   CHANNEL_COUNT = 8;
 public:
-	AudioEffectDelayExternal(AudioEffectDelayMemoryType_t type, float milliseconds=1e6)
+	AudioEffectDelayExternal(AudioEffectDelayMemoryType_t type, 
+							 float milliseconds=1e6,
+							 bool forceInitialize = true)
 	  : AudioStream(1, inputQueueArray), 
-		AudioExtMem(type, (milliseconds*(AUDIO_SAMPLE_RATE_EXACT/1000.0f))+0.5f),
+		AudioExtMem(type, (milliseconds*(AUDIO_SAMPLE_RATE_EXACT/1000.0f))+0.5f, forceInitialize),
 		activemask(0)
 		{}
 	AudioEffectDelayExternal() : AudioEffectDelayExternal(AUDIO_MEMORY_23LC1024) {}
 	
 	~AudioEffectDelayExternal() {}
 	void delay(uint8_t channel, float milliseconds) {
-		if (channel >= 8 || memory_type >= AUDIO_MEMORY_UNDEFINED) return;
+		if (channel >= CHANNEL_COUNT || memory_type >= AUDIO_MEMORY_UNDEFINED) return;
 		if (!initialisationDone)
 			initialize();
 		if (milliseconds < 0.0f) milliseconds = 0.0f;
@@ -58,7 +61,7 @@ public:
 		activemask = mask | (1<<channel);
 	}
 	void disable(uint8_t channel) {
-		if (channel >= 8) return;
+		if (channel >= CHANNEL_COUNT) return;
 		if (!initialisationDone)
 			initialize();
 		uint8_t mask = activemask & ~(1<<channel);
@@ -67,7 +70,7 @@ public:
 	}
 	virtual void update(void);
 private:
-	uint32_t delay_length[8]; // # of sample delay for each channel (128 = no delay)
+	uint32_t delay_length[CHANNEL_COUNT]; // # of sample delay for each channel (128 = no delay)
 	uint8_t  activemask;      // which output channels are active
 	audio_block_t *inputQueueArray[1];
 };

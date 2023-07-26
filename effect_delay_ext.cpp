@@ -37,59 +37,46 @@ void AudioEffectDelayExternal::update(void)
 	// grab incoming data and put it into the memory
 	block = receiveReadOnly();
 	if (memory_type >= AUDIO_MEMORY_UNDEFINED
-	 || !initialisationDone) {
+	 || !initialisationDone) 
+	{
 		// ignore input and do nothing if undefined memory type
 		if (nullptr != block)
 			release(block);
 		return;
 	}
-	if (block) {
-		if (head_offset + AUDIO_BLOCK_SAMPLES <= memory_length) {
-			// a single write is enough
-			write(head_offset, AUDIO_BLOCK_SAMPLES, block->data);
-			head_offset += AUDIO_BLOCK_SAMPLES;
-		} else {
-			// write wraps across end-of-memory
-			n = memory_length - head_offset;
-			write(head_offset, n, block->data);
-			head_offset = AUDIO_BLOCK_SAMPLES - n;
-			write(0, head_offset, block->data + n);
-		}
+	
+	if (block) 
+	{
+		writeWrap(head_offset, AUDIO_BLOCK_SAMPLES, block->data);
 		release(block);
-	} else {
+	} 
+	else 
+	{
 		// if no input, store zeros, so later playback will
 		// not be random garbage previously stored in memory
-		if (head_offset + AUDIO_BLOCK_SAMPLES <= memory_length) {
-			zero(head_offset, AUDIO_BLOCK_SAMPLES);
-			head_offset += AUDIO_BLOCK_SAMPLES;
-		} else {
-			n = memory_length - head_offset;
-			zero(head_offset, n);
-			head_offset = AUDIO_BLOCK_SAMPLES - n;
-			zero(0, head_offset);
-		}
+		zero(head_offset, AUDIO_BLOCK_SAMPLES);
 	}
+	head_offset += AUDIO_BLOCK_SAMPLES;
+	if (head_offset >= memory_length)
+		head_offset -= memory_length;
 
 	// transmit the delayed outputs
-	for (channel = 0; channel < 8; channel++) {
+	for (channel = 0; channel < CHANNEL_COUNT; channel++) 
+	{
 		if (!(activemask & (1<<channel))) continue;
 		block = allocate();
 		if (!block) continue;
+		
 		// compute the delayed location where we read
-		if (delay_length[channel] <= head_offset) {
-			read_offset = head_offset - delay_length[channel];
-		} else {
-			read_offset = memory_length + head_offset - delay_length[channel];
-		}
-		if (read_offset + AUDIO_BLOCK_SAMPLES <= memory_length) {
-			// a single read will do it
-			read(read_offset, AUDIO_BLOCK_SAMPLES, block->data);
-		} else {
-			// read wraps across end-of-memory
-			n = memory_length - read_offset;
-			read(read_offset, n, block->data);
-			read(0, AUDIO_BLOCK_SAMPLES - n, block->data + n);
-		}
+		read_offset = head_offset - delay_length[channel];
+		if (delay_length[channel] > head_offset) 
+			read_offset += memory_length;
+		
+		// read in delayed samples, wrapping as needed
+		readWrap(read_offset, AUDIO_BLOCK_SAMPLES, block->data); 
+		
+		// transmit the result, and relinquish 
+		// ownership of the block
 		transmit(block, channel);
 		release(block);
 	}

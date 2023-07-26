@@ -61,7 +61,7 @@ public:
 	AudioExtMem(AudioEffectDelayMemoryType_t type, 
 				uint32_t samples = AUDIO_SAMPLE_RATE_EXACT,
 				bool forceInitialize = true)
-		: memory_begin(0), initialisationDone(false)
+		: memory_begin(0), initialisationDone(false), memory_type(AUDIO_MEMORY_UNDEFINED)
 	{
 		preInitialize(type, samples, forceInitialize);
 	}
@@ -87,10 +87,12 @@ private:
 	
 protected:	
 	void initialize(void); //!< finish off initialisation when SPI object is ready
-	void read(uint32_t address, uint32_t count, int16_t *data);
-	void write(uint32_t address, uint32_t count, const int16_t *data);
-	void zero(uint32_t address, uint32_t count) {
-		write(address, count, NULL);
+	void read(uint32_t offset, uint32_t count, int16_t *data);
+	void readWrap(uint32_t offset, uint32_t count, int16_t *data);
+	void write(uint32_t offset, uint32_t count, const int16_t *data);
+	void writeWrap(uint32_t offset, uint32_t count, const int16_t *data);
+	void zero(uint32_t offset, uint32_t count) {
+		writeWrap(offset, count, NULL);
 	}
 	bool initialisationDone;	//!< flag that SPI memory initialisation has been done
 	uint32_t memory_length;   	//!< the amount of memory we're using (samples)
