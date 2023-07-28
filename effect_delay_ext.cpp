@@ -32,7 +32,7 @@
 void AudioEffectDelayExternal::update(void)
 {
 	audio_block_t *block;
-	uint32_t n, channel, read_offset;
+	uint32_t channel, read_offset;
 
 	// grab incoming data and put it into the memory
 	block = receiveReadOnly();
