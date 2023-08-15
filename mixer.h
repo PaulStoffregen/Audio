@@ -44,6 +44,7 @@ public:
 		else if (gain < -32767.0f) gain = -32767.0f;
 		multiplier[channel] = gain * 65536.0f; // TODO: proper roundoff?
 	}
+	int32_t getMultiplier(unsigned int channel) { return multiplier[channel]; };
 private:
 	int32_t multiplier[4];
 	audio_block_t *inputQueueArray[4];
