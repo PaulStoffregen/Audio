@@ -27,9 +27,9 @@
 #ifndef audio_spi_interrupt_h_
 #define audio_spi_interrupt_h_
 
-#include "Arduino.h"
-#include "AudioStream.h"
-#include "SPI.h"
+#include <Arduino.h>     // github.com/PaulStoffregen/cores/blob/master/teensy4/Arduino.h
+#include <AudioStream.h> // github.com/PaulStoffregen/cores/blob/master/teensy4/AudioStream.h
+#include <SPI.h>         // github.com/PaulStoffregen/SPI/blob/master/SPI.h
 
 static inline void AudioStartUsingSPI(void) __attribute__((always_inline, unused));
 static inline void AudioStopUsingSPI(void) __attribute__((always_inline, unused));
