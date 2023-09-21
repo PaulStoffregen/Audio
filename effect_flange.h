@@ -23,8 +23,8 @@
 #ifndef effect_flange_h_
 #define effect_flange_h_
 
-#include "Arduino.h"
-#include "AudioStream.h"
+#include <Arduino.h>     // github.com/PaulStoffregen/cores/blob/master/teensy4/Arduino.h
+#include <AudioStream.h> // github.com/PaulStoffregen/cores/blob/master/teensy4/AudioStream.h
 
 /******************************************************************/
 //                A u d i o E f f e c t F l a n g e

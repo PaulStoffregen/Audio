@@ -31,7 +31,7 @@
 #define resampler_h_
 
 
-#include "Arduino.h"
+#include <Arduino.h>     // github.com/PaulStoffregen/cores/blob/master/teensy4/Arduino.h
 //#define DEBUG_RESAMPLER  //activates debug output
 
 #define MAX_FILTER_SAMPLES 40961 //=1024*20 +1
