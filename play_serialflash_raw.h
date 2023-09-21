@@ -28,9 +28,9 @@
 #ifndef play_serial_raw_h_
 #define play_serial_raw_h_
 
-#include "Arduino.h"
-#include <AudioStream.h>
-#include <SerialFlash.h>
+#include <Arduino.h>     // github.com/PaulStoffregen/cores/blob/master/teensy4/Arduino.h
+#include <AudioStream.h> // github.com/PaulStoffregen/cores/blob/master/teensy4/AudioStream.h
+#include <SerialFlash.h> // github.com/PaulStoffregen/SerialFlash/blob/master/SerialFlash.h
 
 class AudioPlaySerialflashRaw : public AudioStream
 {

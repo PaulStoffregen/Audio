@@ -54,8 +54,8 @@
 #ifndef control_tlv320aic3206_h_
 #define control_tlv320aic3206_h_
 
+#include <Arduino.h>     // github.com/PaulStoffregen/cores/blob/master/teensy4/Arduino.h
 #include "AudioControl.h"
-#include <Arduino.h>
 
 //convenience names to use with inputSelect() to set whnch analog inputs to use
 #define AIC3206_INPUT_IN1            1   //uses IN1
