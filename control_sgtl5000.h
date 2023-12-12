@@ -62,9 +62,9 @@ public:
 	}
 	bool headphoneSelect(int n) {
 		if (n == AUDIO_HEADPHONE_DAC) {
-			return write(0x0024, ana_ctrl | (1<<6)); // route DAC to headphones out
-		} else if (n == AUDIO_HEADPHONE_LINEIN) {
 			return write(0x0024, ana_ctrl & ~(1<<6)); // route linein to headphones out
+		} else if (n == AUDIO_HEADPHONE_LINEIN) {
+			return write(0x0024, ana_ctrl | (1<<6)); // route DAC to headphones out
 		} else {
 			return false;
 		}
