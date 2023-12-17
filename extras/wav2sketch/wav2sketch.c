@@ -21,6 +21,8 @@
 
 // compile with:  gcc -O2 -Wall -o wav2sketch wav2sketch.c
 //                i686-w64-mingw32-gcc -s -O2 -Wall wav2sketch.c -o wav2sketch.exe
+// for Windows:   cl wav2sketch.c -DWINDOWS -W3
+// tested using Visual Studio 2022 Community edition
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,7 +32,11 @@
 #include <ctype.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifdef WINDOWS
+#include <windows.h>
+#else
 #include <dirent.h>
+#endif
 
 uint8_t ulaw_encode(int16_t audio);
 void print_byte(FILE *out, uint8_t b);
@@ -39,7 +45,11 @@ uint32_t padding(uint32_t length, uint32_t block);
 uint8_t read_uint8(FILE *in);
 int16_t read_int16(FILE *in);
 uint32_t read_uint32(FILE *in);
-void die(const char *format, ...) __attribute__ ((format (printf, 1, 2)));
+#ifdef WINDOWS
+void die(const char *format, ...);
+#else
+void die(const char* format, ...) __attribute__((format(printf, 1, 2)));
+#endif
 
 // WAV file format:
 // http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html
@@ -49,10 +59,23 @@ char samplename[64];
 unsigned int bcount, wcount;
 unsigned int total_length=0;
 int pcm_mode=0;
+int getFirstFile();
+int getNextFile();
+
+#ifdef WINDOWS
+WIN32_FIND_DATAA dir;
+HANDLE hFind;
+#else
+DIR* dir;
+struct dirent* f;
+struct stat s;
+#endif
+int MoreFiles;
+
 
 void wav2c(FILE *in, FILE *out, FILE *outh)
 {
-	uint32_t header[4];
+	uint32_t header[4] = { 0,0,0,0 };
 	int16_t format, channels, bits;
 	uint32_t rate;
 	uint32_t i, length, padlength=0, arraylen;
@@ -232,7 +255,7 @@ void print_byte(FILE *out, uint8_t b)
 // convert the WAV filename into a C-compatible name
 void filename2samplename(void)
 {
-	int len, i, n;
+	size_t len, i, n;
 	char c;
 
 	len = strlen(filename) - 4;
@@ -252,12 +275,9 @@ const char *title = "// Audio data converted from WAV file by wav2sketch\n\n";
 
 int main(int argc, char **argv)
 {
-	DIR *dir;
-	struct dirent *f;
-	struct stat s;
-	FILE *fp, *outc=NULL, *outh=NULL;
+	FILE* fp, * outc = NULL, * outh = NULL;
 	char buf[128];
-	int i, len;
+	int i;
 
 	// By default, audio is u-law encoded to reduce the memory requirement
 	// in half.  However, u-law does add distortion.  If "-16" is specified
@@ -265,20 +285,9 @@ int main(int argc, char **argv)
 	for (i=1; i < argc; i++) {
 		if (strcmp(argv[i], "-16") == 0) pcm_mode = 1;
 	}
-	dir = opendir(".");
-	if (!dir) die("unable to open directory");
-	while (1) {
-		f = readdir(dir);
-		if (!f) break;
-		//if ((f->d_type & DT_DIR)) continue; // skip directories
-		//if (!(f->d_type & DT_REG)) continue; // skip special files
-		if (stat(f->d_name, &s) < 0) continue; // skip if unable to stat
-		if (S_ISDIR(s.st_mode)) continue;  // skip directories
-		if (!S_ISREG(s.st_mode)) continue; // skip special files
-		filename = f->d_name;
-		len = strlen(filename);
-		if (len < 5) continue;
-		if (strcasecmp(filename + len - 4, ".wav") != 0) continue;
+	pcm_mode = 1;
+	MoreFiles = getFirstFile();;
+	while (MoreFiles) {
 		fp = fopen(filename, "rb");
 		if (!fp) die("unable to read file %s", filename);
 		filename2samplename();
@@ -298,7 +307,11 @@ int main(int argc, char **argv)
 		fclose(outc);
 		fclose(outh);
 		fclose(fp);
+		MoreFiles = getNextFile();
 	}
+#ifdef WINDOWS
+		FindClose(hFind);
+#endif
 	printf("Total data size %d bytes\n", total_length * 4);
 	return 0;
 }
@@ -354,3 +367,48 @@ void die(const char *format, ...)
 	fprintf(stderr, "\n");
 	exit(1);
 }
+#ifdef WINDOWS
+int getFirstFile()
+{
+	hFind = FindFirstFileA(".\\*.wav", &dir);
+	if (!hFind || hFind == INVALID_HANDLE_VALUE) die("unable to open directory");
+	filename = dir.cFileName;
+	return TRUE;
+}
+int getNextFile()
+{
+	int rc = FindNextFileA(hFind, &dir);
+	if (rc)
+		filename = dir.cFileName;
+	return rc;
+
+}
+#else
+int getFirstFile()
+{
+	dir = opendir(".");
+	if (!dir) die("unable to open directory");
+	return getNextFile();
+}
+int getNextFile()
+{
+	int len;
+	while (1)
+	{
+		f = readdir(dir);
+		if (!f) return 0;
+		//if ((f->d_type & DT_DIR)) continue; // skip directories
+		//if (!(f->d_type & DT_REG)) continue; // skip special files
+		if (stat(f->d_name, &s) < 0) continue; // skip if unable to stat
+		if (S_ISDIR(s.st_mode)) continue;  // skip directories
+		if (!S_ISREG(s.st_mode)) continue; // skip special files
+		filename = f->d_name;
+		len = strlen(filename);
+		if (len < 5) continue;
+		if (strcasecmp(filename + len - 4, ".wav") != 0) continue;
+		break;
+	}
+	return 1;
+
+}
+#endif
