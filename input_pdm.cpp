@@ -139,13 +139,12 @@ void AudioInputPDM::begin()
   dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI1_RX);
   
   update_responsibility = update_setup();
+  dma.attachInterrupt(isr);
   dma.enable();
 
   I2S1_RCSR = I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE | I2S_RCSR_FR;
   //I2S1_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE | I2S_RCSR_FR;
   //I2S1_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE; // TX clock enable, because sync'd to TX
-
-  dma.attachInterrupt(isr);
 }
 
 
@@ -261,12 +260,13 @@ void AudioInputPDM::begin(void)
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
 
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_RX);
+	
 	update_responsibility = update_setup();
+	dma.attachInterrupt(isr);
 	dma.enable();
 
 	I2S0_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE | I2S_RCSR_FR;
 	I2S0_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE; // TX clock enable, because sync'd to TX
-	dma.attachInterrupt(isr);
 }
 #endif
 

@@ -131,12 +131,12 @@ void AudioInputPDM2::begin(void)
   dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
 
   dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI2_RX);
+  
   update_responsibility = update_setup();
+  dma.attachInterrupt(isr);
   dma.enable();
 
   I2S2_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE | I2S_RCSR_FR;
-
-  dma.attachInterrupt(isr);
 }
 
 extern const int16_t enormous_pdm_filter_table[];

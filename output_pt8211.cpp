@@ -74,9 +74,11 @@ void AudioOutputPT8211::begin(void)
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
 
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_TX);
+	
 	update_responsibility = update_setup();
 	dma.attachInterrupt(isr);
 	dma.enable();
+	
 	I2S0_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE | I2S_TCSR_FR;
 	return;
 #elif defined(__IMXRT1052__) || defined(__IMXRT1062__)
@@ -99,14 +101,15 @@ void AudioOutputPT8211::begin(void)
 	dma.TCD->BITER_ELINKNO = sizeof(i2s_tx_buffer) / 2;
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
 	dma.TCD->DADDR = (void *)((uint32_t)&I2S1_TDR0);
-	dma.attachInterrupt(isr);
+	
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI1_TX);
+	
+	update_responsibility = update_setup();
+	dma.attachInterrupt(isr);
 	dma.enable();
 
 	I2S1_RCSR |= I2S_RCSR_RE;
 	I2S1_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
-
-	update_responsibility = update_setup();
 	return;
 #endif
 }
@@ -612,20 +615,20 @@ void AudioOutputPT8211::begin(void)
 	dma1.triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_TX);
 	dma1.interruptAtCompletion();
 	dma1.disableOnCompletion();
+
+	update_responsibility = update_setup();
 	dma1.attachInterrupt(isr1);
 
 	dma2.destination(*(int16_t *)&I2S0_TDR0);
 	dma2.sourceBuffer(i2s_tx_buffer2, sizeof(i2s_tx_buffer2));
 	dma2.interruptAtCompletion();
 	dma2.disableOnCompletion();
-	dma2.attachInterrupt(isr2);
+	dma2.attachInterrupt(isr2); // this is the ISR which calls update_all()
 
-	update_responsibility = update_setup();
 	dma1.enable();
 
 	I2S0_TCSR = I2S_TCSR_SR;
 	I2S0_TCSR = I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FWDE;
-
 }
 
 void AudioOutputPT8211::update(void)
