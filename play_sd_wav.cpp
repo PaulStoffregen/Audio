@@ -94,6 +94,39 @@ bool AudioPlaySdWav::play(const char *filename)
 	return true;
 }
 
+bool AudioPlaySdWav::play(FS *fs, const char *filename)
+{
+	stop();
+	bool irq = false;
+	if (NVIC_IS_ENABLED(IRQ_SOFTWARE)) {
+		NVIC_DISABLE_IRQ(IRQ_SOFTWARE);
+		irq = true;
+	}
+#if defined(HAS_KINETIS_SDHC)
+	if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStartUsingSPI();
+#else
+	AudioStartUsingSPI();
+#endif
+	wavfile = fs->open(filename);
+	if (!wavfile) {
+#if defined(HAS_KINETIS_SDHC)
+		if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
+#else
+		AudioStopUsingSPI();
+#endif
+		if (irq) NVIC_ENABLE_IRQ(IRQ_SOFTWARE);
+		return false;
+	}
+	buffer_length = 0;
+	buffer_offset = 0;
+	state_play = STATE_STOP;
+	data_length = 20;
+	header_offset = 0;
+	state = STATE_PARSE1;
+	if (irq) NVIC_ENABLE_IRQ(IRQ_SOFTWARE);
+	return true;
+}
+
 void AudioPlaySdWav::stop(void)
 {
 	bool irq = false;
