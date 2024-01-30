@@ -36,11 +36,19 @@ public:
 	AudioEffectFade(void)
 	  : AudioStream(1, inputQueueArray), position(0xFFFFFFFF) {}
 	void fadeIn(uint32_t milliseconds) {
+		if (milliseconds == 0) {
+			position = 0xFFFFFFFF;
+			return;
+		}
 		uint32_t samples = (uint32_t)(milliseconds * 441u + 5u) / 10u;
 		//Serial.printf("fadeIn, %u samples\n", samples);
 		fadeBegin(0xFFFFFFFFu / samples, 1);
 	}
 	void fadeOut(uint32_t milliseconds) {
+		if (milliseconds == 0) {
+			position = 0;
+			return;
+		}
 		uint32_t samples = (uint32_t)(milliseconds * 441u + 5u) / 10u;
 		//Serial.printf("fadeOut, %u samples\n", samples);
 		fadeBegin(0xFFFFFFFFu / samples, 0);
