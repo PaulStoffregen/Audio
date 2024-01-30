@@ -23,7 +23,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 #include <Arduino.h>
 
 #if !defined(KINETISL)
@@ -319,20 +318,30 @@ void AudioOutputTDM::config_tdm(void)
 	I2S1_TCR1 = I2S_TCR1_RFW(4);
 	I2S1_TCR2 = I2S_TCR2_SYNC(tsync) | I2S_TCR2_BCP | I2S_TCR2_MSEL(1)
 		| I2S_TCR2_BCD | I2S_TCR2_DIV(0);
-	I2S1_TCR3 = I2S_TCR3_TCE;
+
+    // enable all TX data pins.  Channels must be used in order, so
+    // enabled chanels can (0b0001, 0b0011, 0b0111, or 0b1111) only.  This
+    // limitation is because of the fifo combine mode limitation.
+    I2S1_TCR3 = ((1 << AUDIO_N_SAI1_TX_DATAPINS)-1) << 16;
+
 	I2S1_TCR4 = I2S_TCR4_FRSZ(7) | I2S_TCR4_SYWD(0) | I2S_TCR4_MF
 		| I2S_TCR4_FSE | I2S_TCR4_FSD;
+    I2S1_TCR4 |= (AUDIO_N_SAI1_TX_DATAPINS > 1) ? I2S_TCR4_FCOMB_ENABLED_ON_WRITES : 0;
 	I2S1_TCR5 = I2S_TCR5_WNW(31) | I2S_TCR5_W0W(31) | I2S_TCR5_FBT(31);
 
 	I2S1_RMR = 0;
 	I2S1_RCR1 = I2S_RCR1_RFW(4);
 	I2S1_RCR2 = I2S_RCR2_SYNC(rsync) | I2S_TCR2_BCP | I2S_RCR2_MSEL(1)
 		| I2S_RCR2_BCD | I2S_RCR2_DIV(0);
-	I2S1_RCR3 = I2S_RCR3_RCE;
+        // enable all RX data pins.  Channels must be used in order, so
+        // enabled chanels can (0b0001, 0b0011, 0b0111, or 0b1111) only.  This
+        // limitation is because of the fifo combine mode limitation.
+        I2S1_RCR3 = ( (1 << AUDIO_N_SAI1_RX_DATAPINS) - 1 ) << 16;
+
 	I2S1_RCR4 = I2S_RCR4_FRSZ(7) | I2S_RCR4_SYWD(0) | I2S_RCR4_MF
 		| I2S_RCR4_FSE | I2S_RCR4_FSD;
+        I2S1_RCR4 |= (AUDIO_N_SAI1_RX_DATAPINS > 1) ? I2S_RCR4_FCOMB_ENABLED_ON_READS : 0;
 	I2S1_RCR5 = I2S_RCR5_WNW(31) | I2S_RCR5_W0W(31) | I2S_RCR5_FBT(31);
-
 	CORE_PIN23_CONFIG = 3;  //1:MCLK
 	CORE_PIN21_CONFIG = 3;  //1:RX_BCLK
 	CORE_PIN20_CONFIG = 3;  //1:RX_SYNC

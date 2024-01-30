@@ -30,6 +30,9 @@
 #include <Arduino.h>     // github.com/PaulStoffregen/cores/blob/master/teensy4/Arduino.h
 #include <AudioStream.h> // github.com/PaulStoffregen/cores/blob/master/teensy4/AudioStream.h
 #include <DMAChannel.h>  // github.com/PaulStoffregen/cores/blob/master/teensy4/DMAChannel.h
+#include "AudioRate.h"
+
+#define TDM_IN_N_AUDIO_BLOCKS (TDM_CHANNELS_PER_PIN*AUDIO_N_SAI1_RX_DATAPINS)
 
 class AudioInputTDM : public AudioStream
 {
@@ -42,7 +45,7 @@ protected:
 	static DMAChannel dma;
 	static void isr(void);
 private:
-	static audio_block_t *block_incoming[16];
+	static audio_block_t *block_incoming[TDM_IN_N_AUDIO_BLOCKS];
 };
 
 #endif
