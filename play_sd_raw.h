@@ -36,7 +36,7 @@ class AudioPlaySdRaw : public AudioStream
 public:
 	AudioPlaySdRaw(void) : AudioStream(0, NULL) { begin(); }
 	void begin(void);
-	bool play(const char *filename);
+	bool play(const char *filename, FS *pfs=&SD);
 	void stop(void);
 	bool isPlaying(void) { return playing; }
 	uint32_t positionMillis(void);
