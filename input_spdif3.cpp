@@ -46,7 +46,7 @@ void AudioInputSPDIF3::begin(void)
 {
 	dma.begin(true); // Allocate the DMA channel first
 
-	AudioOutputSPDIF3::config_spdif3();
+	AudioOutputSPDIF3::config_spdif3(true); // force output (if any) to sync to this
 
 	const int nbytes_mlno = 2 * 4; // 8 Bytes per minor loop
 	dma.TCD->SADDR = &SPDIF_SRL;
