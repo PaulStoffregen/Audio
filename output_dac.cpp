@@ -183,7 +183,7 @@ void AudioOutputAnalog::begin(void)
 	// commandeer FTM1 for timing (PWM on pin 3 & 4 will become 22 kHz)
 	FTM1_SC = 0;
 	FTM1_CNT = 0;
-	FTM1_MOD = (uint32_t)((F_PLL/2) / 44117.64706/*AUDIO_SAMPLE_RATE_EXACT*/ + 0.5);
+	FTM1_MOD = (uint32_t)((F_PLL/2) / AUDIO_SAMPLE_RATE_EXACT + 0.5);
 	FTM1_SC = FTM_SC_CLKS(1) | FTM_SC_DMA;
 
 	dma1.sourceBuffer(dac_buffer1, sizeof(dac_buffer1));
