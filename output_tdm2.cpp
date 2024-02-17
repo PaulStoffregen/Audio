@@ -82,7 +82,7 @@ static void memcpy_tdm_tx(uint32_t *dest, const uint32_t *src1, const uint32_t *
 {
 	uint32_t i, in1, in2, out1, out2;
 
-	for (i=0; i < AUDIO_BLOCK_SAMPLES/2; i++) {
+	for (i=0; i < AUDIO_BLOCK_SAMPLES/4; i++) {
 
 		in1 = *src1++;
 		in2 = *src2++;
