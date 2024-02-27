@@ -166,6 +166,57 @@ AudioEffectReverb::reverbTime(float rt)
     lpf[i].g1 = g1_q31_lpf[i];
 }
 
+/** 
+ * @brief  Provide guard bits for Input buffer
+ * @param  q31_t* 	Pointer to input buffer
+ * @param  uint32_t 	blockSize
+ * @param  uint32_t 	guard_bits
+ * @return none
+ * The function Provides the guard bits for the buffer 
+ * to avoid overflow 
+ */
+
+void provide_guard_bits_q31 (q31_t * input_buf, 
+								 uint32_t blockSize,
+                                 uint32_t guard_bits)
+{
+  uint32_t i;
+
+  for (i = 0; i < blockSize; i++)
+    {
+      input_buf[i] = input_buf[i] >> guard_bits;
+    }
+}
+
+/** 
+ * @brief  Remove guard bits and saturate for Input buffer
+ * @param  q31_t* 	Pointer to input buffer
+ * @param  uint32_t 	blockSize
+ * @param  uint32_t 	guard_bits
+ * @return none
+ * The function removes the guard bits for the buffer 
+ * and prevents overflow 
+ */
+
+void remove_guard_bits_q31 (q31_t * input_buf, 
+								 uint32_t blockSize,
+                                 uint32_t guard_bits)
+{
+  uint32_t i;
+  int32_t sat_max = 2147483647 >> guard_bits;
+  int32_t sat_min = -2147483648 >> guard_bits;
+  int32_t temp;
+  
+  for (i = 0; i < blockSize; i++)
+    {
+	  temp = input_buf[i];
+	  temp = temp > sat_max ? sat_max : temp;
+	  temp = temp < sat_min ? sat_min : temp;
+      input_buf[i] = temp << guard_bits;
+      //input_buf[i] = input_buf[i] << guard_bits;
+    }
+}
+
 void
 AudioEffectReverb::update(void)
 {
@@ -178,7 +229,8 @@ AudioEffectReverb::update(void)
     return;
 
   arm_q15_to_q31(block->data, q31_buf, AUDIO_BLOCK_SAMPLES);
-
+  provide_guard_bits_q31(q31_buf, AUDIO_BLOCK_SAMPLES, 8);
+  
   _do_comb_apf(&apf[0], q31_buf, q31_buf);
   _do_comb_apf(&apf[1], q31_buf, q31_buf);
 
@@ -199,6 +251,7 @@ AudioEffectReverb::update(void)
 
   _do_comb_apf(&apf[2], sum_buf, q31_buf);
 
+  remove_guard_bits_q31(q31_buf, AUDIO_BLOCK_SAMPLES, 8);
   arm_q31_to_q15(q31_buf, block->data, AUDIO_BLOCK_SAMPLES);
 
   transmit(block, 0);
