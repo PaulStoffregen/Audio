@@ -66,6 +66,46 @@ private:
 #endif
 };
 
+class AudioMixer8 : public AudioStream
+{
+#if defined(__ARM_ARCH_7EM__)
+public:
+	AudioMixer8(void) : AudioStream(nchan, inputQueueArray) {
+		for (int i=0; i < nchan; i++) multiplier[i] = 65536;
+	}
+	virtual void update(void);
+	void gain(unsigned int channel, float gain) {
+		if (channel >= nchan) return;
+		if (gain > 32767.0f) gain = 32767.0f;
+		else if (gain < -32767.0f) gain = -32767.0f;
+		multiplier[channel] = gain * 65536.0f; // TODO: proper roundoff?
+	}
+private:
+	static const int nchan = 8;
+	int32_t multiplier[nchan];
+	audio_block_t *inputQueueArray[nchan];
+
+#elif defined(KINETISL)
+public:
+	AudioMixer4(void) : AudioStream(nchan, inputQueueArray) {
+		for (int i=0; i < nchan; i++) multiplier[i] = 256;
+	}
+	virtual void update(void);
+	void gain(unsigned int channel, float gain) {
+		if (channel >= nchan) return;
+		if (gain > 127.0f) gain = 127.0f;
+		else if (gain < -127.0f) gain = -127.0f;
+		multiplier[channel] = gain * 256.0f; // TODO: proper roundoff?
+	}
+private:
+	static const int nchan = 8;
+	int16_t multiplier[nchan];
+	audio_block_t *inputQueueArray[nchan];
+#endif
+};
+
+
+
 class AudioAmplifier : public AudioStream
 {
 public:
