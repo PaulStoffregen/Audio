@@ -27,9 +27,9 @@
 #ifndef play_sd_raw_h_
 #define play_sd_raw_h_
 
-#include "Arduino.h"
-#include "AudioStream.h"
-#include "SD.h"
+#include <Arduino.h>     // github.com/PaulStoffregen/cores/blob/master/teensy4/Arduino.h
+#include <AudioStream.h> // github.com/PaulStoffregen/cores/blob/master/teensy4/AudioStream.h
+#include <SD.h>          // github.com/PaulStoffregen/SD/blob/Juse_Use_SdFat/src/SD.h
 
 class AudioPlaySdRaw : public AudioStream
 {

@@ -26,8 +26,8 @@
 
 #ifndef effect_envelope_h_
 #define effect_envelope_h_
-#include "Arduino.h"
-#include "AudioStream.h"
+#include <Arduino.h>     // github.com/PaulStoffregen/cores/blob/master/teensy4/Arduino.h
+#include <AudioStream.h> // github.com/PaulStoffregen/cores/blob/master/teensy4/AudioStream.h
 #include "utility/dspinst.h"
 
 #define SAMPLES_PER_MSEC (AUDIO_SAMPLE_RATE_EXACT/1000.0f)
@@ -76,7 +76,6 @@ public:
 	}
 	bool isActive();
 	bool isSustain();
-	using AudioStream::release;
 	virtual void update(void);
 private:
 	uint16_t milliseconds2count(float milliseconds) {

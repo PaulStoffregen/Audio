@@ -27,7 +27,7 @@
 #include <Arduino.h>
 #include "output_pwm.h"
 
-bool AudioOutputPWM::update_responsibility = false;
+volatile bool AudioOutputPWM::update_responsibility = false;
 
 #if defined(KINETISK)
 audio_block_t * AudioOutputPWM::block_1st = NULL;
@@ -204,32 +204,15 @@ void AudioOutputPWM::update(void)
 #elif defined(__IMXRT1062__)
 
 
-#if 1
-
-// Frank says this should be disabled for non-beta release
-// https://forum.pjrc.com/threads/60532-Teensy-4-1-Beta-Test?p=239244&viewfull=1#post239244
-
-void AudioOutputPWM::begin(void)
-{
-}
-
-void AudioOutputPWM::update(void)
-{
-	audio_block_t *block;
-	block = receiveReadOnly();
-	if (block) release(block);
-}
-
-#else
 /*
-* by Frank B
+* by Frank B  (some fixes Mark T)
 */
 
 static const uint8_t silence[2] = {0x80, 0x00};
 
 extern uint8_t analog_write_res;
 extern const struct _pwm_pin_info_struct pwm_pin_info[];
-audio_block_t * AudioOutputPWM::block = NULL;
+volatile audio_block_t * AudioOutputPWM::block = NULL;
 DMAMEM __attribute__((aligned(32))) static uint16_t pwm_tx_buffer[2][AUDIO_BLOCK_SAMPLES * 2];
 DMAChannel AudioOutputPWM::dma[2];
 _audio_info_flexpwm AudioOutputPWM::apins[2];
@@ -346,11 +329,10 @@ void AudioOutputPWM::begin(uint8_t pin1, uint8_t pin2)
 void AudioOutputPWM::isr(void)
 {
 	dma[1].clearInterrupt();
-
 	uint16_t *dest, *dest1;
 
-	uint32_t saddr = (uint32_t)(dma[0].TCD->SADDR);
-	if (saddr < (uint32_t)&pwm_tx_buffer[0][AUDIO_BLOCK_SAMPLES]) {
+	uint32_t saddr = (uint32_t)(dma[1].TCD->SADDR);
+	if (saddr < (uint32_t)&pwm_tx_buffer[1][AUDIO_BLOCK_SAMPLES]) {
 		// DMA is transmitting the first half of the buffer
 		// so we must fill the second half
 		dest = &pwm_tx_buffer[0][AUDIO_BLOCK_SAMPLES];
@@ -362,7 +344,7 @@ void AudioOutputPWM::isr(void)
 		dest1 = &pwm_tx_buffer[1][0];
 	}
 
-        const uint32_t modulo[2] = { apins[0].flexpwm->SM[apins[0].info.module & 3].VAL1, apins[1].flexpwm->SM[apins[1].info.module & 3].VAL1};
+	const uint32_t modulo[2] = { apins[0].flexpwm->SM[apins[0].info.module & 3].VAL1, apins[1].flexpwm->SM[apins[1].info.module & 3].VAL1};
 
 	if (block) {
 
@@ -371,53 +353,57 @@ void AudioOutputPWM::isr(void)
 			
 			uint32_t msb = ((sample >> 8) & 255)/* + 120 ???*/;
 			uint32_t cval0 = (msb * (modulo[0] + 1)) >> analog_write_res;
-			if (cval0 > modulo[0]) cval0 = modulo[0]; // TODO: is this check correct?
-			*dest++ = cval0;
+			if (cval0 >= modulo[0])
+			  cval0 = modulo[0]-1; // TODO: is this check correct?
+			dest[i] = cval0;
 			
 			uint32_t lsb = sample & 255;
 			uint32_t cval1 = (lsb * (modulo[1] + 1)) >> analog_write_res;
-			if (cval1 > modulo[1]) cval1 = modulo[1];
-			*dest1++ = cval1;
+			if (cval1 >= modulo[1])
+			  cval1 = modulo[1]-1;
+			dest1[i] = cval1;
 		}
+
 		arm_dcache_flush_delete(dest, sizeof(pwm_tx_buffer[0]) / 2 );
 		arm_dcache_flush_delete(dest1, sizeof(pwm_tx_buffer[1]) / 2 );
 		
-		AudioStream::release(block);
+		AudioStream::release((audio_block_t *)block);  // block is defined as volatile
 		block = NULL;
 	} else {
 		//Serial.println(".");
 
 		// fill with silence when no data available
 		uint32_t cval0 = (silence[0] * (modulo[0] + 1)) >> analog_write_res;
-		if (cval0 > modulo[0]) cval0 = modulo[0];
+		if (cval0 >= modulo[0])
+		  cval0 = modulo[0]-1;
 
 		uint32_t cval1 = (silence[1] * (modulo[1] + 1)) >> analog_write_res;
-		if (cval1 > modulo[1]) cval1 = modulo[1];
+		if (cval1 >= modulo[1])
+		  cval1 = modulo[1]-1;
 
-		for (unsigned i=0; i < AUDIO_BLOCK_SAMPLES / 2; i++) {
-			*dest++ = cval0;
-			*dest++ = cval0;
-			*dest1++ = cval1;
-			*dest1++ = cval1;
+		for (unsigned i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+		  dest[i] = cval0;
+		  dest1[i] = cval1;
 		}
 
 		arm_dcache_flush_delete(dest, sizeof(pwm_tx_buffer[0]) / 2 );
 		arm_dcache_flush_delete(dest1, sizeof(pwm_tx_buffer[1]) / 2 );
 	}
-
-        AudioStream::update_all();
+	if (AudioOutputPWM::update_responsibility)
+	  AudioStream::update_all();
 	//digitalWriteFast(13, !digitalRead(13));
 }
 
 void AudioOutputPWM::update(void)
 {
-	audio_block_t *tblock;
-	tblock = receiveReadOnly();
-	if (!tblock) return;
+	audio_block_t * new_block = receiveReadOnly();
+	audio_block_t * old_block ;
 	__disable_irq();
-	block = tblock;
+	old_block = (audio_block_t*)block ;  // block is defined as volatile
+	block = new_block ;
 	__enable_irq();
+	if (old_block)
+		release (old_block);
 }
-#endif
 
 #endif // __IMXRT1062__

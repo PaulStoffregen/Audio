@@ -1,4 +1,4 @@
-/* Audio Library for Teensy 3.X
+/* Audio Library for Teensy 3.X // github.com/PaulStoffregen/cores/blob/master/teensy4/AudioStream.h
  * Copyright (c) 2014, Paul Stoffregen, paul@pjrc.com
  *
  * Development of this audio library was funded by PJRC.COM, LLC by sales of
@@ -27,9 +27,9 @@
 #ifndef _input_i2s_hex_h_
 #define _input_i2s_hex_h_
 
-#include "Arduino.h"
-#include "AudioStream.h"
-#include "DMAChannel.h"
+#include <Arduino.h>     // github.com/PaulStoffregen/cores/blob/master/teensy4/Arduino.h
+#include <AudioStream.h> // github.com/PaulStoffregen/cores/blob/master/teensy4/AudioStream.h
+#include <DMAChannel.h>  // github.com/PaulStoffregen/cores/blob/master/teensy4/DMAChannel.h
 
 class AudioInputI2SHex : public AudioStream
 {

@@ -27,9 +27,9 @@
 #ifndef synth_sine_h_
 #define synth_sine_h_
 
-#include "Arduino.h"
-#include "AudioStream.h"
-#include "arm_math.h"
+#include <Arduino.h>     // github.com/PaulStoffregen/cores/blob/master/teensy4/Arduino.h
+#include <AudioStream.h> // github.com/PaulStoffregen/cores/blob/master/teensy4/AudioStream.h
+#include <arm_math.h>    // github.com/PaulStoffregen/cores/blob/master/teensy4/arm_math.h
 
 // TODO: investigate making a high resolution sine wave
 // using Taylor series expansion.

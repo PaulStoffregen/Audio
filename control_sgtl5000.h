@@ -27,7 +27,7 @@
 #ifndef control_sgtl5000_h_
 #define control_sgtl5000_h_
 
-#include <AudioStream.h>
+#include <AudioStream.h> // github.com/PaulStoffregen/cores/blob/master/teensy4/AudioStream.h
 #include "AudioControl.h"
 
 // SGTL5000-specific defines for headphones

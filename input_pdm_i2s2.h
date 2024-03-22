@@ -27,9 +27,9 @@
 #ifndef _input_pdm_i2s2_h_
 #define _input_pdm_i2s2_h_
 
-#include "Arduino.h"
-#include "AudioStream.h"
-#include "DMAChannel.h"
+#include <Arduino.h>     // github.com/PaulStoffregen/cores/blob/master/teensy4/Arduino.h
+#include <AudioStream.h> // github.com/PaulStoffregen/cores/blob/master/teensy4/AudioStream.h
+#include <DMAChannel.h>  // github.com/PaulStoffregen/cores/blob/master/teensy4/DMAChannel.h
 
 class AudioInputPDM2 : public AudioStream
 {

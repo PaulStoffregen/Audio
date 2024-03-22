@@ -575,7 +575,8 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<h3>Functions</h3>
 	<p>This object has no functions to call from the Arduino sketch.  It
 		simply streams data from the I2S hardware to its 2 output ports.</p>
-	<h3>Hardware</h3>
+	<h3>Hardware Teensy 4</h3>
+	<h3>Hardware Teensy 3</h3>
 	<p align=center><img src="img/audioshield_backside.jpg"></p>
 	<p>The I2S signals are used in "master" mode, where Teensy creates
 		all 3 clock signals and controls all data timing.</p>
@@ -990,8 +991,8 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<li>Teensy 3.2
 	<li>Teensy 3.5
 	<li>Teensy 3.6
-	<li>Teensy 4.0 - experimental
-	<li>Teensy 4.1 - experimental
+	<li>Teensy 4.0
+	<li>Teensy 4.1
 	</ul>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -1001,7 +1002,17 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<h3>Functions</h3>
 	<p>This object has no functions to call from the Arduino sketch.  It
 		simply streams data from the ADC to its output port.</p>
-	<h3>Hardware</h3>
+	<h3>Hardware Teensy 4</h3>
+	<p>Pin A2 is used by default for audio input.</p>
+	<p>The same circuitry as Teensy 3 can be used (see schematic below),
+		but the 10K resistor should be changed to 2.2K.
+	<p>Signal range is 0 to 3.3V.</p>
+	<p>Low impedance (strong) drive is required.  The ADC pin picks up
+		a lot of noise from inside the chip.  A strong signal is
+		needed to overcome this noise coupling.  DO NOT leave the
+		input pin disconnected.  Strong noise will occur if the
+		ADC input pin is left floating!</p>
+	<h3>Hardware Teensy 3</h3>
 	<p>Pin A2 is used for audio input.  This circuitry is recommended.</p>
 	<p align=center><img src="img/adccircuit.png"></p>
 	<p>Signal range is 0 to 1.2V</p>
@@ -1021,11 +1032,14 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<p class=exam>File &gt; Examples &gt; OctoWS2811 &gt; SpectrumAnalyzer
 	</p>
 	<h3>Notes</h3>
-	<p><b>analogRead() must not be used</b>, because AudioInputAnalog is regularly
+	<p><b>analogRead() must not be used</b>, on Teensy 3.x because AudioInputAnalog
+		is regularly
 		accessing the ADC hardware.  If both access the hardware at the same
 		moment, analogRead() can end up waiting forever, which effectively
 		crashes your program.
 	</p>
+	<p><b>analogRead()</b> can be used on Teensy 4.x while AudioInputAnalog is
+		running, as long as pins 26/A12, 27/A13, 38/A14, 39/A15 are not used.</p>
 	<p>A different pin may be used, but adding it as an parameter
 		to the AudioInputAnalog object definition.
 	</p>
@@ -1033,13 +1047,22 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	</p>
 	<p class=desc><span class=keyword>AudioInputAnalog</span>  adc1(<span class=literal>A3</span>);
 	</p>
+	<p>On Teensy 4, analog pins 24/A10 and 25/A11 are not supported.</p>
 
 	<p>Noise due to high source impedance, which allows rapidly switching digital signals
 		to capacitively couple... avoiding higher analog impedance is the solution.</p>
 	<p>Power Supply rejection issue with simple DC bias (bigger capacitor may be needed if 3.3V has low frequency noise)</p>
 	<p>Algorithm for automatic DC bias tracking</p>
-	<p>TODO: actual noise measurements with different input circuitry
-		(it's not as quiet as the audio shield)</p>
+	<p>Noise coupling from digital circuitry inside the chip is always a problem when using
+		ADC inputs pin.  It's never as quiet as the audio shield and any good quality
+		audio ADC chip.  Stong low impedance drive to the analog input pin is critical
+		to minimizing noise coupling.  If an opamp is used, connect a low value resistor
+		(eg, 100 to 1000 ohms)
+		between the opamp output and ADC input pin, and a 1nF capacitor from the ADC pin
+		to GND or AGND.  The capacitor lowers the impedance for high frequency noise,
+		and most opamps require a resistor to avoid oscillation when driving a
+		capacitive load.  Strong drive from an opamp, 100 ohm resistor and 1nF
+		capacitor can greatly reduce the digital noise coupling.</p>
 </script>
 <script type="text/x-red" data-template-name="AudioInputAnalog">
 	<div class="form-row">
@@ -1228,7 +1251,9 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<p>Audio from
 		master mode TDM may be used in the same project as ADC, DAC and
 		PWM signals, because all remain in sync to Teensy's timing</p>
-	<!--<h3>Examples</h3>-->
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughTDM16</p>
+	</p>
 	<h3>Notes</h3>
 	<p>Only one TDM input and one TDM output object may be used.  The
 		I2S hardware is used by TDM, so TDM objects may not be used
@@ -2317,7 +2342,9 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 		<a href="https://oshpark.com/shared_projects/gVFy0fWQ">
 		CS42448 Board for Teensy 4.x</a> and this
 		<a href="https://oshpark.com/shared_projects/O7iqdcLr">
-		ADAU1966A Board for Teensy 4.x</a>.
+		ADAU1966A Board for Teensy 4.x</a>, and an
+		<a href="https://forum.pjrc.com/threads/72479?p=327541&viewfull=1#post327541">
+		inexpensive CS42448 breakout board</a>.
 		</p>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>T3.x<br>Pin</th><th>T4.x<br>Pin</th><th>Signal</th><th>Direction</th></tr>
@@ -2331,6 +2358,10 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 		PWM signals, because all remain in sync to Teensy's timing</p>
 	<h3>Examples</h3>
 	<p><a href="https://www.youtube.com/watch?v=LOnEv4EDYsk">Video Demo</a> (YouTube)
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; WaveformsTDM16</p>
+	</p>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughTDM16</p>
+	</p>
 	<h3>Notes</h3>
 	<p>Only one TDM input and one TDM output object may be used.  The
 		I2S hardware is used by TDM, so TDM objects may not be used
@@ -3000,26 +3031,39 @@ The actual packets are taken
 		<tr class=odd><td align=center>Out 0</td><td>Output</td></tr>
 	</table>
 	<h3>Functions</h3>
+		<p>Note that "amplitude" is treated inconsistently within this object, 
+		and inconsistently with the general approach of the Audio library, 
+		which is to use values between 0.0 and 1.0
+		</p>
 	<p class=func><span class=keyword>setInstrument</span>(instrument);</p>
-	<p class=desc>blah blah
+	<p class=desc>Set sample set to instrument (reference to AudioSynthWavetable::instrument_data)
 	</p>
 	<p class=func><span class=keyword>amplitude</span>(volume);</p>
-	<p class=desc>blah blah
+	<p class=desc>Change amplitude. Volume is float in the range 0.0-1.0.
 	</p>
 	<p class=func><span class=keyword>setFrequency</span>(freq);</p>
-	<p class=desc>blah blah
+	<p class=desc>Set frequency of playing note (freq is float in Hz). Note that this
+	will not necessarily have the same sound as a note played at the given frequency, as
+	the sample is use is not changed.
 	</p>
 	<p class=func><span class=keyword>playFrequency</span>(freq, amplitude);</p>
-	<p class=desc>blah blah
+	<p class=desc>Play a note at a given frequency (float, Hz) and amplitude (integer, 0 - 127).
+	</p>
+	<p class=func><span class=keyword>playNote</span>(noteNumber, amplitude);</p>
+	<p class=desc>Play a note at a given MIDI note number (int, 0 - 127) and amplitude (integer, 0 - 127).
 	</p>
 	<p class=func><span class=keyword>stop</span>();</p>
-	<p class=desc>blah blah
+	<p class=desc>Stop playing a note. The sound will typically not stop immediately, but
+	decay away according to the release parameter of the wavetable. Use isPlaying()
+	to determine if the note has finished.
 	</p>
 	<p class=func><span class=keyword>isPlaying</span>();</p>
-	<p class=desc>blah blah
+	<p class=desc>Returns true if a note is playing.
 	</p>
 	<p class=func><span class=keyword>getEnvState</span>();</p>
-	<p class=desc>blah blah
+	<p class=desc>Return AudioSynthWavetable::envelopeStateEnum value giving current
+	state of the envelope generator. One of STATE_IDLE, STATE_DELAY, STATE_ATTACK, 
+	STATE_HOLD, STATE_DECAY, STATE_SUSTAIN, STATE_RELEASE 
 	</p>
 	<h3>Examples</h3>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; Synthesis &gt; Wavetable &gt; MidiSynth
@@ -3211,7 +3255,8 @@ The actual packets are taken
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
 	<p>Create a modulated sine wave, using any audio signal to continuously
-		modulate the sine wave frequency.</p>
+		modulate the sine wave frequency.  Note: limited modulation range,
+		use waveformMod for FM synthesis needing wide modulation range.</p>
 	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -3244,7 +3289,14 @@ The actual packets are taken
 	</p>
 -->
 	<h3>Notes</h3>
-	<p></p>
+	<p>This modulated sine wave offers only limited range, and the control
+		input scales differently than "volt per octave" commonly used
+		with FM synthesis.  Use the newer AudioSynthWaveformModulated
+		(waveformMod) waveform when wide range is needed.  This simple
+		sine wave uses a very simple algorithm, written in the earliest
+		versions of the Teensy Audio Library.  The newer waveformMod
+		offers up to 12 octaves modulation with control input mapped
+		to modulation in the way commonly used by audio synthesis.</p>
 </script>
 <script type="text/x-red" data-template-name="AudioSynthWaveformSineModulated">
 	<div class="form-row">
@@ -3399,12 +3451,16 @@ The actual packets are taken
 		<ul>
 		<li><span class=literal>WAVEFORM_SINE</span></li>
 		<li><span class=literal>WAVEFORM_SAWTOOTH</span></li>
+		<li><span class=literal>WAVEFORM_BANDLIMIT_SAWTOOTH</span></li>
 		<li><span class=literal>WAVEFORM_SAWTOOTH_REVERSE</span></li>
+		<li><span class=literal>WAVEFORM_BANDLIMIT_SAWTOOTH_REVERSE</span></li>
 		<li><span class=literal>WAVEFORM_SQUARE</span></li>
+		<li><span class=literal>WAVEFORM_BANDLIMIT_SQUARE</span></li>
 		<li><span class=literal>WAVEFORM_TRIANGLE</span></li>
 		<li><span class=literal>WAVEFORM_TRIANGLE_VARIABLE</span></li>
 		<li><span class=literal>WAVEFORM_ARBITRARY</span></li>
 		<li><span class=literal>WAVEFORM_PULSE</span></li>
+		<li><span class=literal>WAVEFORM_BANDLIMIT_PULSE</span></li>
 		<li><span class=literal>WAVEFORM_SAMPLE_HOLD</span></li>
 		</ul>
 	</p>
@@ -4101,7 +4157,7 @@ double s_freq = .0625;</p>
 	<p class=func><span class=keyword>disable</span>(channel);</p>
 	<p class=desc>Disable a channel.  The output of this channel becomes
 		silent.  If this channel is the longest delay, memory usage is
-		automatically reduced to accomodate only the remaining channels used.
+		automatically reduced to accommodate only the remaining channels used.
 	</p>
 	<h3>Examples</h3>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Delay
@@ -4159,9 +4215,7 @@ double s_freq = .0625;</p>
 		delay order.
 	</p>
 	<p class=func><span class=keyword>disable</span>(channel);</p>
-	<p class=desc>Disable a channel.  The output of this channel becomes
-		silent.  If this channel is the longest delay, memory usage is
-		automatically reduced to accomodate only the remaining channels used.
+	<p class=desc>Disable a channel.  The output of this channel becomes silent.
 	</p>
 	<h3>Hardware</h3>
 	<p>By default, or when <span class=literal>AUDIO_MEMORY_23LC1024</span> is used (see below),

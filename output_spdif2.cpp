@@ -55,6 +55,7 @@ FLASHMEM
 void AudioOutputSPDIF2::begin(void)
 {
 
+	memset(SPDIF_tx_buffer,0,sizeof SPDIF_tx_buffer); // ensure we start with silence
 	dma.begin(true); // Allocate the DMA channel first
 
 	block_left_1st = NULL;
