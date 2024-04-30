@@ -101,7 +101,7 @@ public:
 		phase_accumulator(0), phase_increment(0), phase_offset(0),
 		magnitude(0), pulse_width(0x40000000),
 		arbdata(NULL), sample(0), tone_type(WAVEFORM_SINE),
-		tone_offset(0) {
+		tone_offset(0), restart_phase_accumulator(false) {
 	}
 
 	void frequency(float freq) {
@@ -121,6 +121,9 @@ public:
 			if (angle >= 360.0f) return;
 		}
 		phase_offset = angle * (float)(4294967296.0 / 360.0);
+	}
+	void restart() {
+		restart_phase_accumulator = true;
 	}
 	void amplitude(float n) {	// 0 to 1.0
 		if (n < 0) {
@@ -178,6 +181,7 @@ private:
 	short    tone_type;
 	int16_t  tone_offset;
         BandLimitedWaveform band_limit_waveform ;
+	bool     restart_phase_accumulator;
 };
 
 
@@ -187,7 +191,7 @@ public:
 	AudioSynthWaveformModulated(void) : AudioStream(2, inputQueueArray),
 		phase_accumulator(0), phase_increment(0), modulation_factor(32768),
 		magnitude(0), arbdata(NULL), sample(0), tone_offset(0),
-		tone_type(WAVEFORM_SINE), modulation_type(0) {
+		tone_type(WAVEFORM_SINE), modulation_type(0), restart_phase_accumulator(false) {
 	}
 
 	void frequency(float freq) {
@@ -198,6 +202,9 @@ public:
 		}
 		phase_increment = freq * (4294967296.0f / AUDIO_SAMPLE_RATE_EXACT);
 		if (phase_increment > 0x7FFE0000u) phase_increment = 0x7FFE0000;
+	}
+	void restart() {
+		restart_phase_accumulator = true;
 	}
 	void amplitude(float n) {	// 0 to 1.0
 		if (n < 0) {
@@ -265,6 +272,7 @@ private:
 	uint8_t  tone_type;
 	uint8_t  modulation_type;
         BandLimitedWaveform band_limit_waveform ;
+	bool     restart_phase_accumulator;
 };
 
 
