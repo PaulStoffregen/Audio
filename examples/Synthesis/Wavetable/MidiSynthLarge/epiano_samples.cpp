@@ -1,5 +1,5 @@
 #include "epiano_samples.h"
-const AudioSynthWavetable::sample_data epiano_samples[4] = {
+PROGMEM const AudioSynthWavetable::sample_data epiano_samples[4] = {
 	{
 		(int16_t*)sample_0_epiano_coldglass7wave, // sample
 		true, // LOOP
@@ -106,7 +106,7 @@ const AudioSynthWavetable::sample_data epiano_samples[4] = {
 	},
 };
 
-const uint32_t sample_0_epiano_coldglass7wave[128] = {
+PROGMEM const uint32_t sample_0_epiano_coldglass7wave[128] = {
 0x00000000,0x3549d7cd,0x14e0eff8,0xe3bd3b27,0xf1ca4888,0x212cfe35,0x1aa3bac9,0xd98bd0a6,
 0xbb3f15ac,0xf66e27b1,0x44a7fb3b,0x40a5e39f,0xf3ce0d09,0xc5f235ea,0xe95412c8,0x1aa2c6bd,
 0x0db7b955,0xe03b0205,0xe75843aa,0x26eb2e0c,0x4369eb10,0x083fda8c,0xbbdf0605,0xc15c1b69,
@@ -117,7 +117,7 @@ const uint32_t sample_0_epiano_coldglass7wave[128] = {
 0x00000000,0x00000000,0x00000000,
 };
 
-const uint32_t sample_1_epiano_coldglass7wave[128] = {
+PROGMEM const uint32_t sample_1_epiano_coldglass7wave[128] = {
 0x00000000,0x3549d7cd,0x14e0eff8,0xe3bd3b27,0xf1ca4888,0x212cfe35,0x1aa3bac9,0xd98bd0a6,
 0xbb3f15ac,0xf66e27b1,0x44a7fb3b,0x40a5e39f,0xf3ce0d09,0xc5f235ea,0xe95412c8,0x1aa2c6bd,
 0x0db7b955,0xe03b0205,0xe75843aa,0x26eb2e0c,0x4369eb10,0x083fda8c,0xbbdf0605,0xc15c1b69,
@@ -128,7 +128,7 @@ const uint32_t sample_1_epiano_coldglass7wave[128] = {
 0x00000000,0x00000000,0x00000000,
 };
 
-const uint32_t sample_2_epiano_coldglass7wave[128] = {
+PROGMEM const uint32_t sample_2_epiano_coldglass7wave[128] = {
 0x00000000,0x3549d7cd,0x14e0eff8,0xe3bd3b27,0xf1ca4888,0x212cfe35,0x1aa3bac9,0xd98bd0a6,
 0xbb3f15ac,0xf66e27b1,0x44a7fb3b,0x40a5e39f,0xf3ce0d09,0xc5f235ea,0xe95412c8,0x1aa2c6bd,
 0x0db7b955,0xe03b0205,0xe75843aa,0x26eb2e0c,0x4369eb10,0x083fda8c,0xbbdf0605,0xc15c1b69,
@@ -139,7 +139,7 @@ const uint32_t sample_2_epiano_coldglass7wave[128] = {
 0x00000000,0x00000000,0x00000000,
 };
 
-const uint32_t sample_3_epiano_epiano2ms[640] = {
+PROGMEM const uint32_t sample_3_epiano_epiano2ms[640] = {
 0x00000000,0x00630062,0x00640064,0x00620061,0x00620064,0x00640064,0x00640062,0x00640063,
 0x00610063,0x00620064,0x00640064,0x00640062,0x00640064,0x00630061,0x00610064,0x00640064,
 0x00640064,0x00630064,0x00640063,0x00640062,0x00610063,0x00620064,0x00630064,0x00620064,

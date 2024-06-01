@@ -1,5 +1,5 @@
 #include "timpani_samples.h"
-const AudioSynthWavetable::sample_data timpani_samples[3] = {
+PROGMEM const AudioSynthWavetable::sample_data timpani_samples[3] = {
 	{
 		(int16_t*)sample_0_timpani_timpani, // sample
 		true, // LOOP
@@ -80,7 +80,7 @@ const AudioSynthWavetable::sample_data timpani_samples[3] = {
 	},
 };
 
-const uint32_t sample_0_timpani_timpani[3968] = {
+PROGMEM const uint32_t sample_0_timpani_timpani[3968] = {
 0x00000000,0xfff9fff5,0xfff9fff5,0x0004fff5,0x004fffd7,0x010dff91,0x0f21fd95,0x4fbb460b,
 0x598a625b,0x40225439,0x1dc43113,0xcebe1dfc,0xa00faa38,0x8dee95d9,0xa37e9a5c,0xc251ae3d,
 0xce93bae0,0x0511d76d,0x3eb12a28,0x4c583de2,0x57c249d3,0x71fb4441,0x23dd71fb,0xe630f1b5,
@@ -568,7 +568,7 @@ const uint32_t sample_0_timpani_timpani[3968] = {
 0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,
 };
 
-const uint32_t sample_1_timpani_timpani[3968] = {
+PROGMEM const uint32_t sample_1_timpani_timpani[3968] = {
 0x00000000,0xfff9fff5,0xfff9fff5,0x0004fff5,0x004fffd7,0x010dff91,0x0f21fd95,0x4fbb460b,
 0x598a625b,0x40225439,0x1dc43113,0xcebe1dfc,0xa00faa38,0x8dee95d9,0xa37e9a5c,0xc251ae3d,
 0xce93bae0,0x0511d76d,0x3eb12a28,0x4c583de2,0x57c249d3,0x71fb4441,0x23dd71fb,0xe630f1b5,
@@ -1056,7 +1056,7 @@ const uint32_t sample_1_timpani_timpani[3968] = {
 0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,
 };
 
-const uint32_t sample_2_timpani_timpani[3968] = {
+PROGMEM const uint32_t sample_2_timpani_timpani[3968] = {
 0x00000000,0xfff9fff5,0xfff9fff5,0x0004fff5,0x004fffd7,0x010dff91,0x0f21fd95,0x4fbb460b,
 0x598a625b,0x40225439,0x1dc43113,0xcebe1dfc,0xa00faa38,0x8dee95d9,0xa37e9a5c,0xc251ae3d,
 0xce93bae0,0x0511d76d,0x3eb12a28,0x4c583de2,0x57c249d3,0x71fb4441,0x23dd71fb,0xe630f1b5,

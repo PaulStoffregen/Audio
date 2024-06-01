@@ -1,5 +1,5 @@
 #include "tuba_samples.h"
-const AudioSynthWavetable::sample_data tuba_samples[2] = {
+PROGMEM const AudioSynthWavetable::sample_data tuba_samples[2] = {
 	{
 		(int16_t*)sample_0_tuba_tubaax1, // sample
 		true, // LOOP
@@ -54,7 +54,7 @@ const AudioSynthWavetable::sample_data tuba_samples[2] = {
 	},
 };
 
-const uint32_t sample_0_tuba_tubaax1[1024] = {
+PROGMEM const uint32_t sample_0_tuba_tubaax1[1024] = {
 0x00000000,0x003c0084,0xff770005,0xfe98ff1e,0xfdcbfe1b,0xfd61fd7e,0xfd88fd69,0xfe52fde3,
 0xff83fedf,0x00cf0028,0x01d80165,0x027c0246,0x02800292,0x01ea023f,0x0102017f,0x002d0093,
 0xffafffe0,0xffbeff9d,0x00640006,0x016900e7,0x026901de,0x034702e1,0x03d9039f,0x04150404,
@@ -182,7 +182,7 @@ const uint32_t sample_0_tuba_tubaax1[1024] = {
 0x00000000,
 };
 
-const uint32_t sample_1_tuba_tromg4[896] = {
+PROGMEM const uint32_t sample_1_tuba_tromg4[896] = {
 0x00000000,0xffc7ffd4,0xffb9ffc2,0xffa1ffab,0xff9eff9d,0xffb9ffa8,0xfff4ffcf,0x00370014,
 0x0072004f,0x00980080,0x0099009c,0x00750089,0x003b005d,0xfff6001c,0xffc4ffe1,0xff95ffaa,
 0xff80ff8b,0xff83ff7f,0xff8eff84,0xff90ff88,0xffa8ff99,0xffecffd2,0x00440020,0x0083005d,

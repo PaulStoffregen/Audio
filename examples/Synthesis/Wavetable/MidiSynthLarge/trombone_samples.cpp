@@ -1,5 +1,5 @@
 #include "trombone_samples.h"
-const AudioSynthWavetable::sample_data trombone_samples[4] = {
+PROGMEM const AudioSynthWavetable::sample_data trombone_samples[4] = {
 	{
 		(int16_t*)sample_0_trombone_tromb2, // sample
 		true, // LOOP
@@ -106,7 +106,7 @@ const AudioSynthWavetable::sample_data trombone_samples[4] = {
 	},
 };
 
-const uint32_t sample_0_trombone_tromb2[768] = {
+PROGMEM const uint32_t sample_0_trombone_tromb2[768] = {
 0x00000000,0x0001fff5,0xfff8fff8,0xffe7ffe7,0xffeaffe4,0x0003fff6,0x00230012,0x00230022,
 0x0016001b,0x0000000f,0xfff5fffb,0xffeffff0,0xffeeffeb,0xfffbfff3,0x00220008,0x0049003c,
 0x0066005b,0x007d007b,0x007f0083,0x00700078,0x00780071,0x00880083,0x0086008a,0x007d0083,
@@ -196,7 +196,7 @@ const uint32_t sample_0_trombone_tromb2[768] = {
 0x00000000,0x00000000,0x00000000,
 };
 
-const uint32_t sample_1_trombone_troma3[768] = {
+PROGMEM const uint32_t sample_1_trombone_troma3[768] = {
 0x00000000,0xffbfffbf,0xffbfffbf,0xffbfffbf,0xffbfffbf,0xffbfffbf,0xffbfffc1,0xffbfffbf,
 0xffbfffbe,0xffbfffbe,0xffc4ffbd,0xfffdffdd,0x002e001a,0x003e003b,0x003f0043,0x00370038,
 0x0050003e,0x007e0069,0x007d0081,0x00560068,0xfffd0029,0xffc3ffd5,0xffccffc1,0xfff6ffe3,
@@ -286,7 +286,7 @@ const uint32_t sample_1_trombone_troma3[768] = {
 0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,
 };
 
-const uint32_t sample_2_trombone_tromd4[640] = {
+PROGMEM const uint32_t sample_2_trombone_tromd4[640] = {
 0x00000000,0xfffefff3,0xffebffef,0xffdeffe1,0xffdcffdc,0xffd3ffd4,0xffc4ffc5,0xffb6ffbb,
 0xffabffaf,0xff9effa7,0xff9fffa2,0xff9dff9e,0xffb7ffa3,0xfff6ffd7,0x00240011,0x004b0037,
 0x005e005b,0x005f005e,0x006e0063,0x00700073,0x005b006c,0x00320049,0x0007001a,0xffdbfff3,
@@ -362,7 +362,7 @@ const uint32_t sample_2_trombone_tromd4[640] = {
 0x00000000,0x00000000,0x00000000,0x00000000,
 };
 
-const uint32_t sample_3_trombone_tromg4[896] = {
+PROGMEM const uint32_t sample_3_trombone_tromg4[896] = {
 0x00000000,0xffc7ffd4,0xffb9ffc2,0xffa1ffab,0xff9eff9d,0xffb9ffa8,0xfff4ffcf,0x00370014,
 0x0072004f,0x00980080,0x0099009c,0x00750089,0x003b005d,0xfff6001c,0xffc4ffe1,0xff95ffaa,
 0xff80ff8b,0xff83ff7f,0xff8eff84,0xff90ff88,0xffa8ff99,0xffecffd2,0x00440020,0x0083005d,

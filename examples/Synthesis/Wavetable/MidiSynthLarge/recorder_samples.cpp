@@ -1,5 +1,5 @@
 #include "recorder_samples.h"
-const AudioSynthWavetable::sample_data recorder_samples[1] = {
+PROGMEM const AudioSynthWavetable::sample_data recorder_samples[1] = {
 	{
 		(int16_t*)sample_0_recorder_recorderax2, // sample
 		true, // LOOP
@@ -28,7 +28,7 @@ const AudioSynthWavetable::sample_data recorder_samples[1] = {
 	},
 };
 
-const uint32_t sample_0_recorder_recorderax2[768] = {
+PROGMEM const uint32_t sample_0_recorder_recorderax2[768] = {
 0x00000000,0x02e10679,0x043ffe86,0x006b01bd,0xffea001a,0x023a031b,0xff5ffee7,0x04fb03d5,
 0xfe33ff10,0x013302c3,0x04c00142,0xffcd0211,0x06d2034d,0x008d037a,0x044d02fa,0x004c0062,
 0x0637088b,0xff92fd40,0x06c7047b,0xff17ff39,0x017a05ac,0x035801c3,0x017a0219,0x025d0003,
