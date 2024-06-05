@@ -1,5 +1,5 @@
 #include "piano_samples.h"
-const AudioSynthWavetable::sample_data piano_samples[4] = {
+PROGMEM const AudioSynthWavetable::sample_data piano_samples[4] = {
 	{
 		(int16_t*)sample_0_piano_kpianob1, // sample
 		true, // LOOP
@@ -106,7 +106,7 @@ const AudioSynthWavetable::sample_data piano_samples[4] = {
 	},
 };
 
-const uint32_t sample_0_piano_kpianob1[8704] = {
+PROGMEM const uint32_t sample_0_piano_kpianob1[8704] = {
 0x00000000,0xff2cfe83,0x006fffd0,0x01b0008d,0x03ec01fd,0x060e06f1,0x080b057c,0x036a0618,
 0x03fe02b7,0xffe30299,0x031601e9,0x02ca0252,0x02aefe06,0xf4fffa2f,0xfafcfdd6,0xfa0eff91,
 0xfb320136,0xf2d9f597,0x0176f6be,0xfdaafbeb,0x1045fa37,0xfd460886,0xff85f155,0xdb9aef93,
@@ -1189,7 +1189,7 @@ const uint32_t sample_0_piano_kpianob1[8704] = {
 0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,
 };
 
-const uint32_t sample_1_piano_kpianocx4[10880] = {
+PROGMEM const uint32_t sample_1_piano_kpianocx4[10880] = {
 0x00000000,0xff8eff67,0xfffcffc1,0x0236007a,0xff8b0282,0x0197feda,0x03b801a6,0x0435050d,
 0x032905bb,0x0011fe2a,0x0a1a0451,0x00e4079f,0x0abb03d8,0x0ad60cb3,0x0a3205d4,0x13191386,
 0x05b10b95,0x0f3908f2,0xfbcb07a3,0x1169fdca,0xfd67097a,0xe478f9b7,0x0de70002,0xef6cec13,
@@ -2544,7 +2544,7 @@ const uint32_t sample_1_piano_kpianocx4[10880] = {
 0x00000000,0x00000000,0x00000000,
 };
 
-const uint32_t sample_2_piano_kpianodx5[3200] = {
+PROGMEM const uint32_t sample_2_piano_kpianodx5[3200] = {
 0x00000000,0x00780121,0x00cf00f6,0x00c500ce,0x009c008b,0x007c005b,0x00690047,0x006b0042,
 0x00660051,0x0037003e,0x000c0011,0xffeafff0,0xffe4ffde,0xffe6ffe4,0xffeeffe5,0xffd6ffde,
 0xffb4ffc2,0xff83ff94,0xff6cff77,0xff7cff70,0xffbeff95,0xfffeffde,0x00420019,0x006d0072,
@@ -2936,7 +2936,7 @@ const uint32_t sample_2_piano_kpianodx5[3200] = {
 0x00000000,
 };
 
-const uint32_t sample_3_piano_kpianof502[2304] = {
+PROGMEM const uint32_t sample_3_piano_kpianof502[2304] = {
 0x00000000,0x00fd00d3,0x013c0124,0x015e014c,0x0171016d,0x01680169,0x01650168,0x0143015a,
 0x011b012f,0x00d600f9,0x00b900c5,0x008f00a8,0x0064007a,0x0008002d,0xffc3ffe9,0xff9affa5,
 0xffa6ffa3,0xffd1ffb9,0xfff9ffe7,0x00330019,0x0041002e,0x002c0047,0x001b0027,0x00310037,

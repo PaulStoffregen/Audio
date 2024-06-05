@@ -1,5 +1,5 @@
 #include "harmonica_samples.h"
-const AudioSynthWavetable::sample_data harmonica_samples[1] = {
+PROGMEM const AudioSynthWavetable::sample_data harmonica_samples[1] = {
 	{
 		(int16_t*)sample_0_harmonica_harmonicaa3, // sample
 		true, // LOOP
@@ -28,7 +28,7 @@ const AudioSynthWavetable::sample_data harmonica_samples[1] = {
 	},
 };
 
-const uint32_t sample_0_harmonica_harmonicaa3[512] = {
+PROGMEM const uint32_t sample_0_harmonica_harmonicaa3[512] = {
 0x00000000,0xfe50fc97,0x01450058,0x03e003c8,0x0639054e,0x076007ae,0x066806d2,0x02e4058d,
 0xff59028b,0xfcfdfdb7,0xf88df9e0,0xf6acf8d0,0xf890f7d6,0xfa43f87b,0xfbbcfa4b,0xfe74fe06,
 0x01890168,0x05a004bd,0x07f60628,0x091f08aa,0x06f608d3,0x040b0665,0xff9a0140,0xfa81fd24,

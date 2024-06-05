@@ -1,5 +1,5 @@
 #include "glockenspiel_samples.h"
-const AudioSynthWavetable::sample_data glockenspiel_samples[2] = {
+PROGMEM const AudioSynthWavetable::sample_data glockenspiel_samples[2] = {
 	{
 		(int16_t*)sample_0_glockenspiel_sinetick, // sample
 		false, // LOOP
@@ -54,7 +54,7 @@ const AudioSynthWavetable::sample_data glockenspiel_samples[2] = {
 	},
 };
 
-const uint32_t sample_0_glockenspiel_sinetick[128] = {
+PROGMEM const uint32_t sample_0_glockenspiel_sinetick[128] = {
 0x00000000,0x78bc7a66,0x723075f8,0x676e6d4c,0x590760a7,0x4751508b,0x33203d8a,0x1cfa283a,
 0x05e51191,0xee80fa2b,0xd7d7e316,0xc29bccf0,0xaf84b8bc,0x9f67a704,0x92bb9899,0x8a098ddb,
 0x85968746,0x85988505,0x8a068740,0x92b18dce,0x9f579891,0xaf73a6f6,0xc274b8ac,0xd7c4ccdc,
@@ -65,7 +65,7 @@ const uint32_t sample_0_glockenspiel_sinetick[128] = {
 0x00000000,0x00000000,0x00000000,
 };
 
-const uint32_t sample_1_glockenspiel_sinetick[128] = {
+PROGMEM const uint32_t sample_1_glockenspiel_sinetick[128] = {
 0x00000000,0x78bc7a66,0x723075f8,0x676e6d4c,0x590760a7,0x4751508b,0x33203d8a,0x1cfa283a,
 0x05e51191,0xee80fa2b,0xd7d7e316,0xc29bccf0,0xaf84b8bc,0x9f67a704,0x92bb9899,0x8a098ddb,
 0x85968746,0x85988505,0x8a068740,0x92b18dce,0x9f579891,0xaf73a6f6,0xc274b8ac,0xd7c4ccdc,
