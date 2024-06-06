@@ -79,13 +79,14 @@ void AudioOutputSPDIF::begin(void)
 	dma.TCD->DLASTSGA = 0;
 	dma.TCD->BITER_ELINKNO = sizeof(SPDIF_tx_buffer) / nbytes_mlno;
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
+	
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_TX);
+	
 	update_responsibility = update_setup();
+	dma.attachInterrupt(isr);
 	dma.enable();
 
 	I2S0_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE | I2S_TCSR_FR;
-	dma.attachInterrupt(isr);
-
 #elif defined(__IMXRT1062__)
 	CORE_PIN7_CONFIG  = 3;  //1:TX_DATA0	
 	const int nbytes_mlno = 2 * 4; // 8 Bytes per minor loop
@@ -101,13 +102,15 @@ void AudioOutputSPDIF::begin(void)
 	dma.TCD->DLASTSGA = 0;
 	dma.TCD->BITER_ELINKNO = sizeof(SPDIF_tx_buffer) / nbytes_mlno;
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
+	
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI1_TX);
+	
 	update_responsibility = update_setup();
+	dma.attachInterrupt(isr);
 	dma.enable();
 
 	I2S1_RCSR |= I2S_RCSR_RE;
 	I2S1_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE | I2S_TCSR_FR;
-	dma.attachInterrupt(isr);
 #endif
 }
 
