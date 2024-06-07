@@ -78,7 +78,9 @@ int16_t * AudioRecordQueue::readBuffer(void)
 	// rather than NULL, which according to the 
 	// documentation says no data available
 	
-	return userblock->data;
+	return NULL == userblock // no data, or can't allocate() a silent block
+				?NULL
+				:userblock->data;
 }
 
 void AudioRecordQueue::freeBuffer(void)
