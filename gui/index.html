@@ -4947,8 +4947,9 @@ double s_freq = .0625;</p>
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
 	<p>Compute a 1024 point Fast Fourier Transform (FFT) frequency analysis,
-		with real value (magnitude) output.  The frequency resolution is
-		43 Hz, useful detailed for audio visualization.</p>
+		with complex value output and further computational options like
+		amplitude extraction.  The frequency resolution is 43 Hz, useful
+		detailed for audio visualization.</p>
 	</div>
 	<h3>Audio Connections</h3>
 	<table class=doc align=center cellpadding=3>
@@ -4959,14 +4960,37 @@ double s_freq = .0625;</p>
 	<p class=func><span class=keyword>available</span>();</p>
 	<p class=desc>Returns true each time the FFT analysis produces new output data.
 	</p>
-	<p class=func><span class=keyword>read</span>(binNumber);</p>
-	<p class=desc>Read a single frequency bin, from 0 to 511.  The result is scaled
-		so 1.0 represents a full scale sine wave.
+	<p class=func><span class=keyword>readCmplxNumber</span>(binNumber);</p>
+	<p class=desc>Read a single frequency bin's complex number (uint32_t).  The 16
+		least significant bits represent the real part, the 16 most significant bits
+		represent the imaginary part.  Both parts are signed.
 	</p>
-	<p class=func><span class=keyword>read</span>(firstBin, lastBin);</p>
-	<p class=desc>Read several frequency bins, returning their sum.  The higher
-		audio octaves are represented by many bins, which are typically read
-		as a group for audio visualization.
+	<p class=func><span class=keyword>readCmplxRealPart</span>(binNumber);</p>
+	<p class=desc>Read a single frequency bin complex number's signed real part
+		(int16_t).  That is not the magnitude, but instead "a" from "a + bi".
+	</p>
+	<p class=func><span class=keyword>readCmplxImaginaryPart</span>(binNumber);</p>
+	<p class=desc>Read a single frequency bin complex number's signed imaginary part
+		(int16_t).  That is "b" from "a + bi".
+	</p>
+	<p class=func><span class=keyword>readCmplxMagnitude</span>(binNumber);</p>
+	<p class=desc>Read a single frequency bin complex number's magnitude
+		(uint16_t).  That is the length of the number's vector in the complex plane,
+		which can be computed with "&radic;(a&sup2; + b&sup2;)" considering "a + bi".
+	</p>
+	<p class=func><span class=keyword>readAmplitude</span>(binNumber);</p>
+	<p class=desc>Read a single frequency bin's signal amplitude, from 0 to 511.  The
+		result is scaled so 1.0 represents a full scale sine wave.  This value can be
+		computed by dividing the respective magnitude by 128&sup2; = 16384.
+	</p>
+	<p class=func><span class=keyword>readAmplitudes</span>(firstBin, lastBin);</p>
+	<p class=desc>Read several frequency bins' signal amplitudes, returning their
+		sum.  The higher audio octaves are represented by many bins, which are
+		typically read as a group for audio visualization.
+	</p>
+	<p class=func><span class=keyword>readPhase</span>(binNumber);</p>
+	<p class=desc>Read a single frequency bin's signal phase, from -&pi; to &pi;.  The
+		result is similar to the angle of the number's vector in the complex plane.
 	</p>
 	<p class=func><span class=keyword>averageTogether</span>(number);</p>
 	<p class=desc>This function does nothing.  The 1024 point FFT always
@@ -4984,8 +5008,6 @@ double s_freq = .0625;</p>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; Analysis &gt; SpectrumAnalyzerBasic
 	</p>
 	<h3>Notes</h3>
-	<p>The raw 16 bit output data bins may be access with myFFT.output[num], where
-		num is 0 to 511.</p>
 	<p>TODO: caveats about spectral leakage vs frequency precision for arbitrary signals</p>
 	<p>Window Types:
 		<ul>
