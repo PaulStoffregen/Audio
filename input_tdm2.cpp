@@ -80,7 +80,7 @@ static void memcpy_tdm_rx(uint32_t *dest1, uint32_t *dest2, const uint32_t *src)
 		in2 = *(src+8);
 		src += 16;
 		*dest1++ = (in1 >> 16) | (in2 & 0xFFFF0000);
-		*dest2++ = (in1 << 16) | (in2 & 0x0000FFFF);
+		*dest2++ = (in1 & 0x0000FFFF)  | (in2 << 16);
 	}
 }
 
