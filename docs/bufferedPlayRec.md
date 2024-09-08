@@ -125,6 +125,14 @@ These can be found in Examples/Audio/Buffered
 This is a variant on the Recorder example, but using the buffered objects to record and play a _stereo WAV_ file, rather than a queue and application-based writes to record a _mono RAW_ file, plus the ``AudioPlaySdRaw`` object for playback. As written it uses 128k of heap for the buffers. You will need an audio adaptor and a source of audio connected to the line inputs for this one. A couple of ``AudioAnalyzePeak`` objects are used to provide a crude level meter to allow you to set up prior to recording.
 ### RecSynthMusic
 This is based on the PlaySynthMusic example. It plays a short piece of music using a very simple 16-voice polyphonic synth, while simultaneously recording it to three WAV files with 4, 6 and 8 tracks - the last track of the 6- and 8-track files is unconnected and hence silent. It then re-patches the audio connections and plays the files back, which should sound identical to the original.
+### RecSynthMusicV2
+Same as the above, but achieves tighter note timing by using an IntervalTimer rather than `delay()`.
+### SDpiano
+88-note 3 samples per note piano. See the ReadMe in the sketch folder. Needs updating to use `AudioPreload` objects.
+### AudioTestPlayMultiSD
+Plays audio simultaneously from two separate SD cards - the Teensy 4.1 built-in one, and the one on the Audio Adaptor.
+### PreloadWhileRecording
+Simple 'looper' showing how to start playing back a file while it's still being recorded, and ensuring it plays to the end.
 
 ## Under the hood
 The following graphic describes what's going on under the hood, and when, during playback of a WAV file. Time runs from top to bottom; green bars show the regular 2.9ms audio update; brown bars at irregular intervals show when calls to yield() occur; grey blocks show when your sketch code is running. Not particularly to scale - for a start a 700kB/s filesystem would be a bit on the slow side...
