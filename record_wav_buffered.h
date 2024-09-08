@@ -33,12 +33,6 @@
 #include "EventResponder.h"
 #include "AudioBuffer.h"
 
-/*
-#define SCOPE_PIN 25
-#define SCOPE_SERIAL Serial1
-#define SCOPESER_SPEED 57600
-#include "oscope.h"
-//*/
 
 #if !defined(SAFE_RELEASE_INPUTS)
 #define SAFE_RELEASE_INPUTS(...)

@@ -45,9 +45,6 @@ void AudioRecordWAVbuffered::flushBuffer(uint8_t* pb, size_t sz)
 {
 	size_t outN;
 	
-SCOPE_HIGH();	
-SCOPESER_TX(objnum);
-
 	if (sz > 0) // file write triggered, but there's no data - ignore the request
 	{
 		
@@ -55,8 +52,6 @@ SCOPESER_TX(objnum);
 	size_t av = getAvailable();
 	if (av != 0 && av < lowWater && !eof)
 		lowWater = av;
-SCOPESER_TX((av >> 8) & 0xFF);
-SCOPESER_TX(av & 0xFF);
 }//----------------------------------------------------
 
 		uint32_t now = micros();
@@ -76,7 +71,6 @@ SCOPESER_TX(av & 0xFF);
 		writeExecuted(sz);
 	}
 	writePending = false;
-SCOPE_LOW();
 }
 
 
@@ -88,9 +82,6 @@ AudioRecordWAVbuffered::AudioRecordWAVbuffered(unsigned char ninput, audio_block
 		data_length(0), total_length(0),
 		state(STATE_STOP), state_record(STATE_STOP)
 {
-SCOPE_ENABLE();
-SCOPESER_ENABLE();
-	
 	// prepare EventResponder to refill buffer
 	// during yield(), if triggered from update()
 	setContext(this);

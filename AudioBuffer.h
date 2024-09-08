@@ -30,11 +30,6 @@
 #include <Arduino.h>
 #include <FS.h>
 
-// Default to disabling oscilloscope debug
-// This will be removed in production code
-#define noSCOPE_PIN
-#include <oscope.h>  
-
 class MemBuffer
 {
 	int inUse;			// if true, buffer is in use and createBuffer() and disposeBuffer() will fail

@@ -139,9 +139,6 @@ void AudioPlayWAVbuffered::loadBuffer(uint8_t* pb, size_t sz, bool firstLoad /* 
 {
 	size_t got;
 	
-SCOPE_HIGH();	
-SCOPESER_TX(objnum);
-
 	if (sz > 0 && !eof) // read triggered, but there's no room or already stopped - ignore the request
 	{
 		
@@ -149,8 +146,6 @@ SCOPESER_TX(objnum);
 	size_t av = getAvailable();
 	if (av != 0 && av < lowWater && !eof)
 		lowWater = av;
-SCOPESER_TX((av >> 8) & 0xFF);
-SCOPESER_TX(av & 0xFF);
 }//----------------------------------------------------
 
 		uint32_t now = micros();
@@ -170,7 +165,6 @@ SCOPESER_TX(av & 0xFF);
 		readExecuted(got);
 	}
 	readPending = false;
-SCOPE_LOW();
 }
 
 
@@ -223,9 +217,6 @@ AudioPlayWAVbuffered::AudioPlayWAVbuffered(void) :
 		playState(silent), fileState(silent),
 		leftover_bytes(0)
 {
-SCOPE_ENABLE();
-SCOPESER_ENABLE();
-	
 	// prepare EventResponder to refill buffer
 	// during yield(), if triggered from update()
 	setContext(this);
