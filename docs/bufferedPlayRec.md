@@ -6,6 +6,8 @@ The `AudioPlayWAV*` and `AudioRecordWAV*` objects are intended to provide good-p
 For playback, `AudioPlayWAVstereo`, `AudioPlayWAVquad`, `AudioPlayWAVhex`, and `AudioPlayWAVoct` objects are provided. These have 2, 4, 6 and 8 outputs respectively; in order to play a mono WAV file, use either output of an `AudioPlayWAVstereo` object.
 ### Recording
 For recording, `AudioRecordWAVmono`, `AudioRecordWAVstereo`, `AudioRecordWAVquad`, `AudioRecordWAVhex`, and `AudioRecordWAVoct` objects are provided. These have 1, 2, 4, 6 and 8 inputs respectively. Inputs which are not connected will still result in a channel being present in the stored WAV file, but it will be silent.
+### Pre-load
+For low-latency playback applications, an `AudioPreload` class is provided. This is used to store file information and some audio data from the start of the file, so that playback can start on the next audio system update. Playback transitions seamlessly to streaming from the fileystem once the pre-loadded audio data is exhausted.
 
 ## Enums
 ### `AudioBuffer::result`
@@ -15,7 +17,7 @@ One of ``AudioBuffer::none``, ``AudioBuffer::given``, ``AudioBuffer::inHeap``, `
 
 ## Functions
 ### Buffer functions
-For best results a buffer should be allocated prior to using any of these objects; if you fail to do so, a minimal 1k buffer will be allocated on the first operation, but it is unlikely to be large enough to provide stable operation.
+For best results a buffer should be allocated prior to using any of the playback and record objects; if you fail to do so, a minimal 1k buffer will be allocated on the first operation, but it is unlikely to be large enough to provide stable operation.
 ### `AudioBuffer::result createBuffer(size_t size,AudioBuffer::bufType location)`
 Creates a memory buffer of the required ``size`` in the requested ``location``. The return value will be ``AudioBuffer::ok`` if there was enough memory available to allocate the buffer, or `AudioBuffer::invalid` if memory could not be allocated, or the object was actively using the buffer to play or record when the attempt was made. 
 
@@ -27,17 +29,41 @@ It is highly recommended that ``size`` be a multiple of 1024. Use of this varian
 ### `AudioBuffer::result disposeBuffer()`
 Signals that the object no longer requires the use of the buffer allocated by a call to ``createBuffer()``. If allocated by the ``size, location`` overload, then the memory will be freed up; if the ``address, size`` overload was used, the application may re-purpose the buffer _after_ this call has been made. Returns ``AudioBuffer::ok`` if the buffer was disposed of, or `AudioBuffer::invalid` if the object was actively using the buffer to play or record when the attempt was made.
 
+### Pre-load
+### `AudioPreload()`
+Defines an "empty" pre-load object.
+### `AudioPreload(AudioBuffer::bufType bt, size_t sz)`
+Defines a pre-load object with buffer memory of size `sz`, in memory area `bt`. The buffer memory is allocated by the object's constructor.
+### `AudioPreload(uint8_t* buf, size_t sz)`
+Defines a pre-load object with buffer memory of size `sz`, at address `buf`: the programmer is responsible for managing the buffer memory.
+### `AudioBuffer::result preLoad(const char* fp, AudioBuffer::bufType bt, size_t sz, float startFrom = 0.0f, FS& fs = SD)`
+Allocate buffer and load audio data from file named in `fp`
+### `AudioBuffer::result preLoad(const char* fp, uint8_t* buf, size_t sz, float startFrom = 0.0f, FS& fs = SD)`
+Load audio data from file named in `fp` into provided buffer memory at `buf`
+### `AudioBuffer::result preLoad(const char* fp, float startFrom = 0.0f, FS& fs = SD)`
+Load audio data from file named in `fp` into pre-existing buffer memory.
+### `bool isReady(void)`
+Returns `true` if pre-load object has data loaded.
+
 ### Operational functions
 ### Playback
 ### ``bool playSD(const char* filename [,bool paused=false [,float startFrom = 0.0]])``
 ### ``bool cueSD(const char* filename [,float startFrom = 0.0])``
 ### ``bool play(File file [,bool paused=false [,float startFrom = 0.0]])``
+### ``bool play(const char* filename, [,bool paused=false [,float startFrom = 0.0]])``
+### ``bool play(const char* filename, FS& filesystem, [,bool paused=false [,float startFrom = 0.0]])``
+### ``bool play(AudioPreload& p, [,bool paused=false [,float startFrom = 0.0]])``
 ### ``bool cue(File file [,float startFrom = 0.0])``
-Play a file from SD or another filesystem. If the optional ``paused`` parameter is provided and set to true, then playing will start in "paused" mode; the identical effect can be achieved by using the ``cue()`` variants, which are equivalent to ``play(<something>,true)``.
+Play a file from SD, another filesystem, or a pre-load object. If the optional ``paused`` parameter is provided and set to true, then playing will start in "paused" mode; the identical effect can be achieved by using the ``cue()`` variants, which are equivalent to ``play(<something>,true)``.
 
-The optional `startFrom` parameter sets an offset into the audio data from which playback should start; the value is in milliseconds. This may be useful if you have pre-loaded the start of the file for playing directly from memory using the AudioPlayMemory object, and will play the rest from the filesystem once it has been cued up. This allows the use of large sample sets while still minimising latency and using only a single file for each sample. 
+The optional `startFrom` parameter sets an offset into the audio data from which playback should start; the value is in milliseconds. ~~This may be useful if you have pre-loaded the start of the file for playing directly from memory using the AudioPlayMemory object, and will play the rest from the filesystem once it has been cued up. This allows the use of large sample sets while still minimising latency and using only a single file for each sample.~~ Usage deprecated: use an `AudioPreload` object to achieve low-latency start of playback.
 
-Whichever variant is used, the buffer will be pre-loaded from the filesystem during the function call, which may mean that the call takes a few milliseconds to return. If synchronisation of multiple files is important to your application, you should start them in paused mode and then resume them simultaneously - see the ``play()`` function. 
+Unless an `AudioPreload` object is used, the buffer will be pre-loaded from the filesystem during the `play()` function call, which may mean that the call takes a few milliseconds to return. If synchronisation of multiple files is important to your application, you should start them in paused mode and then resume them simultaneously.
+
+Playing a pre-load object will start emitting audio on the next audio update, from the buffer data already loaded. The filename and filesystem are also stored in the object, and used to transition to streaming playback once the pre-load buffer is exhausted.
+
+### `void adjustHeaderInfo(void)`
+Forces a re-read of the WAV header, typically after recording is stopped. The header is written when recording stops and the file size is known, but if you have started playback while recording, you *must* call this to ensure playback will reach the end of the file. See also `writeCurrentHeader()`. Typically used for 'looper' applications.
 
 ### Recording
 ### ``bool recordSD(const char* filename [,bool paused=false])``
@@ -47,6 +73,9 @@ Whichever variant is used, the buffer will be pre-loaded from the filesystem dur
 Record a file to SD or another filesystem. If the optional ``paused`` parameter is provided and set to true, then recording will start in "paused" mode; the identical effect can be achieved by using the ``cue()`` variants, which are equivalent to ``record(<something>,true)``.
 
 If synchronisation of multiple files is important to your application, you should start them in paused mode and then resume them simultaneously - see the ``record()`` function. 
+
+### `void writeCurrentHeader(void)`
+Forces a valid WAV header to be written before recording is stopped. Usually the header is only written when recording stops and the file size is known, but if you want to start playback while recording, you *must* call this before doing so. See also `adjustHeaderInfo()`. Typically used for 'looper' applications.
 
 ### Transport controls
 ### ``bool pause()``
