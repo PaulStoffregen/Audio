@@ -33,16 +33,17 @@
 class AudioEffectFade : public AudioStream
 {
 	const uint32_t MAX_FADE = 0xFFFFFFFFu; // fader fully up - pass through
+	const uint32_t MILLIS_MULT = (int) (AUDIO_SAMPLE_RATE_EXACT) / 100;
 public:
 	AudioEffectFade(void)
 	  : AudioStream(1, inputQueueArray), position(MAX_FADE) {}
 	void fadeIn(uint32_t milliseconds) {
-		uint32_t samples = (uint32_t)(milliseconds * 441u + 5u) / 10u;
+		uint32_t samples = (uint32_t)(milliseconds * MILLIS_MULT + 5u) / 10u;
 		//Serial.printf("fadeIn, %u samples\n", samples);
 		fadeBegin(samples, 1);
 	}
 	void fadeOut(uint32_t milliseconds) {
-		uint32_t samples = (uint32_t)(milliseconds * 441u + 5u) / 10u;
+		uint32_t samples = (uint32_t)(milliseconds * MILLIS_MULT + 5u) / 10u;
 		//Serial.printf("fadeOut, %u samples\n", samples);
 		fadeBegin(samples, 0);
 	}
