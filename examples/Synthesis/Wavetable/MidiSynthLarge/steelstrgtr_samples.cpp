@@ -1,5 +1,5 @@
 #include "steelstrgtr_samples.h"
-const AudioSynthWavetable::sample_data steelstrgtr_samples[2] = {
+PROGMEM const AudioSynthWavetable::sample_data steelstrgtr_samples[2] = {
 	{
 		(int16_t*)sample_0_steelstrgtr_acgtrg2, // sample
 		true, // LOOP
@@ -54,7 +54,7 @@ const AudioSynthWavetable::sample_data steelstrgtr_samples[2] = {
 	},
 };
 
-const uint32_t sample_0_steelstrgtr_acgtrg2[2560] = {
+PROGMEM const uint32_t sample_0_steelstrgtr_acgtrg2[2560] = {
 0x00000000,0x004e005b,0x004c0040,0x004c0054,0x009c0064,0x01b100e0,0xfc43fec8,0x011fff16,
 0x0101fbe3,0x004ffe6c,0x0094fdcc,0x09520c4f,0x0bd307c5,0x17391001,0x06c01171,0x0a5a04f3,
 0xfbde0306,0xf812f607,0xf58601e8,0xf64cf319,0xf7e0feae,0xe892f095,0xe9fee13a,0xea39f35d,
@@ -366,7 +366,7 @@ const uint32_t sample_0_steelstrgtr_acgtrg2[2560] = {
 0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,
 };
 
-const uint32_t sample_1_steelstrgtr_acgtrb3[3200] = {
+PROGMEM const uint32_t sample_1_steelstrgtr_acgtrb3[3200] = {
 0x00000000,0x008b009d,0x00f100b6,0x012a0118,0x01680141,0x0196018f,0x01c101a9,0x01fb01e2,
 0x01e301e2,0x01f501f5,0x01dc01e5,0x01d201e8,0x01ae01c1,0x0176018f,0x01620165,0x01030132,
 0x00bf00d3,0x007c009e,0x002d0045,0x00010006,0xffc3ffcd,0xff59ff90,0xff2cff3e,0xfefaff0c,

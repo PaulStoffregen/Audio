@@ -1,5 +1,5 @@
 #include "oboe_samples.h"
-const AudioSynthWavetable::sample_data oboe_samples[3] = {
+PROGMEM const AudioSynthWavetable::sample_data oboe_samples[3] = {
 	{
 		(int16_t*)sample_0_oboe_oboecx3, // sample
 		true, // LOOP
@@ -80,7 +80,7 @@ const AudioSynthWavetable::sample_data oboe_samples[3] = {
 	},
 };
 
-const uint32_t sample_0_oboe_oboecx3[512] = {
+PROGMEM const uint32_t sample_0_oboe_oboecx3[512] = {
 0x00000000,0x018200e3,0x014b0187,0x00ca00d6,0x02e501b2,0x030f048a,0xffaf0100,0xfc53fe9c,
 0xfca5fafa,0xfac7fb91,0xfc3afb95,0xfedefca4,0x02f9037a,0x015f0118,0x04b30318,0x019e01de,
 0x069d03a8,0x01bd0752,0x05100110,0x05680869,0xfda5fe11,0xfa5ffd1b,0xf58df60f,0xfe3ffc05,
@@ -141,7 +141,7 @@ const uint32_t sample_0_oboe_oboecx3[512] = {
 0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,
 };
 
-const uint32_t sample_1_oboe_oboefx3[640] = {
+PROGMEM const uint32_t sample_1_oboe_oboefx3[640] = {
 0x00000000,0xffa0feaa,0x0079ffcc,0x002c00cc,0x01780124,0x009f00f6,0x007bff85,0xffd2ffd5,
 0xff6eff91,0x0076007f,0xffcd00a9,0xfeffff44,0xfdbefeb7,0xff8dfea0,0x00c1ff84,0x0221013c,
 0x01930347,0x01160185,0xfef6feaf,0x0126001b,0x018e01f6,0x006d0336,0x0484016b,0x07f806a6,
@@ -222,7 +222,7 @@ const uint32_t sample_1_oboe_oboefx3[640] = {
 0x00000000,0x00000000,0x00000000,0x00000000,
 };
 
-const uint32_t sample_2_oboe_oboeax3[512] = {
+PROGMEM const uint32_t sample_2_oboe_oboeax3[512] = {
 0x00000000,0xffbeffbe,0xffbeffbf,0xffacffb5,0xffbeffb5,0xffc3ffbe,0xffc3ffc2,0xffd4ffc9,
 0xffc9ffe0,0xff7fffb5,0xffdbff9f,0xff64ffbe,0xfff8ff88,0xff9cffd8,0xffabffa3,0x0007fff9,
 0xffde0005,0xff67ffe7,0xffeeff5f,0xffc2000c,0x002c0017,0xffd20044,0xfff3ff7f,0x001f0099,

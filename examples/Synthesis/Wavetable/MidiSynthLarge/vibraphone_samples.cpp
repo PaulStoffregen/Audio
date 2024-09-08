@@ -1,5 +1,5 @@
 #include "vibraphone_samples.h"
-const AudioSynthWavetable::sample_data vibraphone_samples[2] = {
+PROGMEM const AudioSynthWavetable::sample_data vibraphone_samples[2] = {
 	{
 		(int16_t*)sample_0_vibraphone_vibese2, // sample
 		true, // LOOP
@@ -54,7 +54,7 @@ const AudioSynthWavetable::sample_data vibraphone_samples[2] = {
 	},
 };
 
-const uint32_t sample_0_vibraphone_vibese2[512] = {
+PROGMEM const uint32_t sample_0_vibraphone_vibese2[512] = {
 0x00000000,0x003e002d,0x006e0058,0x00860084,0x0080007b,0x007f0081,0x007d007f,0x007d007f,
 0x007f007d,0x007f007f,0x008d007d,0x008a0092,0x00db00bb,0x00e400e2,0x011200cc,0x01d40071,
 0x09deffb6,0x02a00139,0x67a83628,0x47bd7648,0xf6ba14b3,0xb723d7e0,0xd37ebea6,0x9e44c009,
@@ -110,7 +110,7 @@ const uint32_t sample_0_vibraphone_vibese2[512] = {
 0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,
 };
 
-const uint32_t sample_1_vibraphone_vibese2[512] = {
+PROGMEM const uint32_t sample_1_vibraphone_vibese2[512] = {
 0x00000000,0x003e002d,0x006e0058,0x00860084,0x0080007b,0x007f0081,0x007d007f,0x007d007f,
 0x007f007d,0x007f007f,0x008d007d,0x008a0092,0x00db00bb,0x00e400e2,0x011200cc,0x01d40071,
 0x09deffb6,0x02a00139,0x67a83628,0x47bd7648,0xf6ba14b3,0xb723d7e0,0xd37ebea6,0x9e44c009,
