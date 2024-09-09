@@ -106,7 +106,7 @@ static inline int32_t multiply_32x32_rshift32(int32_t a, int32_t b)
 #endif
 }
 
-// computes (((int64_t)a[31:0] * (int64_t)b[31:0] + 0x8000000) >> 32)
+// computes (((int64_t)a[31:0] * (int64_t)b[31:0] + 0x80000000) >> 32)
 static inline int32_t multiply_32x32_rshift32_rounded(int32_t a, int32_t b) __attribute__((always_inline, unused));
 static inline int32_t multiply_32x32_rshift32_rounded(int32_t a, int32_t b)
 {
@@ -115,11 +115,11 @@ static inline int32_t multiply_32x32_rshift32_rounded(int32_t a, int32_t b)
 	asm volatile("smmulr %0, %1, %2" : "=r" (out) : "r" (a), "r" (b));
 	return out;
 #elif defined(KINETISL)
-	return (((int64_t)a * (int64_t)b) + 0x8000000) >> 32;
+	return (((int64_t)a * (int64_t)b) + 0x80000000) >> 32;
 #endif
 }
 
-// computes sum + (((int64_t)a[31:0] * (int64_t)b[31:0] + 0x8000000) >> 32)
+// computes sum + (((int64_t)a[31:0] * (int64_t)b[31:0] + 0x80000000) >> 32)
 static inline int32_t multiply_accumulate_32x32_rshift32_rounded(int32_t sum, int32_t a, int32_t b) __attribute__((always_inline, unused));
 static inline int32_t multiply_accumulate_32x32_rshift32_rounded(int32_t sum, int32_t a, int32_t b)
 {
@@ -128,11 +128,11 @@ static inline int32_t multiply_accumulate_32x32_rshift32_rounded(int32_t sum, in
 	asm volatile("smmlar %0, %2, %3, %1" : "=r" (out) : "r" (sum), "r" (a), "r" (b));
 	return out;
 #elif defined(KINETISL)
-	return sum + ((((int64_t)a * (int64_t)b) + 0x8000000) >> 32);
+	return sum + ((((int64_t)a * (int64_t)b) + 0x80000000) >> 32);
 #endif
 }
 
-// computes sum - (((int64_t)a[31:0] * (int64_t)b[31:0] + 0x8000000) >> 32)
+// computes sum - (((int64_t)a[31:0] * (int64_t)b[31:0] + 0x80000000) >> 32)
 static inline int32_t multiply_subtract_32x32_rshift32_rounded(int32_t sum, int32_t a, int32_t b) __attribute__((always_inline, unused));
 static inline int32_t multiply_subtract_32x32_rshift32_rounded(int32_t sum, int32_t a, int32_t b)
 {
@@ -141,7 +141,7 @@ static inline int32_t multiply_subtract_32x32_rshift32_rounded(int32_t sum, int3
 	asm volatile("smmlsr %0, %2, %3, %1" : "=r" (out) : "r" (sum), "r" (a), "r" (b));
 	return out;
 #elif defined(KINETISL)
-	return sum - ((((int64_t)a * (int64_t)b) + 0x8000000) >> 32);
+	return sum - ((((int64_t)a * (int64_t)b) + 0x80000000) >> 32);
 #endif
 }
 
