@@ -891,9 +891,9 @@ unsigned short AudioControlSGTL5000::autoVolumeControl(uint8_t maxGain, uint8_t 
 	if(maxGain>2) maxGain=2;
 	lbiResponse&=3;
 	hardLimit&=1;
-	uint8_t thresh=(pow(10,threshold/20)*0.636)*pow(2,15);
-	uint8_t att=(1-pow(10,-(attack/(20*44100))))*pow(2,19);
-	uint8_t dec=(1-pow(10,-(decay/(20*44100))))*pow(2,23);
+	uint16_t thresh=(pow(10,threshold/20)*0.636)*pow(2,15);
+	uint16_t att=(1-pow(10,-(attack/(20*44100))))*pow(2,19);
+	uint16_t dec=(1-pow(10,-(decay/(20*44100))))*pow(2,23);
 	write(DAP_AVC_THRESHOLD,thresh);
 	write(DAP_AVC_ATTACK,att);
 	write(DAP_AVC_DECAY,dec);
