@@ -134,6 +134,7 @@ windowFunction	KEYWORD2
 modify	KEYWORD2
 output	KEYWORD2
 trigger	KEYWORD2
+decimate	KEYWORD2
 length	KEYWORD2
 threshold	KEYWORD2
 setAddress	KEYWORD2
