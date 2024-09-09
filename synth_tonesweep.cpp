@@ -87,7 +87,6 @@ unsigned char AudioSynthToneSweep::isPlaying(void)
 void AudioSynthToneSweep::update(void)
 {
   audio_block_t *block;
-  short *bp;
   int i;
   
   if(!sweep_busy)return;
@@ -95,13 +94,12 @@ void AudioSynthToneSweep::update(void)
   //          L E F T  C H A N N E L  O N L Y
   block = allocate();
   if(block) {
-    bp = block->data;
     uint32_t tmp  = tone_freq >> 32; 
     uint64_t tone_tmp = (tone_freq << 14) / (int) AUDIO_SAMPLE_RATE_EXACT;
     uint64_t incr     = (tone_incr << 14) / (int) AUDIO_SAMPLE_RATE_EXACT;
     // Generate the sweep
     for(i = 0;i < AUDIO_BLOCK_SAMPLES;i++) {
-      *bp++ = (short)(( (short)(arm_sin_q31((uint32_t)((tone_phase >> 15)&0x7fffffff))>>16) *tone_amp) >> 15);
+      block->data[i] = (short)(( (short)(arm_sin_q31((uint32_t)((tone_phase >> 15)&0x7fffffff))>>16) *tone_amp) >> 15);
 
       tone_phase +=  tone_tmp;
       tone_tmp   +=  incr ;
@@ -122,7 +120,7 @@ void AudioSynthToneSweep::update(void)
       }
     }
     while(i < AUDIO_BLOCK_SAMPLES) {
-      *bp++ = 0;
+      block->data[i] = 0;
       i++;
     }    
     // send the samples to the left channel
