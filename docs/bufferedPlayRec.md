@@ -121,6 +121,11 @@ Filesystem access can take a significant amount of time to execute, depending on
 
 ## Examples
 These can be found in Examples/Audio/Buffered
+### WavFilePlayer
+Adapted from the existing WAV file player example. Shows:
+* how to create buffers
+* that `yield()` or `delay()` calls are needed if you don't let `loop()` exit
+* `play()` does *not* need a delay before `isPlaying()` becomes true
 ### Recorder
 This is a variant on the Recorder example, but using the buffered objects to record and play a _stereo WAV_ file, rather than a queue and application-based writes to record a _mono RAW_ file, plus the ``AudioPlaySdRaw`` object for playback. As written it uses 128k of heap for the buffers. You will need an audio adaptor and a source of audio connected to the line inputs for this one. A couple of ``AudioAnalyzePeak`` objects are used to provide a crude level meter to allow you to set up prior to recording.
 ### RecSynthMusic

@@ -61,7 +61,7 @@ void setup()
     delay(500);
   }
 
-  audioShield.setAddress(HIGH);
+  // audioShield.setAddress(HIGH);
   audioShield.enable();
   audioShield.volume(0.1f);
 
