@@ -44,12 +44,12 @@ AudioConnection          patchCord2(playWav1, 1, audioOutput, 1);
 AudioControlSGTL5000     sgtl5000_1;
 
 // Use these with the Teensy Audio Shield
-//#define SDCARD_CS_PIN    10
+#define SDCARD_CS_PIN    10
 #define SDCARD_MOSI_PIN  7   // Teensy 4 ignores this, uses pin 11
 #define SDCARD_SCK_PIN   14  // Teensy 4 ignores this, uses pin 13
 
 // Use these with the Teensy 3.5 & 3.6 & 4.1 SD card
-#define SDCARD_CS_PIN    BUILTIN_SDCARD
+//#define SDCARD_CS_PIN    BUILTIN_SDCARD
 //#define SDCARD_MOSI_PIN  11  // not actually used
 //#define SDCARD_SCK_PIN   13  // not actually used
 
@@ -70,10 +70,8 @@ void setup() {
   // playWav1.createBuffer(4096,AudioBuffer::inExt); // works on a Teensy 4.1 with PSRAM fitted
   //* 
   {
-    static uint8_t audioBuffer[4096+32];
-    uint8_t* alignedBuffer = (uint8_t*)((uint32_t)(audioBuffer+32) & -32); // 32-byte align - necessary?
-    Serial.printf("Buffer at %08X; using memory from %08X\n", (uint32_t) audioBuffer, (uint32_t) alignedBuffer);
-    playWav1.createBuffer(alignedBuffer, 4096); // application-managed memory    
+    static uint8_t audioBuffer[4096];
+    playWav1.createBuffer(audioBuffer, 4096); // application-managed memory    
   }
   //*/
 
