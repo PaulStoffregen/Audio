@@ -133,7 +133,9 @@ This is based on the PlaySynthMusic example. It plays a short piece of music usi
 ### RecSynthMusicV2
 Same as the above, but achieves tighter note timing by using an IntervalTimer rather than `delay()`.
 ### SDpiano
-88-note 3 samples per note piano. See the ReadMe in the sketch folder. Needs updating to use `AudioPreload` objects.
+88-note 3 samples per note piano. See the ReadMe in the sketch folder. Pre-dates `AudioPreload` objects, and shows how hard it is to get it right if you don't have them...
+### SDpianoUsingPreload
+88-note 3 samples per note piano, using AudioPreload objects.
 ### AudioTestPlayMultiSD
 Plays audio simultaneously from two separate SD cards - the Teensy 4.1 built-in one, and the one on the Audio Adaptor.
 ### PreloadWhileRecording

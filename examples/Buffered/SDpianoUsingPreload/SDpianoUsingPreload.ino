@@ -1,18 +1,6 @@
 #include "Arduino.h"
 #include "SD.h"
 #include "Audio.h"
-
-//=============================================================
-// For debugging, use (custom) Dual Serial + MIDI + Audio
-// Install TeensyDebug library
-// Set GDB to "Dual Serial"
-// and uncomment the following line:
-//#include "TeensyDebug.h"
-
-#if defined(GDB_IS_ENABLED)
-#pragma GCC optimize ("O0")
-#endif
-
 #include "SDpiano.h"
 
 // Needs fix for AudioEffectEnvelope:
@@ -62,50 +50,6 @@ void findSGTL5000(AudioControlSGTL5000& sgtl5000_1)
 }
 
 //=============================================================
-/*
- * Use an IntervalTimer to ensure system latency is not affected by
- * SD card buffering. 
- * 
- * For this scheme we run the MIDI engine, starting and stopping notes,
- * until we have no further MIDI events to process.
- * 
- * We actually use a slightly convoluted method, because IntervalTimer may 
- * be set to a high priority, but we want the MIDI processor to execute at
- * a higher priority than foreground / yield() code, but at a lower priority
- * than the (already low!) audio engine.
- * 
- * Hence we set up an unused interrupt at super-low priority, and all the
- * IntervalTimer does is to .end() itself (so it doesn't re-trigger) and 
- * trigger the MIDI service interrupt. The latter then runs until no events
- * are left, sets up the IntervalTimer once again with the new delay, and exits.
- */
-#define IRQ_SYNTH IRQ_Reserved3
-#define RESTART_ADDR 0xE000ED0C
-#define WRITE_RESTART(val) ((*(volatile uint32_t *)RESTART_ADDR) = (val))
-void setupSynthInterrupt()
-{
-  attachInterruptVector(IRQ_SYNTH, runSynthIRQ);
-  NVIC_SET_PRIORITY(IRQ_SYNTH, 224); // lower priority than audio
-  NVIC_ENABLE_IRQ(IRQ_SYNTH);
-}
-
-IntervalTimer synthTimer;
-void synthIntvl()
-{
-  digitalWrite(LED_BUILTIN,1);
-  synthTimer.end(); // synth IRQ will .begin() it again
-  NVIC_SET_PENDING(IRQ_SYNTH);
-}
-
-void runSynthIRQ()
-{
-  usbMIDI.read(); // do all MIDI actions
-  synthTimer.begin(synthIntvl,1000);  // run again in 1ms
-  digitalWrite(LED_BUILTIN,0);
-  asm("DSB");
-}
-
-//=============================================================
 
 size_t sppOff;
 uint8_t layer,threshold;
@@ -149,11 +93,6 @@ void setup()
     }
   }
 
-#if defined(GDB_IS_ENABLED)
-  halt_cpu();
-#endif
-
-
   // scan directory and fill in data structure
   // we expect to find 3 folders under the root, called
   // loud, med and soft; within the folders are the relevant
@@ -180,13 +119,6 @@ void setup()
   allocInit();
   usbMIDI.setHandleNoteOff(myNoteOff);
   usbMIDI.setHandleNoteOn(myNoteOn);
-
-  // set up the low-priority interrupt handler
-  // to try to improve MIDI->sound latency
-  /*
-  setupSynthInterrupt();
-  synthTimer.begin(synthIntvl,1000);  // run MIDI update in 1ms
-  //*/
 }
 
 //=============================================================
@@ -291,11 +223,13 @@ void myNoteOff(uint8_t channel, uint8_t note, uint8_t velocity)
 
   if (av >= 0)        // there is one
     pv[av].endNote(); // begin its release process
-      
 }
 
 
 //=============================================================
+#define RESTART_ADDR 0xE000ED0C
+#define WRITE_RESTART(val) ((*(volatile uint32_t *)RESTART_ADDR) = (val))
+
 void loop() 
 {
   if (Serial.available())
@@ -312,30 +246,14 @@ void loop()
     }
   }
 
-  //*
   while (usbMIDI.read()) // do all MIDI actions
     ;
-  //*/
   
   for (uint8_t i=0;i<COUNT_OF(pv);i++)
   {
     if (allocated[i] != UNUSED && !pv[i].isPlaying()) // allocated, but now silent:
       deAllocVoice(allocated[i]); // free it up for re-use
   }  
-
-#if 0 // defined(GDB_IS_ENABLED)
-  static uint32_t next = 0;
-  
-  if (millis() > next)
-  {
-    for (int i =0;i<8;i++)
-    {
-      Serial.printf("%3d, %d, %d: ",allocated[i],pv[i].playState,pv[i].fileState);
-    }
-    Serial.printf("; ocnt=%d, myOcnt=%d\n",ocnt,myOcnt);
-    next = millis() + 250;
-  }
-#endif // defined(GDB_IS_ENABLED)
 }
 
 
