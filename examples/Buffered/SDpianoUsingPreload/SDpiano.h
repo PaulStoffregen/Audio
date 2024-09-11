@@ -12,8 +12,6 @@ struct thresholds
 
 struct sample_t
 {
-  //char* fname;          // file with the whole sample in it
-  //unsigned int* left,*right;  // pre-buffered start of the sample
   AudioPreload pload;   // preload class
   uint8_t threshold;    // use this sample <= this velocity
   float maxGain;        // gain to apply when at threshold velocity
@@ -176,11 +174,17 @@ class PianoVoice
     }
 
 //==================================================================================
+    // checks to see if playing has stopped recently and 
+    // if so sets the status and stops file playback
     // return true if voice is currently playing a sound
     bool isPlaying(void)
     {
       if (!envL.isActive())
-        playState = silent;
+      {
+        if (silent != playState && playWAVstereo1.isPlaying())
+          playWAVstereo1.stop();
+        playState = silent;        
+      }
       return silent != playState;
     }
 };
