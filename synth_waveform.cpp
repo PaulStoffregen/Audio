@@ -45,6 +45,12 @@ void AudioSynthWaveform::update(void)
 	uint32_t i, ph, index, index2, scale;
 	const uint32_t inc = phase_increment;
 
+	// Restart the phase accumulator if requested using restart()
+	if (restart_phase_accumulator) {
+		phase_accumulator = 0;
+		restart_phase_accumulator = false;
+	}
+
 	ph = phase_accumulator + phase_offset;
 	if (magnitude == 0) {
 		phase_accumulator += inc * AUDIO_BLOCK_SAMPLES;
@@ -234,6 +240,12 @@ void AudioSynthWaveformModulated::update(void)
 
 	moddata = receiveReadOnly(0);
 	shapedata = receiveReadOnly(1);
+
+	// Restart the phase accumulator if requested using restart()
+	if (restart_phase_accumulator) {
+		phase_accumulator = 0;
+		restart_phase_accumulator = false;
+	}
 
 	// Pre-compute the phase angle for every output sample of this update
 	ph = phase_accumulator;
