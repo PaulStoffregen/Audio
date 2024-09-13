@@ -49,10 +49,11 @@ public:
 	friend class AudioInputI2SHex;
 	friend class AudioOutputI2SOct;
 	friend class AudioInputI2SOct;
+	friend class AudioOutputSPDIF3; // just for setting up clock sync
 #endif
 protected:
 	AudioOutputI2S(int dummy): AudioStream(2, inputQueueArray) {} // to be used only inside AudioOutputI2Sslave !!
-	static void config_i2s(bool only_bclk = false);
+	static void config_i2s(bool only_bclk = false, bool SPDIF_sync = false);
 	static audio_block_t *block_left_1st;
 	static audio_block_t *block_right_1st;
 	static bool update_responsibility;
@@ -63,6 +64,9 @@ private:
 	static audio_block_t *block_right_2nd;
 	static uint16_t block_left_offset;
 	static uint16_t block_right_offset;
+#if defined(__IMXRT1062__)
+	static bool SPDIF_is_master;
+#endif // defined(__IMXRT1062__)
 	audio_block_t *inputQueueArray[2];
 };
 
