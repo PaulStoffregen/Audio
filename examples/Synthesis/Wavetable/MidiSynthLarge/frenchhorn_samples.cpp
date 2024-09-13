@@ -1,5 +1,5 @@
 #include "frenchhorn_samples.h"
-const AudioSynthWavetable::sample_data frenchhorn_samples[1] = {
+PROGMEM const AudioSynthWavetable::sample_data frenchhorn_samples[1] = {
 	{
 		(int16_t*)sample_0_frenchhorn_frenchhorng4, // sample
 		true, // LOOP
@@ -28,7 +28,7 @@ const AudioSynthWavetable::sample_data frenchhorn_samples[1] = {
 	},
 };
 
-const uint32_t sample_0_frenchhorn_frenchhorng4[768] = {
+PROGMEM const uint32_t sample_0_frenchhorn_frenchhorng4[768] = {
 0x00000000,0xffd3ffde,0xffc9ffca,0xffd8ffcc,0x0002ffe9,0x00450024,0x007a0063,0x00a50099,
 0x00b700b9,0x00a000b2,0x0072008f,0x00330054,0x00010012,0xffcdffe1,0xffb4ffbc,0xffadffaa,
 0xffb5ffaf,0xffb4ffbb,0xffc7ffc2,0x0002ffe1,0x00510024,0x008a006e,0x00c300ad,0x00eb00e0,

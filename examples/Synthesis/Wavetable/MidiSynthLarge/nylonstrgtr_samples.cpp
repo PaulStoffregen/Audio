@@ -1,5 +1,5 @@
 #include "nylonstrgtr_samples.h"
-const AudioSynthWavetable::sample_data nylonstrgtr_samples[3] = {
+PROGMEM const AudioSynthWavetable::sample_data nylonstrgtr_samples[3] = {
 	{
 		(int16_t*)sample_0_nylonstrgtr_nguitrf2, // sample
 		true, // LOOP
@@ -80,7 +80,7 @@ const AudioSynthWavetable::sample_data nylonstrgtr_samples[3] = {
 	},
 };
 
-const uint32_t sample_0_nylonstrgtr_nguitrf2[1920] = {
+PROGMEM const uint32_t sample_0_nylonstrgtr_nguitrf2[1920] = {
 0x00000000,0xff9dfef2,0xfebbff73,0x001bff86,0x00c00033,0x01c80171,0x016901a3,0x009c019d,
 0xffd1ffd9,0x008fffeb,0x011700b1,0x01020190,0x005f00c3,0xffec000c,0x00acfff0,0xffebff92,
 0x012301ba,0xfee90017,0x00a7ff2e,0x010d0156,0x019a00dd,0x02000263,0x01ad0208,0x014100e7,
@@ -323,7 +323,7 @@ const uint32_t sample_0_nylonstrgtr_nguitrf2[1920] = {
 0x064102a4,0x0000097b,0x00000000,0x00000000,
 };
 
-const uint32_t sample_1_nylonstrgtr_nguitb2[2688] = {
+PROGMEM const uint32_t sample_1_nylonstrgtr_nguitb2[2688] = {
 0x00000000,0x00e1005a,0x008801b8,0x00b4006c,0x009e0218,0xffefff5b,0x002fff75,0x01840199,
 0x003c002d,0x0128001b,0x0045016c,0xffb6ff89,0x00e6fffb,0x012f01b8,0xfff300c9,0xffe40092,
 0xff06fee1,0x0016ff05,0x0028ff8d,0xfed1fe94,0xff97ffe4,0xfe440027,0xfedbfe42,0xfe98ffd7,
@@ -654,7 +654,7 @@ const uint32_t sample_1_nylonstrgtr_nguitb2[2688] = {
 0x00000000,0x00000000,0x00000000,
 };
 
-const uint32_t sample_2_nylonstrgtr_acgtrb3[3200] = {
+PROGMEM const uint32_t sample_2_nylonstrgtr_acgtrb3[3200] = {
 0x00000000,0x008b009d,0x00f100b6,0x012a0118,0x01680141,0x0196018f,0x01c101a9,0x01fb01e2,
 0x01e301e2,0x01f501f5,0x01dc01e5,0x01d201e8,0x01ae01c1,0x0176018f,0x01620165,0x01030132,
 0x00bf00d3,0x007c009e,0x002d0045,0x00010006,0xffc3ffcd,0xff59ff90,0xff2cff3e,0xfefaff0c,

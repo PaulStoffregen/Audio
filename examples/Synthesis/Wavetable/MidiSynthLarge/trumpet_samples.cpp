@@ -1,5 +1,5 @@
 #include "trumpet_samples.h"
-const AudioSynthWavetable::sample_data trumpet_samples[5] = {
+PROGMEM const AudioSynthWavetable::sample_data trumpet_samples[5] = {
 	{
 		(int16_t*)sample_0_trumpet_htrumpetd2, // sample
 		true, // LOOP
@@ -132,7 +132,7 @@ const AudioSynthWavetable::sample_data trumpet_samples[5] = {
 	},
 };
 
-const uint32_t sample_0_trumpet_htrumpetd2[896] = {
+PROGMEM const uint32_t sample_0_trumpet_htrumpetd2[896] = {
 0x00000000,0x0002ffef,0x00190017,0x00110014,0x0002000d,0xffd7ffe6,0xfffdffe7,0xfff10002,
 0xffeeffeb,0x001a0000,0x00060014,0xffe7fff4,0xffe1ffe5,0xffefffe9,0xffefffef,0x000c0000,
 0x001a0015,0x00100022,0x00100006,0x00060002,0x0006000c,0x0027fff3,0x02a80006,0x029e04c6,
@@ -242,7 +242,7 @@ const uint32_t sample_0_trumpet_htrumpetd2[896] = {
 0x00000000,0x00000000,0x00000000,0x00000000,
 };
 
-const uint32_t sample_1_trumpet_htrumpetg2[896] = {
+PROGMEM const uint32_t sample_1_trumpet_htrumpetg2[896] = {
 0x00000000,0x00020002,0x00110010,0xfffa000a,0xffdaffe7,0xffe0ffda,0xfffefff2,0x00110005,
 0x00290027,0x0006001a,0xffd2ffed,0xffdeffce,0x0016fffc,0x00550046,0xffea0027,0xffc6ffb6,
 0xffc3ffdb,0xffd2ffb9,0x000cfff4,0x00190014,0x0013001c,0x00000005,0x001a000b,0x0011001d,
@@ -350,7 +350,7 @@ const uint32_t sample_1_trumpet_htrumpetg2[896] = {
 0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,
 };
 
-const uint32_t sample_2_trumpet_htrumpetc3[896] = {
+PROGMEM const uint32_t sample_2_trumpet_htrumpetc3[896] = {
 0x00000000,0x001e0050,0xff9fffd2,0xff73ff62,0x0048ffba,0x014c00e7,0x00dc014c,0xff880031,
 0xfee6ff10,0xff8aff15,0x0096001a,0x00cb00d6,0x00290082,0xff9effde,0xff6fff6f,0xffdeff96,
 0x00680026,0x00cf00a7,0x009f00cb,0x00160057,0xff9affdb,0xff5eff7e,0xff66ff4c,0x0025ffbe,
@@ -459,7 +459,7 @@ const uint32_t sample_2_trumpet_htrumpetc3[896] = {
 0x00000000,0x00000000,0x00000000,0x00000000,
 };
 
-const uint32_t sample_3_trumpet_htrumpetf3[768] = {
+PROGMEM const uint32_t sample_3_trumpet_htrumpetf3[768] = {
 0x00000000,0xfff3fff9,0xfffefffd,0xfffbfffc,0xfff9fffc,0xffedfff5,0xffeaffef,0xfff6fff1,
 0xffedfff2,0xfff5fff4,0xfffcfffc,0xfff8fff8,0xfff2fff5,0xfff0fff3,0xfff0fff0,0xfffefff6,
 0x000f0004,0xffc6fff5,0xffbcffb0,0x0037ffed,0x000b0045,0xffccffde,0xffccffcf,0xffffffdd,
@@ -557,7 +557,7 @@ const uint32_t sample_3_trumpet_htrumpetf3[768] = {
 0x00000000,
 };
 
-const uint32_t sample_4_trumpet_htrumpetax3[896] = {
+PROGMEM const uint32_t sample_4_trumpet_htrumpetax3[896] = {
 0x00000000,0x002c002e,0x0029002c,0x00290029,0x00280029,0x00290029,0x00290028,0x0029002a,
 0x00290029,0x00260028,0x00260028,0x00280028,0x00250027,0x00260020,0x0020001f,0x001f0020,
 0x00220025,0x002f002e,0x002f002c,0x002b002e,0x001d0027,0x00040010,0x0026000f,0x0045003b,

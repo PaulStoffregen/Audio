@@ -2406,7 +2406,9 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 		<a href="https://oshpark.com/shared_projects/gVFy0fWQ">
 		CS42448 Board for Teensy 4.x</a> and this
 		<a href="https://oshpark.com/shared_projects/O7iqdcLr">
-		ADAU1966A Board for Teensy 4.x</a>.
+		ADAU1966A Board for Teensy 4.x</a>, and an
+		<a href="https://forum.pjrc.com/threads/72479?p=327541&viewfull=1#post327541">
+		inexpensive CS42448 breakout board</a>.
 		</p>
 	<table class=doc align=center cellpadding=3>
 		<tr class=top><th>T3.x<br>Pin</th><th>T4.x<br>Pin</th><th>Signal</th><th>Direction</th></tr>
@@ -3513,12 +3515,16 @@ The actual packets are taken
 		<ul>
 		<li><span class=literal>WAVEFORM_SINE</span></li>
 		<li><span class=literal>WAVEFORM_SAWTOOTH</span></li>
+		<li><span class=literal>WAVEFORM_BANDLIMIT_SAWTOOTH</span></li>
 		<li><span class=literal>WAVEFORM_SAWTOOTH_REVERSE</span></li>
+		<li><span class=literal>WAVEFORM_BANDLIMIT_SAWTOOTH_REVERSE</span></li>
 		<li><span class=literal>WAVEFORM_SQUARE</span></li>
+		<li><span class=literal>WAVEFORM_BANDLIMIT_SQUARE</span></li>
 		<li><span class=literal>WAVEFORM_TRIANGLE</span></li>
 		<li><span class=literal>WAVEFORM_TRIANGLE_VARIABLE</span></li>
 		<li><span class=literal>WAVEFORM_ARBITRARY</span></li>
 		<li><span class=literal>WAVEFORM_PULSE</span></li>
+		<li><span class=literal>WAVEFORM_BANDLIMIT_PULSE</span></li>
 		<li><span class=literal>WAVEFORM_SAMPLE_HOLD</span></li>
 		</ul>
 	</p>
@@ -4215,7 +4221,7 @@ double s_freq = .0625;</p>
 	<p class=func><span class=keyword>disable</span>(channel);</p>
 	<p class=desc>Disable a channel.  The output of this channel becomes
 		silent.  If this channel is the longest delay, memory usage is
-		automatically reduced to accomodate only the remaining channels used.
+		automatically reduced to accommodate only the remaining channels used.
 	</p>
 	<h3>Examples</h3>
 	<p class=exam>File &gt; Examples &gt; Audio &gt; Effects &gt; Delay
@@ -4273,9 +4279,7 @@ double s_freq = .0625;</p>
 		delay order.
 	</p>
 	<p class=func><span class=keyword>disable</span>(channel);</p>
-	<p class=desc>Disable a channel.  The output of this channel becomes
-		silent.  If this channel is the longest delay, memory usage is
-		automatically reduced to accomodate only the remaining channels used.
+	<p class=desc>Disable a channel.  The output of this channel becomes silent.
 	</p>
 	<h3>Hardware</h3>
 	<p>By default, or when <span class=literal>AUDIO_MEMORY_23LC1024</span> is used (see below),

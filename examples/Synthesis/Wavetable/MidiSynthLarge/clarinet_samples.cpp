@@ -1,5 +1,5 @@
 #include "clarinet_samples.h"
-const AudioSynthWavetable::sample_data clarinet_samples[2] = {
+PROGMEM const AudioSynthWavetable::sample_data clarinet_samples[2] = {
 	{
 		(int16_t*)sample_0_clarinet_clarinetd2, // sample
 		true, // LOOP
@@ -54,7 +54,7 @@ const AudioSynthWavetable::sample_data clarinet_samples[2] = {
 	},
 };
 
-const uint32_t sample_0_clarinet_clarinetd2[384] = {
+PROGMEM const uint32_t sample_0_clarinet_clarinetd2[384] = {
 0x00000000,0x033d02a9,0x03750270,0x02830366,0x02d90328,0x038b029b,0x025502c9,0x02b6030f,
 0x034702c7,0x02fb02cc,0x03050374,0x03520331,0x02a402a7,0x0208028b,0x01dc0214,0x01400155,
 0x00b40117,0x00050064,0xff70ff97,0xfedaff5d,0xfe20fe6c,0xfdb9fdaf,0xfd89fdaf,0xfe03fde9,
@@ -101,7 +101,7 @@ const uint32_t sample_0_clarinet_clarinetd2[384] = {
 0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,
 };
 
-const uint32_t sample_1_clarinet_clarinetb2[384] = {
+PROGMEM const uint32_t sample_1_clarinet_clarinetb2[384] = {
 0x00000000,0x019001fb,0x00860104,0xff50fffb,0xfe3dfeae,0xfd6cfdde,0xfce5fd0e,0xfcbcfcca,
 0xfd08fce4,0xfd4afd17,0xfe09fdaa,0xfe2efe3c,0xfdc6fdfb,0xfd02fd7a,0xfcaafca8,0xfcebfcd3,
 0xfd34fcfa,0xfe5ffdad,0x0017ff34,0x01bc00f5,0x03220274,0x03e203a1,0x043003fc,0x0482046d,

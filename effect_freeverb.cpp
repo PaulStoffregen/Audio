@@ -474,7 +474,7 @@ void AudioEffectFreeverbStereo::update()
 		outputR = sat16(bufout - outputR, 1);
 		if (++allpass4indexR >= sizeof(allpass4bufR)/sizeof(int16_t)) allpass4indexR = 0;
 
-		outblockR->data[i] = sat16(outputL * 30, 0);
+		outblockR->data[i] = sat16(outputR * 30, 0);
 	}
 	transmit(outblockL, 0);
 	transmit(outblockR, 1);

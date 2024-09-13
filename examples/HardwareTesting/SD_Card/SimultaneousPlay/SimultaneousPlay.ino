@@ -33,8 +33,8 @@ AudioControlSGTL5000     sgtl5000_1;     //xy=625,368
 
 // SD card on Teensy 3.x Audio Shield (Rev C)
 #define SDCARD_CS_PIN    10
-#define SDCARD_MOSI_PIN  7
-#define SDCARD_SCK_PIN   14
+#define SDCARD_MOSI_PIN  7   // Teensy 4 ignores this, uses pin 11
+#define SDCARD_SCK_PIN   14  // Teensy 4 ignores this, uses pin 13
 
 // Built in SD card on Teensy 3.5, 3.6 & 4.1
 //#define SDCARD_CS_PIN    BUILTIN_SDCARD

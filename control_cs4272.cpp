@@ -113,8 +113,11 @@ bool AudioControlCS4272::enable(void)
 	// Wait for further setup
 	delay(1);
 
-	// Set ratio select for MCLK=512*LRCLK (BCLK = 64*LRCLK), and master mode
-	write(CS4272_MODE_CONTROL, CS4272_MC_RATIO_SEL(3) | CS4272_MC_MASTER_SLAVE);
+	// Set ratio select for MCLK=512*LRCLK (BCLK = 64*LRCLK), and master mode, I2S
+	// https://forum.pjrc.com/index.php?threads/73960/
+	write(CS4272_MODE_CONTROL, CS4272_MC_RATIO_SEL(2) | CS4272_MC_MASTER_SLAVE |
+		CS4272_MC_SERIAL_FORMAT(1));
+	write(CS4272_ADC_CTRL, CS4272_ADC_CTRL_SER_FORMAT); // Set ADC I2S format
 
 	delay(10);
 	

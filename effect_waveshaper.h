@@ -25,13 +25,13 @@
 #ifndef effect_waveshaper_h_
 #define effect_waveshaper_h_
 
-#include "Arduino.h"
-#include "AudioStream.h"
+#include <Arduino.h>     // github.com/PaulStoffregen/cores/blob/master/teensy4/Arduino.h
+#include <AudioStream.h> // github.com/PaulStoffregen/cores/blob/master/teensy4/AudioStream.h
 
 class AudioEffectWaveshaper : public AudioStream
 {
   public:
-    AudioEffectWaveshaper(void): AudioStream(1, inputQueueArray) {}
+    AudioEffectWaveshaper(void): AudioStream(1, inputQueueArray), waveshape(nullptr) {}
     ~AudioEffectWaveshaper();
     virtual void update(void);
     void shape(float* waveshape, int length);

@@ -1,5 +1,5 @@
 #include "strings_samples.h"
-const AudioSynthWavetable::sample_data strings_samples[3] = {
+PROGMEM const AudioSynthWavetable::sample_data strings_samples[3] = {
 	{
 		(int16_t*)sample_0_strings_stringsg2, // sample
 		true, // LOOP
@@ -80,7 +80,7 @@ const AudioSynthWavetable::sample_data strings_samples[3] = {
 	},
 };
 
-const uint32_t sample_0_strings_stringsg2[4736] = {
+PROGMEM const uint32_t sample_0_strings_stringsg2[4736] = {
 0x00000000,0x005d0181,0x002affba,0x02b60251,0x006401ff,0x02c00134,0x0211022f,0x04ed0455,
 0x00850421,0xfec8fee8,0x0110011f,0xf585f949,0xfbfef67e,0xf824fde3,0xf93df587,0x0392001e,
 0x03270296,0x0aa60968,0x024b06bf,0x0b3d0491,0x0a6b0e51,0xf15ffe6b,0xf923f01c,0x033501e3,
@@ -668,7 +668,7 @@ const uint32_t sample_0_strings_stringsg2[4736] = {
 0x00000000,0x00000000,0x00000000,
 };
 
-const uint32_t sample_1_strings_stringsf3[4352] = {
+PROGMEM const uint32_t sample_1_strings_stringsf3[4352] = {
 0x00000000,0x02b60200,0x03a00337,0x00ec0209,0x00afff86,0x02530002,0xfe740172,0x00a5fe42,
 0xfc0dff47,0xfc00fbf6,0xfd80fc33,0xfcadfd0e,0x0059fdf3,0xfe030089,0x0077ff56,0x03b90280,
 0x03050241,0x02cf03e9,0x043e02ff,0x047504e4,0x00ee02f6,0x00320067,0xffff005e,0x009a012b,
@@ -1213,7 +1213,7 @@ const uint32_t sample_1_strings_stringsf3[4352] = {
 0x00000000,0x00000000,0x00000000,
 };
 
-const uint32_t sample_2_strings_stringsdx4[5376] = {
+PROGMEM const uint32_t sample_2_strings_stringsdx4[5376] = {
 0x00000000,0x0037002f,0x00a60067,0xffa80120,0x007b004f,0x00c4fe18,0xff9a0037,0x024cfd23,
 0x02b703b2,0xfb46015a,0x02fa0273,0x0239feb8,0x00c0fcf2,0xf53efb8f,0x011cfeeb,0xfe71fcca,
 0x049bfd3c,0xfeb902b6,0x023e04ed,0x0249fe93,0xfe650103,0xfd00022f,0xff9a0208,0xfe0ffd0a,
