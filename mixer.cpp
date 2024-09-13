@@ -74,7 +74,7 @@ static void applyGainThenAdd(int16_t *data, const int16_t *in, int32_t mult)
 }
 
 #elif defined(KINETISL)
-#define MULTI_UNITYGAIN 256
+#define MULTI_UNITYGAIN 65536
 
 static void applyGain(int16_t *data, int32_t mult)
 {
@@ -82,7 +82,7 @@ static void applyGain(int16_t *data, int32_t mult)
 
 	do {
 		int32_t val = *data * mult;
-		*data++ = signed_saturate_rshift(val, 16, 0);
+		*data++ = signed_saturate_rshift(val, 16, 16);
 	} while (data < end);
 }
 
@@ -97,7 +97,7 @@ static void applyGainThenAdd(int16_t *dst, const int16_t *src, int32_t mult)
 		} while (dst < end);
 	} else {
 		do {
-			int32_t val = *dst + ((*src++ * mult) >> 8); // overflow possible??
+			int32_t val = *dst + signed_saturate_rshift(*src++ * mult, 16, 16); // overflow possible??
 			*dst++ = signed_saturate_rshift(val, 16, 0);
 		} while (dst < end);
 	}
