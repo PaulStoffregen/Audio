@@ -1,5 +1,5 @@
 #include "distortiongt_samples.h"
-const AudioSynthWavetable::sample_data distortiongt_samples[4] = {
+PROGMEM const AudioSynthWavetable::sample_data distortiongt_samples[4] = {
 	{
 		(int16_t*)sample_0_distortiongt_distgtra2, // sample
 		true, // LOOP
@@ -106,7 +106,7 @@ const AudioSynthWavetable::sample_data distortiongt_samples[4] = {
 	},
 };
 
-const uint32_t sample_0_distortiongt_distgtra2[1024] = {
+PROGMEM const uint32_t sample_0_distortiongt_distgtra2[1024] = {
 0x00000000,0xfd58fbd7,0xfdc2fd4c,0xfd0ffdb3,0xfb83fc31,0xfbebfbb8,0xfbf2fc25,0xfcc3fc2a,
 0xfec0fde5,0xffeaff73,0x00d30092,0x003700b7,0x00d10037,0x02f60209,0x02a50337,0x016501de,
 0x01c30198,0x023401de,0x03ae0300,0x039203e0,0x024d0305,0x01f001d2,0x01890220,0xfeff0037,
@@ -227,7 +227,7 @@ const uint32_t sample_0_distortiongt_distgtra2[1024] = {
 0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,
 };
 
-const uint32_t sample_1_distortiongt_distgtre3[768] = {
+PROGMEM const uint32_t sample_1_distortiongt_distgtre3[768] = {
 0x00000000,0xed9fed58,0xfc0ff40b,0xfa10feb3,0xef70f2a9,0x063cf5e1,0x1efe1819,0x07c21681,
 0x01b3ffbe,0x090706c1,0x0d2909f7,0x15ea1244,0x112d158f,0x05b10add,0x0a0a0500,0x0e4a0fee,
 0xf98a03e0,0xfa9cf71b,0xfb2afcf1,0xf324f734,0xf0a4f013,0x018cf75a,0x051207b8,0xf605fcf1,
@@ -322,7 +322,7 @@ const uint32_t sample_1_distortiongt_distgtre3[768] = {
 0x00000000,
 };
 
-const uint32_t sample_2_distortiongt_distgtra3[640] = {
+PROGMEM const uint32_t sample_2_distortiongt_distgtra3[640] = {
 0x00000000,0xe663d87f,0xf9f3f5dd,0xd2c0ea60,0xd237c999,0xd93bdb6c,0xcd19d136,0xced8cd97,
 0xd4a8d0be,0xddedd986,0xe937e28b,0x047af2d1,0x4d2328f6,0x2ff04ecc,0x1dbc174c,0x3be2331a,
 0x292133c8,0x295b2686,0x23ea2a1e,0x02e715ac,0xf7eef5ab,0x258a0b53,0x2ff73510,0x02081b68,
@@ -404,7 +404,7 @@ const uint32_t sample_2_distortiongt_distgtra3[640] = {
 0x00000000,0x00000000,
 };
 
-const uint32_t sample_3_distortiongt_distgtrd4[896] = {
+PROGMEM const uint32_t sample_3_distortiongt_distgtrd4[896] = {
 0x00000000,0x055efebb,0x0a460a0e,0x09e20af1,0x024d060e,0xfa74fdff,0xfce7fa7b,0x027bffd5,
 0x03290389,0xfe36018f,0xfc5ffbad,0x068e005c,0x0fb80c78,0x0d2a0f6b,0x05b309fd,0xfb4f004f,
 0xf2edf6fd,0xef70f00d,0xf763f1d5,0x0668ff14,0x0ab90a80,0x03ef0803,0x0199013d,0x084c0468,

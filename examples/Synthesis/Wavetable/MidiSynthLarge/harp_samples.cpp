@@ -1,5 +1,5 @@
 #include "harp_samples.h"
-const AudioSynthWavetable::sample_data harp_samples[1] = {
+PROGMEM const AudioSynthWavetable::sample_data harp_samples[1] = {
 	{
 		(int16_t*)sample_0_harp_pluckharp, // sample
 		true, // LOOP
@@ -28,7 +28,7 @@ const AudioSynthWavetable::sample_data harp_samples[1] = {
 	},
 };
 
-const uint32_t sample_0_harp_pluckharp[1792] = {
+PROGMEM const uint32_t sample_0_harp_pluckharp[1792] = {
 0x00000000,0x17bc1494,0x29dc3287,0x134c12fe,0x270c0b11,0x1ae41fa4,0xf60cfe7e,0xfb68e65e,
 0xfa06e827,0xf40df78e,0x0fd81085,0xd081fa20,0xc95ec9cb,0xd0ead69b,0xd0e8e0c9,0x0df2f9fd,
 0x0edb0f93,0x2c210f09,0x184f1e14,0x2df81041,0x3e802890,0x45024085,0x1d842ca5,0xf01b1fed,

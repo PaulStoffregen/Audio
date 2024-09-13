@@ -1,5 +1,5 @@
 #include "flute_samples.h"
-const AudioSynthWavetable::sample_data flute_samples[1] = {
+PROGMEM const AudioSynthWavetable::sample_data flute_samples[1] = {
 	{
 		(int16_t*)sample_0_flute_flutec4, // sample
 		true, // LOOP
@@ -28,7 +28,7 @@ const AudioSynthWavetable::sample_data flute_samples[1] = {
 	},
 };
 
-const uint32_t sample_0_flute_flutec4[768] = {
+PROGMEM const uint32_t sample_0_flute_flutec4[768] = {
 0x00000000,0x024300df,0xfecd0140,0xffe5fdec,0xfeb00179,0x0306fecd,0x021d0534,0x021bfe27,
 0xfe0601f2,0xff2dfc12,0x059e0458,0xfab70015,0x0413ffc2,0x01780416,0x038e00fb,0x03ee06d8,
 0x09340901,0xfcfbff58,0x04bcff1a,0x030509c9,0x03b8fcf8,0x02c7098a,0x026600aa,0x04f30571,

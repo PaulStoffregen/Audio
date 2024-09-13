@@ -1,5 +1,5 @@
 #include "bassoon_samples.h"
-const AudioSynthWavetable::sample_data bassoon_samples[2] = {
+PROGMEM const AudioSynthWavetable::sample_data bassoon_samples[2] = {
 	{
 		(int16_t*)sample_0_bassoon_bassoonc2, // sample
 		true, // LOOP
@@ -54,7 +54,7 @@ const AudioSynthWavetable::sample_data bassoon_samples[2] = {
 	},
 };
 
-const uint32_t sample_0_bassoon_bassoonc2[640] = {
+PROGMEM const uint32_t sample_0_bassoon_bassoonc2[640] = {
 0x00000000,0x0095003b,0x00ffff84,0x023c0140,0x01e101eb,0x029e03df,0x02e302bc,0x03e302b6,
 0x04ab0347,0x05cd050c,0x06d2072f,0x075a06be,0x06a20686,0x04ae047a,0x04270466,0x03560433,
 0x04130496,0x044902fe,0x01b60203,0xff4b01fe,0xfe4affb0,0xffabfe7c,0xff58fdd4,0x0072ffc7,
@@ -127,7 +127,7 @@ const uint32_t sample_0_bassoon_bassoonc2[640] = {
 0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,
 };
 
-const uint32_t sample_1_bassoon_enghorndx3[896] = {
+PROGMEM const uint32_t sample_1_bassoon_enghorndx3[896] = {
 0x00000000,0x00fe0072,0x01170132,0x00ea015b,0x004b00b6,0xff33feb6,0xfeb1ff27,0xff72ffc4,
 0xff05ff27,0xfe8afdd4,0xfd44fe6f,0xfdf6fefa,0x0011fefa,0xff4cfef3,0xffeefef5,0x006600ac,
 0x02970103,0x014b01d9,0xfe58fff3,0xfe38fef0,0xfe41fdd6,0x0077fe42,0x010c01e7,0x001b018a,

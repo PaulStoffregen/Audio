@@ -1,5 +1,5 @@
 #include "mutedgtr_samples.h"
-const AudioSynthWavetable::sample_data mutedgtr_samples[1] = {
+PROGMEM const AudioSynthWavetable::sample_data mutedgtr_samples[1] = {
 	{
 		(int16_t*)sample_0_mutedgtr_mgtr, // sample
 		true, // LOOP
@@ -28,7 +28,7 @@ const AudioSynthWavetable::sample_data mutedgtr_samples[1] = {
 	},
 };
 
-const uint32_t sample_0_mutedgtr_mgtr[512] = {
+PROGMEM const uint32_t sample_0_mutedgtr_mgtr[512] = {
 0x00000000,0xfe46fb78,0xfe5dfe26,0xfb55fcb3,0xf8def9f3,0xfa15f944,0xfb86fb59,0xfc14fc22,
 0xfd72fd0b,0xfd30fdc9,0xfddafd22,0x026cfffc,0x066304d1,0x079d074e,0x05f90728,0x02c9046b,
 0x00550189,0xfc99feb6,0xf9b1fa78,0xfdf9fb27,0x00f3002f,0xff6a0059,0xff0cfef6,0x00f8ffa7,

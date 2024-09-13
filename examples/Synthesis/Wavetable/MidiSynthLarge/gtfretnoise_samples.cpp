@@ -1,5 +1,5 @@
 #include "gtfretnoise_samples.h"
-const AudioSynthWavetable::sample_data gtfretnoise_samples[1] = {
+PROGMEM const AudioSynthWavetable::sample_data gtfretnoise_samples[1] = {
 	{
 		(int16_t*)sample_0_gtfretnoise_guitarfret, // sample
 		false, // LOOP
@@ -28,7 +28,7 @@ const AudioSynthWavetable::sample_data gtfretnoise_samples[1] = {
 	},
 };
 
-const uint32_t sample_0_gtfretnoise_guitarfret[1792] = {
+PROGMEM const uint32_t sample_0_gtfretnoise_guitarfret[1792] = {
 0x00000000,0x17361ac6,0x05fc120d,0xf4f8fbfb,0xe107e5e6,0xd813dbd6,0xe0d8dbb5,0xf0c6e800,
 0x03ecf998,0x0f8009da,0x028e07ce,0xf023fadc,0xe4cee648,0xe44fe293,0xf052e7b2,0xf67cecb6,
 0x00c3fc27,0x07a80679,0xffff014f,0xe81bf287,0xd576dc6d,0xcb5dd0c8,0xd051cb98,0xd7d7da76,

@@ -54,6 +54,7 @@ const AudioSynthWavetable::sample_data BasicFlute1_samples[2] = {
 	},
 };
 
+PROGMEM
 const uint32_t sample_0_BasicFlute1_BreathyFluteC2[28544] = {
 0x001d001d,0x0023001e,0x00260027,0x00210021,0x0019001c,0x001a001f,0x00080015,0xfff0fffc,
 0xffddffe2,0xffe1ffda,0xfffaffed,0xfff5fffc,0x0000fff6,0x001f000e,0x0025002c,0x00100017,
@@ -3615,6 +3616,7 @@ const uint32_t sample_0_BasicFlute1_BreathyFluteC2[28544] = {
 0x00000000,0x00000000,0x00000000,
 };
 
+PROGMEM
 const uint32_t sample_1_BasicFlute1_BreathyFluteA2[31616] = {
 0x056c0701,0x0ee40bd4,0x025104df,0xff6305da,0xf8b1fd8f,0xf2a4f512,0xf3d0eba2,0xf615ecd9,
 0xfe18f938,0x07e4fed8,0x011d0768,0xfb8008b3,0x08860107,0xfd53fb78,0xf9530476,0xfbe4f6ce,

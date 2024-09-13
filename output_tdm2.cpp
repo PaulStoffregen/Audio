@@ -49,7 +49,11 @@ void AudioOutputTDM2::begin(void)
 	for (int i=0; i < 16; i++) {
 		block_input[i] = nullptr;
 	}
-
+	
+	// DMAMEM doesn't get zeroed, have to do it ourselves:
+	memset(zeros, 0, sizeof zeros);
+	memset(tdm_tx_buffer, 0, sizeof tdm_tx_buffer);
+	
 	// TODO: should we set & clear the I2S_TCSR_SR bit here?
 	config_tdm();
 
@@ -82,7 +86,7 @@ static void memcpy_tdm_tx(uint32_t *dest, const uint32_t *src1, const uint32_t *
 {
 	uint32_t i, in1, in2, out1, out2;
 
-	for (i=0; i < AUDIO_BLOCK_SAMPLES/2; i++) {
+	for (i=0; i < AUDIO_BLOCK_SAMPLES/4; i++) {
 
 		in1 = *src1++;
 		in2 = *src2++;
