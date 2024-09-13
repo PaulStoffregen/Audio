@@ -28,6 +28,7 @@ const AudioSynthWavetable::sample_data FrenchHorns_samples[1] = {
 	},
 };
 
+PROGMEM
 const uint32_t sample_0_FrenchHorns_FrenchHornsA4L[55040] = {
 0xfffefffd,0xfffdfffd,0xfffdfffd,0xfffefffe,0xfffdfffd,0xfffdfffe,0xfffdfffe,0xfffdfffd,
 0xfffcfffe,0xfffefffe,0xfffcfffe,0xfffdfffe,0xfffdfffe,0xfffdfffe,0xfffefffd,0xfffdfffc,
