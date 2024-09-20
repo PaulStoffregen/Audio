@@ -167,11 +167,11 @@ void AudioPlaySdWav::update(void)
 		if (consume(n)) return; // it was enough to transmit audio
 	}
 
-	// we only get to this point when buffer[512] is empty
+	// we only get to this point when buffer[] is empty
 	if (state != STATE_STOP && wavfile.available()) {
 		// we can read more data from the file...
 		readagain:
-		buffer_length = wavfile.read(buffer, 512);
+		buffer_length = wavfile.read(buffer, sizeof buffer);
 		if (buffer_length == 0) goto end;
 		buffer_offset = 0;
 		bool parsing = (state >= 8);
