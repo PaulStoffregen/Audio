@@ -64,6 +64,33 @@ bool AudioPlaySdRaw::play(const char *filename)
 	return true;
 }
 
+bool AudioPlaySdRaw::play(FS *fs, const char *filename)
+{
+	stop();
+#if defined(HAS_KINETIS_SDHC)
+	if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStartUsingSPI();
+#else
+	AudioStartUsingSPI();
+#endif
+	__disable_irq();
+	rawfile = fs->open(filename);
+	__enable_irq();
+	if (!rawfile) {
+		//Serial.println("unable to open file");
+		#if defined(HAS_KINETIS_SDHC)
+			if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
+		#else
+			AudioStopUsingSPI();
+		#endif
+		return false;
+	}
+	file_size = rawfile.size();
+	file_offset = 0;
+	//Serial.println("able to open file");
+	playing = true;
+	return true;
+}
+
 void AudioPlaySdRaw::stop(void)
 {
 	__disable_irq();
