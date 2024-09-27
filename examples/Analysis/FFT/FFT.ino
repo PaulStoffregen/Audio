@@ -17,7 +17,7 @@
 #include <SD.h>
 #include <SerialFlash.h>
 
-const int myInput = AUDIO_INPUT_LINEIN;
+const int myInput = AUDIO_INPUT_LINEIN; // Note: - socket on board is headphone not Line-In
 //const int myInput = AUDIO_INPUT_MIC;
 
 // Create the Audio components.  These should be created in the
