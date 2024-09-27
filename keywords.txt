@@ -71,6 +71,20 @@ AudioMixer4	KEYWORD2
 AudioAmplifier	KEYWORD2
 AudioOutputAnalog	KEYWORD2
 AudioOutputAnalogStereo	KEYWORD2
+
+AudioBuffer	KEYWORD2
+AudioPreload	KEYWORD2
+AudioPlayWAVstereo	KEYWORD2
+AudioPlayWAVquad	KEYWORD2
+AudioPlayWAVhex	KEYWORD2
+AudioPlayWAVoct	KEYWORD2
+
+AudioRecordWAVmono	KEYWORD2
+AudioRecordWAVstereo	KEYWORD2
+AudioRecordWAVquad	KEYWORD2
+AudioRecordWAVhex	KEYWORD2
+AudioRecordWAVoct	KEYWORD2
+
 AudioPlayMemory	KEYWORD2
 AudioPlaySdRaw	KEYWORD2
 AudioPlaySdWav	KEYWORD2
@@ -91,8 +105,14 @@ AudioSynthKarplusStrong	KEYWORD2
 AudioSynthSimpleDrum	KEYWORD2
 AudioSynthWavetable	KEYWORD2
 isPlaying	KEYWORD2
+isPaused	KEYWORD2
+isRecording	KEYWORD2
+isStopped	KEYWORD2
+isReady	KEYWORD2
 positionMillis	KEYWORD2
 lengthMillis	KEYWORD2
+adjustHeaderInfo	KEYWORD2
+writeCurrentHeader	KEYWORD2
 gain	KEYWORD2
 fadeIn	KEYWORD2
 fadeOut	KEYWORD2
@@ -100,6 +120,15 @@ noteOn	KEYWORD2
 noteOff	KEYWORD2
 stop	KEYWORD2
 play	KEYWORD2
+pause	KEYWORD2
+playSD	KEYWORD2
+record	KEYWORD2
+recordSD	KEYWORD2
+createBuffer	KEYWORD2
+disposeBuffer	KEYWORD2
+cue	KEYWORD2
+cueSD	KEYWORD2
+preLoad	KEYWORD2
 updateCoefs	KEYWORD2
 setCoefficients	KEYWORD2
 setLowpass	KEYWORD2
@@ -270,3 +299,6 @@ AUDIO_MEMORY_MEMORYBOARD	LITERAL1
 CS4272_RATIO_SINGLE	LITERAL1
 CS4272_RATIO_DOUBLE	LITERAL1
 CS4272_RATIO_QUAD	LITERAL1
+
+inExt	LITERAL1
+inHeap	LITERAL1

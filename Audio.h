@@ -127,6 +127,8 @@
 #include "play_sd_raw.h"
 #include "play_sd_wav.h"
 #include "play_serialflash_raw.h"
+#include "play_wav_buffered.h"
+#include "record_wav_buffered.h"
 #include "record_queue.h"
 #include "synth_tonesweep.h"
 #include "synth_sine.h"
