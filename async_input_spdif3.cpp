@@ -96,14 +96,16 @@ void AsyncAudioInputSPDIF3::begin()
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;	
 	dma.TCD->SADDR = (void *)((uint32_t)&SPDIF_SRL);
 	dma.TCD->DADDR = spdif_rx_buffer;
+	
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SPDIF_RX);
 
-	//SPDIF_SCR |=SPDIF_SCR_DMA_RX_EN;		//DMA Receive Request Enable
-	dma.enable();
 	dma.attachInterrupt(isr);
+	dma.enable();
+
 #ifdef DEBUG_SPDIF_IN
 	while (!Serial);
 #endif
+
 	_bufferLPFilter.pCoeffs=new float[5];
 	_bufferLPFilter.numStages=1;
 	_bufferLPFilter.pState=new float[2];

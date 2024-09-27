@@ -61,8 +61,13 @@ void AudioInputI2S::begin(void)
 	dma.TCD->DLASTSGA = -sizeof(i2s_rx_buffer);
 	dma.TCD->BITER_ELINKNO = sizeof(i2s_rx_buffer) / 2;
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
+	
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_RX);
 
+	update_responsibility = update_setup();
+	dma.attachInterrupt(isr);
+	dma.enable();
+	
 	I2S0_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE | I2S_RCSR_FR;
 	I2S0_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE; // TX clock enable, because sync'd to TX
 
@@ -81,13 +86,15 @@ void AudioInputI2S::begin(void)
 	dma.TCD->DLASTSGA = -sizeof(i2s_rx_buffer);
 	dma.TCD->BITER_ELINKNO = sizeof(i2s_rx_buffer) / 2;
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
+	
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI1_RX);
 
+	update_responsibility = update_setup();
+	dma.attachInterrupt(isr);
+	dma.enable();
+	
 	I2S1_RCSR = I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE | I2S_RCSR_FR;
 #endif
-	update_responsibility = update_setup();
-	dma.enable();
-	dma.attachInterrupt(isr);
 }
 
 void AudioInputI2S::isr(void)
@@ -211,12 +218,13 @@ void AudioInputI2Sslave::begin(void)
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
 
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_RX);
+	
 	update_responsibility = update_setup();
+	dma.attachInterrupt(isr);
 	dma.enable();
 
 	I2S0_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE | I2S_RCSR_FR;
 	I2S0_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE; // TX clock enable, because sync'd to TX
-	dma.attachInterrupt(isr);
 
 #elif defined(__IMXRT1062__)
 	CORE_PIN8_CONFIG  = 3;  //1:RX_DATA0
@@ -233,13 +241,15 @@ void AudioInputI2Sslave::begin(void)
 	dma.TCD->DLASTSGA = -sizeof(i2s_rx_buffer);
 	dma.TCD->BITER_ELINKNO = sizeof(i2s_rx_buffer) / 2;
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
+	
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI1_RX);
+	
+	update_responsibility = update_setup();
+	dma.attachInterrupt(isr);
 	dma.enable();
 
 	I2S1_RCSR = 0;
 	I2S1_RCSR = I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE | I2S_RCSR_FR;
-	update_responsibility = update_setup();
-	dma.attachInterrupt(isr);
 #endif
 }
 
@@ -273,7 +283,9 @@ void AudioInputI2S::begin(void)
 	dma1.CFG->SAR = (void *)((uint32_t)&I2S0_RDR0 + 2);
 	dma1.CFG->DCR = (dma1.CFG->DCR & 0xF08E0FFF) | DMA_DCR_SSIZE(2);
 	dma1.destinationBuffer(i2s_rx_buffer1, sizeof(i2s_rx_buffer1));
+	
 	dma1.triggerAtHardwareEvent(DMAMUX_SOURCE_I2S0_RX);
+	
 	dma1.interruptAtCompletion();
 	dma1.disableOnCompletion();
 	dma1.attachInterrupt(isr1);
@@ -283,14 +295,14 @@ void AudioInputI2S::begin(void)
 	dma2.destinationBuffer(i2s_rx_buffer2, sizeof(i2s_rx_buffer2));
 	dma2.interruptAtCompletion();
 	dma2.disableOnCompletion();
-	dma2.attachInterrupt(isr2);
+	
+	update_responsibility = update_setup();
+	dma2.attachInterrupt(isr2); // isr2 triggers update_all()
+	dma1.enable();
 
 	I2S0_RCSR = 0;
 	I2S0_RCSR = I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FWDE | I2S_RCSR_FR;
 	I2S0_TCSR |= I2S_TCSR_TE | I2S_TCSR_BCE; // TX clock enable, because sync'd to TX
-
-	update_responsibility = update_setup();
-	dma1.enable();
 }
 
 void AudioInputI2S::update(void)
