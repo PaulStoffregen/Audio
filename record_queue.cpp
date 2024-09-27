@@ -43,14 +43,15 @@ void AudioRecordQueue::clear(void)
 {
 	uint32_t t;
 
-	if (userblock) {
+	if (NULL != userblock) {
 		release(userblock);
 		userblock = NULL;
 	}
 	t = tail;
 	while (t != head) {
 		if (++t >= max_buffers) t = 0;
-		release(queue[t]);
+		if (SILENT_BLOCK_FLAG != queue[t]) // real block?
+			release(queue[t]);
 	}
 	tail = t;
 }
@@ -59,13 +60,27 @@ int16_t * AudioRecordQueue::readBuffer(void)
 {
 	uint32_t t;
 
-	if (userblock) return NULL;
-	t = tail;
-	if (t == head) return NULL;
-	if (++t >= max_buffers) t = 0;
-	userblock = queue[t];
-	tail = t;
-	return userblock->data;
+	if (NULL == userblock) // no block passed to foreground yet
+	{
+		t = tail;
+		if (t == head) return NULL;
+		if (++t >= max_buffers) t = 0;
+		userblock = queue[t];
+		if (SILENT_BLOCK_FLAG == userblock) // got a NULL block, i.e. silence
+		{
+			userblock = allocate(); // allocate a block now, rather than one for every silent entry
+			if (NULL != userblock)	// if we got one...
+				memset(userblock->data,0,sizeof userblock->data); // ...set it to silent
+		}
+		tail = t;
+	}
+	// otherwise return data address previously sent, 
+	// rather than NULL, which according to the 
+	// documentation says no data available
+	
+	return NULL == userblock // no data, or can't allocate() a silent block
+				?NULL
+				:userblock->data;
 }
 
 void AudioRecordQueue::freeBuffer(void)
@@ -81,16 +96,24 @@ void AudioRecordQueue::update(void)
 	uint32_t h;
 
 	block = receiveReadOnly();
-	if (!block) return;
+	//if (!block) return;
 	if (!enabled) {
-		release(block);
+		if (NULL != block)
+			release(block);
 		return;
 	}
+		
 	h = head + 1;
 	if (h >= max_buffers) h = 0;
-	if (h == tail) {
-		release(block);
+	if (h == tail) { // no room in queue
+		if (NULL != block)
+			release(block);
 	} else {
+		// No block supplied, but we are active: make a place-holder
+		if (NULL == block)
+			block = SILENT_BLOCK_FLAG;
+		
+		// queue the block or place-holder
 		queue[h] = block;
 		head = h;
 	}
