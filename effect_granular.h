@@ -21,6 +21,9 @@
  * SOFTWARE.
  */
 
+#ifndef _effect_granular_h_
+#define _effect_granular_h_
+
 #include <AudioStream.h> // github.com/PaulStoffregen/cores/blob/master/teensy4/AudioStream.h
 
 class AudioEffectGranular : public AudioStream
@@ -63,3 +66,4 @@ private:
 	bool sample_req;
 };
 
+#endif // _effect_granular_h_
