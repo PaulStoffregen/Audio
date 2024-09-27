@@ -61,7 +61,7 @@ void AudioEffectEnvelope::noteOn(void)
 void AudioEffectEnvelope::noteOff(void)
 {
 	__disable_irq();
-	if (state != STATE_IDLE && state != STATE_FORCED) {
+	if (state != STATE_RELEASE && state != STATE_IDLE && state != STATE_FORCED) {
 		state = STATE_RELEASE;
 		count = release_count;
 		inc_hires = (-mult_hires) / (int32_t)count;
