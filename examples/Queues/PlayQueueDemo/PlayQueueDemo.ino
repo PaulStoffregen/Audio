@@ -44,7 +44,8 @@ void setup() {
   }
 
   AudioMemory(10);
-  
+
+  //sgtl5000_1.setAddress(HIGH);
   sgtl5000_1.enable();
   sgtl5000_1.volume(0.5);
 
@@ -53,6 +54,7 @@ void setup() {
   // Comment the following out (or set to ORIGINAL) for old stall behaviour;
   // set to NON_STALLING for return with status if audio blocks not available,
   // or no room in queue for another audio block.
+  //queue1.setBehaviour(AudioPlayQueue::ORIGINAL);
   queue1.setBehaviour(AudioPlayQueue::NON_STALLING);
 
   queue1.setMaxBuffers(4);
@@ -80,10 +82,13 @@ int16_t nextSample()
 
 int loops;
 int nulls,nulls2;
-int testMode = 2; // 1: getBuffer / playBuffer; 2: play(), mix of samples and buffers
+int testMode = 1; // 1: getBuffer / playBuffer; 2: play(), mix of samples and buffers
 int playMode; // 1: generate individual samples and send; 2: generate buffer of samples and send
 int16_t samples[512],*sptr; // space for samples when using play()
 uint32_t len; // number of buffered samples (remaining)
+int noQueueSpace; // did call to AudioPlayQueue::playBuffer() fail? If so, re-try
+int noQcount; // count of times we had to wait to queue a block
+
 
 void loop() {
 
@@ -91,16 +96,24 @@ void loop() {
   {
     case 1: // use getBuffer / playBuffer 
     {  
-      int16_t* buf = queue1.getBuffer();
-      
-      if (NULL == buf)
-        nulls++;
+      if (0 != noQueueSpace)
+        noQueueSpace = queue1.playBuffer();
       else
       {
-        for (int i=0;i<AUDIO_BLOCK_SAMPLES;i++)
-          buf[i] = nextSample();
-        queue1.playBuffer();
+        int16_t* buf = queue1.getBuffer();
+        
+        if (NULL == buf)
+          nulls++;
+        else
+        {
+          for (int i=0;i<AUDIO_BLOCK_SAMPLES;i++)
+            buf[i] = nextSample();
+          noQueueSpace = queue1.playBuffer();
+        }
       }
+
+      if (noQueueSpace)
+        noQcount++;
     }
       break;
 
@@ -168,7 +181,7 @@ void loop() {
     // In NON_STALLING mode this loops really fast, and the millis() value goes up by
     // 100 on every output line. In ORIGINAL mode the loop is slow, and the internal
     // stall results in slightly unpredictable timestamps.
-    Serial.printf("%d: millis = %d, loops = %d, nulls = %u, nulls2 = %u, samples = %u\n",
-                  playMode,millis(),loops,nulls,nulls2,genLen);
+    Serial.printf("%d: millis = %d, loops = %d, nulls = %u, nulls2 = %u, samples = %u, wait count = %d\n",
+                  playMode,millis(),loops,nulls,nulls2,genLen,noQcount);
   }
 }
