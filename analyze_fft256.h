@@ -44,6 +44,7 @@ extern const int16_t AudioWindowWelch256[];
 extern const int16_t AudioWindowHamming256[];
 extern const int16_t AudioWindowCosine256[];
 extern const int16_t AudioWindowTukey256[];
+extern const int16_t AudioWindowKaiserBessel256[];
 }
 
 class AudioAnalyzeFFT256 : public AudioStream
