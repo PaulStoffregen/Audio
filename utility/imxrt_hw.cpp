@@ -36,7 +36,7 @@ void set_audioClock(int nfact, int32_t nmult, uint32_t ndiv, bool force) // sets
 	if (!force && (CCM_ANALOG_PLL_AUDIO & CCM_ANALOG_PLL_AUDIO_ENABLE)) return;
 
 	CCM_ANALOG_PLL_AUDIO = CCM_ANALOG_PLL_AUDIO_BYPASS | CCM_ANALOG_PLL_AUDIO_ENABLE
-			     | CCM_ANALOG_PLL_AUDIO_POST_DIV_SELECT(2) // 2: 1/4; 1: 1/2; 0: 1/1
+			     | CCM_ANALOG_PLL_AUDIO_POST_DIV_SELECT(2) // page 1105
 			     | CCM_ANALOG_PLL_AUDIO_DIV_SELECT(nfact);
 
 	CCM_ANALOG_PLL_AUDIO_NUM   = nmult & CCM_ANALOG_PLL_AUDIO_NUM_MASK;
