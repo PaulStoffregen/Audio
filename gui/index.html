@@ -494,6 +494,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 
 		{"type":"AudioAmplifier","data":{"defaults":{"name":{"value":"new"}},"shortName":"amp","inputs":1,"outputs":1,"category":"mixer-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioMixer4","data":{"defaults":{"name":{"value":"new"}},"shortName":"mixer","inputs":4,"outputs":1,"category":"mixer-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioMixer8","data":{"defaults":{"name":{"value":"new"}},"shortName":"mixer8","inputs":8,"outputs":1,"category":"mixer-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioPlayMemory","data":{"defaults":{"name":{"value":"new"}},"shortName":"playMem","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioPlaySdWav","data":{"defaults":{"name":{"value":"new"}},"shortName":"playSdWav","inputs":0,"outputs":2,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioPlaySdRaw","data":{"defaults":{"name":{"value":"new"}},"shortName":"playSdRaw","inputs":0,"outputs":1,"category":"play-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -2617,6 +2618,50 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	</p>
 </script>
 <script type="text/x-red" data-template-name="AudioMixer4">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="AudioMixer8">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Combine up to 8 audio signals together, each with adjustable gain.
+		All channels support signal attenuation or amplification.</p>
+	</div>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Input signal #1</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Input signal #2</td></tr>
+		<tr class=odd><td align=center>In 2</td><td>Input signal #3</td></tr>
+		<tr class=odd><td align=center>In 3</td><td>Input signal #4</td></tr>
+		<tr class=odd><td align=center>In 3</td><td>Input signal #5</td></tr>
+		<tr class=odd><td align=center>In 3</td><td>Input signal #6</td></tr>
+		<tr class=odd><td align=center>In 3</td><td>Input signal #7</td></tr>
+		<tr class=odd><td align=center>In 3</td><td>Input signal #8</td></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Sum of all inputs</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>gain</span>(channel, level);</p>
+	<p class=desc>Adjust the amplification or attenuation.  "channel" must
+		be 0 to 3.  "level" may be any floating point number from 0 to 32767.0.
+		1.0 passes the signal through directly.  Level of 0 shuts the channel
+		off completely.  Between 0 to 1.0 attenuates the signal, and above
+		1.0 amplifies it.  Negative numbers may also be used, to invert the
+		signal.  All 8 channels have separate gain settings.
+	</p>
+	
+	<h3>Notes</h3>
+	<p>Signal clipping can occur when any channel has gain greater than 1.0,
+		or when multiple signals add together to greater than 1.0.</p>
+	<p>More than 8 channels may be combined by connecting multiple mixers
+		in tandem.  For example, a 32 channel mixer may be built using 5
+		mixers, where the fifth mixer combines the outputs of the first 4.
+	</p>
+</script>
+<script type="text/x-red" data-template-name="AudioMixer8">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
