@@ -3341,6 +3341,14 @@ The actual packets are taken
 		<a href="http://www.pjrc.com/teensy/td_libs_AudioProcessorUsage.html" target="_blank">AudioNoInterrupts()</a>
 		should be used to guarantee all new settings take effect together.
 	</p>
+	<p class=func><span class=keyword>restart</span>();</p>
+	<p class=desc>
+		Cause the generated waveform to restart its cycle. The generation
+		starts with the angle 0 degrees (default) or with the last value
+		configured by phase(angle);. When multiple objects are configured,
+		<a href="http://www.pjrc.com/teensy/td_libs_AudioProcessorUsage.html" target="_blank">AudioNoInterrupts()</a>
+		should be used to guarantee all new settings take effect together.
+	</p>
 	<p class=func><span class=keyword>pulseWidth</span>(amount);</p>
 	<p class=desc>Change the width (duty cycle) of the pulse.</p>
 	<p class=func><span class=keyword>arbitraryWaveform</span>(array, maxFreq);</p>
@@ -3412,6 +3420,14 @@ The actual packets are taken
 	</p>
 	<p class=func><span class=keyword>amplitude</span>(level);</p>
 	<p class=desc>Change the amplitude.  Set to 0 to turn the signal off.
+	</p>
+	<p class=func><span class=keyword>restart</span>();</p>
+	<p class=desc>
+		Cause the generated waveform to restart its cycle. The generation
+		starts with the angle 0 degrees (default) or with the last value
+		configured by phase(angle);. When multiple objects are configured,
+		<a href="http://www.pjrc.com/teensy/td_libs_AudioProcessorUsage.html" target="_blank">AudioNoInterrupts()</a>
+		should be used to guarantee all new settings take effect together.
 	</p>
 	<p class=func><span class=keyword>offset</span>(level);</p>
 	<p class=desc>Add a DC offset, from -1.0 to +1.0.  Useful for generating
