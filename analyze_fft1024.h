@@ -60,11 +60,36 @@ public:
 		}
 		return false;
 	}
-	float read(unsigned int binNumber) {
+
+	// For details on the internal structure of complex numbers, see the declaration of output[] down below.
+	// Note that only the raw complex numbers and their magnitudes are stored while all phase computations
+	// are done "live" without any form of precalculation.
+	// That's a deliberate design decision since it's unlikely that a user needs all 512 phases.
+	// Moreover, most users don't require the phases anyway.
+	// Instead, the phase retrieval method only computes what the user actually needs and when he needs it.
+	// Although a few users are now responsible for trying to only retrieve each phase once for maximum efficiency,
+	// that's better than wasting a lot of other users' processing time with useless computations.
+	uint32_t readCmplxNumber(unsigned int binNumber) {
+		if (binNumber > 511) return 0;
+		return outputCmplx[binNumber];
+	}
+	int16_t readCmplxRealPart(unsigned int binNumber) {
+		if (binNumber > 511) return 0;
+		return outputCmplx[binNumber] & 0x0000ffff;
+	}
+	int16_t readCmplxImaginaryPart(unsigned int binNumber) {
+		if (binNumber > 511) return 0;
+		return outputCmplx[binNumber] >> 16;
+	}
+	uint16_t readCmplxMagnitude(unsigned int binNumber) {
+		if (binNumber > 511) return 0.0;
+		return output[binNumber];
+	}
+	float readAmplitude(unsigned int binNumber) {
 		if (binNumber > 511) return 0.0;
 		return (float)(output[binNumber]) * (1.0f / 16384.0f);
 	}
-	float read(unsigned int binFirst, unsigned int binLast) {
+	float readAmplitudes(unsigned int binFirst, unsigned int binLast) {
 		if (binFirst > binLast) {
 			unsigned int tmp = binLast;
 			binLast = binFirst;
@@ -78,6 +103,8 @@ public:
 		} while (binFirst <= binLast);
 		return (float)sum * (1.0f / 16384.0f);
 	}
+	float readPhase(unsigned int binNumber);
+
 	void averageTogether(uint8_t n) {
 		// not implemented yet (may never be, 86 Hz output rate is ok)
 	}
@@ -85,7 +112,15 @@ public:
 		window = w;
 	}
 	virtual void update(void);
-	uint16_t output[512] __attribute__ ((aligned (4)));
+
+	// DEPRECATED members; they exist for backwards compatibility
+	float read(unsigned int binNumber) {
+		return readAmplitude(binNumber);
+	}
+	float read(unsigned int binFirst, unsigned int binLast) {
+		return readAmplitudes(binFirst, binLast);
+	}
+	uint16_t output[512] __attribute__ ((aligned (4))); // stores raw magnitudes; should be private
 private:
 	void init(void);
 	const int16_t *window;
@@ -98,6 +133,11 @@ private:
 	volatile bool outputflag;
 	audio_block_t *inputQueueArray[1];
 	arm_cfft_radix4_instance_q15 fft_inst;
+
+	// Stores a 32-bit complex number for each output bin.
+	// The 16 least significant bits are the real part, the 16 most significant bits are the imaginary part.
+	// Both parts are signed.
+	uint32_t outputCmplx[512] __attribute__ ((aligned (4)));
 };
 
 #endif
