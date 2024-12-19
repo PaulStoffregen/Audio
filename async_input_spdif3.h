@@ -58,15 +58,14 @@ protected:
 	static void isr(void);
 private:
 	void resample(int16_t* data_left, int16_t* data_right, int32_t& block_offset);
-	void monitorResampleBuffer();
-	void configure();
+	void monitorResampleBuffer(bool newConfiguration);
+	bool configure();
 	double getNewValidInputFrequ();
 	void config_spdifIn();
 
 	//accessed in isr ====
 	static volatile int32_t buffer_offset;
 	static int32_t resample_offset;
-    static volatile uint32_t microsLast;
 	//====================
 
 	Resampler _resampler;
