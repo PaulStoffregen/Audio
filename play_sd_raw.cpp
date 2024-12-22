@@ -40,14 +40,17 @@ void AudioPlaySdRaw::begin(void)
 bool AudioPlaySdRaw::play(const char *filename)
 {
 	stop();
+	bool irq = false;
+	if (NVIC_IS_ENABLED(IRQ_SOFTWARE)) {
+		NVIC_DISABLE_IRQ(IRQ_SOFTWARE);
+		irq = true;
+	}
 #if defined(HAS_KINETIS_SDHC)
 	if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStartUsingSPI();
 #else
 	AudioStartUsingSPI();
 #endif
-	__disable_irq();
 	rawfile = SD.open(filename);
-	__enable_irq();
 	if (!rawfile) {
 		//Serial.println("unable to open file");
 		#if defined(HAS_KINETIS_SDHC)
@@ -55,8 +58,10 @@ bool AudioPlaySdRaw::play(const char *filename)
 		#else
 			AudioStopUsingSPI();
 		#endif
+		if (irq) NVIC_ENABLE_IRQ(IRQ_SOFTWARE);
 		return false;
 	}
+	if (irq) NVIC_ENABLE_IRQ(IRQ_SOFTWARE);
 	file_size = rawfile.size();
 	file_offset = 0;
 	//Serial.println("able to open file");
@@ -66,21 +71,22 @@ bool AudioPlaySdRaw::play(const char *filename)
 
 void AudioPlaySdRaw::stop(void)
 {
-	__disable_irq();
+	bool irq = false;
+	if (NVIC_IS_ENABLED(IRQ_SOFTWARE)) {
+		NVIC_DISABLE_IRQ(IRQ_SOFTWARE);
+		irq = true;
+	}
 	if (playing) {
 		playing = false;
-		__enable_irq();
 		rawfile.close();
 		#if defined(HAS_KINETIS_SDHC)
 			if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
 		#else
 			AudioStopUsingSPI();
 		#endif
-	} else {
-		__enable_irq();
 	}
+	if (irq) NVIC_ENABLE_IRQ(IRQ_SOFTWARE);
 }
-
 
 void AudioPlaySdRaw::update(void)
 {
