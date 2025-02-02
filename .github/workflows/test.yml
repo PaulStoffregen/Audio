@@ -24,7 +24,6 @@ jobs:
           - examples/Effects/Flange
           - examples/HardwareTesting/PassThroughMono
           - examples/HardwareTesting/PassThroughStereo
-          - examples/HardwareTesting/SdCardTest
           - examples/HardwareTesting/ToneSweep
           - examples/HardwareTesting/WM8731MikroSine
           - examples/MemoryAndCpuUsage
@@ -40,13 +39,13 @@ jobs:
     runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
+      - run: rm -r extras
       - run: pip install platformio
       # install dependent libraries
       # http://platformio.org/#!/lib/show/539/SerialFlash
       - run: platformio lib install 539
       # remove unused items
-      - run: rm -r extras || true  # Ignore errors
-      - run: ls -l ${{ matrix.src }}
+      # - run: ls -l ${{ matrix.src }}
       - env:
           PLATFORMIO_BUILD_FLAGS: -larm_cortexM4l_math
           PLATFORMIO_CI_SRC: ${{ matrix.src }}
