@@ -62,7 +62,7 @@ RED.editor = (function() {
 	 * @param definition - the node property definitions (either def.defaults or def.creds)
 	 * @param property - the property name being validated
 	 * @param value - the property value being validated
-	 * @returns {boolean} whether the node proprty is valid
+	 * @returns {boolean} whether the node property is valid
 	 */
 	function validateNodeProperty(node,definition,property,value) {
 		var valid = true;
@@ -86,7 +86,7 @@ RED.editor = (function() {
 	/**
 	 * Called when the node's properties have changed.
 	 * Marks the node as dirty and needing a size check.
-	 * Removes any links to non-existant outputs.
+	 * Removes any links to non-existent outputs.
 	 * @param node - the node that has been updated
 	 * @returns {array} the links that were removed due to this update
 	 */

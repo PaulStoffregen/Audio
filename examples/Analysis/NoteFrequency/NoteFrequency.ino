@@ -82,7 +82,7 @@ void setup() {
      */
     notefreq.begin(.15);
     pinMode(LED_BUILTIN, OUTPUT);
-    // Audio library isr allways gets priority
+    // Audio library isr always gets priority
     playNoteTimer.priority(144);
     playNoteTimer.begin(playNote, 1000);
 }

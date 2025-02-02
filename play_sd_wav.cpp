@@ -267,7 +267,7 @@ start:
 				}
 				if (header[4] > sizeof(header)) {
 					// if such .wav files exist, increasing the
-					// size of header[] should accomodate them...
+					// size of header[] should accommodate them...
 					//Serial.println("WAVEFORMATEXTENSIBLE too long");
 					break;
 				}

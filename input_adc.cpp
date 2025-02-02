@@ -59,7 +59,7 @@ void AudioInputAnalog::init(uint8_t pin)
 #endif
 	// Note for review:
 	// Probably not useful to spin cycles here stabilizing
-	// since DC blocking is similar to te external analog filters
+	// since DC blocking is similar to the external analog filters
 	tmp = (uint16_t) analogRead(pin);
 	tmp = ( ((int32_t) tmp) << 14);
 	hpf_x1 = tmp;   // With constant DC level x1 would be x0
@@ -518,7 +518,7 @@ void AudioInputAnalog::update(void)
 		// proper low-pass filter sounds pretty good
 		*dest++ = fir(capture_buffer + i * 4, filter, sizeof(filter)/2);
 #else
-		// just averge 4 samples together, lower quality but less math
+		// just average 4 samples together, lower quality but less math
 		*dest++ = (capture_buffer[i * 4] + capture_buffer[i * 4 + 1]
 			+ capture_buffer[i * 4 + 2] + capture_buffer[i * 4 + 3]) << 2;
 #endif

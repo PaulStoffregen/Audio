@@ -228,7 +228,7 @@ void AudioOutputSPDIF3::config_spdif3(void)
 
 	uint32_t fs = AUDIO_SAMPLE_RATE_EXACT;
 	// PLL between 27*24 = 648MHz und 54*24=1296MHz
-	// n1, n2 choosen for compatibility with I2S (same PLL frequency) :
+	// n1, n2 chosen for compatibility with I2S (same PLL frequency) :
 	int n1 = 4; //SAI prescaler 4 => (n1*n2) = multiple of 4
 	int n2 = 1 + (24000000 * 27) / (fs * 256 * n1);
 	double C = ((double)fs * 256 * n1 * n2) / 24000000;

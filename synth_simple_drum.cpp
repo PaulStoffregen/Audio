@@ -84,7 +84,7 @@ void AudioSynthSimpleDrum::pitchMod(float depth)
   // 0x0 to 0x3fff;
   intdepth = depth * 0x7fff;
 
-  // Lets turn it into 2.14, in range between -0.75 and 2.9999, woth 0 at 0.5
+  // Lets turn it into 2.14, in range between -0.75 and 2.9999, with 0 at 0.5
   // It becomes the scalar for the modulation component of the phasor increment.
   if(intdepth < 0x4000)
   {

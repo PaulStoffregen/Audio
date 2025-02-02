@@ -70,7 +70,7 @@
 *  tone generators without any volume or tone controls.
 *
 *  Volume ("velocity") and instrument specifications in the MIDI files are discarded.
-*  All the tracks are prcoessed and merged into a single time-ordered stream of
+*  All the tracks are processed and merged into a single time-ordered stream of
 *  "note on", "note off", and "delay" commands.
 *
 *  This was written for the "Playtune" Arduino library, which plays polyphonic music
@@ -101,7 +101,7 @@
 *     miditones chopin
 *
 *  It will create a file in the same directory called "chopin.c" which contains
-*  the C-language statement to intiialize an array called "score" with the bytestream.
+*  the C-language statement to initialize an array called "score" with the bytestream.
 *
 *
 *  The general form for command line execution is this:
@@ -134,7 +134,7 @@
 *       The default is 6 tone generators, and the maximum is 16.
 *       The program will report how many notes had to be discarded because there
 *       weren't enough tone generators.  Note that for the Arduino Playtunes
-*       library, it's ok to have the bytestream use more tone genreators than
+*       library, it's ok to have the bytestream use more tone generators than
 *       exist on your processor because any extra notes will be ignored, although
 *       it does make the file bigger than necessary . Of course, too many ignored
 *       notes will make the music sound really strange!
@@ -811,7 +811,7 @@ int main(int argc,char *argv[]) {
     }
 
     /* Continue processing all tracks, in an order based on the simulated time.
-    This is not unlike multiway merging used for tape sorting algoritms in the 50's! */
+    This is not unlike multiway merging used for tape sorting algorithms in the 50's! */
 
     tracknum = 0;
     if (!parseonly) do { /* while there are still track notes to process */

@@ -306,7 +306,7 @@ void Resampler::resample(float* input0, float* input1, uint16_t inputLength, uin
         }
     }
     if(outputCount < outputLength){
-        //ouput vector not full -> we ran out of input samples
+        //output vector not full -> we ran out of input samples
         processedLength=inputLength;
     }
     else{

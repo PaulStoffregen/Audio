@@ -168,7 +168,7 @@ void AudioOutputSPDIF::isr(void)
 			aux = (0xB333 ^ (((uint32_t)((int16_t)lo)) >> 17));
 
 			if (++frame > 191) {
-				// VUCP-Bits ("Valid, Subcode, Channelstatus, Parity) = 0 (0xcc) | Preamble (depends on Framno.) | Auxillary
+				// VUCP-Bits ("Valid, Subcode, Channelstatus, Parity) = 0 (0xcc) | Preamble (depends on Framno.) | Auxiliary
 				*(dest+0) =  vucp | (PREAMBLE_B << 16 ) | aux; //special preamble for one of 192 frames
 				frame = 0;
 			} else {

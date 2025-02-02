@@ -161,7 +161,7 @@ class Resampler {
                 }
             }
             if(outputCount < outputLength){
-                //ouput vector not full -> we ran out of input samples
+                //output vector not full -> we ran out of input samples
                 processedLength=inputLength;
             }
             else{

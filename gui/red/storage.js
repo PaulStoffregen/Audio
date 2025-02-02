@@ -4,7 +4,7 @@
 
 RED.storage = (function() {
 	function update() {
-		// TOOD: use setTimeout to limit the rate of changes?
+		// TODO: use setTimeout to limit the rate of changes?
 		if (localStorage) {
 			var nns = RED.nodes.createCompleteNodeSet();
 			localStorage.setItem("audio_library_guitool", JSON.stringify(nns));
@@ -19,7 +19,7 @@ RED.storage = (function() {
 		}
 	}
 	function clear() {
-		// TOOD: use setTimeout to limit the rate of changes?
+		// TODO: use setTimeout to limit the rate of changes?
 		if (localStorage) {
 			localStorage.removeItem("audio_library_guitool");
 			//console.log("localStorage write");

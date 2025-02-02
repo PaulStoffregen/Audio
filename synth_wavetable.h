@@ -97,7 +97,7 @@ public:
 	 *
 	 * A wavetable uses a set of samples to generate sound.
 	 * This function is used to set the instrument samples.
-	 * @param instrument a struct of type instrument_data, commonly prodced from a
+	 * @param instrument a struct of type instrument_data, commonly produced from a
 	 * decoded SoundFont file using the SoundFont Decoder Script which accompanies this library.
 	 */
 	void setInstrument(const instrument_data& instrument) {
@@ -125,7 +125,7 @@ public:
 
 	/**
 	 * @brief Scale midi_amp to a value between 0.0 and 1.0
-	 * using a logarithmic tranformation.
+	 * using a logarithmic transformation.
 	 *
 	 * @param midi_amp a value between 0 and 127
 	 * @return a value between 0.0 to 1.0
@@ -149,7 +149,7 @@ public:
 	}
 
 	/**
-	 * @brief Convert a frequency to the corressponding
+	 * @brief Convert a frequency to the corresponding
 	 * MIDI note value.
 	 *
 	 * @param freq the frequency value as a float to convert

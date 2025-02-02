@@ -3,7 +3,7 @@
  *  Author: Joao Rossi Filho
  *          joaorossifilho@gmail.com
  *
- *  Soon I'll make a commit with nice comments and discription
+ *  Soon I'll make a commit with nice comments and description
  *
  * Copyright (c) 2016 Joao Rossi FIlho
  *

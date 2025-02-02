@@ -309,7 +309,7 @@ void AudioOutputPWM::begin(uint8_t pin1, uint8_t pin2)
 	//set PWM-DMA-Enable
 	apins[i].flexpwm->SM[submodule].DMAEN = FLEXPWM_SMDMAEN_VALDE;
 
-	//clear inital dma data:
+	//clear initial dma data:
 	uint32_t modulo = apins[i].flexpwm->SM[apins[i].info.module & 3].VAL1;
 	for (unsigned j=0; j<AUDIO_BLOCK_SAMPLES * 2; j++) {
 		uint32_t cval = (silence[i] * (modulo + 1)) >> analog_write_res;

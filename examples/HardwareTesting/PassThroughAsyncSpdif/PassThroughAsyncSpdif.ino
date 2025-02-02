@@ -28,7 +28,7 @@ void loop() {
   Serial.print("anti-aliasing attenuation: ");
   Serial.println(spdifIn.getAttenuation());
   
-  Serial.print("resampling goup delay [milli seconds]: ");
+  Serial.print("resampling group delay [milli seconds]: ");
   Serial.println(spdifIn.getHalfFilterLength()/inputFrequency*1e3,2);
   
   Serial.print("half filter length: ");

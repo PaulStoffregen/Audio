@@ -222,11 +222,11 @@ void AudioSynthWavetable::update(void) {
 
 	// Main loop to handle interpolation, vibrato (vibrato LFO and modulation LFO), and tremolo (modulation LFO only)
 	// Virbrato and modulation offsets/multipliers are updated depending on the LFO_SMOOTHNESS, with max smoothness (7) being one
-	// update per loop interation, and minimum smoothness (1) being once per loop. Hence there is a configurable trade-off
+	// update per loop iteration, and minimum smoothness (1) being once per loop. Hence there is a configurable trade-off
 	// between performance and the smoothness of LFO changes to pitch/amplitude as well as the vibrato/modulation delay granularity
 
 	// also note that the vibrato/tremolo for the two LFO are defined in the SoundFont spec to be a cents (vibrato) or centibel (tremolo)
-	// diviation oscillating with a triangle wave at a given frequency; the following implementation gets the critical points of those
+	// deviation oscillating with a triangle wave at a given frequency; the following implementation gets the critical points of those
 	// oscillations correct, but linearly interpolates the *frequency* and *amplitude* range between those points, which technically results
 	// in a "bowing" of the triangle wave curve relative to what it should be (although this typically isn't audible)
 	while (p < end) {
@@ -272,11 +272,11 @@ void AudioSynthWavetable::update(void) {
 		for (int i = LFO_PERIOD / 2; i; --i, ++p) {
 			// INDEX_BITS representing the higher order bits we use to index into the sample data
 			index = tone_phase >> (32 - s->INDEX_BITS);
-			// recast as uint32_t to load in packed variable; initially int16_t* since we may need to read accross a word boundry
+			// recast as uint32_t to load in packed variable; initially int16_t* since we may need to read across a word boundary
 			// note we are assuming a little-endian cpu (i.e. the first sample is loaded into the lower half-word)
 			tmp1 = *((uint32_t*)(s->sample + index));
-			// phase_scale here being the next 16-bits after the first INDEX_BITS, representing the distince between the samples to interpolate at
-			// 0x0000 gives us all of the first sample point, 0xFFFF all of the second, anything inbetween a sliding mix
+			// phase_scale here being the next 16-bits after the first INDEX_BITS, representing the distance between the samples to interpolate at
+			// 0x0000 gives us all of the first sample point, 0xFFFF all of the second, anything in between a sliding mix
 			phase_scale = (tone_phase << s->INDEX_BITS) >> 16;
 			// scaling of second sample point
 			s1 = signed_multiply_32x16t(phase_scale, tmp1);
@@ -326,7 +326,7 @@ void AudioSynthWavetable::update(void) {
 	// Outside of this code, playNote() and playFrequency() will initially set STATE_DELAY, and stop()
 	// is responsible for setting STATE_RELEASE which can occur during any state, except STATE_IDLE
 
-	// State defintions:
+	// State definitions:
 	// idle - not playing (generally should never arrive here)
 	// delay - full attenuation
 	// attack - linear ramp from full attenuation to no attenuation
@@ -336,9 +336,9 @@ void AudioSynthWavetable::update(void) {
 	// release - linear ramp down from current attenuation level to full attenuation
 	
 	// Definitions of the states generally follow the SoundFont spec, with a major exception being that all
-	// volume scaling is linear realtive to amplitude; this is correct with respect to the attack, but not
+	// volume scaling is linear relative to amplitude; this is correct with respect to the attack, but not
 	// the correct implementation relative to the decay and release which should be scaling linearly relative
-	// to centibels. Practically this means the decay and release happen too slowing intially, and too quick
+	// to centibels. Practically this means the decay and release happen too slowing initially, and too quick
 	// near the end
 
 	// other points of note are that one env_count corresponds to 1 second * ENVELOPE_PERIOD / AUDIO_SAMPLE_RATE_EXACT;

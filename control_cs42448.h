@@ -66,7 +66,7 @@ private:
 	bool volumeInteger(uint32_t n);
 	bool volumeInteger(int channel, uint32_t n);
 	bool inputLevelInteger(int32_t n);
-	bool inputLevelInteger(int chnnel, int32_t n);
+	bool inputLevelInteger(int channel, int32_t n);
 	// convert level to volume byte, section 6.9.1, page 50
 	uint32_t volumebyte(float level) {
 		if (level >= 1.0f) return 0;

@@ -69,7 +69,7 @@ void AudioInputAnalogStereo::init(uint8_t pin0, uint8_t pin1)
 
     // Note for review:
     // Probably not useful to spin cycles here stabilizing
-    // since DC blocking is similar to te external analog filters
+    // since DC blocking is similar to the external analog filters
     tmp = (uint16_t) analogRead(pin0);
     tmp = ( ((int32_t) tmp) << 14);
     hpf_x1[0] = tmp;   // With constant DC level x1 would be x0
