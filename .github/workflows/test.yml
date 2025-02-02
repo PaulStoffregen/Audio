@@ -44,7 +44,7 @@ jobs:
       # http://platformio.org/#!/lib/show/539/SerialFlash
       - run: platformio lib install 539
       # remove unused items
-      - run: rm -r extras
+      - run: rm -r extras || true  # Ignore errors
       - env:
           PLATFORMIO_BUILD_FLAGS: -larm_cortexM4l_math
           PLATFORMIO_CI_SRC: ${{ matrix.src }}
