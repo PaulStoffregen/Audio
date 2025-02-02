@@ -1,0 +1,51 @@
+name: test
+on:
+  push:
+    # branches: [main, master]
+  pull_request:
+    # branches: [main, master]
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        src:
+          - examples/MemoryAndCpuUsage
+          - examples/Recorder
+          - examples/SamplePlayer
+          - examples/WavFilePlayer
+          - examples/Analysis/DialTone_7segment
+          - examples/Analysis/DialTone_Serial
+          - examples/Analysis/FFT
+          - examples/Analysis/PeakMeterMono
+          - examples/Analysis/PeakMeterStereo
+          - examples/Analysis/SpectrumAnalyzerBasic
+          - examples/Effects/Bitcrusher
+          - examples/Effects/Chorus
+          - examples/Effects/Delay
+          - examples/Effects/Filter
+          - examples/Effects/Filter_FIR
+          - examples/Effects/Flange
+          - examples/HardwareTesting/PassThroughMono
+          - examples/HardwareTesting/PassThroughStereo
+          - examples/HardwareTesting/SdCardTest
+          - examples/HardwareTesting/ToneSweep
+          - examples/HardwareTesting/WM8731MikroSine
+          - examples/Synthesis/PlaySynthMusic
+          - examples/Synthesis/pulseWidth
+          - examples/Tutorial/Part_1_02_Hardware_Test
+          - examples/Tutorial/Part_1_03_Playing_Music
+          - examples/Tutorial/Part_1_04_Blink_While_Playing
+          - examples/Tutorial/Part_1_05_Do_More_While_Playing
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - run: pip install platformio
+      # install dependent libraries
+      # http://platformio.org/#!/lib/show/539/SerialFlash
+      - run: platformio lib install 539
+      # remove unused items
+      - run: rm -r extras
+      - env:
+          PLATFORMIO_BUILD_FLAGS: -larm_cortexM4l_math
+          PLATFORMIO_CI_SRC: ${{ matrix.src }}
+        run: platformio ci --lib=. --board=teensy31
