@@ -32,15 +32,15 @@
 #include "extmem.h"
 
 
-class AudioEffectDelayExternal : public AudioStream, public AudioExtMem
+class AudioEffectDelayExternal : public AudioExtMem, public AudioStream
 {
 	static const int   CHANNEL_COUNT = 8;
 public:
 	AudioEffectDelayExternal(AudioEffectDelayMemoryType_t type, 
 							 float milliseconds=1e6,
 							 bool forceInitialize = true)
-	  : AudioStream(1, inputQueueArray), 
-		AudioExtMem(type, (milliseconds*(AUDIO_SAMPLE_RATE_EXACT/1000.0f))+0.5f, forceInitialize),
+	  : AudioExtMem(type, (milliseconds*(AUDIO_SAMPLE_RATE_EXACT/1000.0f))+0.5f, forceInitialize),
+		AudioStream(1, inputQueueArray), 
 		activemask(0)
 		{}
 	AudioEffectDelayExternal() : AudioEffectDelayExternal(AUDIO_MEMORY_23LC1024) {}
