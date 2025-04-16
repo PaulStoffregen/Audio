@@ -110,7 +110,7 @@ void AudioSynthWaveformSineHires::update(void)
 #if defined(__ARM_ARCH_7EM__)
 	audio_block_t *msw, *lsw;
 	uint32_t i, ph, inc;
-	int32_t val;
+	int64_t val;
 
 	if (magnitude) {
 		msw = allocate();
@@ -119,9 +119,9 @@ void AudioSynthWaveformSineHires::update(void)
 			ph = phase_accumulator;
 			inc = phase_increment;
 			for (i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
-				val = taylor(ph);
-				msw->data[i] = val >> 16;
-				lsw->data[i] = val & 0xFFFF;
+				val = (int64_t) taylor(ph) * (int64_t) magnitude;
+				msw->data[i] =  val >> 47;
+				lsw->data[i] = (val >> 31) & 0xFFFF;
 				ph += inc;
 			}
 			phase_accumulator = ph;
