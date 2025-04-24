@@ -35,7 +35,7 @@ class AudioInputAnalog : public AudioStream
 {
 public:
         AudioInputAnalog() : AudioStream(0, NULL) { init(A2); }
-        AudioInputAnalog(uint8_t pin) : AudioStream(0, NULL) { init(pin); }
+        AudioInputAnalog(uint8_t pin, bool _dc_block = true) : AudioStream(0, NULL), dc_block(_dc_block) { init(pin); }
         virtual void update(void);
 private:
         static audio_block_t *block_left;
@@ -47,6 +47,7 @@ private:
         static DMAChannel dma;
         static void isr(void);
         static void init(uint8_t pin);
+        bool dc_block = true;
 
 };
 
