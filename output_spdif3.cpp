@@ -285,6 +285,8 @@ void AudioOutputSPDIF3::config_spdif3(void)
 	SPDIF_STC =
 		SPDIF_STC_TXCLK_SOURCE(1) |	//tx_clk input (from SPDIF0_CLK_ROOT)
 		SPDIF_STC_TXCLK_DF(clkdiv - 1);
+
+	SPDIF_STCSCH = 1 << 21; // set copyright permitted bit in control channel
 }
 
 #endif // __IMXRT1062__

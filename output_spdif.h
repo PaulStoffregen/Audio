@@ -28,6 +28,8 @@
 #include <AudioStream.h> // github.com/PaulStoffregen/cores/blob/master/teensy4/AudioStream.h
 #include <DMAChannel.h>  // github.com/PaulStoffregen/cores/blob/master/teensy4/DMAChannel.h
 
+extern int16_t spdif_bmclookup[256]; // from data_spdif.c
+
 class AudioOutputSPDIF : public AudioStream
 {
 public:
@@ -45,7 +47,7 @@ protected:
 	static DMAChannel dma;
 	static void isr(void);
 private:
-	static uint32_t vucp;
+	static int32_t vucp;
 	static audio_block_t *block_left_2nd;
 	static audio_block_t *block_right_2nd;
 	static uint16_t block_left_offset;

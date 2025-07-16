@@ -37,7 +37,7 @@ uint16_t  AudioOutputSPDIF2::block_left_offset = 0;
 uint16_t  AudioOutputSPDIF2::block_right_offset = 0;
 bool AudioOutputSPDIF2::update_responsibility = false;
 DMAChannel AudioOutputSPDIF2::dma(false);
-extern uint16_t spdif_bmclookup[256];
+extern int16_t spdif_bmclookup[256];
 
 DMAMEM __attribute__((aligned(32)))
 static uint32_t SPDIF_tx_buffer[AUDIO_BLOCK_SAMPLES * 4]; //2 KB

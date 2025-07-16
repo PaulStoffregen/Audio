@@ -35,21 +35,51 @@ uint16_t  AudioOutputSPDIF::block_left_offset = 0;
 uint16_t  AudioOutputSPDIF::block_right_offset = 0;
 bool AudioOutputSPDIF::update_responsibility = false;
 DMAChannel AudioOutputSPDIF::dma(false);
-extern uint16_t spdif_bmclookup[256];
 DMAMEM __attribute__((aligned(32)))
-static uint32_t SPDIF_tx_buffer[AUDIO_BLOCK_SAMPLES * 4]; //2 KB
+static int32_t SPDIF_tx_buffer[AUDIO_BLOCK_SAMPLES * 4]; //2 KB
 
 #if defined(KINETISK) || defined(__IMXRT1062__)
 
-#define PREAMBLE_B  (0xE8) //11101000
-#define PREAMBLE_M  (0xE2) //11100010
-#define PREAMBLE_W  (0xE4) //11100100
+#define PREAMBLE_B  ((0xE8) << 16) //11101000
+#define PREAMBLE_M  ((0xE2) << 16) //11100010
+#define PREAMBLE_W  ((0xE4) << 16) //11100100
 
-#define VUCP_VALID   ((0xCC) << 24)
-#define VUCP_INVALID ((0xD4) << 24)// To mute PCM, set VUCP = invalid.
+// 1 bit of aux is included here, since it gets used as the "real" parity
+#define VUCP_VALID    (0xCC008000) // V=0,U=0,C=0,P=0
+#define VUCP_INVALID  (0xAC008000) // V=1,U=1,C=0,P=0. To mute PCM, set VUCP = invalid.
+#define VUCP_C_TOGGLE (0x18000000) // XOR with VUCP to flip U and C (keep parity even)
 
-uint32_t  AudioOutputSPDIF::vucp = VUCP_VALID;
+int32_t  AudioOutputSPDIF::vucp = VUCP_VALID;
 
+static const union {
+	struct {
+		// byte 0
+		uint32_t pro:1; // 0=consumer format, 1=professional format
+		uint32_t audio:1; // 0=linear PCM, 1=non-PCM
+		uint32_t copy_permitted:1; // 0=copy inhibited, 1=copy permitted
+		uint32_t pre_emphasis:3; // 0=none(2ch), 1=50/15us(2ch), 2/3=reserved(2ch), others=reserved(4ch)
+		uint32_t mode:2; // 0=mode 0 (defines next 24 bits)
+		// byte 1
+		uint32_t category:7; // 0=general
+		uint32_t generation:1; // 0=none/1st generation, 1=original/commercial
+		// byte 2
+		uint32_t source:4; // 0=unspecified
+		uint32_t channel:4; // channel number, 0=unspecified
+		// byte 3
+		uint32_t Fs:4; // 0=44.1kHz, 2=48, 3=32, others=reserved
+		uint32_t clock_accuracy:2; // 0=+/- 1000ppm, 1=+/- 50ppm, 2=variable, 3=reserved
+		uint32_t :2; // reserved
+	};
+	uint32_t bits;
+
+	bool operator[] (int index) const {
+		if (index >= 0 && index < 32)
+			return (bits >> index) & 1;
+		return false;
+	}
+} consumer_channel_status = { // fields not initialized here will be zero
+	.copy_permitted = 1,
+};
 
 FLASHMEM
 void AudioOutputSPDIF::begin(void)
@@ -123,14 +153,25 @@ void AudioOutputSPDIF::begin(void)
 
 */
 
+// pulls a 16-bit sample from the given channel, returns encoded 32-bit value
+static int32_t next_encoded_sample(const int16_t* &src) {
+	if (src) {
+		uint16_t sample = (uint16_t)*src++;
+
+		int32_t hi = spdif_bmclookup[sample >> 8];
+		int32_t lo = ~spdif_bmclookup[sample & 0xFF];
+		return (lo << 16) ^ hi;
+	}
+
+	// silence: return encoded 0
+	return 0xCCCCCCCC;
+}
+
 void AudioOutputSPDIF::isr(void)
 {
-	static uint16_t frame = 0;
-	const int16_t *src;
+	static int frame = 0;
 	int32_t *end, *dest;
-	audio_block_t *block;
-	uint32_t saddr, offset;
-	uint16_t sample, lo, hi, aux;
+	uint32_t saddr;
 
 #if defined(KINETISK) || defined(__IMXRT1062__)
 	saddr = (uint32_t)(dma.TCD->SADDR);
@@ -139,112 +180,80 @@ void AudioOutputSPDIF::isr(void)
 	if (saddr < (uint32_t)SPDIF_tx_buffer + sizeof(SPDIF_tx_buffer) / 2) {
 		// DMA is transmitting the first half of the buffer
 		// so we must fill the second half
-		dest = (int32_t *)&SPDIF_tx_buffer[AUDIO_BLOCK_SAMPLES * 4/2];
-		end = (int32_t *)&SPDIF_tx_buffer[AUDIO_BLOCK_SAMPLES * 4];
+		dest = &SPDIF_tx_buffer[AUDIO_BLOCK_SAMPLES * 4/2];
+		end = &SPDIF_tx_buffer[AUDIO_BLOCK_SAMPLES * 4];
 		if (AudioOutputSPDIF::update_responsibility) AudioStream::update_all();
 	} else {
 		// DMA is transmitting the second half of the buffer
 		// so we must fill the first half
-		dest = (int32_t *)SPDIF_tx_buffer;
-		end = (int32_t *)&SPDIF_tx_buffer[AUDIO_BLOCK_SAMPLES * 4/2];
+		dest = SPDIF_tx_buffer;
+		end = &SPDIF_tx_buffer[AUDIO_BLOCK_SAMPLES * 4/2];
 	}
 
+	const int16_t* leftsrc = block_left_1st != NULL ? &block_left_1st->data[block_left_offset] : NULL;
+	const int16_t* rightsrc = block_right_1st != NULL ? &block_right_1st->data[block_right_offset] : NULL;
 
-	block = AudioOutputSPDIF::block_left_1st;
-	if (block) {
-		offset = AudioOutputSPDIF::block_left_offset;
-		src = &block->data[offset];
-		do {
+	do {
+		// each output sample is 8 bytes, generate 2 stereo samples (2x2x8=32) to fill a cacheline
+		for (int i=0; i < 2; i++) {
+			int32_t left  = next_encoded_sample(leftsrc);
+			int32_t right = next_encoded_sample(rightsrc);
 
-			sample = *src++;
+			uint16_t laux = 0x3333 ^ (left >> 31);
+			uint16_t raux = 0x3333 ^ (right >> 31);
 
-			//Subframe Channel 1
-			hi  = spdif_bmclookup[(uint8_t)(sample >> 8)];
-			lo  = spdif_bmclookup[(uint8_t) sample];
-			lo ^= (~((int16_t)hi) >> 16);
-			// 16 Bit sample:
-			*(dest+1) = ((uint32_t)lo << 16) | hi;
-			// 4 Bit Auxillary-audio-databits, the first used as parity
-			aux = (0xB333 ^ (((uint32_t)((int16_t)lo)) >> 17));
+			if (++frame > 191) frame = 0;
 
-			if (++frame > 191) {
-				// VUCP-Bits ("Valid, Subcode, Channelstatus, Parity) = 0 (0xcc) | Preamble (depends on Framno.) | Auxillary
-				*(dest+0) =  vucp | (PREAMBLE_B << 16 ) | aux; //special preamble for one of 192 frames
-				frame = 0;
-			} else {
-				*(dest+0) = vucp | (PREAMBLE_M << 16 ) | aux;
+			// 1 byte of previous subframe 1, 3 bytes subframe 0 (channel 1)
+			dest[0] = vucp | (frame==0 ? PREAMBLE_B : PREAMBLE_M) | laux;
+			dest[1] = left;
+			// 1 byte of subframe 0, 3 bytes of subframe 1 (channel 2)
+			dest[2] = vucp | PREAMBLE_W | raux;
+			dest[3] = right;
+
+			/* channel status is identical for both channels, but
+			 * the status for channel 2 is one frame delayed due to
+			 * the one byte offset in our output.
+			 */
+			if (frame <= 32) {
+				// set status for previous subframe 1/channel 2
+				if (consumer_channel_status[frame-1]) dest[0] ^= VUCP_C_TOGGLE;
+				// set status for subframe 0/channel 1
+				if (consumer_channel_status[frame]) dest[2] ^= VUCP_C_TOGGLE;
 			}
+
 			dest += 4;
-
-		} while (dest < end);
-		offset += AUDIO_BLOCK_SAMPLES/2;
-		if (offset < AUDIO_BLOCK_SAMPLES) {
-			AudioOutputSPDIF::block_left_offset = offset;
-		} else {
-			AudioOutputSPDIF::block_left_offset = 0;
-			AudioStream::release(block);
-			AudioOutputSPDIF::block_left_1st = AudioOutputSPDIF::block_left_2nd;
-			AudioOutputSPDIF::block_left_2nd = NULL;
 		}
-	} else {
-		do {
-			if ( ++frame > 191 ) {
-				*(dest+0) = vucp | 0x00e8cccc;
-				frame = 0;
-			} else {
-				*(dest+0) = vucp | 0x00e2cccc;
-			}
-			*(dest+1) = 0xccccccccUL;
 
-			dest +=4;
-		} while (dest < end);
+		#if IMXRT_CACHE_ENABLED >= 2
+		// flush
+		SCB_CACHE_DCCMVAC = (uint32_t)(dest-8);
+		#endif
+	} while (dest < end);
+
+	if (leftsrc) {
+		if (block_left_offset >= AUDIO_BLOCK_SAMPLES/2) {
+			block_left_offset = 0;
+			release(block_left_1st);
+			block_left_1st = block_left_2nd;
+			block_left_2nd = NULL;
+		}
+		else block_left_offset += AUDIO_BLOCK_SAMPLES/2;
 	}
-
-
-	dest -= AUDIO_BLOCK_SAMPLES * 4/2 - 4/2;
-	block = AudioOutputSPDIF::block_right_1st;
-	if (block) {
-		offset = AudioOutputSPDIF::block_right_offset;
-		src = &block->data[offset];
-
-		do {
-			sample = *src++;
-
-			//Subframe Channel 2
-			hi  = spdif_bmclookup[(uint8_t)(sample >> 8)];
-			lo  = spdif_bmclookup[(uint8_t)sample];
-			lo ^= (~((int16_t)hi) >> 16);
-
-			*(dest+1) = ( ((uint32_t)lo << 16) | hi );
-
-			aux = (0xB333 ^ (((uint32_t)((int16_t)lo)) >> 17));
-			*(dest+0)  =  vucp | (PREAMBLE_W << 16 ) | aux;
-
-			dest += 4;
-		} while (dest < end);
-
-		offset += AUDIO_BLOCK_SAMPLES/2;
-		if (offset < AUDIO_BLOCK_SAMPLES) {
-			AudioOutputSPDIF::block_right_offset = offset;
-		} else {
-			AudioOutputSPDIF::block_right_offset = 0;
-			AudioStream::release(block);
-			AudioOutputSPDIF::block_right_1st = AudioOutputSPDIF::block_right_2nd;
-			AudioOutputSPDIF::block_right_2nd = NULL;
+	if (rightsrc) {
+		if (block_right_offset >= AUDIO_BLOCK_SAMPLES/2) {
+			block_right_offset = 0;
+			release(block_right_1st);
+			block_right_1st = block_right_2nd;
+			block_right_2nd = NULL;
 		}
-	} else {
-		do {
-			*dest 	= vucp | 0x00e4ccccUL;
-			*(dest+1) = 0xccccccccUL;
-			dest += 4 ;
-		} while (dest < end);
+		else block_right_offset += AUDIO_BLOCK_SAMPLES/2;
 	}
 
 	#if IMXRT_CACHE_ENABLED >= 2
-	dest -= AUDIO_BLOCK_SAMPLES * 4/2 + 4/2;
-	arm_dcache_flush_delete(dest, sizeof(SPDIF_tx_buffer) / 2 );
-	#endif	
-	
+	// ensure cache operations are complete
+	asm volatile("dsb");
+	#endif
 }
 
 void AudioOutputSPDIF::mute_PCM(const bool mute)
