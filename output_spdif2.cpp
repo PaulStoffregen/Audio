@@ -58,7 +58,7 @@ void AudioOutputSPDIF2::begin(void)
 	dma.TCD->SOFF = 4;
 	dma.TCD->ATTR = DMA_TCD_ATTR_SSIZE(2) | DMA_TCD_ATTR_DSIZE(2);
 	dma.TCD->NBYTES_MLNO = nbytes_mlno;
-	dma.TCD->SLAST = -sizeof(SPDIF_tx_buffer);
+	dma.TCD->SLAST = -sizeof(tx_buffer);
 	dma.TCD->DADDR = &I2S2_TDR0;
 	dma.TCD->DOFF = 0;
 	dma.TCD->CITER_ELINKNO = sizeof(tx_buffer) / nbytes_mlno;
