@@ -38,7 +38,7 @@
 // Timing analysis and info is here:
 // https://forum.pjrc.com/threads/29276-Limits-of-delay-effect-in-audio-library?p=97506&viewfull=1#post97506
 #define SPISETTING 		SPISettings(20'000'000, MSBFIRST, SPI_MODE0)
-#define SPISETTING_PS 	SPISettings(30'000'000, MSBFIRST, SPI_MODE0) // you actually get 30MHz, but it seems the best achievable
+#define SPISETTING_PS 	SPISettings(40'000'000, MSBFIRST, SPI_MODE0) // seems the best achievable
 
 // Use these with the audio adaptor board  (should be adjustable by the user...)
 #define SPIRAM_MOSI_PIN  7
@@ -539,8 +539,9 @@ void AudioExtMem::read(uint32_t offset, uint32_t count, int16_t *data)
 				while (0 != count)
 				{
 					digitalWriteFast(SPIRAM_CS_PIN, LOW);
-					SPI.transfer16((0x03 << 8) | (addr >> 16));
+					SPI.transfer16((0x0B << 8) | (addr >> 16));
 					SPI.transfer16(addr & 0xFFFF);
+					SPI.transfer((uint8_t) 0x0); // ...put in the 8 wait cycles (datasheet rev A, figure 5.2)
 					SPIreadMany(data,cnt);
 					digitalWriteFast(SPIRAM_CS_PIN, HIGH);
 					count -= cnt;
@@ -661,7 +662,7 @@ void AudioExtMem::write(uint32_t offset, uint32_t count, const int16_t *data)
 
 		case AUDIO_MEMORY_PSRAM128: // wraps: need to do multiple writes
 			addr *= SIZEOF_SAMPLE;  // -> byte address in memory
-			SPI.beginTransaction(SPISETTING_PS);
+			SPI.beginTransaction(SPISETTING); // can't do fast writes
 			{
 				uint32_t wrap = 1024; // chip wraps at 1024 byte boundaries
 				uint32_t cnt = (wrap - (addr & (wrap-1)))/SIZEOF_SAMPLE; // max first write length in samples
