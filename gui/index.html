@@ -4264,7 +4264,7 @@ double s_freq = .0625;</p>
 	</p>
 -->
 	<p>
-	<a href="https://forum.pjrc.com/threads/29276-Limits-of-delay-effect-in-audio-library?p=79436&viewfull=1#post79436" target="_blank">Forum Conversaton</a> (with sample code)
+	<a href="https://forum.pjrc.com/threads/29276-Limits-of-delay-effect-in-audio-library?p=79436&viewfull=1#post79436" target="_blank">Forum Conversation</a> (with sample code)
 	</p>
 	<h3>Notes</h3>
 	<p>External RAM allows for longer delays without consuming
@@ -4285,7 +4285,8 @@ double s_freq = .0625;</p>
 
 	<p class=desc><span class=keyword>AudioEffectDelayExternal</span>  delayExt1(<span class=literal>AUDIO_MEMORY_23LC1024</span>, 700);<br><span class=keyword>AudioEffectDelayExternal</span>  delayExt2(<span class=literal>AUDIO_MEMORY_23LC1024</span>, 700);
 	</p>
-	<p>You may also create more than one delay using different hardware.  
+	<p>You may also create more than one delay using different hardware, though <em>only one SPI-based delay memory
+		can be used</em>.  
 	This can be useful if you wish to use extremely long delay times.
 
 	<p class=desc><span class=keyword>AudioEffectDelayExternal</span>  delayExt1(<span class=literal>AUDIO_MEMORY_PSRAM64</span>);<br><span class=keyword>AudioEffectDelayExternal</span>  delayExt2(<span class=literal>AUDIO_MEMORY_EXTMEM</span>, 190000.0f);
@@ -4298,12 +4299,16 @@ double s_freq = .0625;</p>
         <tr class=odd><td align=center>AUDIO_MEMORY_CY15B104</td><td>0.5</td><td>SPI</td><td>5.944</td></tr>
         <tr class=odd><td align=center>AUDIO_MEMORY_MEMORYBOARD</td><td>0.75 (max)</td><td>SPI</td><td>8.916 (max)</td></tr>
         <tr class=odd><td align=center>AUDIO_MEMORY_PSRAM64</td><td>8</td><td>SPI</td><td>95.1</td></tr>
-        <tr class=odd><td align=center>AUDIO_MEMORY_PSRAM64_X8</td><td>64 (max)</td><td>SPI</td><td>760.8 (max)</td></tr>
-        <tr class=odd><td align=center>AUDIO_MEMORY_EXTMEM*</td><td>8 / 16</td><td>EXTMEM</td><td>95.1 / 190.2</td></tr>
+        <tr class=odd><td align=center>AUDIO_MEMORY_PSRAM128</td><td>16</td><td>SPI</td><td>190.2</td></tr>
+        <tr class=odd><td align=center>AUDIO_MEMORY_PSRAM64_X8&dagger;</td><td>64 (max)</td><td>SPI</td><td>760.8 (max)</td></tr>
+        <tr class=odd><td align=center>AUDIO_MEMORY_EXTMEM*</td><td>8 / 16 / <br> 24 / 32</td><td>EXTMEM</td><td>95.1 / 190.2 / 285.3 / 380.4</td></tr>
         <tr class=odd><td align=center>AUDIO_MEMORY_HEAP**</td><td>(variable)</td><td>Heap</td><td>(variable)</td></tr>
     </table>
-	* depends on whether you have 1 or 2 PSRAM chips fitted to your Teensy.<br>
-	** depends on heap remaining<br><br> 
+	* depends on whether you have 1 or 2 PSRAM chips fitted to your Teensy, and whether they are 8MB or 16MB parts.<br>
+	** depends on heap remaining<br>
+	&dagger; see <a href = "https://forum.pjrc.com/index.php?threads/limits-of-delay-effect-in-audio-library.29276/post-320254"> 
+		this post onward</a> in the above-mentioned Forum Conversation.
+		<br> 
 	</p>
 	<p>
 	Using a PSRAM chip as EXTMEM is faster than using the SPI-based hardware on the audio adaptor, due to a higher clock speed and 4-bit 
