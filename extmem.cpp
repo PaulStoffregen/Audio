@@ -38,7 +38,7 @@
 // Timing analysis and info is here:
 // https://forum.pjrc.com/threads/29276-Limits-of-delay-effect-in-audio-library?p=97506&viewfull=1#post97506
 #define SPISETTING 		SPISettings(20'000'000, MSBFIRST, SPI_MODE0)
-#define SPISETTING_PS 	SPISettings(72'000'000, MSBFIRST, SPI_MODE0) // you actually get 30MHz, but it seems the best achievable
+#define SPISETTING_PS 	SPISettings(30'000'000, MSBFIRST, SPI_MODE0) // you actually get 30MHz, but it seems the best achievable
 
 // Use these with the audio adaptor board  (should be adjustable by the user...)
 #define SPIRAM_MOSI_PIN  7
@@ -76,8 +76,8 @@ static const uint32_t NOT_ENOUGH_MEMORY = 0xFFFFFFFF;
 
 // This memory size array needs to match the sizes of 
 // the entries in AudioEffectDelayMemoryType_t
-const uint32_t AudioExtMem::memSizeSamples[AUDIO_MEMORY_UNDEFINED+1] = {65536,65536*6,262144,4194304,8000,0,0,4194304*8};
-bool AudioExtMem::chipResetNeeded[AUDIO_MEMORY_UNDEFINED+1] = {0,0,0,1,0,0,0,1};
+const uint32_t AudioExtMem::memSizeSamples[AUDIO_MEMORY_UNDEFINED+1] = {65536,65536*6,262144,4'194'304,8000,0,0,4'194'304*8,8'388'608};
+bool AudioExtMem::chipResetNeeded[AUDIO_MEMORY_UNDEFINED+1] = {0,0,0,1,0,0,0,1,1};
 AudioExtMem* AudioExtMem::first[AUDIO_MEMORY_UNDEFINED+1] = {nullptr};
 
 
@@ -274,6 +274,7 @@ void AudioExtMem::initialize(void)
 	switch (type)
 	{
 		case AUDIO_MEMORY_PSRAM64:
+		case AUDIO_MEMORY_PSRAM128:
 		case AUDIO_MEMORY_23LC1024:
 		case AUDIO_MEMORY_CY15B104:
 			pinMode(SPIRAM_CS_PIN, OUTPUT);
@@ -329,6 +330,7 @@ void AudioExtMem::initialize(void)
 		// Slightly different in dynamic system because of fragmentation,
 		// but should be the same if used with legacy static design.
 		case AUDIO_MEMORY_PSRAM64:
+		case AUDIO_MEMORY_PSRAM128:
 		case AUDIO_MEMORY_23LC1024:
 		case AUDIO_MEMORY_CY15B104:
 		case AUDIO_MEMORY_MEMORYBOARD:
@@ -525,6 +527,31 @@ void AudioExtMem::read(uint32_t offset, uint32_t count, int16_t *data)
 			digitalWriteFast(SPIRAM_CS_PIN, HIGH);
 			SPI.endTransaction();
 			break;
+
+		case AUDIO_MEMORY_PSRAM128: // wraps: need to do multiple reads
+			addr *= SIZEOF_SAMPLE;  // -> byte address in memory
+			SPI.beginTransaction(SPISETTING_PS);
+			{
+				uint32_t wrap = 1024; // chip wraps at 1024 byte boundaries
+				uint32_t cnt = (wrap - (addr & (wrap-1)))/SIZEOF_SAMPLE; // max first read length in samples
+				wrap /= SIZEOF_SAMPLE; // make wrap value a sample count, not bytes
+				if (cnt > count) cnt = count;
+				while (0 != count)
+				{
+					digitalWriteFast(SPIRAM_CS_PIN, LOW);
+					SPI.transfer16((0x03 << 8) | (addr >> 16));
+					SPI.transfer16(addr & 0xFFFF);
+					SPIreadMany(data,cnt);
+					digitalWriteFast(SPIRAM_CS_PIN, HIGH);
+					count -= cnt;
+					addr  += cnt * SIZEOF_SAMPLE;
+					if (nullptr != data)
+						data += cnt;
+					cnt = count > wrap?wrap:count;
+				}
+			}
+			SPI.endTransaction();
+			break;
 		
 		case AUDIO_MEMORY_MEMORYBOARD:
 			SPI.beginTransaction(SPISETTING);
@@ -631,7 +658,32 @@ void AudioExtMem::write(uint32_t offset, uint32_t count, const int16_t *data)
 			digitalWriteFast(SPIRAM_CS_PIN, HIGH);
 			SPI.endTransaction();
 			break;
-			
+
+		case AUDIO_MEMORY_PSRAM128: // wraps: need to do multiple writes
+			addr *= SIZEOF_SAMPLE;  // -> byte address in memory
+			SPI.beginTransaction(SPISETTING_PS);
+			{
+				uint32_t wrap = 1024; // chip wraps at 1024 byte boundaries
+				uint32_t cnt = (wrap - (addr & (wrap-1)))/SIZEOF_SAMPLE; // max first write length in samples
+				wrap /= SIZEOF_SAMPLE; // make wrap value a sample count, not bytes
+				if (cnt > count) cnt = count;
+				while (0 != count)
+				{
+					digitalWriteFast(SPIRAM_CS_PIN, LOW);
+					SPI.transfer16((0x02 << 8) | (addr >> 16));
+					SPI.transfer16(addr & 0xFFFF);
+					SPIwriteMany(data,cnt);
+					digitalWriteFast(SPIRAM_CS_PIN, HIGH);
+					count -= cnt;
+					addr  += cnt * SIZEOF_SAMPLE;
+					if (nullptr != data)
+						data += cnt;
+					cnt = count > wrap?wrap:count;
+				}
+			}
+			SPI.endTransaction();
+			break;
+					
 		case AUDIO_MEMORY_CY15B104:
 			addr *= SIZEOF_SAMPLE;
 
@@ -731,6 +783,7 @@ void AudioExtMem::chipReset(AudioEffectDelayMemoryType_t type)
 			break;
 			
 		case AUDIO_MEMORY_PSRAM64:
+		case AUDIO_MEMORY_PSRAM128:
 			SPI.beginTransaction(SPISETTING);
 			digitalWriteFast(SPIRAM_CS_PIN, LOW);
 			SPI.transfer(0x66);

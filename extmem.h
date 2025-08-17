@@ -46,6 +46,7 @@ enum AudioEffectDelayMemoryType_t {
 	AUDIO_MEMORY_HEAP 	  	 = 5,
 	AUDIO_MEMORY_EXTMEM 	 = 6,
 	AUDIO_MEMORY_PSRAM64_X8  = 7,	// 8x 8MB PSRAM
+	AUDIO_MEMORY_PSRAM128 	 = 8,	// 128Mb / 16MB PSRAM (190s @ 44kHz / 16 bit)
 	AUDIO_MEMORY_UNDEFINED
 };
 
@@ -53,6 +54,7 @@ enum AudioEffectDelayMemoryType_t {
 					 AUDIO_MEMORY_MEMORYBOARD == memory_type || \
 					 AUDIO_MEMORY_CY15B104 == memory_type || \
 					 AUDIO_MEMORY_PSRAM64 == memory_type || \
+					 AUDIO_MEMORY_PSRAM128 == memory_type || \
 					 AUDIO_MEMORY_PSRAM64_X8 == memory_type)
 
 class AudioExtMem
