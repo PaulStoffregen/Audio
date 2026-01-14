@@ -222,15 +222,17 @@ AudioEffectReverb::update(void)
 {
   audio_block_t *block;
 
-  if (!(block = receiveWritable()))
-    return;
-
-  if (!block->data)
-    return;
+  if (nullptr == (block = receiveWritable()))
+  {
+	if (nullptr == (block = allocate()))
+		return;
+	else
+		memset(block->data,0,sizeof block->data);
+  }
 
   arm_q15_to_q31(block->data, q31_buf, AUDIO_BLOCK_SAMPLES);
   provide_guard_bits_q31(q31_buf, AUDIO_BLOCK_SAMPLES, 8);
-  
+
   _do_comb_apf(&apf[0], q31_buf, q31_buf);
   _do_comb_apf(&apf[1], q31_buf, q31_buf);
 
