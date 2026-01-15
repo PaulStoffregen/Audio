@@ -41,6 +41,8 @@ public:
 	void begin(void);
 	static bool pllLocked(void);
 	static unsigned int sampleRate(void);
+	void grabUpdateResponsibility(bool grab) { update_responsibility = grab; }
+
 protected:
 	//AudioInputSPDIF3(int dummy): AudioStream(0, NULL) {} // to be used only inside AudioInputSPDIF3slave !!
 	static bool update_responsibility;

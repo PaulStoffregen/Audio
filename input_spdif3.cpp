@@ -102,89 +102,106 @@ void AudioInputSPDIF3::isr(void)
 	left = AudioInputSPDIF3::block_left;
 	right = AudioInputSPDIF3::block_right;
 
-	if (left != NULL && right != NULL) {
+	if (!pllLocked()) // no valid signal
+	{
 		offset = AudioInputSPDIF3::block_offset;
-		if (offset <= AUDIO_BLOCK_SAMPLES*2) {
-			dest_left = &(left->data[offset]);
-			dest_right = &(right->data[offset]);
+		if (offset <= AUDIO_BLOCK_SAMPLES*2) 
+		{
+			//dest_left = &(left->data[offset]);
+			//dest_right = &(right->data[offset]);
 			AudioInputSPDIF3::block_offset = offset + AUDIO_BLOCK_SAMPLES*2;
-
-			do {
-				#if IMXRT_CACHE_ENABLED >=1
-				SCB_CACHE_DCIMVAC = (uintptr_t)src;
-				asm("dsb":::"memory");
-				#endif
-
-				*dest_left++ = (*src++) >> 8;
-				*dest_right++ = (*src++) >> 8;
-
-				*dest_left++ = (*src++) >> 8;
-				*dest_right++ = (*src++) >> 8;
-
-				*dest_left++ = (*src++) >> 8;
-				*dest_right++ = (*src++) >> 8;
-
-				*dest_left++ = (*src++) >> 8;
-				*dest_right++ = (*src++) >> 8;
-
-			} while (src < end);
+			if (nullptr != left)  memset(left->data, 0,sizeof left->data);
+			if (nullptr != right) memset(right->data,0,sizeof right->data);
 		}
 	}
-	else if (left != NULL) {
-		offset = AudioInputSPDIF3::block_offset;
-		if (offset <= AUDIO_BLOCK_SAMPLES*2) {
-			dest_left = &(left->data[offset]);
-			AudioInputSPDIF3::block_offset = offset + AUDIO_BLOCK_SAMPLES*2;
+	else
+	{
+		if (left != NULL && right != NULL) 
+		{
+			offset = AudioInputSPDIF3::block_offset;
+			if (offset <= AUDIO_BLOCK_SAMPLES*2) {
+				dest_left = &(left->data[offset]);
+				dest_right = &(right->data[offset]);
+				AudioInputSPDIF3::block_offset = offset + AUDIO_BLOCK_SAMPLES*2;
 
-			do {
-				#if IMXRT_CACHE_ENABLED >=1
-				SCB_CACHE_DCIMVAC = (uintptr_t)src;
-				asm("dsb":::"memory");
-				#endif
+				do {
+					#if IMXRT_CACHE_ENABLED >=1
+					SCB_CACHE_DCIMVAC = (uintptr_t)src;
+					asm("dsb":::"memory");
+					#endif
 
-				*dest_left++ = (*src++) >> 8;
-				src++;
+					*dest_left++ = (*src++) >> 8;
+					*dest_right++ = (*src++) >> 8;
 
-				*dest_left++ = (*src++) >> 8;
-				src++;
+					*dest_left++ = (*src++) >> 8;
+					*dest_right++ = (*src++) >> 8;
 
-				*dest_left++ = (*src++) >> 8;
-				src++;
+					*dest_left++ = (*src++) >> 8;
+					*dest_right++ = (*src++) >> 8;
 
-				*dest_left++ = (*src++) >> 8;
-				src++;
+					*dest_left++ = (*src++) >> 8;
+					*dest_right++ = (*src++) >> 8;
 
-			} while (src < end);
-		}		
+				} while (src < end);
+			}
+		}
+		else if (left != NULL) 
+		{
+			offset = AudioInputSPDIF3::block_offset;
+			if (offset <= AUDIO_BLOCK_SAMPLES*2) {
+				dest_left = &(left->data[offset]);
+				AudioInputSPDIF3::block_offset = offset + AUDIO_BLOCK_SAMPLES*2;
+
+				do {
+					#if IMXRT_CACHE_ENABLED >=1
+					SCB_CACHE_DCIMVAC = (uintptr_t)src;
+					asm("dsb":::"memory");
+					#endif
+
+					*dest_left++ = (*src++) >> 8;
+					src++;
+
+					*dest_left++ = (*src++) >> 8;
+					src++;
+
+					*dest_left++ = (*src++) >> 8;
+					src++;
+
+					*dest_left++ = (*src++) >> 8;
+					src++;
+
+				} while (src < end);
+			}		
+		}
+		else if (right != NULL) 
+		{
+			offset = AudioInputSPDIF3::block_offset;
+			if (offset <= AUDIO_BLOCK_SAMPLES*2) {
+				dest_right = &(right->data[offset]);
+				AudioInputSPDIF3::block_offset = offset + AUDIO_BLOCK_SAMPLES*2;
+
+				do {
+					#if IMXRT_CACHE_ENABLED >=1
+					SCB_CACHE_DCIMVAC = (uintptr_t)src;
+					asm("dsb":::"memory");
+					#endif
+
+					src++;
+					*dest_right++ = (*src++) >> 8;
+
+					src++;
+					*dest_right++ = (*src++) >> 8;
+
+					src++;
+					*dest_right++ = (*src++) >> 8;
+
+					src++;
+					*dest_right++ = (*src++) >> 8;
+
+				} while (src < end);
+			}		
+		}
 	}
-	else if (right != NULL) {
-		offset = AudioInputSPDIF3::block_offset;
-		if (offset <= AUDIO_BLOCK_SAMPLES*2) {
-			dest_right = &(right->data[offset]);
-			AudioInputSPDIF3::block_offset = offset + AUDIO_BLOCK_SAMPLES*2;
-
-			do {
-				#if IMXRT_CACHE_ENABLED >=1
-				SCB_CACHE_DCIMVAC = (uintptr_t)src;
-				asm("dsb":::"memory");
-				#endif
-
-				src++;
-				*dest_right++ = (*src++) >> 8;
-
-				src++;
-				*dest_right++ = (*src++) >> 8;
-
-				src++;
-				*dest_right++ = (*src++) >> 8;
-
-				src++;
-				*dest_right++ = (*src++) >> 8;
-
-			} while (src < end);
-		}		
-	}
-
 }
 
 
