@@ -209,6 +209,11 @@ void AudioInputSPDIF3::update(void)
 {
 	audio_block_t *new_left=NULL, *new_right=NULL, *out_left=NULL, *out_right=NULL;
 
+	// If PLL isn't locked we tend to get crazy speeds,
+	// so do nothing.
+	if (!pllLocked())
+		return;
+
 	// allocate 2 new blocks, but if one fails, allocate neither
 	new_left = allocate();
 	if (new_left != NULL) {
@@ -229,10 +234,16 @@ void AudioInputSPDIF3::update(void)
 		block_offset = 0;
 		__enable_irq();
 		// then transmit the DMA's former blocks
-		transmit(out_left, 0);
-		release(out_left);
-		transmit(out_right, 1);
-		release(out_right);
+		if (nullptr != out_left)
+		{
+			transmit(out_left, 0);
+			release(out_left);
+		}
+		if (nullptr != out_right)
+		{
+			transmit(out_right, 1);
+			release(out_right);
+		}
 		//Serial.print(".");
 	} else if (new_left != NULL) {
 		// the DMA didn't fill blocks, but we allocated blocks
