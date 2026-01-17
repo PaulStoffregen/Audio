@@ -42,23 +42,7 @@ public:
 	void begin(void);
 	void syncToSPDIF(bool sync) 
 	{
-		if (SPDIF_is_master != sync) // only if changing sync
-		{
-			NVIC_DISABLE_IRQ(IRQ_DMA_CH0 + dma.channel); // stop only our interrupts
-
-			set_registers(sync);
-#define SAFE_RELEASE_BLOCK(b) if (nullptr != b)	{ release(b); b = nullptr; }
-			SAFE_RELEASE_BLOCK(block_left_1st);
-			SAFE_RELEASE_BLOCK(block_right_1st);
-			SAFE_RELEASE_BLOCK(block_left_2nd);
-			SAFE_RELEASE_BLOCK(block_right_2nd);
-			block_left_offset = 0;
-			block_right_offset = 0;
-
-			NVIC_ENABLE_IRQ(IRQ_DMA_CH0 + dma.channel);
-			
-			Serial.printf("\n***** I2S %s *****\n\n",sync?"synced to S/PDIF":"self-clocked");
-		}
+		syncToSPDIF(sync, dma.channel, &outBlocks[0], 4, &outOffsets[0], 2);
 	}
 	void grabUpdateResponsibility(bool grab) { update_responsibility = grab;}
 	friend class AudioInputI2S;
@@ -76,6 +60,10 @@ protected:
 	AudioOutputI2S(int dummy): AudioStream(2, inputQueueArray) {} // to be used only inside AudioOutputI2Sslave !!
 	static void config_i2s(bool only_bclk = false, bool SPDIF_sync = false);
 	static void set_registers(bool SPDIF_sync); // may need to change if sync source changes
+	static void syncToSPDIF(bool sync, int DMAch,
+							audio_block_t*** pBlockArray,int nBlocks,
+							uint16_t** pOffsetArray, int nOffsets);
+
 	static audio_block_t *block_left_1st;
 	static audio_block_t *block_right_1st;
 	static bool update_responsibility;
@@ -88,6 +76,8 @@ private:
 	static uint16_t block_right_offset;
 #if defined(__IMXRT1062__)
 	static bool SPDIF_is_master;
+	static audio_block_t** outBlocks[];
+	static uint16_t* outOffsets[];
 #endif // defined(__IMXRT1062__)
 	audio_block_t *inputQueueArray[2];
 };

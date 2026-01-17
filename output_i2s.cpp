@@ -48,6 +48,9 @@ DMAMEM __attribute__((aligned(32))) static uint32_t i2s_tx_buffer[AUDIO_BLOCK_SA
 
 #if defined(__IMXRT1062__)
 #include "utility/imxrt_hw.h"
+audio_block_t** AudioOutputI2S::outBlocks[]
+		{&block_left_1st, &block_right_1st, &block_left_2nd, &block_right_2nd};
+uint16_t* AudioOutputI2S::outOffsets[]{&block_left_offset, &block_right_offset};
 bool AudioOutputI2S::SPDIF_is_master = false;
 #endif
 
@@ -336,6 +339,43 @@ void AudioOutputI2S::update(void)
 #endif
 #endif
 #endif
+
+/*
+ * Switch I²C clock between internal and S/PDIF.
+ *
+ * Only does something if the clock source is being changed, so
+ * it's safe to call this repeatedly from the application, e.g. 
+ * when polling for loss / recovery of the S/PDIF input.
+ */
+void AudioOutputI2S::syncToSPDIF(bool sync, 
+								 int DMAch, // which DMA channel we're using
+								 audio_block_t*** pBlockArray,int nBlocks, // audio blocks queued for output
+								 uint16_t** pOffsetArray, int nOffsets)
+{
+	if (SPDIF_is_master != sync) // only if changing sync
+	{
+		NVIC_DISABLE_IRQ(IRQ_DMA_CH0 + DMAch); // stop only our interrupts
+
+		set_registers(sync); // set up all the SAI registers
+
+		// clear out all the incoming blocks...
+		for (int i=0;i<nBlocks;i++)
+		{
+			audio_block_t** b = pBlockArray[i];
+			if (nullptr != *b)	
+			{ 
+				release(*b); 
+				*b = nullptr; 
+			}
+		}
+
+		// ...and the offsets into them
+		for (int i=0;i<nOffsets;i++)
+			*pOffsetArray[i] = 0;
+
+		NVIC_ENABLE_IRQ(IRQ_DMA_CH0 + DMAch); // re-enable our interrupts
+	}
+}
 
 /*
  * Set the SAI registers.
