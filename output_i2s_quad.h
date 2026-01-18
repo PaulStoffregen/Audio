@@ -37,6 +37,13 @@ public:
 	AudioOutputI2SQuad(void) : AudioStream(4, inputQueueArray) { begin(); }
 	virtual void update(void);
 	void begin(void);
+
+#if defined(__IMXRT1062__)
+	void syncToSPDIF(bool sync); 
+	void grabUpdateResponsibility(bool grab) { update_responsibility = grab;}
+#endif // defined(__IMXRT1062__)
+
+	friend class AudioOutputI2S;
 	friend class AudioInputI2SQuad;
 private:
 	static void config_i2s(void);
@@ -55,6 +62,12 @@ private:
 	static uint16_t ch2_offset;
 	static uint16_t ch3_offset;
 	static uint16_t ch4_offset;
+
+#if defined(__IMXRT1062__)
+	static audio_block_t** outBlocks[];
+	static uint16_t* outOffsets[];
+#endif // defined(__IMXRT1062__)
+
 	audio_block_t *inputQueueArray[4];
 };
 

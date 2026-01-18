@@ -37,6 +37,12 @@ public:
 	AudioOutputI2SOct(void) : AudioStream(8, inputQueueArray) { begin(); }
 	virtual void update(void);
 	void begin(void);
+
+#if defined(__IMXRT1062__)
+	void syncToSPDIF(bool sync); 
+	void grabUpdateResponsibility(bool grab) { update_responsibility = grab;}
+#endif // defined(__IMXRT1062__)
+
 private:
 	static audio_block_t *block_ch1_1st;
 	static audio_block_t *block_ch2_1st;
@@ -65,6 +71,12 @@ private:
 	static uint16_t ch6_offset;
 	static uint16_t ch7_offset;
 	static uint16_t ch8_offset;
+	
+#if defined(__IMXRT1062__)
+	static audio_block_t** outBlocks[];
+	static uint16_t* outOffsets[];
+#endif // defined(__IMXRT1062__)
+
 	audio_block_t *inputQueueArray[8];
 };
 

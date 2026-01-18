@@ -538,7 +538,7 @@ void AudioOutputI2S::config_i2s(bool only_bclk /* = false */, bool SPDIF_sync /*
 	IOMUXC_GPR_GPR1 = (IOMUXC_GPR_GPR1
 		& ~(IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL_MASK)
 		& ~(IOMUXC_GPR_GPR1_SAI1_MCLK3_SEL_MASK))
-		| (IOMUXC_GPR_GPR1_SAI1_MCLK_DIR | IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL(0)) //; // ccm.ss1_clk_root (p330) = 
+		| (IOMUXC_GPR_GPR1_SAI1_MCLK_DIR | IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL(0))  // ccm.ss1_clk_root (p330) = 
 		|  (                               IOMUXC_GPR_GPR1_SAI1_MCLK3_SEL(2)); // spdif.spdif_srclk (p330)
 
 	// only set up I/O pins if we're not syncing to SPDIF

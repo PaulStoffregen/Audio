@@ -47,6 +47,15 @@ uint16_t  AudioOutputI2SQuad::ch1_offset = 0;
 uint16_t  AudioOutputI2SQuad::ch2_offset = 0;
 uint16_t  AudioOutputI2SQuad::ch3_offset = 0;
 uint16_t  AudioOutputI2SQuad::ch4_offset = 0;
+
+#if defined(__IMXRT1062__)
+audio_block_t** AudioOutputI2SQuad::outBlocks[]
+		{&block_ch1_1st, &block_ch2_1st, &block_ch3_1st, &block_ch4_1st, 
+		 &block_ch1_2nd, &block_ch2_2nd, &block_ch3_2nd, &block_ch4_2nd};
+uint16_t* AudioOutputI2SQuad::outOffsets[]
+		{&ch1_offset, &ch2_offset, &ch3_offset, &ch4_offset};
+#endif // defined(__IMXRT1062__)
+
 bool AudioOutputI2SQuad::update_responsibility = false;
 DMAMEM __attribute__((aligned(32))) static uint32_t i2s_tx_buffer[AUDIO_BLOCK_SAMPLES*2];
 DMAChannel AudioOutputI2SQuad::dma(false);
@@ -127,6 +136,13 @@ void AudioOutputI2SQuad::begin(void)
 	dma.attachInterrupt(isr);
 #endif
 }
+
+#if defined(__IMXRT1062__)
+void AudioOutputI2SQuad::syncToSPDIF(bool sync) 
+{
+	AudioOutputI2S::syncToSPDIF(sync, dma.channel, &outBlocks[0], 8, &outOffsets[0], 4);
+}
+#endif // defined(__IMXRT1062__)
 
 void AudioOutputI2SQuad::isr(void)
 {
