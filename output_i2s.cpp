@@ -383,7 +383,7 @@ void AudioOutputI2S::syncToSPDIF(bool sync,
  * This may be called after initial setup, if S/PDIF sync is
  * wanted and the signal is gained or lost.
  */
-void AudioOutputI2S::set_registers(bool SPDIF_sync)
+void AudioOutputI2S::set_registers(bool SPDIF_sync, IMXRT_SAI_t& I2Shw)
 {
 	int rsync = 0;
 	int tsync = 1;
@@ -393,49 +393,49 @@ void AudioOutputI2S::set_registers(bool SPDIF_sync)
 	SPDIF_is_master = SPDIF_sync;
 
 	// I2S1 / SAI1 registers
-	uint32_t oldTE = I2S1_TCSR & I2S_TCSR_TE,
-			 oldRE = I2S1_RCSR & I2S_RCSR_RE;
-	I2S1_TCSR &= ~I2S_TCSR_TE; // can't touch TCR2 if TE is set
-	I2S1_RCSR &= ~I2S_RCSR_RE; // can't touch RCR2 if RE is set
-	while (I2S1_TCSR & I2S_TCSR_TE) // wait for end of Tx
+	uint32_t oldTE = I2Shw.TCSR & I2S_TCSR_TE,
+			 oldRE = I2Shw.RCSR & I2S_RCSR_RE;
+	I2Shw.TCSR &= ~I2S_TCSR_TE; // can't touch TCR2 if TE is set
+	I2Shw.RCSR &= ~I2S_RCSR_RE; // can't touch RCR2 if RE is set
+	while (I2Shw.TCSR & I2S_TCSR_TE) // wait for end of Tx
 		;
-	while (I2S1_RCSR & I2S_RCSR_RE) // wait for end of Rx
+	while (I2Shw.RCSR & I2S_RCSR_RE) // wait for end of Rx
 		;
 	
-	I2S1_TMR = 0;
+	I2Shw.TMR = 0;
 	//I2S1_TCSR = (1<<25); //Reset
-	I2S1_TCR1 = I2S_TCR1_RFW(1);
+	I2Shw.TCR1 = I2S_TCR1_RFW(1);
 	
 	if (SPDIF_is_master)
 		div_and_mclk = I2S_TCR2_DIV((0)) | I2S_TCR2_MSEL(3); // MCLK[3] / 2
 	else
 		div_and_mclk = I2S_TCR2_DIV((1)) | I2S_TCR2_MSEL(1); // MCLK[1] / 4
 		
-	I2S1_TCR2 = I2S_TCR2_SYNC(tsync) | I2S_TCR2_BCP // sync=0; tx is async;
+	I2Shw.TCR2 = I2S_TCR2_SYNC(tsync) | I2S_TCR2_BCP // sync=0; tx is async;
 		    | I2S_TCR2_BCD | div_and_mclk;
-	I2S1_TCR3 = I2S_TCR3_TCE;
-	I2S1_TCR4 = I2S_TCR4_FRSZ((2-1)) | I2S_TCR4_SYWD((32-1)) | I2S_TCR4_MF
+	I2Shw.TCR3 = I2S_TCR3_TCE;
+	I2Shw.TCR4 = I2S_TCR4_FRSZ((2-1)) | I2S_TCR4_SYWD((32-1)) | I2S_TCR4_MF
 		    | I2S_TCR4_FSD | I2S_TCR4_FSE | I2S_TCR4_FSP;
-	I2S1_TCR5 = I2S_TCR5_WNW((32-1)) | I2S_TCR5_W0W((32-1)) | I2S_TCR5_FBT((32-1));
+	I2Shw.TCR5 = I2S_TCR5_WNW((32-1)) | I2S_TCR5_W0W((32-1)) | I2S_TCR5_FBT((32-1));
 
-	I2S1_RMR = 0;
+	I2Shw.RMR = 0;
 	//I2S1_RCSR = (1<<25); //Reset
-	I2S1_RCR1 = I2S_RCR1_RFW(1);
+	I2Shw.RCR1 = I2S_RCR1_RFW(1);
 	
 	if (SPDIF_is_master)
 		div_and_mclk = I2S_RCR2_DIV((0)) | I2S_RCR2_MSEL(3); // MCLK[3] / 2
 	else
 		div_and_mclk = I2S_RCR2_DIV((1)) | I2S_RCR2_MSEL(1); // MCLK[1] / 4
 		
-	I2S1_RCR2 = I2S_RCR2_SYNC(rsync) | I2S_RCR2_BCP  // sync=0; rx is async;
+	I2Shw.RCR2 = I2S_RCR2_SYNC(rsync) | I2S_RCR2_BCP  // sync=0; rx is async;
 		    | I2S_RCR2_BCD | div_and_mclk;
-	I2S1_RCR3 = I2S_RCR3_RCE;
-	I2S1_RCR4 = I2S_RCR4_FRSZ((2-1)) | I2S_RCR4_SYWD((32-1)) | I2S_RCR4_MF
+	I2Shw.RCR3 = I2S_RCR3_RCE;
+	I2Shw.RCR4 = I2S_RCR4_FRSZ((2-1)) | I2S_RCR4_SYWD((32-1)) | I2S_RCR4_MF
 		    | I2S_RCR4_FSE | I2S_RCR4_FSP | I2S_RCR4_FSD;
-	I2S1_RCR5 = I2S_RCR5_WNW((32-1)) | I2S_RCR5_W0W((32-1)) | I2S_RCR5_FBT((32-1));
+	I2Shw.RCR5 = I2S_RCR5_WNW((32-1)) | I2S_RCR5_W0W((32-1)) | I2S_RCR5_FBT((32-1));
 	
-	I2S1_TCSR |= oldTE; // restore old Transmit Enable...
-	I2S1_RCSR |= oldRE; // ...and Receive Enable
+	I2Shw.TCSR |= oldTE; // restore old Transmit Enable...
+	I2Shw.RCSR |= oldRE; // ...and Receive Enable
 }
 #endif // defined(__IMXRT1062__)
 

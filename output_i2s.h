@@ -63,7 +63,8 @@ public:
 protected:
 	AudioOutputI2S(int dummy): AudioStream(2, inputQueueArray) {} // to be used only inside AudioOutputI2Sslave !!
 	static void config_i2s(bool only_bclk = false, bool SPDIF_sync = false);
-	static void set_registers(bool SPDIF_sync); // may need to change if sync source changes
+	static void set_registers(bool SPDIF_sync, // change settings if sync source changes
+							  IMXRT_SAI_t& I2Shw = (*(IMXRT_SAI_t *)IMXRT_I2S1_ADDRESS)); 
 	static void syncToSPDIF(bool sync, int DMAch,
 							audio_block_t*** pBlockArray,int nBlocks,
 							uint16_t** pOffsetArray, int nOffsets);
