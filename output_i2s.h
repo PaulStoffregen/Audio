@@ -40,11 +40,15 @@ public:
 	AudioOutputI2S(void) : AudioStream(2, inputQueueArray) { begin(); }
 	virtual void update(void);
 	void begin(void);
+
+#if defined(__IMXRT1062__)
 	void syncToSPDIF(bool sync) 
 	{
 		syncToSPDIF(sync, dma.channel, &outBlocks[0], 4, &outOffsets[0], 2);
 	}
 	void grabUpdateResponsibility(bool grab) { update_responsibility = grab;}
+#endif // defined(__IMXRT1062__)
+
 	friend class AudioInputI2S;
 	friend class AudioInputPDM;
 #if defined(__IMXRT1062__)

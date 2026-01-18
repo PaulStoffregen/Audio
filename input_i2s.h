@@ -37,6 +37,12 @@ public:
 	AudioInputI2S(void) : AudioStream(0, NULL) { begin(); }
 	virtual void update(void);
 	void begin(void);
+
+#if defined(__IMXRT1062__)
+	void syncToSPDIF(bool sync);
+	void grabUpdateResponsibility(bool grab) { update_responsibility = grab;}
+#endif // defined(__IMXRT1062__)
+
 protected:	
 	AudioInputI2S(int dummy): AudioStream(0, NULL) {} // to be used only inside AudioInputI2Sslave !!
 	static bool update_responsibility;
@@ -55,7 +61,11 @@ private:
 	static audio_block_t *block_right;
 #if !defined(KINETISL)	
 	static uint16_t block_offset;
-#endif	
+#endif
+#if defined(__IMXRT1062__)
+	static audio_block_t** outBlocks[];
+	static uint16_t* outOffsets[];
+#endif // defined(__IMXRT1062__)	
 };
 
 

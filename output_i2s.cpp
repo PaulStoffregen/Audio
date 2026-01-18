@@ -340,6 +340,7 @@ void AudioOutputI2S::update(void)
 #endif
 #endif
 
+#if defined(__IMXRT1062__)
 /*
  * Switch I²C clock between internal and S/PDIF.
  *
@@ -436,6 +437,7 @@ void AudioOutputI2S::set_registers(bool SPDIF_sync)
 	I2S1_TCSR |= oldTE; // restore old Transmit Enable...
 	I2S1_RCSR |= oldRE; // ...and Receive Enable
 }
+#endif // defined(__IMXRT1062__)
 
 /*
  * Set up SAI1 for I²S use, or (with SPDIF_sync set true) to pass through

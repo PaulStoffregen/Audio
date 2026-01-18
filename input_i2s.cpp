@@ -37,6 +37,12 @@ uint16_t AudioInputI2S::block_offset = 0;
 bool AudioInputI2S::update_responsibility = false;
 DMAChannel AudioInputI2S::dma(false);
 
+#if defined(__IMXRT1062__)
+audio_block_t** AudioInputI2S::outBlocks[]
+		{&block_left, &block_right};
+uint16_t* AudioInputI2S::outOffsets[]{&block_offset};
+#endif // defined(__IMXRT1062__)
+
 
 void AudioInputI2S::begin(void)
 {
@@ -89,6 +95,15 @@ void AudioInputI2S::begin(void)
 	dma.enable();
 	dma.attachInterrupt(isr);
 }
+
+
+#if defined(__IMXRT1062__)
+void AudioInputI2S::syncToSPDIF(bool sync) 
+{
+	AudioOutputI2S::syncToSPDIF(sync, dma.channel, &outBlocks[0], 2, &outOffsets[0], 1);
+}
+#endif // defined(__IMXRT1062__)
+
 
 void AudioInputI2S::isr(void)
 {

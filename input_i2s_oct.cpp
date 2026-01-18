@@ -43,6 +43,12 @@ DMAChannel AudioInputI2SOct::dma(false);
 
 #if defined(__IMXRT1062__)
 
+audio_block_t** AudioInputI2SOct::outBlocks[]
+		{&block_ch1, &block_ch2, &block_ch3, &block_ch4, 
+		 &block_ch5, &block_ch6, &block_ch7, &block_ch8};
+uint16_t* AudioInputI2SOct::outOffsets[]{&block_offset};
+
+
 void AudioInputI2SOct::begin(void)
 {
 	dma.begin(true); // Allocate the DMA channel first
@@ -78,6 +84,13 @@ void AudioInputI2SOct::begin(void)
 	dma.enable();
 	dma.attachInterrupt(isr);
 }
+
+
+void AudioInputI2SOct::syncToSPDIF(bool sync) 
+{
+	AudioOutputI2S::syncToSPDIF(sync, dma.channel, &outBlocks[0], 8, &outOffsets[0], 1);
+}
+
 
 void AudioInputI2SOct::isr(void)
 {
@@ -200,22 +213,25 @@ void AudioInputI2SOct::update(void)
 		block_offset = 0;
 		__enable_irq();
 		// then transmit the DMA's former blocks
-		transmit(out1, 0);
-		release(out1);
-		transmit(out2, 1);
-		release(out2);
-		transmit(out3, 2);
-		release(out3);
-		transmit(out4, 3);
-		release(out4);
-		transmit(out5, 4);
-		release(out5);
-		transmit(out6, 5);
-		release(out6);
-		transmit(out7, 6);
-		release(out7);
-		transmit(out8, 7);
-		release(out8);
+		if (nullptr != out1) // assume all are NULL, or none
+		{
+			transmit(out1, 0);
+			release(out1);
+			transmit(out2, 1);
+			release(out2);
+			transmit(out3, 2);
+			release(out3);
+			transmit(out4, 3);
+			release(out4);
+			transmit(out5, 4);
+			release(out5);
+			transmit(out6, 5);
+			release(out6);
+			transmit(out7, 6);
+			release(out7);
+			transmit(out8, 7);
+			release(out8);
+		}
 	} else if (new1 != NULL) {
 		// the DMA didn't fill blocks, but we allocated blocks
 		if (block_ch1 == NULL) {

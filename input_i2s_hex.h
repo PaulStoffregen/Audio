@@ -37,6 +37,11 @@ public:
 	AudioInputI2SHex(void) : AudioStream(0, NULL) { begin(); }
 	virtual void update(void);
 	void begin(void);
+#if defined(__IMXRT1062__)
+	void syncToSPDIF(bool sync);
+	void grabUpdateResponsibility(bool grab) { update_responsibility = grab;}
+#endif // defined(__IMXRT1062__)
+
 private:
 	static bool update_responsibility;
 	static DMAChannel dma;
@@ -48,6 +53,10 @@ private:
 	static audio_block_t *block_ch5;
 	static audio_block_t *block_ch6;
 	static uint16_t block_offset;
+#if defined(__IMXRT1062__)
+	static audio_block_t** outBlocks[];
+	static uint16_t* outOffsets[];
+#endif // defined(__IMXRT1062__)	
 };
 
 
