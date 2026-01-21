@@ -60,6 +60,7 @@ public:
 	friend class AudioInputI2SOct;
 	friend class AudioOutputSPDIF3; // just for setting up clock sync
 	friend class AudioOutputI2S2; // just for setting up clock sync
+	friend class AudioInputI2S2;
 #endif
 protected:
 	AudioOutputI2S(int dummy): AudioStream(2, inputQueueArray) {} // to be used only inside AudioOutputI2Sslave !!

@@ -366,7 +366,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioInputI2Sslave",    "resource":"Sample Rate",   "shareable":true,  "setting":"LRCLK1 Control"},
 		{"type":"AudioInputI2Sslave",    "resource":"IN1 Pin",       "shareable":false},
 		{"type":"AudioInputI2S2",        "resource":"I2S2 Device",   "shareable":true,  "setting":"I2S Master"},
-		{"type":"AudioInputI2S2",        "resource":"Sample Rate",   "shareable":true,  "setting":"Teensy Control"},
+		{"type":"AudioInputI2S2",        "resource":"Sample Rate",   "shareable":true,  "setting":["Teensy Control", "SPDIF Control"]},
 		{"type":"AudioInputI2S2",        "resource":"IN2 Pin",       "shareable":false},
 		{"type":"AudioInputSPDIF3",      "resource":"SPDIF Device",  "shareable":true,  "setting":"SPDIF Protocol"},
 		{"type":"AudioInputSPDIF3",      "resource":"Sample Rate",   "shareable":true,  "setting":"SPDIF Control"},
@@ -414,7 +414,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioOutputI2Sslave",   "resource":"Sample Rate",   "shareable":true,  "setting":"LRCLK1 Control"},
 		{"type":"AudioOutputI2Sslave",   "resource":"OUT1A Pin",     "shareable":false},
 		{"type":"AudioOutputI2S2",       "resource":"I2S2 Device",   "shareable":true,  "setting":"I2S Master"},
-		{"type":"AudioOutputI2S2",       "resource":"Sample Rate",   "shareable":true,  "setting":"Teensy Control"},
+		{"type":"AudioOutputI2S2",       "resource":"Sample Rate",   "shareable":true,  "setting":["Teensy Control", "SPDIF Control"]},
 		{"type":"AudioOutputI2S2",       "resource":"OUT2 Pin",      "shareable":false},
 		{"type":"AudioOutputSPDIF",      "resource":"I2S Device",    "shareable":true,  "setting":"SPDIF Protocol"},
 		{"type":"AudioOutputSPDIF",      "resource":"Sample Rate",   "shareable":true,  "setting":"Teensy Control"},
@@ -573,8 +573,24 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		<tr class=odd><td align=center>Out 1</td><td>Right Channel</td></tr>
 	</table>
 	<h3>Functions</h3>
-	<p>This object has no functions to call from the Arduino sketch.  It
-		simply streams data from the I2S hardware to its 2 output ports.</p>
+	<p class=func><span class=keyword>syncToSPDIF</span>(sync);</p>
+	<p class=desc>If <span class=keyword>sync</span> is true, set the  
+		sample clock rate according to the incoming signal on the S/PDIF input 
+		(i.e. using an <span class=keyword>AudioInputSPDIF3</span> object).
+		Otherwise the clock rate is set to the usual <span class=keyword>AUDIO_SAMPLE_RATE_EXACT</span>
+		defined at compile time. 
+		<br><br>
+		Your sketch must use the <span class=keyword>AudioInputSPDIF3::pllLocked()</span> 
+		method to determine which clock source to use - at this time automatic clock switching is 
+		not implemented.
+	</p>
+	<p class=func><span class=keyword>grabUpdateResponsibility</span>(grab);</p>
+	<p class=desc>If <span class=keyword>grab</span> is true, set this object to be the one that
+		defines the Audio library update rate. You should use this if the S/PDIF PLL has 
+		lost lock, and the <span class=keyword>AudioInputSPDIF3</span> object had update responsibility.
+		<br><br>
+		NOTE that only ONE object may have update responsibility at any one time.
+	</p>
 	<h3>Hardware Teensy 4</h3>
 	<h3>Hardware Teensy 3</h3>
 	<p align=center><img src="img/audioshield_backside.jpg"></p>
@@ -676,8 +692,24 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		<tr class=odd><td align=center>Out 3</td><td>Channel #4</td></tr>
 	</table>
 	<h3>Functions</h3>
-	<p>This object has no functions to call from the Arduino sketch.  It
-		simply streams data from the I2S hardware to its 4 output ports.</p>
+	<p class=func><span class=keyword>syncToSPDIF</span>(sync);</p>
+	<p class=desc>If <span class=keyword>sync</span> is true, set the  
+		sample clock rate according to the incoming signal on the S/PDIF input 
+		(i.e. using an <span class=keyword>AudioInputSPDIF3</span> object).
+		Otherwise the clock rate is set to the usual <span class=keyword>AUDIO_SAMPLE_RATE_EXACT</span>
+		defined at compile time. 
+		<br><br>
+		Your sketch must use the <span class=keyword>AudioInputSPDIF3::pllLocked()</span> 
+		method to determine which clock source to use - at this time automatic clock switching is 
+		not implemented.
+	</p>
+	<p class=func><span class=keyword>grabUpdateResponsibility</span>(grab);</p>
+	<p class=desc>If <span class=keyword>grab</span> is true, set this object to be the one that
+		defines the Audio library update rate. You should use this if the S/PDIF PLL has 
+		lost lock, and the <span class=keyword>AudioInputSPDIF3</span> object had update responsibility.
+		<br><br>
+		NOTE that only ONE object may have update responsibility at any one time.
+	</p>
 	<h3>Hardware</h3>
 	<p>See this Sparkfun blog for <a href="https://www.sparkfun.com/news/2055" target="_blank">how
 		to connect two audio adaptors for 4 channel audio</a>.</p>
@@ -740,8 +772,24 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		<tr class=odd><td align=center>Out 5</td><td>Channel #6</td></tr>
 	</table>
 	<h3>Functions</h3>
-	<p>This object has no functions to call from the Arduino sketch.  It
-		simply streams data from the I2S hardware to its 6 output ports.</p>
+	<p class=func><span class=keyword>syncToSPDIF</span>(sync);</p>
+	<p class=desc>If <span class=keyword>sync</span> is true, set the  
+		sample clock rate according to the incoming signal on the S/PDIF input 
+		(i.e. using an <span class=keyword>AudioInputSPDIF3</span> object).
+		Otherwise the clock rate is set to the usual <span class=keyword>AUDIO_SAMPLE_RATE_EXACT</span>
+		defined at compile time. 
+		<br><br>
+		Your sketch must use the <span class=keyword>AudioInputSPDIF3::pllLocked()</span> 
+		method to determine which clock source to use - at this time automatic clock switching is 
+		not implemented.
+	</p>
+	<p class=func><span class=keyword>grabUpdateResponsibility</span>(grab);</p>
+	<p class=desc>If <span class=keyword>grab</span> is true, set this object to be the one that
+		defines the Audio library update rate. You should use this if the S/PDIF PLL has 
+		lost lock, and the <span class=keyword>AudioInputSPDIF3</span> object had update responsibility.
+		<br><br>
+		NOTE that only ONE object may have update responsibility at any one time.
+	</p>
 	<h3>Hardware</h3>
 	<p>The I2S signals are used in "master" mode, where Teensy creates
 		all 3 clock signals and controls all data timing.</p>
@@ -801,8 +849,24 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		<tr class=odd><td align=center>Out 7</td><td>Channel #8</td></tr>
 	</table>
 	<h3>Functions</h3>
-	<p>This object has no functions to call from the Arduino sketch.  It
-		simply streams data from the I2S hardware to its 8 output ports.</p>
+	<p class=func><span class=keyword>syncToSPDIF</span>(sync);</p>
+	<p class=desc>If <span class=keyword>sync</span> is true, set the  
+		sample clock rate according to the incoming signal on the S/PDIF input 
+		(i.e. using an <span class=keyword>AudioInputSPDIF3</span> object).
+		Otherwise the clock rate is set to the usual <span class=keyword>AUDIO_SAMPLE_RATE_EXACT</span>
+		defined at compile time. 
+		<br><br>
+		Your sketch must use the <span class=keyword>AudioInputSPDIF3::pllLocked()</span> 
+		method to determine which clock source to use - at this time automatic clock switching is 
+		not implemented.
+	</p>
+	<p class=func><span class=keyword>grabUpdateResponsibility</span>(grab);</p>
+	<p class=desc>If <span class=keyword>grab</span> is true, set this object to be the one that
+		defines the Audio library update rate. You should use this if the S/PDIF PLL has 
+		lost lock, and the <span class=keyword>AudioInputSPDIF3</span> object had update responsibility.
+		<br><br>
+		NOTE that only ONE object may have update responsibility at any one time.
+	</p>
 	<h3>Hardware</h3>
 	<p>The I2S signals are used in "master" mode, where Teensy creates
 		all 3 clock signals and controls all data timing.</p>
@@ -857,8 +921,24 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		<tr class=odd><td align=center>Out 1</td><td>Right Channel</td></tr>
 	</table>
 	<h3>Functions</h3>
-	<p>This object has no functions to call from the Arduino sketch.  It
-		simply streams data from the I2S hardware to its 2 output ports.</p>
+	<p class=func><span class=keyword>syncToSPDIF</span>(sync);</p>
+	<p class=desc>If <span class=keyword>sync</span> is true, set the  
+		sample clock rate according to the incoming signal on the S/PDIF input 
+		(i.e. using an <span class=keyword>AudioInputSPDIF3</span> object).
+		Otherwise the clock rate is set to the usual <span class=keyword>AUDIO_SAMPLE_RATE_EXACT</span>
+		defined at compile time. 
+		<br><br>
+		Your sketch must use the <span class=keyword>AudioInputSPDIF3::pllLocked()</span> 
+		method to determine which clock source to use - at this time automatic clock switching is 
+		not implemented.
+	</p>
+	<p class=func><span class=keyword>grabUpdateResponsibility</span>(grab);</p>
+	<p class=desc>If <span class=keyword>grab</span> is true, set this object to be the one that
+		defines the Audio library update rate. You should use this if the S/PDIF PLL has 
+		lost lock, and the <span class=keyword>AudioInputSPDIF3</span> object had update responsibility.
+		<br><br>
+		NOTE that only ONE object may have update responsibility at any one time.
+	</p>
 	<h3>Hardware</h3>
 	<p>The I2S signals are used in "master" mode, where Teensy creates
 		all 3 clock signals and controls all data timing.</p>
@@ -869,6 +949,13 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		<tr class=odd><td align=center>5</td><td>RX</td><td>Input</td></tr>
 		<tr class=odd><td align=center>3</td><td>LRCLK</td><td>Output</td></tr>
 	</table>
+	</p>
+	<p>With some degradation in quality, 
+	audio from master mode I2S may be used in the same project as
+	AudioInputSPDIF3, in which case the audio update clock will derive from
+	the input S/PDIF sample rate. Note that this may also result in a pitch
+	shift for synth objects, and incorrect frequency response for filters,
+	if the sample rates are significantly different.
 	</p>
 	<h3>Examples</h3>
 	<h3>Notes</h3>
@@ -887,7 +974,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p>Receive S/PDIF digital audio, at the rate of the external digital audio source.</p>
 	<p><span style="color:red">This input is incompatible with most other inputs and outputs</span>
 		which run at a speed controlled by Teensy's internal sample rate.</p>
-		<p>It is compatible with the AudioOutputSPDIF3 output and the I2S (but not I2S2) objects: when used together the audio system
+		<p>It is compatible with the AudioOutputSPDIF3 output and the I2S objects: when used together the audio system
 		will run at the external source's sample rate. See the AudioOutputI2S documentation for more detail.</p>
 	</div>
 	<h3>Boards Supported</h3>
@@ -923,7 +1010,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<h3>Notes</h3>
 	<p>This input tries to force the entire audio library to run at the
 		sample rate of the incoming data.  It usually can not be combined
-		with most other inputs and outputs which run at specific speeds. I2S and
+		with most other inputs and outputs which run at specific speeds. I2S, I2S2 and
 		the SPDIF3 output can be used.</p>
 </script>
 <script type="text/x-red" data-template-name="AudioInputSPDIF3">
@@ -1546,8 +1633,24 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 		<tr class=odd><td align=center>In 1</td><td>Right Channel</td></tr>
 	</table>
 	<h3>Functions</h3>
-	<p>This object has no functions to call from the Arduino sketch.  It
-		simply streams data from its 2 input ports to the I2S hardware.</p>
+	<p class=func><span class=keyword>syncToSPDIF</span>(sync);</p>
+	<p class=desc>If <span class=keyword>sync</span> is true, set the  
+		sample clock rate according to the incoming signal on the S/PDIF input 
+		(i.e. using an <span class=keyword>AudioInputSPDIF3</span> object).
+		Otherwise the clock rate is set to the usual <span class=keyword>AUDIO_SAMPLE_RATE_EXACT</span>
+		defined at compile time. 
+		<br><br>
+		Your sketch must use the <span class=keyword>AudioInputSPDIF3::pllLocked()</span> 
+		method to determine which clock source to use - at this time automatic clock switching is 
+		not implemented.
+	</p>
+	<p class=func><span class=keyword>grabUpdateResponsibility</span>(grab);</p>
+	<p class=desc>If <span class=keyword>grab</span> is true, set this object to be the one that
+		defines the Audio library update rate. You should use this if the S/PDIF PLL has 
+		lost lock, and the <span class=keyword>AudioInputSPDIF3</span> object had update responsibility.
+		<br><br>
+		NOTE that only ONE object may have update responsibility at any one time.
+	</p>
 	<h3>Hardware</h3>
 	<p align=center><img src="img/audioshield_backside.jpg"></p>
 	<p>The I2S signals are used in "master" mode, where Teensy creates
@@ -1635,8 +1738,24 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 		<tr class=odd><td align=center>In 3</td><td>Channel #4</td></tr>
 	</table>
 	<h3>Functions</h3>
-	<p>This object has no functions to call from the Arduino sketch.  It
-		simply streams data from its 4 input ports to the I2S hardware.</p>
+<p class=func><span class=keyword>syncToSPDIF</span>(sync);</p>
+	<p class=desc>If <span class=keyword>sync</span> is true, set the  
+		sample clock rate according to the incoming signal on the S/PDIF input 
+		(i.e. using an <span class=keyword>AudioInputSPDIF3</span> object).
+		Otherwise the clock rate is set to the usual <span class=keyword>AUDIO_SAMPLE_RATE_EXACT</span>
+		defined at compile time. 
+		<br><br>
+		Your sketch must use the <span class=keyword>AudioInputSPDIF3::pllLocked()</span> 
+		method to determine which clock source to use - at this time automatic clock switching is 
+		not implemented.
+	</p>
+	<p class=func><span class=keyword>grabUpdateResponsibility</span>(grab);</p>
+	<p class=desc>If <span class=keyword>grab</span> is true, set this object to be the one that
+		defines the Audio library update rate. You should use this if the S/PDIF PLL has 
+		lost lock, and the <span class=keyword>AudioInputSPDIF3</span> object had update responsibility.
+		<br><br>
+		NOTE that only ONE object may have update responsibility at any one time.
+	</p>
 	<h3>Hardware</h3>
 	<p>See this Sparkfun blog for <a href="https://www.sparkfun.com/news/2055" target="_blank">how
 		to connect two audio adaptors for 4 channel audio</a>.  More
@@ -1700,8 +1819,24 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 		<tr class=odd><td align=center>In 5</td><td>Channel #6</td></tr>
 	</table>
 	<h3>Functions</h3>
-	<p>This object has no functions to call from the Arduino sketch.  It
-		simply streams data from its 6 input ports to the I2S hardware.</p>
+	<p class=func><span class=keyword>syncToSPDIF</span>(sync);</p>
+	<p class=desc>If <span class=keyword>sync</span> is true, set the  
+		sample clock rate according to the incoming signal on the S/PDIF input 
+		(i.e. using an <span class=keyword>AudioInputSPDIF3</span> object).
+		Otherwise the clock rate is set to the usual <span class=keyword>AUDIO_SAMPLE_RATE_EXACT</span>
+		defined at compile time. 
+		<br><br>
+		Your sketch must use the <span class=keyword>AudioInputSPDIF3::pllLocked()</span> 
+		method to determine which clock source to use - at this time automatic clock switching is 
+		not implemented.
+	</p>
+	<p class=func><span class=keyword>grabUpdateResponsibility</span>(grab);</p>
+	<p class=desc>If <span class=keyword>grab</span> is true, set this object to be the one that
+		defines the Audio library update rate. You should use this if the S/PDIF PLL has 
+		lost lock, and the <span class=keyword>AudioInputSPDIF3</span> object had update responsibility.
+		<br><br>
+		NOTE that only ONE object may have update responsibility at any one time.
+	</p>
 	<h3>Hardware</h3>
 	<p>The I2S signals are used in "master" mode, where Teensy creates
 		all 3 clock signals and controls all data timing.</p>
@@ -1759,8 +1894,24 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 		<tr class=odd><td align=center>In 7</td><td>Channel #8</td></tr>
 	</table>
 	<h3>Functions</h3>
-	<p>This object has no functions to call from the Arduino sketch.  It
-		simply streams data from its 8 input ports to the I2S hardware.</p>
+	<p class=func><span class=keyword>syncToSPDIF</span>(sync);</p>
+	<p class=desc>If <span class=keyword>sync</span> is true, set the  
+		sample clock rate according to the incoming signal on the S/PDIF input 
+		(i.e. using an <span class=keyword>AudioInputSPDIF3</span> object).
+		Otherwise the clock rate is set to the usual <span class=keyword>AUDIO_SAMPLE_RATE_EXACT</span>
+		defined at compile time. 
+		<br><br>
+		Your sketch must use the <span class=keyword>AudioInputSPDIF3::pllLocked()</span> 
+		method to determine which clock source to use - at this time automatic clock switching is 
+		not implemented.
+	</p>
+	<p class=func><span class=keyword>grabUpdateResponsibility</span>(grab);</p>
+	<p class=desc>If <span class=keyword>grab</span> is true, set this object to be the one that
+		defines the Audio library update rate. You should use this if the S/PDIF PLL has 
+		lost lock, and the <span class=keyword>AudioInputSPDIF3</span> object had update responsibility.
+		<br><br>
+		NOTE that only ONE object may have update responsibility at any one time.
+	</p>
 	<h3>Hardware</h3>
 	<p>The I2S signals are used in "master" mode, where Teensy creates
 		all 3 clock signals and controls all data timing.</p>
@@ -1814,8 +1965,24 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 		<tr class=odd><td align=center>In 1</td><td>Right Channel</td></tr>
 	</table>
 	<h3>Functions</h3>
-	<p>This object has no functions to call from the Arduino sketch.  It
-		simply streams data from its 2 input ports to the I2S hardware.</p>
+	<p class=func><span class=keyword>syncToSPDIF</span>(sync);</p>
+	<p class=desc>If <span class=keyword>sync</span> is true, set the  
+		sample clock rate according to the incoming signal on the S/PDIF input 
+		(i.e. using an <span class=keyword>AudioInputSPDIF3</span> object).
+		Otherwise the clock rate is set to the usual <span class=keyword>AUDIO_SAMPLE_RATE_EXACT</span>
+		defined at compile time. 
+		<br><br>
+		Your sketch must use the <span class=keyword>AudioInputSPDIF3::pllLocked()</span> 
+		method to determine which clock source to use - at this time automatic clock switching is 
+		not implemented.
+	</p>
+	<p class=func><span class=keyword>grabUpdateResponsibility</span>(grab);</p>
+	<p class=desc>If <span class=keyword>grab</span> is true, set this object to be the one that
+		defines the Audio library update rate. You should use this if the S/PDIF PLL has 
+		lost lock, and the <span class=keyword>AudioInputSPDIF3</span> object had update responsibility.
+		<br><br>
+		NOTE that only ONE object may have update responsibility at any one time.
+	</p>
 	<h3>Hardware</h3>
 	<p>The I2S signals are used in "master" mode, where Teensy creates
 		all 3 clock signals and controls all data timing.</p>
@@ -1826,6 +1993,13 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 		<tr class=odd><td align=center>2</td><td>TX</td><td>Output</td></tr>
 		<tr class=odd><td align=center>3</td><td>LRCLK</td><td>Output</td></tr>
 	</table>
+	<p>With some degradation in quality, 
+	audio from master mode I2S may be used in the same project as
+	AudioInputSPDIF3, in which case the audio update clock will derive from
+	the input S/PDIF sample rate. Note that this may also result in a pitch
+	shift for synth objects, and incorrect frequency response for filters,
+	if the sample rates are significantly different.
+	</p>
 	<h3>Examples</h3>
 	<h3>Notes</h3>
 </script>
@@ -1953,7 +2127,7 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<h3>Summary</h3>
 	<div class=tooltipinfo>
 		<p>Transmit 16 bit stereo audio as Digital S/PDIF by use of the native S/PDIF port.</p>
-		<p>It is compatible with the AudioInputSPDIF3 input (and I2S, but not I2S2, objects): when used together the audio system
+		<p>It is compatible with the AudioInputSPDIF3 input, I2S and I2S2 objects): when used together the audio system
 		will run at the external source's sample rate, in which case other audio input or output
 		objects which use the internal clock should not be used. See the AudioOutputI2S documentation for more detail.</p>	
 		<p>If AudioInputSPDIF3 is not used then the S/PDIF sample rate will be governed

@@ -235,9 +235,6 @@ void AudioOutputI2S2::config_i2s(void)
 	CORE_PIN4_CONFIG  = 2;  //EMC_06, 2=SAI2_TX_BCLK
 	CORE_PIN3_CONFIG  = 2;  //EMC_05, 2=SAI2_TX_SYNC, page 429
 
-	int rsync = 1;
-	int tsync = 0;
-
 	AudioOutputI2S::set_registers(false,(*(IMXRT_SAI_t *)IMXRT_I2S2_ADDRESS));
 }
 
