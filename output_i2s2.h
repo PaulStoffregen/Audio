@@ -39,6 +39,10 @@ public:
 	AudioOutputI2S2(void) : AudioStream(2, inputQueueArray) { begin(); }
 	virtual void update(void);
 	void begin(void);
+
+	void syncToSPDIF(bool sync); 
+	void grabUpdateResponsibility(bool grab) { update_responsibility = grab;}
+
 	friend class AudioInputI2S2;
 protected:
 	AudioOutputI2S2(int dummy): AudioStream(2, inputQueueArray) {} // to be used only inside AudioOutputI2Sslave !!
@@ -53,6 +57,10 @@ private:
 	static audio_block_t *block_right_2nd;
 	static uint16_t block_left_offset;
 	static uint16_t block_right_offset;
+
+	static audio_block_t** outBlocks[];
+	static uint16_t* outOffsets[];
+
 	audio_block_t *inputQueueArray[2];
 };
 

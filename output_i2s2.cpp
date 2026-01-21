@@ -26,6 +26,7 @@
 #if defined(__IMXRT1062__)
 #include <Arduino.h>
 #include "output_i2s2.h"
+#include "output_i2s.h" // friend class for I²S register settings etc.
 #include "memcpy_audio.h"
 #include "utility/imxrt_hw.h"
 
@@ -40,6 +41,10 @@ DMAChannel AudioOutputI2S2::dma(false);
 DMAMEM __attribute__((aligned(32))) static uint32_t i2s2_tx_buffer[AUDIO_BLOCK_SAMPLES];
 
 #include "utility/imxrt_hw.h"
+
+audio_block_t** AudioOutputI2S2::outBlocks[]
+		{&block_left_1st, &block_right_1st, &block_left_2nd, &block_right_2nd};
+uint16_t* AudioOutputI2S2::outOffsets[]{&block_left_offset, &block_right_offset};
 
 void AudioOutputI2S2::begin(void)
 {
@@ -75,6 +80,15 @@ void AudioOutputI2S2::begin(void)
 	update_responsibility = update_setup();
 	dma.attachInterrupt(isr);
 }
+
+void AudioOutputI2S2::syncToSPDIF(bool sync) 
+{
+	AudioOutputI2S::syncToSPDIF(sync, dma.channel, 
+								&outBlocks[0], 4, 
+								&outOffsets[0], 2,
+								IMXRT_SAI2);
+}
+
 
 void AudioOutputI2S2::isr(void)
 {
@@ -194,7 +208,8 @@ void AudioOutputI2S2::config_i2s(void)
 	// if either transmitter or receiver is enabled, do nothing
 	if (I2S2_TCSR & I2S_TCSR_TE) return;
 	if (I2S2_RCSR & I2S_RCSR_RE) return;
-//PLL:
+
+	//PLL:
 	int fs = AUDIO_SAMPLE_RATE_EXACT;
 	// PLL between 27*24 = 648MHz und 54*24=1296MHz
 	int n1 = 4; //SAI prescaler 4 => (n1*n2) = multiple of 4
@@ -213,7 +228,8 @@ void AudioOutputI2S2::config_i2s(void)
 		   | CCM_CS2CDR_SAI2_CLK_PRED(n1-1)
 		   | CCM_CS2CDR_SAI2_CLK_PODF(n2-1);
 	IOMUXC_GPR_GPR1 = (IOMUXC_GPR_GPR1 & ~(IOMUXC_GPR_GPR1_SAI2_MCLK3_SEL_MASK))
-			| (IOMUXC_GPR_GPR1_SAI2_MCLK_DIR | IOMUXC_GPR_GPR1_SAI2_MCLK3_SEL(0));	//Select MCLK
+			// MCLK1 is always sai3_clk_root - no settings needed
+			| (IOMUXC_GPR_GPR1_SAI2_MCLK_DIR | IOMUXC_GPR_GPR1_SAI2_MCLK3_SEL(2));	// spdif.spdif_srclk (p330)
 
 	CORE_PIN33_CONFIG = 2;  //EMC_07, 2=SAI2_MCLK
 	CORE_PIN4_CONFIG  = 2;  //EMC_06, 2=SAI2_TX_BCLK
@@ -222,26 +238,7 @@ void AudioOutputI2S2::config_i2s(void)
 	int rsync = 1;
 	int tsync = 0;
 
-	I2S2_TMR = 0;
-	//I2S2_TCSR = (1<<25); //Reset
-	I2S2_TCR1 = I2S_TCR1_RFW(1);
-	I2S2_TCR2 = I2S_TCR2_SYNC(tsync) | I2S_TCR2_BCP // sync=0; tx is async;
-		| (I2S_TCR2_BCD | I2S_TCR2_DIV((1)) | I2S_TCR2_MSEL(1));
-	I2S2_TCR3 = I2S_TCR3_TCE;
-	I2S2_TCR4 = I2S_TCR4_FRSZ((2-1)) | I2S_TCR4_SYWD((32-1)) | I2S_TCR4_MF
-		| I2S_TCR4_FSD | I2S_TCR4_FSE | I2S_TCR4_FSP;
-	I2S2_TCR5 = I2S_TCR5_WNW((32-1)) | I2S_TCR5_W0W((32-1)) | I2S_TCR5_FBT((32-1));
-
-	I2S2_RMR = 0;
-	//I2S2_RCSR = (1<<25); //Reset
-	I2S2_RCR1 = I2S_RCR1_RFW(1);
-	I2S2_RCR2 = I2S_RCR2_SYNC(rsync) | I2S_RCR2_BCP  // sync=0; rx is async;
-		| (I2S_RCR2_BCD | I2S_RCR2_DIV((1)) | I2S_RCR2_MSEL(1));
-	I2S2_RCR3 = I2S_RCR3_RCE;
-	I2S2_RCR4 = I2S_RCR4_FRSZ((2-1)) | I2S_RCR4_SYWD((32-1)) | I2S_RCR4_MF
-		| I2S_RCR4_FSE | I2S_RCR4_FSP | I2S_RCR4_FSD;
-	I2S2_RCR5 = I2S_RCR5_WNW((32-1)) | I2S_RCR5_W0W((32-1)) | I2S_RCR5_FBT((32-1));
-
+	AudioOutputI2S::set_registers(false,(*(IMXRT_SAI_t *)IMXRT_I2S2_ADDRESS));
 }
 
 /******************************************************************/

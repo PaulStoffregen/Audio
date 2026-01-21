@@ -51,7 +51,7 @@ DMAMEM __attribute__((aligned(32))) static uint32_t i2s_tx_buffer[AUDIO_BLOCK_SA
 audio_block_t** AudioOutputI2S::outBlocks[]
 		{&block_left_1st, &block_right_1st, &block_left_2nd, &block_right_2nd};
 uint16_t* AudioOutputI2S::outOffsets[]{&block_left_offset, &block_right_offset};
-bool AudioOutputI2S::SPDIF_is_master = false;
+bool AudioOutputI2S::SPDIF_is_clock[2]{false,false};
 #endif
 
 void AudioOutputI2S::begin(void)
@@ -351,13 +351,16 @@ void AudioOutputI2S::update(void)
 void AudioOutputI2S::syncToSPDIF(bool sync, 
 								 int DMAch, // which DMA channel we're using
 								 audio_block_t*** pBlockArray,int nBlocks, // audio blocks queued for output
-								 uint16_t** pOffsetArray, int nOffsets)
+								 uint16_t** pOffsetArray, int nOffsets,
+								 IMXRT_SAI_t& I2Shw)
 {
-	if (SPDIF_is_master != sync) // only if changing sync
+	int which = (&I2Shw == &IMXRT_SAI2)?1:0;
+
+	if (SPDIF_is_clock[which] != sync) // only if changing sync
 	{
 		NVIC_DISABLE_IRQ(IRQ_DMA_CH0 + DMAch); // stop only our interrupts
 
-		set_registers(sync); // set up all the SAI registers
+		set_registers(sync, I2Shw); // set up all the SAI registers
 
 		// clear out all the incoming blocks...
 		for (int i=0;i<nBlocks;i++)
@@ -385,12 +388,15 @@ void AudioOutputI2S::syncToSPDIF(bool sync,
  */
 void AudioOutputI2S::set_registers(bool SPDIF_sync, IMXRT_SAI_t& I2Shw)
 {
-	int rsync = 0;
-	int tsync = 1;
+	int which = (&I2Shw == &IMXRT_SAI2)?1:0;
+	//if (1 == which) return;
+
+	int rsync = which;
+	int tsync = 1 - rsync;
 	uint32_t div_and_mclk;
-	
-	// record that SPDIF is master clock, if that's been set
-	SPDIF_is_master = SPDIF_sync;
+
+	// record that S/PDIF is clock source, if that's been set
+	SPDIF_is_clock[which] = SPDIF_sync;
 
 	// I2S1 / SAI1 registers
 	uint32_t oldTE = I2Shw.TCSR & I2S_TCSR_TE,
@@ -406,7 +412,7 @@ void AudioOutputI2S::set_registers(bool SPDIF_sync, IMXRT_SAI_t& I2Shw)
 	//I2S1_TCSR = (1<<25); //Reset
 	I2Shw.TCR1 = I2S_TCR1_RFW(1);
 	
-	if (SPDIF_is_master)
+	if (SPDIF_sync)
 		div_and_mclk = I2S_TCR2_DIV((0)) | I2S_TCR2_MSEL(3); // MCLK[3] / 2
 	else
 		div_and_mclk = I2S_TCR2_DIV((1)) | I2S_TCR2_MSEL(1); // MCLK[1] / 4
@@ -422,7 +428,7 @@ void AudioOutputI2S::set_registers(bool SPDIF_sync, IMXRT_SAI_t& I2Shw)
 	//I2S1_RCSR = (1<<25); //Reset
 	I2Shw.RCR1 = I2S_RCR1_RFW(1);
 	
-	if (SPDIF_is_master)
+	if (SPDIF_sync)
 		div_and_mclk = I2S_RCR2_DIV((0)) | I2S_RCR2_MSEL(3); // MCLK[3] / 2
 	else
 		div_and_mclk = I2S_RCR2_DIV((1)) | I2S_RCR2_MSEL(1); // MCLK[1] / 4
@@ -497,7 +503,7 @@ void AudioOutputI2S::config_i2s(bool only_bclk /* = false */, bool SPDIF_sync /*
 #elif defined(__IMXRT1062__)
 
 	// if it's a repeated request for SPDIF sync, we're already done
-	if (SPDIF_sync && SPDIF_is_master)
+	if (SPDIF_sync && SPDIF_is_clock[0])
 		return;
 
 	CCM_CCGR5 |= CCM_CCGR5_SAI1(CCM_CCGR_ON);
