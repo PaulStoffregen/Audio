@@ -419,7 +419,8 @@ void AudioOutputI2S::set_registers(bool SPDIF_sync, IMXRT_SAI_t& I2Shw)
 		
 	I2Shw.TCR2 = I2S_TCR2_SYNC(tsync) | I2S_TCR2_BCP // sync=0; tx is async;
 		    | I2S_TCR2_BCD | div_and_mclk;
-	I2Shw.TCR3 = I2S_TCR3_TCE;
+	if (0 == I2Shw.TCR3) // only if not yet set: multi-channel objects change this 			
+		I2Shw.TCR3 = I2S_TCR3_TCE;
 	I2Shw.TCR4 = I2S_TCR4_FRSZ((2-1)) | I2S_TCR4_SYWD((32-1)) | I2S_TCR4_MF
 		    | I2S_TCR4_FSD | I2S_TCR4_FSE | I2S_TCR4_FSP;
 	I2Shw.TCR5 = I2S_TCR5_WNW((32-1)) | I2S_TCR5_W0W((32-1)) | I2S_TCR5_FBT((32-1));
@@ -435,7 +436,8 @@ void AudioOutputI2S::set_registers(bool SPDIF_sync, IMXRT_SAI_t& I2Shw)
 		
 	I2Shw.RCR2 = I2S_RCR2_SYNC(rsync) | I2S_RCR2_BCP  // sync=0; rx is async;
 		    | I2S_RCR2_BCD | div_and_mclk;
-	I2Shw.RCR3 = I2S_RCR3_RCE;
+	if (0 == I2Shw.RCR3) // only if not yet set: multi-channel objects change this 			
+		I2Shw.RCR3 = I2S_RCR3_RCE;
 	I2Shw.RCR4 = I2S_RCR4_FRSZ((2-1)) | I2S_RCR4_SYWD((32-1)) | I2S_RCR4_MF
 		    | I2S_RCR4_FSE | I2S_RCR4_FSP | I2S_RCR4_FSD;
 	I2Shw.RCR5 = I2S_RCR5_WNW((32-1)) | I2S_RCR5_W0W((32-1)) | I2S_RCR5_FBT((32-1));
