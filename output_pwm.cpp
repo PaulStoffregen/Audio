@@ -214,7 +214,7 @@ extern uint8_t analog_write_res;
 extern const struct _pwm_pin_info_struct pwm_pin_info[];
 volatile audio_block_t * AudioOutputPWM::block = NULL;
 DMAMEM __attribute__((aligned(32))) static uint16_t pwm_tx_buffer[2][AUDIO_BLOCK_SAMPLES * 2];
-DMAChannel AudioOutputPWM::dma[2];
+DMAChannel AudioOutputPWM::dma[2]{{false},{false}};
 _audio_info_flexpwm AudioOutputPWM::apins[2];
 
 FLASHMEM
@@ -289,7 +289,7 @@ void AudioOutputPWM::begin(uint8_t pin1, uint8_t pin2)
 	    default:  valReg = &apins[i].flexpwm->SM[submodule].VAL5; break;
 	}
 
-	dma[i].begin(true);
+	dma[i].begin();
 	dma[i].TCD->SADDR = &pwm_tx_buffer[i][0];
 	dma[i].TCD->SOFF = 2;
 	dma[i].TCD->ATTR = DMA_TCD_ATTR_SSIZE(1) | DMA_TCD_ATTR_DSIZE(1);
