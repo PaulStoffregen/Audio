@@ -48,6 +48,10 @@ DMAMEM __attribute__((aligned(32))) static uint32_t i2s_tx_buffer[AUDIO_BLOCK_SA
 
 #if defined(__IMXRT1062__)
 #include "utility/imxrt_hw.h"
+audio_block_t** AudioOutputI2S::outBlocks[]
+		{&block_left_1st, &block_right_1st, &block_left_2nd, &block_right_2nd};
+uint16_t* AudioOutputI2S::outOffsets[]{&block_left_offset, &block_right_offset};
+bool AudioOutputI2S::SPDIF_is_clock[2]{false,false};
 #endif
 
 void AudioOutputI2S::begin(void)
@@ -336,8 +340,118 @@ void AudioOutputI2S::update(void)
 #endif
 #endif
 
+#if defined(__IMXRT1062__)
+/*
+ * Switch I²C clock between internal and S/PDIF.
+ *
+ * Only does something if the clock source is being changed, so
+ * it's safe to call this repeatedly from the application, e.g. 
+ * when polling for loss / recovery of the S/PDIF input.
+ */
+void AudioOutputI2S::syncToSPDIF(bool sync, 
+								 int DMAch, // which DMA channel we're using
+								 audio_block_t*** pBlockArray,int nBlocks, // audio blocks queued for output
+								 uint16_t** pOffsetArray, int nOffsets,
+								 IMXRT_SAI_t& I2Shw)
+{
+	int which = (&I2Shw == &IMXRT_SAI2)?1:0;
 
-void AudioOutputI2S::config_i2s(bool only_bclk)
+	if (SPDIF_is_clock[which] != sync) // only if changing sync
+	{
+		NVIC_DISABLE_IRQ(IRQ_DMA_CH0 + DMAch); // stop only our interrupts
+
+		set_registers(sync, I2Shw); // set up all the SAI registers
+
+		// clear out all the incoming blocks...
+		for (int i=0;i<nBlocks;i++)
+		{
+			audio_block_t** b = pBlockArray[i];
+			if (nullptr != *b)	
+			{ 
+				release(*b); 
+				*b = nullptr; 
+			}
+		}
+
+		// ...and the offsets into them
+		for (int i=0;i<nOffsets;i++)
+			*pOffsetArray[i] = 0;
+
+		NVIC_ENABLE_IRQ(IRQ_DMA_CH0 + DMAch); // re-enable our interrupts
+	}
+}
+
+/*
+ * Set the SAI registers.
+ * This may be called after initial setup, if S/PDIF sync is
+ * wanted and the signal is gained or lost.
+ */
+void AudioOutputI2S::set_registers(bool SPDIF_sync, IMXRT_SAI_t& I2Shw)
+{
+	int which = (&I2Shw == &IMXRT_SAI2)?1:0;
+	//if (1 == which) return;
+
+	int rsync = which;
+	int tsync = 1 - rsync;
+	uint32_t div_and_mclk;
+
+	// record that S/PDIF is clock source, if that's been set
+	SPDIF_is_clock[which] = SPDIF_sync;
+
+	// I2S1 / SAI1 registers
+	uint32_t oldTE = I2Shw.TCSR & I2S_TCSR_TE,
+			 oldRE = I2Shw.RCSR & I2S_RCSR_RE;
+	I2Shw.TCSR &= ~I2S_TCSR_TE; // can't touch TCR2 if TE is set
+	I2Shw.RCSR &= ~I2S_RCSR_RE; // can't touch RCR2 if RE is set
+	while (I2Shw.TCSR & I2S_TCSR_TE) // wait for end of Tx
+		;
+	while (I2Shw.RCSR & I2S_RCSR_RE) // wait for end of Rx
+		;
+	
+	I2Shw.TMR = 0;
+	//I2S1_TCSR = (1<<25); //Reset
+	I2Shw.TCR1 = I2S_TCR1_RFW(1);
+	
+	if (SPDIF_sync)
+		div_and_mclk = I2S_TCR2_DIV((0)) | I2S_TCR2_MSEL(3); // MCLK[3] / 2
+	else
+		div_and_mclk = I2S_TCR2_DIV((1)) | I2S_TCR2_MSEL(1); // MCLK[1] / 4
+		
+	I2Shw.TCR2 = I2S_TCR2_SYNC(tsync) | I2S_TCR2_BCP // sync=0; tx is async;
+		    | I2S_TCR2_BCD | div_and_mclk;
+	if (0 == I2Shw.TCR3) // only if not yet set: multi-channel objects change this 			
+		I2Shw.TCR3 = I2S_TCR3_TCE;
+	I2Shw.TCR4 = I2S_TCR4_FRSZ((2-1)) | I2S_TCR4_SYWD((32-1)) | I2S_TCR4_MF
+		    | I2S_TCR4_FSD | I2S_TCR4_FSE | I2S_TCR4_FSP;
+	I2Shw.TCR5 = I2S_TCR5_WNW((32-1)) | I2S_TCR5_W0W((32-1)) | I2S_TCR5_FBT((32-1));
+
+	I2Shw.RMR = 0;
+	//I2S1_RCSR = (1<<25); //Reset
+	I2Shw.RCR1 = I2S_RCR1_RFW(1);
+	
+	if (SPDIF_sync)
+		div_and_mclk = I2S_RCR2_DIV((0)) | I2S_RCR2_MSEL(3); // MCLK[3] / 2
+	else
+		div_and_mclk = I2S_RCR2_DIV((1)) | I2S_RCR2_MSEL(1); // MCLK[1] / 4
+		
+	I2Shw.RCR2 = I2S_RCR2_SYNC(rsync) | I2S_RCR2_BCP  // sync=0; rx is async;
+		    | I2S_RCR2_BCD | div_and_mclk;
+	if (0 == I2Shw.RCR3) // only if not yet set: multi-channel objects change this 			
+		I2Shw.RCR3 = I2S_RCR3_RCE;
+	I2Shw.RCR4 = I2S_RCR4_FRSZ((2-1)) | I2S_RCR4_SYWD((32-1)) | I2S_RCR4_MF
+		    | I2S_RCR4_FSE | I2S_RCR4_FSP | I2S_RCR4_FSD;
+	I2Shw.RCR5 = I2S_RCR5_WNW((32-1)) | I2S_RCR5_W0W((32-1)) | I2S_RCR5_FBT((32-1));
+	
+	I2Shw.TCSR |= oldTE; // restore old Transmit Enable...
+	I2Shw.RCSR |= oldRE; // ...and Receive Enable
+}
+#endif // defined(__IMXRT1062__)
+
+/*
+ * Set up SAI1 for I²S use, or (with SPDIF_sync set true) to pass through
+ * SPDIF input-derived clock to SPDIF transmitter
+ */
+void AudioOutputI2S::config_i2s(bool only_bclk /* = false */, bool SPDIF_sync /* = false */)
 {
 #if defined(KINETISK)
 	SIM_SCGC6 |= SIM_SCGC6_I2S;
@@ -390,24 +504,32 @@ void AudioOutputI2S::config_i2s(bool only_bclk)
 
 #elif defined(__IMXRT1062__)
 
+	// if it's a repeated request for SPDIF sync, we're already done
+	if (SPDIF_sync && SPDIF_is_clock[0])
+		return;
+
 	CCM_CCGR5 |= CCM_CCGR5_SAI1(CCM_CCGR_ON);
 
-	// if either transmitter or receiver is enabled, do nothing
-	if ((I2S1_TCSR & I2S_TCSR_TE) != 0 || (I2S1_RCSR & I2S_RCSR_RE) != 0)
+	// if not setting up new SPDIF sync, and
+	// either transmitter or receiver is enabled, do nothing
+	if (!SPDIF_sync &&
+	    ((I2S1_TCSR & I2S_TCSR_TE) != 0 || ((I2S1_RCSR & (I2S_RCSR_RE | I2S_RCSR_BCE)) == (I2S_RCSR_RE | I2S_RCSR_BCE)))
+		)
 	{
 	  if (!only_bclk) // if previous transmitter/receiver only activated BCLK, activate the other clock pins now
 	  {
 	    CORE_PIN23_CONFIG = 3;  //1:MCLK
 	    CORE_PIN20_CONFIG = 3;  //1:RX_SYNC (LRCLK)
 	  }
+	  CORE_PIN21_CONFIG = 3;  //1:RX_BCLK
 	  return ;
 	}
 
 	//PLL:
-	int fs = AUDIO_SAMPLE_RATE_EXACT;
+	double fs = AUDIO_SAMPLE_RATE_EXACT;
 	// PLL between 27*24 = 648MHz und 54*24=1296MHz
 	int n1 = 4; //SAI prescaler 4 => (n1*n2) = multiple of 4
-	int n2 = 1 + (24000000 * 27) / (fs * 256 * n1);
+	int n2 = 1 + (24000000 * 27) / ((int) fs * 256 * n1);
 
 	double C = ((double)fs * 256 * n1 * n2) / 24000000;
 	int c0 = C;
@@ -422,40 +544,25 @@ void AudioOutputI2S::config_i2s(bool only_bclk)
 		   | CCM_CS1CDR_SAI1_CLK_PRED(n1-1) // &0x07
 		   | CCM_CS1CDR_SAI1_CLK_PODF(n2-1); // &0x3f
 
-	// Select MCLK
+	// Select MCLK source options - we'll pick one of them later
 	IOMUXC_GPR_GPR1 = (IOMUXC_GPR_GPR1
-		& ~(IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL_MASK))
-		| (IOMUXC_GPR_GPR1_SAI1_MCLK_DIR | IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL(0));
+		& ~(IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL_MASK)
+		& ~(IOMUXC_GPR_GPR1_SAI1_MCLK3_SEL_MASK))
+		| (IOMUXC_GPR_GPR1_SAI1_MCLK_DIR | IOMUXC_GPR_GPR1_SAI1_MCLK1_SEL(0))  // ccm.ss1_clk_root (p330) = 
+		|  (                               IOMUXC_GPR_GPR1_SAI1_MCLK3_SEL(2)); // spdif.spdif_srclk (p330)
 
-	if (!only_bclk)
+	// only set up I/O pins if we're not syncing to SPDIF
+	if (!SPDIF_sync)
 	{
-	  CORE_PIN23_CONFIG = 3;  //1:MCLK
-	  CORE_PIN20_CONFIG = 3;  //1:RX_SYNC  (LRCLK)
+		if (!only_bclk)
+		{
+		  CORE_PIN23_CONFIG = 3;  //1:MCLK
+		  CORE_PIN20_CONFIG = 3;  //1:RX_SYNC  (LRCLK)
+		}
+		CORE_PIN21_CONFIG = 3;  //1:RX_BCLK
 	}
-	CORE_PIN21_CONFIG = 3;  //1:RX_BCLK
 
-	int rsync = 0;
-	int tsync = 1;
-
-	I2S1_TMR = 0;
-	//I2S1_TCSR = (1<<25); //Reset
-	I2S1_TCR1 = I2S_TCR1_RFW(1);
-	I2S1_TCR2 = I2S_TCR2_SYNC(tsync) | I2S_TCR2_BCP // sync=0; tx is async;
-		    | (I2S_TCR2_BCD | I2S_TCR2_DIV((1)) | I2S_TCR2_MSEL(1));
-	I2S1_TCR3 = I2S_TCR3_TCE;
-	I2S1_TCR4 = I2S_TCR4_FRSZ((2-1)) | I2S_TCR4_SYWD((32-1)) | I2S_TCR4_MF
-		    | I2S_TCR4_FSD | I2S_TCR4_FSE | I2S_TCR4_FSP;
-	I2S1_TCR5 = I2S_TCR5_WNW((32-1)) | I2S_TCR5_W0W((32-1)) | I2S_TCR5_FBT((32-1));
-
-	I2S1_RMR = 0;
-	//I2S1_RCSR = (1<<25); //Reset
-	I2S1_RCR1 = I2S_RCR1_RFW(1);
-	I2S1_RCR2 = I2S_RCR2_SYNC(rsync) | I2S_RCR2_BCP  // sync=0; rx is async;
-		    | (I2S_RCR2_BCD | I2S_RCR2_DIV((1)) | I2S_RCR2_MSEL(1));
-	I2S1_RCR3 = I2S_RCR3_RCE;
-	I2S1_RCR4 = I2S_RCR4_FRSZ((2-1)) | I2S_RCR4_SYWD((32-1)) | I2S_RCR4_MF
-		    | I2S_RCR4_FSE | I2S_RCR4_FSP | I2S_RCR4_FSD;
-	I2S1_RCR5 = I2S_RCR5_WNW((32-1)) | I2S_RCR5_W0W((32-1)) | I2S_RCR5_FBT((32-1));
+	set_registers(SPDIF_sync);
 
 #endif
 }

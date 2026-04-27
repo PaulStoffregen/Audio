@@ -40,6 +40,15 @@ public:
 	AudioOutputI2S(void) : AudioStream(2, inputQueueArray) { begin(); }
 	virtual void update(void);
 	void begin(void);
+
+#if defined(__IMXRT1062__)
+	void syncToSPDIF(bool sync) 
+	{
+		syncToSPDIF(sync, dma.channel, &outBlocks[0], 4, &outOffsets[0], 2);
+	}
+	void grabUpdateResponsibility(bool grab) { update_responsibility = grab;}
+#endif // defined(__IMXRT1062__)
+
 	friend class AudioInputI2S;
 	friend class AudioInputPDM;
 #if defined(__IMXRT1062__)
@@ -49,10 +58,20 @@ public:
 	friend class AudioInputI2SHex;
 	friend class AudioOutputI2SOct;
 	friend class AudioInputI2SOct;
+	friend class AudioOutputSPDIF3; // just for setting up clock sync
+	friend class AudioOutputI2S2; // just for setting up clock sync
+	friend class AudioInputI2S2;
 #endif
 protected:
 	AudioOutputI2S(int dummy): AudioStream(2, inputQueueArray) {} // to be used only inside AudioOutputI2Sslave !!
-	static void config_i2s(bool only_bclk = false);
+	static void config_i2s(bool only_bclk = false, bool SPDIF_sync = false);
+	static void set_registers(bool SPDIF_sync, // change settings if sync source changes
+							  IMXRT_SAI_t& I2Shw = (*(IMXRT_SAI_t *)IMXRT_I2S1_ADDRESS)); 
+	static void syncToSPDIF(bool sync, int DMAch,
+							audio_block_t*** pBlockArray,int nBlocks,
+							uint16_t** pOffsetArray, int nOffsets,
+							IMXRT_SAI_t& I2Shw = (*(IMXRT_SAI_t *)IMXRT_I2S1_ADDRESS));
+
 	static audio_block_t *block_left_1st;
 	static audio_block_t *block_right_1st;
 	static bool update_responsibility;
@@ -63,6 +82,11 @@ private:
 	static audio_block_t *block_right_2nd;
 	static uint16_t block_left_offset;
 	static uint16_t block_right_offset;
+#if defined(__IMXRT1062__)
+	static bool SPDIF_is_clock[2]; // I2S and I2S2
+	static audio_block_t** outBlocks[];
+	static uint16_t* outOffsets[];
+#endif // defined(__IMXRT1062__)
 	audio_block_t *inputQueueArray[2];
 };
 

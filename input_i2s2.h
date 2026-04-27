@@ -38,6 +38,10 @@ public:
 	AudioInputI2S2(void) : AudioStream(0, NULL) { begin(); }
 	virtual void update(void);
 	void begin(void);
+
+	void syncToSPDIF(bool sync);
+	void grabUpdateResponsibility(bool grab) { update_responsibility = grab;}
+
 protected:
 	AudioInputI2S2(int dummy): AudioStream(0, NULL) {} // to be used only inside AudioInputI2Sslave !!
 	static bool update_responsibility;
@@ -47,6 +51,9 @@ private:
 	static audio_block_t *block_left;
 	static audio_block_t *block_right;
 	static uint16_t block_offset;
+	
+	static audio_block_t** outBlocks[];
+	static uint16_t* outOffsets[];
 };
 
 

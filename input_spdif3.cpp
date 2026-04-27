@@ -46,7 +46,7 @@ void AudioInputSPDIF3::begin(void)
 {
 	dma.begin(true); // Allocate the DMA channel first
 
-	AudioOutputSPDIF3::config_spdif3();
+	AudioOutputSPDIF3::config_spdif3(true); // force output (if any) to sync to this
 
 	const int nbytes_mlno = 2 * 4; // 8 Bytes per minor loop
 	dma.TCD->SADDR = &SPDIF_SRL;
@@ -102,95 +102,117 @@ void AudioInputSPDIF3::isr(void)
 	left = AudioInputSPDIF3::block_left;
 	right = AudioInputSPDIF3::block_right;
 
-	if (left != NULL && right != NULL) {
+	if (!pllLocked()) // no valid signal
+	{
 		offset = AudioInputSPDIF3::block_offset;
-		if (offset <= AUDIO_BLOCK_SAMPLES*2) {
-			dest_left = &(left->data[offset]);
-			dest_right = &(right->data[offset]);
+		if (offset <= AUDIO_BLOCK_SAMPLES*2) 
+		{
+			//dest_left = &(left->data[offset]);
+			//dest_right = &(right->data[offset]);
 			AudioInputSPDIF3::block_offset = offset + AUDIO_BLOCK_SAMPLES*2;
-
-			do {
-				#if IMXRT_CACHE_ENABLED >=1
-				SCB_CACHE_DCIMVAC = (uintptr_t)src;
-				asm("dsb":::"memory");
-				#endif
-
-				*dest_left++ = (*src++) >> 8;
-				*dest_right++ = (*src++) >> 8;
-
-				*dest_left++ = (*src++) >> 8;
-				*dest_right++ = (*src++) >> 8;
-
-				*dest_left++ = (*src++) >> 8;
-				*dest_right++ = (*src++) >> 8;
-
-				*dest_left++ = (*src++) >> 8;
-				*dest_right++ = (*src++) >> 8;
-
-			} while (src < end);
+			if (nullptr != left)  memset(left->data, 0,sizeof left->data);
+			if (nullptr != right) memset(right->data,0,sizeof right->data);
 		}
 	}
-	else if (left != NULL) {
-		offset = AudioInputSPDIF3::block_offset;
-		if (offset <= AUDIO_BLOCK_SAMPLES*2) {
-			dest_left = &(left->data[offset]);
-			AudioInputSPDIF3::block_offset = offset + AUDIO_BLOCK_SAMPLES*2;
+	else
+	{
+		if (left != NULL && right != NULL) 
+		{
+			offset = AudioInputSPDIF3::block_offset;
+			if (offset <= AUDIO_BLOCK_SAMPLES*2) {
+				dest_left = &(left->data[offset]);
+				dest_right = &(right->data[offset]);
+				AudioInputSPDIF3::block_offset = offset + AUDIO_BLOCK_SAMPLES*2;
 
-			do {
-				#if IMXRT_CACHE_ENABLED >=1
-				SCB_CACHE_DCIMVAC = (uintptr_t)src;
-				asm("dsb":::"memory");
-				#endif
+				do {
+					#if IMXRT_CACHE_ENABLED >=1
+					SCB_CACHE_DCIMVAC = (uintptr_t)src;
+					asm("dsb":::"memory");
+					#endif
 
-				*dest_left++ = (*src++) >> 8;
-				src++;
+					*dest_left++ = (*src++) >> 8;
+					*dest_right++ = (*src++) >> 8;
 
-				*dest_left++ = (*src++) >> 8;
-				src++;
+					*dest_left++ = (*src++) >> 8;
+					*dest_right++ = (*src++) >> 8;
 
-				*dest_left++ = (*src++) >> 8;
-				src++;
+					*dest_left++ = (*src++) >> 8;
+					*dest_right++ = (*src++) >> 8;
 
-				*dest_left++ = (*src++) >> 8;
-				src++;
+					*dest_left++ = (*src++) >> 8;
+					*dest_right++ = (*src++) >> 8;
 
-			} while (src < end);
-		}		
+				} while (src < end);
+			}
+		}
+		else if (left != NULL) 
+		{
+			offset = AudioInputSPDIF3::block_offset;
+			if (offset <= AUDIO_BLOCK_SAMPLES*2) {
+				dest_left = &(left->data[offset]);
+				AudioInputSPDIF3::block_offset = offset + AUDIO_BLOCK_SAMPLES*2;
+
+				do {
+					#if IMXRT_CACHE_ENABLED >=1
+					SCB_CACHE_DCIMVAC = (uintptr_t)src;
+					asm("dsb":::"memory");
+					#endif
+
+					*dest_left++ = (*src++) >> 8;
+					src++;
+
+					*dest_left++ = (*src++) >> 8;
+					src++;
+
+					*dest_left++ = (*src++) >> 8;
+					src++;
+
+					*dest_left++ = (*src++) >> 8;
+					src++;
+
+				} while (src < end);
+			}		
+		}
+		else if (right != NULL) 
+		{
+			offset = AudioInputSPDIF3::block_offset;
+			if (offset <= AUDIO_BLOCK_SAMPLES*2) {
+				dest_right = &(right->data[offset]);
+				AudioInputSPDIF3::block_offset = offset + AUDIO_BLOCK_SAMPLES*2;
+
+				do {
+					#if IMXRT_CACHE_ENABLED >=1
+					SCB_CACHE_DCIMVAC = (uintptr_t)src;
+					asm("dsb":::"memory");
+					#endif
+
+					src++;
+					*dest_right++ = (*src++) >> 8;
+
+					src++;
+					*dest_right++ = (*src++) >> 8;
+
+					src++;
+					*dest_right++ = (*src++) >> 8;
+
+					src++;
+					*dest_right++ = (*src++) >> 8;
+
+				} while (src < end);
+			}		
+		}
 	}
-	else if (right != NULL) {
-		offset = AudioInputSPDIF3::block_offset;
-		if (offset <= AUDIO_BLOCK_SAMPLES*2) {
-			dest_right = &(right->data[offset]);
-			AudioInputSPDIF3::block_offset = offset + AUDIO_BLOCK_SAMPLES*2;
-
-			do {
-				#if IMXRT_CACHE_ENABLED >=1
-				SCB_CACHE_DCIMVAC = (uintptr_t)src;
-				asm("dsb":::"memory");
-				#endif
-
-				src++;
-				*dest_right++ = (*src++) >> 8;
-
-				src++;
-				*dest_right++ = (*src++) >> 8;
-
-				src++;
-				*dest_right++ = (*src++) >> 8;
-
-				src++;
-				*dest_right++ = (*src++) >> 8;
-
-			} while (src < end);
-		}		
-	}
-
 }
 
 
 void AudioInputSPDIF3::update(void)
 {
 	audio_block_t *new_left=NULL, *new_right=NULL, *out_left=NULL, *out_right=NULL;
+
+	// If PLL isn't locked we tend to get crazy speeds,
+	// so do nothing.
+	if (!pllLocked())
+		return;
 
 	// allocate 2 new blocks, but if one fails, allocate neither
 	new_left = allocate();
@@ -212,10 +234,16 @@ void AudioInputSPDIF3::update(void)
 		block_offset = 0;
 		__enable_irq();
 		// then transmit the DMA's former blocks
-		transmit(out_left, 0);
-		release(out_left);
-		transmit(out_right, 1);
-		release(out_right);
+		if (nullptr != out_left)
+		{
+			transmit(out_left, 0);
+			release(out_left);
+		}
+		if (nullptr != out_right)
+		{
+			transmit(out_right, 1);
+			release(out_right);
+		}
 		//Serial.print(".");
 	} else if (new_left != NULL) {
 		// the DMA didn't fill blocks, but we allocated blocks

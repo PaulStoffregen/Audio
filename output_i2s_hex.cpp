@@ -50,6 +50,15 @@ uint16_t  AudioOutputI2SHex::ch3_offset = 0;
 uint16_t  AudioOutputI2SHex::ch4_offset = 0;
 uint16_t  AudioOutputI2SHex::ch5_offset = 0;
 uint16_t  AudioOutputI2SHex::ch6_offset = 0;
+
+#if defined(__IMXRT1062__)
+audio_block_t** AudioOutputI2SHex::outBlocks[]
+		{&block_ch1_1st, &block_ch2_1st, &block_ch3_1st, &block_ch4_1st, &block_ch5_1st, &block_ch6_1st, 
+		 &block_ch1_2nd, &block_ch2_2nd, &block_ch3_2nd, &block_ch4_2nd, &block_ch5_2nd, &block_ch6_2nd};
+uint16_t* AudioOutputI2SHex::outOffsets[]
+		{&ch1_offset, &ch2_offset, &ch3_offset, &ch4_offset, &ch5_offset, &ch6_offset};
+#endif // defined(__IMXRT1062__)
+
 bool AudioOutputI2SHex::update_responsibility = false;
 DMAMEM __attribute__((aligned(32))) static uint32_t i2s_tx_buffer[AUDIO_BLOCK_SAMPLES*3];
 DMAChannel AudioOutputI2SHex::dma(false);
@@ -103,6 +112,13 @@ void AudioOutputI2SHex::begin(void)
 	update_responsibility = update_setup();
 	dma.attachInterrupt(isr);
 }
+
+#if defined(__IMXRT1062__)
+void AudioOutputI2SHex::syncToSPDIF(bool sync) 
+{
+	AudioOutputI2S::syncToSPDIF(sync, dma.channel, &outBlocks[0], 12, &outOffsets[0], 6);
+}
+#endif // defined(__IMXRT1062__)
 
 void AudioOutputI2SHex::isr(void)
 {

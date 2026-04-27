@@ -38,6 +38,13 @@ uint16_t AudioInputI2SQuad::block_offset = 0;
 bool AudioInputI2SQuad::update_responsibility = false;
 DMAChannel AudioInputI2SQuad::dma(false);
 
+#if defined(__IMXRT1062__)
+audio_block_t** AudioInputI2SQuad::outBlocks[]
+		{&block_ch1, &block_ch2, &block_ch3, &block_ch4};
+uint16_t* AudioInputI2SQuad::outOffsets[]{&block_offset};
+#endif // defined(__IMXRT1062__)
+
+
 #if defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__) || defined(__IMXRT1062__)
 
 void AudioInputI2SQuad::begin(void)
@@ -125,6 +132,13 @@ void AudioInputI2SQuad::begin(void)
 #endif
 }
 
+#if defined(__IMXRT1062__)
+void AudioInputI2SQuad::syncToSPDIF(bool sync) 
+{
+	AudioOutputI2S::syncToSPDIF(sync, dma.channel, &outBlocks[0], 4, &outOffsets[0], 1);
+}
+#endif // defined(__IMXRT1062__)
+
 void AudioInputI2SQuad::isr(void)
 {
 	uint32_t daddr, offset;
@@ -210,14 +224,17 @@ void AudioInputI2SQuad::update(void)
 		block_offset = 0;
 		__enable_irq();
 		// then transmit the DMA's former blocks
-		transmit(out1, 0);
-		release(out1);
-		transmit(out2, 1);
-		release(out2);
-		transmit(out3, 2);
-		release(out3);
-		transmit(out4, 3);
-		release(out4);
+		if (nullptr != out1) // assume all are NULL, or none
+		{
+			transmit(out1, 0);
+			release(out1);
+			transmit(out2, 1);
+			release(out2);
+			transmit(out3, 2);
+			release(out3);
+			transmit(out4, 3);
+			release(out4);
+		}
 	} else if (new1 != NULL) {
 		// the DMA didn't fill blocks, but we allocated blocks
 		if (block_ch1 == NULL) {

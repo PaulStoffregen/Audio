@@ -29,6 +29,7 @@
 #include <Arduino.h>
 #include "input_i2s2.h"
 #include "output_i2s2.h"
+#include "output_i2s.h"
 
 DMAMEM __attribute__((aligned(32))) static uint32_t i2s2_rx_buffer[AUDIO_BLOCK_SAMPLES];
 audio_block_t * AudioInputI2S2::block_left = NULL;
@@ -36,6 +37,10 @@ audio_block_t * AudioInputI2S2::block_right = NULL;
 uint16_t AudioInputI2S2::block_offset = 0;
 bool AudioInputI2S2::update_responsibility = false;
 DMAChannel AudioInputI2S2::dma(false);
+
+audio_block_t** AudioInputI2S2::outBlocks[]
+		{&block_left, &block_right};
+uint16_t* AudioInputI2S2::outOffsets[]{&block_offset};
 
 
 void AudioInputI2S2::begin(void)
@@ -71,6 +76,13 @@ void AudioInputI2S2::begin(void)
 	update_responsibility = update_setup();
 	dma.attachInterrupt(isr);
 }
+
+
+void AudioInputI2S2::syncToSPDIF(bool sync) 
+{
+	AudioOutputI2S::syncToSPDIF(sync, dma.channel, &outBlocks[0], 2, &outOffsets[0], 1);
+}
+
 
 void AudioInputI2S2::isr(void)
 {

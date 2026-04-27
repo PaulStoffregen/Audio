@@ -56,6 +56,16 @@ uint16_t  AudioOutputI2SOct::ch5_offset = 0;
 uint16_t  AudioOutputI2SOct::ch6_offset = 0;
 uint16_t  AudioOutputI2SOct::ch7_offset = 0;
 uint16_t  AudioOutputI2SOct::ch8_offset = 0;
+
+audio_block_t** AudioOutputI2SOct::outBlocks[]
+		{&block_ch1_1st, &block_ch2_1st, &block_ch3_1st, &block_ch4_1st, 
+		 &block_ch5_1st, &block_ch6_1st, &block_ch7_1st, &block_ch8_1st, 
+		 &block_ch1_2nd, &block_ch2_2nd, &block_ch3_2nd, &block_ch4_2nd, 
+		 &block_ch5_2nd, &block_ch6_2nd, &block_ch7_2nd, &block_ch8_2nd};
+uint16_t* AudioOutputI2SOct::outOffsets[]
+		{&ch1_offset, &ch2_offset, &ch3_offset, &ch4_offset,
+		 &ch5_offset, &ch6_offset, &ch7_offset, &ch8_offset};
+
 bool AudioOutputI2SOct::update_responsibility = false;
 DMAMEM __attribute__((aligned(32))) static uint32_t i2s_tx_buffer[AUDIO_BLOCK_SAMPLES*4];
 DMAChannel AudioOutputI2SOct::dma(false);
@@ -100,6 +110,12 @@ void AudioOutputI2SOct::begin(void)
 	//I2S1_TCR3 = I2S_TCR3_TCE_4CH;
 	update_responsibility = update_setup();
 	dma.attachInterrupt(isr);
+}
+
+
+void AudioOutputI2SOct::syncToSPDIF(bool sync) 
+{
+	AudioOutputI2S::syncToSPDIF(sync, dma.channel, &outBlocks[0], 16, &outOffsets[0], 8);
 }
 
 void AudioOutputI2SOct::isr(void)
