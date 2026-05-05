@@ -96,12 +96,27 @@ void AudioOutputI2S::begin(void)
 	dma.enable();
 
 	I2S1_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE;
-	I2S1_TCSR = I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
+	I2S1_TCSR = I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE | I2S_TCSR_FEIE;
+	attachInterruptVector(IRQ_SAI1, isr_fifo_underrun);
+	NVIC_SET_PRIORITY(IRQ_SAI1, 240); // lowest priority
+	NVIC_ENABLE_IRQ(IRQ_SAI1);
 #endif
 	update_responsibility = update_setup();
 	dma.attachInterrupt(isr);
 }
 
+#if defined(__IMXRT1062__)
+
+void AudioOutputI2S::isr_fifo_underrun(void)
+{
+	// TODO: If another DMA channel is hogging all the DMA bandwidth,
+	// maybe we could end up hogging all the CPU until it stops, if
+	// this underrun error repeatedly triggers while the DMA remains
+	// unavailable.  How to better handle this situation??
+	I2S1_TCSR |= I2S_TCSR_FEF; // clear error flag
+}
+
+#endif
 
 void AudioOutputI2S::isr(void)
 {
