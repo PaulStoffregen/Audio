@@ -30,6 +30,9 @@
 #include <Arduino.h>     // github.com/PaulStoffregen/cores/blob/master/teensy4/Arduino.h
 #include <AudioStream.h> // github.com/PaulStoffregen/cores/blob/master/teensy4/AudioStream.h
 
+//#define AVG_OUTPUTS
+#define OVERSAMPLE_4X
+
 class AudioFilterStateVariable: public AudioStream
 {
 public:
@@ -52,7 +55,11 @@ public:
 			* 2147483647.0f;
 	}
 	void resonance(float q) {
+#ifdef OVERSAMPLE_4X
+		if (q < 0.5f) q = 0.5f; // q can be lower with OVERSAMPLE_4X
+#else
 		if (q < 0.7f) q = 0.7f;
+#endif
 		else if (q > 5.0f) q = 5.0f;
 		// TODO: allow lower Q when frequency is lower
 		setting_damp = (1.0f / q) * 1073741824.0f;
@@ -60,9 +67,13 @@ public:
 	void octaveControl(float n) {
 		// filter's corner frequency is Fcenter * 2^(control * N)
 		// where "control" ranges from -1.0 to +1.0
-		// and "N" allows the frequency to change from 0 to 7 octaves
+		// and "N" allows the frequency to change from 0 to 7 octaves (can be 8 octaves with OVERSAMPlE_4X)
 		if (n < 0.0f) n = 0.0f;
+#ifdef OVERSAMPLE_4X
+		else if (n > 7.9998f) n = 7.9998f; 
+#else
 		else if (n > 6.9999f) n = 6.9999f;
+#endif
 		setting_octavemult = n * 4096.0f;
 	}
 	virtual void update(void);

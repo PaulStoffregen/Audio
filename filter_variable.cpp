@@ -57,26 +57,49 @@ void AudioFilterStateVariable::update_fixed(const int16_t *in,
 	int32_t lowpasstmp, bandpasstmp, highpasstmp;
 	int32_t fmult, damp;
 
+#ifdef OVERSAMPLE_4X        
+	fmult = setting_fmult/2;
+#else
 	fmult = setting_fmult;
+#endif
 	damp = setting_damp;
 	inputprev = state_inputprev;
 	lowpass = state_lowpass;
 	bandpass = state_bandpass;
 	do {
 		input = (*in++) << 12;
+#ifdef OVERSAMPLE_4X        
+		lowpass = lowpass + MULT(fmult, bandpass);
+		highpass = ((input + 3*inputprev)>>2) - lowpass - MULT(damp, bandpass);
+		bandpass = bandpass + MULT(fmult, highpass);
+#endif		
 		lowpass = lowpass + MULT(fmult, bandpass);
 		highpass = ((input + inputprev)>>1) - lowpass - MULT(damp, bandpass);
-		inputprev = input;
 		bandpass = bandpass + MULT(fmult, highpass);
+#ifdef AVG_OUTPUTS
 		lowpasstmp = lowpass;
 		bandpasstmp = bandpass;
 		highpasstmp = highpass;
+#endif		
+#ifdef OVERSAMPLE_4X        
+		lowpass = lowpass + MULT(fmult, bandpass);
+		highpass = ((input*3 + inputprev)>>2) - lowpass - MULT(damp, bandpass);
+		bandpass = bandpass + MULT(fmult, highpass);
+#endif		
 		lowpass = lowpass + MULT(fmult, bandpass);
 		highpass = input - lowpass - MULT(damp, bandpass);
 		bandpass = bandpass + MULT(fmult, highpass);
+#ifdef AVG_OUTPUTS
 		lowpasstmp = signed_saturate_rshift(lowpass+lowpasstmp, 16, 13);
 		bandpasstmp = signed_saturate_rshift(bandpass+bandpasstmp, 16, 13);
 		highpasstmp = signed_saturate_rshift(highpass+highpasstmp, 16, 13);
+#else
+        // https://www.musicdsp.org/en/latest/Filters/92-state-variable-filter-double-sampled-stable.html#state-variable-filter-double-sampled-stable
+		lowpasstmp = signed_saturate_rshift(lowpass, 16, 12);  // just decimate, no need to avg outputs
+		bandpasstmp = signed_saturate_rshift(bandpass, 16, 12);
+		highpasstmp = signed_saturate_rshift(highpass, 16, 12);
+#endif
+	    inputprev = input;
 		*lp++ = lowpasstmp;
 		*bp++ = bandpasstmp;
 		*hp++ = highpasstmp;
@@ -97,7 +120,11 @@ void AudioFilterStateVariable::update_variable(const int16_t *in,
 	int32_t fcenter, fmult, damp, octavemult;
 	int32_t n;
 
+#ifdef OVERSAMPLE_4X        
+	fcenter = setting_fcenter/2;
+#else
 	fcenter = setting_fcenter;
+#endif
 	octavemult = setting_octavemult;
 	damp = setting_damp;
 	inputprev = state_inputprev;
@@ -128,7 +155,8 @@ void AudioFilterStateVariable::update_variable(const int16_t *in,
 		#endif
 		n = n >> (6 - (control >> 27)); // 4 integer control bits
 		fmult = multiply_32x32_rshift32_rounded(fcenter, n);
-		if (fmult > 5378279) fmult = 5378279;
+        //if (fmult > 4194303) fmult = 4194303; // max fmult = 1.0*(2^22-1), q >= .707
+        if (fmult > 2965372) fmult = 2965372; // max fmult = .707*(2^22-1), so q can be >= .5
 		fmult = fmult << 8;
 		// fmult is within 0.4% accuracy for all but the top 2 octaves
 		// of the audio band.  This math improves accuracy above 5 kHz.
@@ -145,19 +173,38 @@ void AudioFilterStateVariable::update_variable(const int16_t *in,
 		#endif
 		// now do the state variable filter as normal, using fmult
 		input = (*in++) << 12;
+#ifdef OVERSAMPLE_4X        
+		lowpass = lowpass + MULT(fmult, bandpass);
+		highpass = ((input + 3*inputprev)>>2) - lowpass - MULT(damp, bandpass);
+		bandpass = bandpass + MULT(fmult, highpass);
+#endif		
 		lowpass = lowpass + MULT(fmult, bandpass);
 		highpass = ((input + inputprev)>>1) - lowpass - MULT(damp, bandpass);
-		inputprev = input;
 		bandpass = bandpass + MULT(fmult, highpass);
+#ifdef AVG_OUTPUTS
 		lowpasstmp = lowpass;
 		bandpasstmp = bandpass;
 		highpasstmp = highpass;
+#endif		
+#ifdef OVERSAMPLE_4X        
+		lowpass = lowpass + MULT(fmult, bandpass);
+		highpass = ((input*3 + inputprev)>>2) - lowpass - MULT(damp, bandpass);
+		bandpass = bandpass + MULT(fmult, highpass);
+#endif		
 		lowpass = lowpass + MULT(fmult, bandpass);
 		highpass = input - lowpass - MULT(damp, bandpass);
 		bandpass = bandpass + MULT(fmult, highpass);
+#ifdef AVG_OUTPUTS
 		lowpasstmp = signed_saturate_rshift(lowpass+lowpasstmp, 16, 13);
 		bandpasstmp = signed_saturate_rshift(bandpass+bandpasstmp, 16, 13);
 		highpasstmp = signed_saturate_rshift(highpass+highpasstmp, 16, 13);
+#else
+        // https://www.musicdsp.org/en/latest/Filters/92-state-variable-filter-double-sampled-stable.html#state-variable-filter-double-sampled-stable
+		lowpasstmp = signed_saturate_rshift(lowpass, 16, 12);  // just decimate, no need to avg outputs
+		bandpasstmp = signed_saturate_rshift(bandpass, 16, 12);
+		highpasstmp = signed_saturate_rshift(highpass, 16, 12);
+#endif
+		inputprev = input;
 		*lp++ = lowpasstmp;
 		*bp++ = bandpasstmp;
 		*hp++ = highpasstmp;
