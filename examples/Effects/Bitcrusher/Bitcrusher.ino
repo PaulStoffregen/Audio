@@ -68,7 +68,7 @@ void setup() {
 
   // Audio connections require memory to work.  For more
   // detailed information, see the MemoryAndCpuUsage example
-  AudioMemory(40); //this is WAY more tha nwe need
+  AudioMemory(40); //this is WAY more than we need
 
   // turn on the output
   audioShield.enable();

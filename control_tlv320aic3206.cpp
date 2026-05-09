@@ -244,7 +244,7 @@ bool AudioControlTLV320AIC3206::setMicBias(int n) {
 }
 
 void AudioControlTLV320AIC3206::aic_reset() {
-  if (debugToSerial) Serial.println("INFO: Reseting AIC");
+  if (debugToSerial) Serial.println("INFO: Resetting AIC");
   aic_writePage(0x00, 0x01, 0x01);
   // aic_writeAddress(0x0001, 0x01);
 

@@ -737,7 +737,7 @@ RED.view = (function() {
 					//console.log("delete link: " + link.source.id + ":" + link.sourcePort
 					//	+ " -> " + link.target.id + ":" + link.targetPort);
 					if (link.source == node) {
-						// reenable input port
+						// re-enable input port
 						var n = link.targetPort;
 						var rect = link.target.inputlist[n];
 						rect.on("mousedown", (function(d,n){return function(d){portMouseDown(d,1,n);}})(rect, n))
@@ -755,7 +755,7 @@ RED.view = (function() {
 			setDirty(true);
 		}
 		if (selected_link) {
-			// reenable input port
+			// re-enable input port
 			var n = selected_link.targetPort;
 			var rect = selected_link.target.inputlist[n];
 			rect.on("mousedown", (function(d,n){return function(d){portMouseDown(d,1,n);}})(rect, n))

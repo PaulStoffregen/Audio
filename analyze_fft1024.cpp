@@ -97,7 +97,7 @@ void AudioAnalyzeFFT1024::update(void)
 	case 7:
 		blocklist[7] = block;
 		// TODO: perhaps distribute the work over multiple update() ??
-		//       github pull requsts welcome......
+		//       github pull requests welcome......
 		copy_to_fft_buffer(buffer+0x000, blocklist[0]->data);
 		copy_to_fft_buffer(buffer+0x100, blocklist[1]->data);
 		copy_to_fft_buffer(buffer+0x200, blocklist[2]->data);

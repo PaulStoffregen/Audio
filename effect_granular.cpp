@@ -153,7 +153,7 @@ void AudioEffectGranular::update(void)
 				sample_req = false;
 				allow_len_change = true; // Reduces noise by not allowing the
 						// length to change after the sample has been
-						// recored.  Kind of not too much though
+						// recorded.  Kind of not too much though
 				if (write_head >= glitch_len) {
 					write_head = 0;
 					sample_loaded = true;
@@ -166,7 +166,7 @@ void AudioEffectGranular::update(void)
 
 			if (sample_loaded) {
 				//move it to the middle third of the bank.
-				//3 "seperate" banks are used
+				//3 "separate" banks are used
 				float fade_len = 20.00;
 				int16_t m2 = fade_len;
 

@@ -75,7 +75,7 @@ void loop()
   {
     audioUpdates++;
     audioUpdated = true; // audio engine just updated
-    queue.readBuffer(); // not intereseted in contents,
+    queue.readBuffer(); // not interested in contents,
     queue.freeBuffer(); // just that 
   }
 

@@ -127,7 +127,7 @@ bool AudioControlCS42448::inputLevelInteger(int32_t n)
 	return write(CS42448_DAC_Channel_Invert, data, 7);
 }
 
-bool AudioControlCS42448::inputLevelInteger(int chnnel, int32_t n)
+bool AudioControlCS42448::inputLevelInteger(int channel, int32_t n)
 {
 
 	return true;

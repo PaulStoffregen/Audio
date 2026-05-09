@@ -935,7 +935,7 @@ span.mainfunction {color: #993300; font-weight: bolder}
 	<p class=desc>Returns the sample rate of incoming data, if the PLL has locked, or returns 0 if the audio sample rate is unknown.
 	</p>
 	<p class=func><span class=keyword>getTargetLantency</span>();</p>
-	<p class=desc>Returns the target latency in seconds. The latency is the time from the moment a sample is received by the Teensy SPDIF hardware receiver until it is transmitted by the asrc intput. The audio samples arrive at the asrc input in chunks of 32 samples per channel. The target latency consists of these 32 samples + some buffer that is needed to compensate for timing variations.
+	<p class=desc>Returns the target latency in seconds. The latency is the time from the moment a sample is received by the Teensy SPDIF hardware receiver until it is transmitted by the asrc input. The audio samples arrive at the asrc input in chunks of 32 samples per channel. The target latency consists of these 32 samples + some buffer that is needed to compensate for timing variations.
 	</p>
 	<p class=func><span class=keyword>getAttenuation</span>();</p>
 	<p class=desc>
@@ -955,7 +955,7 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; PassThroughAsyncSpdif
 	</p>
 	<h3>Notes</h3>
-	<p>AsyncAudioInputSPDIF3 is not able to clock the audio pipline (never has the 'update_responsibility'). At least 1 other input or output must be used to cause the entire Audio library to update.
+	<p>AsyncAudioInputSPDIF3 is not able to clock the audio pipeline (never has the 'update_responsibility'). At least 1 other input or output must be used to cause the entire Audio library to update.
 	</p>
 
 	<p>AsyncAudioInputSPDIF3 can optionally take parameters to alter its resampling behavior.
@@ -1055,7 +1055,7 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<p>Algorithm for automatic DC bias tracking</p>
 	<p>Noise coupling from digital circuitry inside the chip is always a problem when using
 		ADC inputs pin.  It's never as quiet as the audio shield and any good quality
-		audio ADC chip.  Stong low impedance drive to the analog input pin is critical
+		audio ADC chip.  Strong low impedance drive to the analog input pin is critical
 		to minimizing noise coupling.  If an opamp is used, connect a low value resistor
 		(eg, 100 to 1000 ohms)
 		between the opamp output and ADC input pin, and a 1nF capacitor from the ADC pin
@@ -1824,7 +1824,7 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<h3>Credits</h3>
 	<p><a href="https://github.com/FrankBoesing" target="_blank">Frank Boesing</a>
 		developed the AudioOutputSPDIF code.  The original
-		<a href="https://forum.pjrc.com/threads/28639-S-pdif" target="_blank">forum disussion</a>
+		<a href="https://forum.pjrc.com/threads/28639-S-pdif" target="_blank">forum discussion</a>
 		included valuable input and code from "kpc".
 	<h3>Notes</h3>
 	<p>S/PDIF output uses the I2S hardware.  This object can not be used
@@ -1876,7 +1876,7 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<h3>Credits</h3>
 	<p><a href="https://github.com/FrankBoesing" target="_blank">Frank Boesing</a>
 		developed the AudioOutputSPDIF code.  The original
-		<a href="https://forum.pjrc.com/threads/28639-S-pdif" target="_blank">forum disussion</a>
+		<a href="https://forum.pjrc.com/threads/28639-S-pdif" target="_blank">forum discussion</a>
 		included valuable input and code from "kpc".
 	<h3>Notes</h3>
 	<p>S/PDIF output uses the I2S2 hardware.  This object can not be used
@@ -1979,7 +1979,7 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<h3>Credits</h3>
 	<p>Frank Boesing and Benjamin developed this PT8211 object.  Details can be
 		found on this
-		<a href="https://forum.pjrc.com/threads/29284-Dual-channel-16bit-dac-PT8211/page3" target="_blank">forum disussion</a>.
+		<a href="https://forum.pjrc.com/threads/29284-Dual-channel-16bit-dac-PT8211/page3" target="_blank">forum discussion</a>.
 	<h3>Notes</h3>
 	<p>
 	</p>
@@ -2025,7 +2025,7 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 	<h3>Credits</h3>
 	<p>Frank Boesing and Benjamin developed this PT8211 object.  Details can be
 		found on this
-		<a href="https://forum.pjrc.com/threads/29284-Dual-channel-16bit-dac-PT8211/page3" target="_blank">forum disussion</a>.
+		<a href="https://forum.pjrc.com/threads/29284-Dual-channel-16bit-dac-PT8211/page3" target="_blank">forum discussion</a>.
 	<h3>Notes</h3>
 	<p>
 	</p>
@@ -4229,7 +4229,7 @@ double s_freq = .0625;</p>
     </table>
 	</p>
 	<p>When <span class=literal>AUDIO_MEMORY_CY15B104</span> is used, a single
-		CY15B104 FRAM chip is used, with these pins:
+		CY15B104 F-RAM chip is used, with these pins:
     <table class=doc align=center cellpadding=3>
         <tr class=top><th>Pin</th><th>Signal</th></tr>
         <tr class=odd><td align=center>6</td><td>CS</td></tr>
@@ -4641,7 +4641,7 @@ double s_freq = .0625;</p>
 		the length to 4.
 	</p>
 	<p>The impulse response must be given in reverse order.  Many filters have
-		symetrical impluse response, making this a non-issue.  If your filter has
+		symmetrical impluse response, making this a non-issue.  If your filter has
 		a non-symetrical response, make sure the data is in reverse time order.
 	</p>
 	<h3>Notes</h3>
@@ -5278,7 +5278,7 @@ double s_freq = .0625;</p>
 31: 1.16 Volts p-p
 </pre>
 	<p class=func><span class=keyword>lineOutLevel</span>(left, right);</p>
-	<p class=desc>Adjust the line level outout voltage range, with separate
+	<p class=desc>Adjust the line level output voltage range, with separate
 		settings for left and right.  The same settings (13 to 31) are available.
 	</p>
 
@@ -5292,7 +5292,7 @@ double s_freq = .0625;</p>
 	<p class=func><span class=keyword>adcHighPassFilterFreeze</span>();</p>
 	<p class=desc>By default, the analog input (either line-level inputs or mic)
 		is high-pass filtered, to remove any DC component.  This function
-		freezes the filter, so the current DC component is still substracted, but
+		freezes the filter, so the current DC component is still subtracted, but
 		the filter stops tracking any DC or low frequency changes.
 	</p>
 	<p class=func><span class=keyword>adcHighPassFilterDisable</span>();</p>
@@ -5375,12 +5375,12 @@ double s_freq = .0625;</p>
 	</p>
 	<p class=desc>If <em>hardLimit</em> is 0, a 'soft
 	knee' compressor is used to progressively compress louder values which are near to or above the
-	threashold (the louder they are, the greater the compression). If it is 1, a hard compressor
-	is used (all values above the threashold are the same loudness). The <em>threashold</em> is specified
+	threshold (the louder they are, the greater the compression). If it is 1, a hard compressor
+	is used (all values above the threshold are the same loudness). The <em>threshold</em> is specified
 	as a float in the range 0dBFS to -96dBFS, where -18dBFS is a typical value.
 	<em>attack</em> is a float controlling the rate of decrease in gain when the signal is over
-	threashold, in dB/s. <em>decay</em> controls how fast gain is restored once the level
-	drops below threashold, again in dB/s. It is typically set to a longer value than attack.
+	threshold, in dB/s. <em>decay</em> controls how fast gain is restored once the level
+	drops below threshold, again in dB/s. It is typically set to a longer value than attack.
 	</p>
 	<p class=func><span class=keyword>autoVolumeEnable</span>();</p>
 	<p class=desc>Enables auto volume control, using the previously specified settings.

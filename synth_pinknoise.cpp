@@ -72,7 +72,7 @@ const uint8_t AudioSynthNoisePink::pnmask[256] = {
 	lfsr ^= bit & taps;          /* update lfsr                     */\
 	out = accu +                 /* save output                     */\
 	  pfira[lfsr & 0x3F] +       /* add 1st half precalculated FIR  */\
-	  pfirb[lfsr >> 6 & 0x3F]    /* add 2nd half, also correts bias */
+	  pfirb[lfsr >> 6 & 0x3F]    /* add 2nd half, also corrects bias */
 
 void AudioSynthNoisePink::update(void)
 {

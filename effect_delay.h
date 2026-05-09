@@ -83,7 +83,7 @@ public:
 	}
 	void disable(uint8_t channel) {
 		if (channel >= 8) return;
-		// diable this channel
+		// disable this channel
 		activemask &= ~(1<<channel);
 		// recompute maxblocks for remaining enabled channels
 		recompute_maxblocks();

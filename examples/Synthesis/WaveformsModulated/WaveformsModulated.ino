@@ -61,7 +61,7 @@ void setup() {
   sgtl5000_1.enable();
   sgtl5000_1.volume(0.8); // caution: very loud - use oscilloscope only!
 
-  // Confirgure both to use "myWaveform" for WAVEFORM_ARBITRARY
+  // Configure both to use "myWaveform" for WAVEFORM_ARBITRARY
   waveformMod1.arbitraryWaveform(myWaveform, 172.0);
 
   // Configure for middle C note without modulation
@@ -114,7 +114,7 @@ void loop() {
         break;
       case WAVEFORM_TRIANGLE_VARIABLE:
         current_waveform = WAVEFORM_ARBITRARY;
-        Serial.println("Arbitary Waveform");
+        Serial.println("Arbitrary Waveform");
         break;
       case WAVEFORM_ARBITRARY:
         current_waveform = WAVEFORM_PULSE;

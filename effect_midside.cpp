@@ -63,7 +63,7 @@ void AudioEffectMidSide::update(void)
 			// R[i] = mid[i] - side[i]);
 			// Because the /2 has already been applied in the encoding,
 			// we shouldn't have to add it here.
-			// However... because of the posibility that the user has
+			// However... because of the possibility that the user has
 			// modified mid or side such that
 			// it could overflow, we have to:
 			// a) preventively do a (x/2+y/2)*2 again, causing bit reduction

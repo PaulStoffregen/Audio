@@ -132,7 +132,7 @@ void loop() {
   }
 
   // after 4 seconds of inactivity, go back to
-  // steady listening intead of the envelope
+  // steady listening instead of the envelope
   if (mixer2_envelope == true && timeout > 4000) {
     mixer2.gain(0, 0.15);
     mixer2.gain(1, 0.0);

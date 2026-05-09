@@ -5,7 +5,7 @@
  * can be changed to modify the usage of audio blocks, and an
  * ability to execute the loop() function more slowly, with
  * simple waveform generation, or more efficiently / faster,
- * but requring some programmer effort to re-try if sending
+ * but requiring some programmer effort to re-try if sending
  * waveform data fails due to a lack of buffer or queue space.
  *
  * This example code is in the public domain.

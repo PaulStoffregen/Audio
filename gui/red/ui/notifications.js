@@ -21,10 +21,10 @@ RED.notify = (function() {
 		if (currentNotifications.length > 4) {
 			var ll = currentNotifications.length;
 			for (var i = 0;ll > 4 && i<currentNotifications.length;i+=1) {
-				var notifiction = currentNotifications[i];
-				if (!notifiction.fixed) {
-					window.clearTimeout(notifiction.timeoutid);
-					notifiction.close();
+				var notification = currentNotifications[i];
+				if (!notification.fixed) {
+					window.clearTimeout(notification.timeoutid);
+					notification.close();
 					ll -= 1;
 				}
 			}
