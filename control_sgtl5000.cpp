@@ -26,7 +26,6 @@
 
 #include <Arduino.h>
 #include "control_sgtl5000.h"
-#include "Wire.h"
 
 #define CHIP_ID				0x0000
 // 15:8 PARTID		0xA0 - 8 bit identifier for SGTL5000
@@ -499,6 +498,18 @@
 #define SGTL5000_I2C_ADDR_CS_LOW	0x0A  // CTRL_ADR0_CS pin low (normal configuration)
 #define SGTL5000_I2C_ADDR_CS_HIGH	0x2A // CTRL_ADR0_CS  pin high
 
+TwoWire* AudioControlSGTL5000::wires[] = {&Wire
+#if defined(WIRE_IMPLEMENT_WIRE1)
+,&Wire1
+#if defined(WIRE_IMPLEMENT_WIRE2)
+,&Wire2
+#if defined(ARDUINO_TEENSY_MICROMOD)
+,Wire3
+#endif//  defined(ARDUINO_TEENSY_MICROMOD)
+#endif // defined(WIRE_IMPLEMENT_WIRE2)
+#endif // defined(WIRE_IMPLEMENT_WIRE1)
+};
+#define MAX_WIRE (sizeof wires / sizeof wires[0] - 1)
 
 void AudioControlSGTL5000::setAddress(uint8_t level)
 {
@@ -509,6 +520,21 @@ void AudioControlSGTL5000::setAddress(uint8_t level)
 	}
 }
 
+void AudioControlSGTL5000::setWire(uint8_t wnum, uint8_t level)
+{
+	setAddress(level);
+	if (wnum > MAX_WIRE) wnum = MAX_WIRE;
+	wire = wires[wnum];
+}
+#undef MAX_WIRE
+
+void AudioControlSGTL5000::setWire(TwoWire& wref, uint8_t level)
+{
+	setAddress(level);
+	wire = &wref;
+}
+
+
 bool AudioControlSGTL5000::enable(void) {
 #if defined(KINETISL)
 	return enable(16000000); // SGTL as Master with 16MHz MCLK from Teensy LC
@@ -517,10 +543,10 @@ bool AudioControlSGTL5000::enable(void) {
 #endif	
 }
 
+
 bool AudioControlSGTL5000::enable(const unsigned extMCLK, const uint32_t pllFreq)
 {
-
-	Wire.begin();
+	wire->begin();
 	delay(5);
 	
 	//Check if we are in Master Mode and if the Teensy had a reset:
@@ -595,25 +621,25 @@ bool AudioControlSGTL5000::enable(const unsigned extMCLK, const uint32_t pllFreq
 unsigned int AudioControlSGTL5000::read(unsigned int reg)
 {
 	unsigned int val;
-	Wire.beginTransmission(i2c_addr);
-	Wire.write(reg >> 8);
-	Wire.write(reg);
-	if (Wire.endTransmission(false) != 0) return 0;
-	if (Wire.requestFrom((int)i2c_addr, 2) < 2) return 0;
-	val = Wire.read() << 8;
-	val |= Wire.read();
+	wire->beginTransmission(i2c_addr);
+	wire->write(reg >> 8);
+	wire->write(reg);
+	if (wire->endTransmission(false) != 0) return 0;
+	if (wire->requestFrom((int)i2c_addr, 2) < 2) return 0;
+	val = wire->read() << 8;
+	val |= wire->read();
 	return val;
 }
 
 bool AudioControlSGTL5000::write(unsigned int reg, unsigned int val)
 {
 	if (reg == CHIP_ANA_CTRL) ana_ctrl = val;
-	Wire.beginTransmission(i2c_addr);
-	Wire.write(reg >> 8);
-	Wire.write(reg);
-	Wire.write(val >> 8);
-	Wire.write(val);
-	if (Wire.endTransmission() == 0) return true;
+	wire->beginTransmission(i2c_addr);
+	wire->write(reg >> 8);
+	wire->write(reg);
+	wire->write(val >> 8);
+	wire->write(val);
+	if (wire->endTransmission() == 0) return true;
 	return false;
 }
 

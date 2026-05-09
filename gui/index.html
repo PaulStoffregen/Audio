@@ -5193,7 +5193,8 @@ double s_freq = .0625;</p>
 	<h3>Functions</h3>
 	<p>These are the most commonly used SGTL5000 functions.</p>
 	<p class=func><span class=keyword>enable</span>();</p>
-	<p class=desc>Start the SGTL5000.  This function should be called first.
+	<p class=desc>Start the SGTL5000.  This function should be called before any
+	other function, unless setWire() or setAddress() are needed.
 	</p>
 	<p class=func><span class=keyword>volume</span>(level);</p>
 	<p class=desc>Set the headphone volume level.  Range is 0 to 1.0, but
@@ -5208,7 +5209,36 @@ double s_freq = .0625;</p>
 	<p class=desc>When using the microphone input, set the amplifier gain.
 		The input number is in decibels, from 0 to 63.
 	</p>
-
+	
+	<h3>I²C bus configuration</h3>
+	<p>These functions will be of use if you have modified hardware which changes the 
+	I²C address of your audio shield, or have wired it to use a different bus from the 
+	standard Wire one.
+	</p>
+	<p class=func><span class=keyword>setWire</span>(wire,address);</p>
+	<p class=desc>Select the I²C bus and address controlling the SGTL5000.  
+	This function must be called before enable(), if it is used. Default
+	is Wire, LOW address.
+	<br><br>
+	The wire parameter may be a reference to a TwoWire object (Wire, Wire1 etc.) or an integer between
+	0 and 3, which will select from Wire, Wire1, Wire2 and Wire3. If a non-existent selection
+	is attempted then the highest available value will be used.
+	<br><br>
+	The address parameter selects which of the two possible I²C addresses for the 
+	SGTL5000 is in use: 0 will select the "low" address (0x0A), and 1 will select
+	the "high" address (0x2A). 
+	</p>
+	
+	<p class=func><span class=keyword>setAddress</span>(address);</p>
+	<p class=desc>Select the I²C address controlling the SGTL5000.  
+	This function must be called before enable(), if it is used. The library default
+	is LOW address, so if your audio shield is unmodified you won't need this function.
+	<br><br>
+	The address parameter selects which of the two possible I²C addresses for the 
+	SGTL5000 is in use: 0 will select the "low" address (0x0A), and 1 will select
+	the "high" address (0x2A).
+	</p>
+	
 	<h3>Signal Levels</h3>
 
 	<p>The default signal levels should be used for most applications,
