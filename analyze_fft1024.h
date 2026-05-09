@@ -60,6 +60,9 @@ public:
 		}
 		return false;
 	}
+	bool peekAvailable() {
+		return outputflag;
+	}
 	float read(unsigned int binNumber) {
 		if (binNumber > 511) return 0.0;
 		return (float)(output[binNumber]) * (1.0f / 16384.0f);
