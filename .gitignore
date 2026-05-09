@@ -1,1 +1,5 @@
 *.swp
+extras/wav2sketch/wav2sketch.c.bak
+*.wav
+*.exe
+*.obj
