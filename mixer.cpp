@@ -110,17 +110,33 @@ void AudioMixer4::update(void)
 	audio_block_t *in, *out=NULL;
 	unsigned int channel;
 
-	for (channel=0; channel < 4; channel++) {
-		if (!out) {
+	for (channel=0; channel < 4; channel++) 
+	{
+		if (nullptr == out)  // no audio so far
+		{
 			out = receiveWritable(channel);
-			if (out) {
+			if (out)  // first audio received
+			{
 				int32_t mult = multiplier[channel];
-				if (mult != MULTI_UNITYGAIN) applyGain(out->data, mult);
+				if (0 == mult) // would be zeroed, just ignore it
+				{
+					release(out);
+					out = nullptr;
+				}
+				else
+				{
+					if (mult != MULTI_UNITYGAIN) 
+						applyGain(out->data, mult);
+				}
 			}
-		} else {
+		} 
+		else // we have something to transmit already: add to it
+		{
 			in = receiveReadOnly(channel);
-			if (in) {
-				applyGainThenAdd(out->data, in->data, multiplier[channel]);
+			if (in) 
+			{
+				if (0 != multiplier[channel]) // only apply non-zero gain!
+					applyGainThenAdd(out->data, in->data, multiplier[channel]);
 				release(in);
 			}
 		}
