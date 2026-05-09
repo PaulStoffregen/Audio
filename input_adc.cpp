@@ -183,26 +183,27 @@ void AudioInputAnalog::update(void)
 	block_offset = 0;
 	__enable_irq();
 
-    //
-	// DC Offset Removal Filter
-    // 1-pole digital high-pass filter implementation
-    //   y = a*(x[n] - x[n-1] + y[n-1])
-    // The coefficient "a" is as follows:
-    //  a = UNITY*e^(-2*pi*fc/fs)
-    //  fc = 2 @ fs = 44100
-    //
-	p = out_left->data;
-	end = p + AUDIO_BLOCK_SAMPLES;
-	do {
-		tmp = (uint16_t)(*p);
-        tmp = ( ((int32_t) tmp) << 14);
-        int32_t acc = hpf_y1 - hpf_x1;
-        acc += tmp;
-        hpf_y1 = FRACMUL_SHL(acc, COEF_HPF_DCBLOCK, 1);
-        hpf_x1 = tmp;
-		s = signed_saturate_rshift(hpf_y1, 16, 14);
-		*p++ = s;
-	} while (p < end);
+    if(dc_block) {
+		// DC Offset Removal Filter
+	    // 1-pole digital high-pass filter implementation
+	    //   y = a*(x[n] - x[n-1] + y[n-1])
+	    // The coefficient "a" is as follows:
+	    //  a = UNITY*e^(-2*pi*fc/fs)
+	    //  fc = 2 @ fs = 44100
+	    //
+		p = out_left->data;
+		end = p + AUDIO_BLOCK_SAMPLES;
+		do {
+			tmp = (uint16_t)(*p);
+	        tmp = ( ((int32_t) tmp) << 14);
+	        int32_t acc = hpf_y1 - hpf_x1;
+	        acc += tmp;
+	        hpf_y1 = FRACMUL_SHL(acc, COEF_HPF_DCBLOCK, 1);
+	        hpf_x1 = tmp;
+			s = signed_saturate_rshift(hpf_y1, 16, 14);
+			*p++ = s;
+		} while (p < end);
+	}
 
 	// then transmit the AC data
 	transmit(out_left);
@@ -473,42 +474,44 @@ void AudioInputAnalog::update(void)
 		return;
 	}
 
-	// Remove DC offset from newly added samples
-	int16_t *s = capture_buffer + recycle_samples;
-	const int16_t *end = capture_buffer + capture_buffer_len;
-	while (s < end) {
-		//if (*s > capture_max) capture_max = *s;
-		//if (*s < capture_min) capture_min = *s;
-#if 0
-		// just subtract a constant, for testing only!!
-		int dc_offset = 1950;
-		int n = (int)*s - dc_offset;
-		if (n > 4095) n = 4095;
-		if (n < -4095) n = -4095;
-#endif
-#if 0
-		// https://forum.pjrc.com/threads/69542
-		#define pole ((int16_t)32767*0.995)
-		#define Q15Mul(a,b) ((int16_t)((int32_t)a*b)>>15)
-		static int xm1=0, ym1=0;
-		ym1 = *s - xm1 + Q15Mul(pole,ym1);
-		xm1 = *s;
-		int n = ym1;
-#endif
-#if 1
-		#define COEF_HPF_DCBLOCK    (1048300<<10)
-		int32_t tmp = *s;
-		tmp = ( ((int32_t) tmp) << 14);
-		int32_t acc = hpf_y1 - hpf_x1;
-		acc += tmp;
-		hpf_y1 = FRACMUL_SHL(acc, COEF_HPF_DCBLOCK, 1);
-		hpf_x1 = tmp;
-		int n = signed_saturate_rshift(hpf_y1, 16, 14);
-#endif
-		// TODO: try this? https://www.dsprelated.com/showarticle/58.php
-		//if (n > ac_only_max) ac_only_max = n;
-		//if (n < ac_only_min) ac_only_min = n;
-		*s++ = n;
+	if(dc_block) {
+		// Remove DC offset from newly added samples
+		int16_t *s = capture_buffer + recycle_samples;
+		const int16_t *end = capture_buffer + capture_buffer_len;
+		while (s < end) {
+			//if (*s > capture_max) capture_max = *s;
+			//if (*s < capture_min) capture_min = *s;
+	#if 0
+			// just subtract a constant, for testing only!!
+			int dc_offset = 1950;
+			int n = (int)*s - dc_offset;
+			if (n > 4095) n = 4095;
+			if (n < -4095) n = -4095;
+	#endif
+	#if 0
+			// https://forum.pjrc.com/threads/69542
+			#define pole ((int16_t)32767*0.995)
+			#define Q15Mul(a,b) ((int16_t)((int32_t)a*b)>>15)
+			static int xm1=0, ym1=0;
+			ym1 = *s - xm1 + Q15Mul(pole,ym1);
+			xm1 = *s;
+			int n = ym1;
+	#endif
+	#if 1
+			#define COEF_HPF_DCBLOCK    (1048300<<10)
+			int32_t tmp = *s;
+			tmp = ( ((int32_t) tmp) << 14);
+			int32_t acc = hpf_y1 - hpf_x1;
+			acc += tmp;
+			hpf_y1 = FRACMUL_SHL(acc, COEF_HPF_DCBLOCK, 1);
+			hpf_x1 = tmp;
+			int n = signed_saturate_rshift(hpf_y1, 16, 14);
+	#endif
+			// TODO: try this? https://www.dsprelated.com/showarticle/58.php
+			//if (n > ac_only_max) ac_only_max = n;
+			//if (n < ac_only_min) ac_only_min = n;
+			*s++ = n;
+		}
 	}
 
 	// Low pass filter and subsample
