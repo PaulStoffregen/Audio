@@ -67,8 +67,9 @@ private:
 
 class AudioSynthWaveformSineHires : public AudioStream
 {
+	static const int32_t MAG_1=2147483647;
 public:
-	AudioSynthWaveformSineHires() : AudioStream(0, NULL), magnitude(16384) {}
+	AudioSynthWaveformSineHires() : AudioStream(0, NULL), magnitude(MAG_1 / 4) {}
 	void frequency(float freq) {
 		if (freq < 0.0f) freq = 0.0;
 		else if (freq > AUDIO_SAMPLE_RATE_EXACT/2.0f) freq = AUDIO_SAMPLE_RATE_EXACT/2.0f;
@@ -85,7 +86,7 @@ public:
 	void amplitude(float n) {
 		if (n < 0.0f) n = 0;
 		else if (n > 1.0f) n = 1.0f;
-		magnitude = n * 65536.0f;
+		magnitude = n * MAG_1;
 	}
 	virtual void update(void);
 private:
