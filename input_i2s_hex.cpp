@@ -79,14 +79,16 @@ void AudioInputI2SHex::begin(void)
 	dma.TCD->DLASTSGA = -sizeof(i2s_rx_buffer);
 	dma.TCD->BITER_ELINKNO = AUDIO_BLOCK_SAMPLES * 2;
 	dma.TCD->CSR = DMA_TCD_CSR_INTHALF | DMA_TCD_CSR_INTMAJOR;
+	
 	dma.triggerAtHardwareEvent(DMAMUX_SOURCE_SAI1_RX);
 
+	update_responsibility = update_setup();
+	dma.attachInterrupt(isr);
+	dma.enable();
+	
 	//I2S1_RCSR = 0;
 	//I2S1_RCR3 = I2S_RCR3_RCE_2CH << pinoffset;
 	I2S1_RCSR = I2S_RCSR_RE | I2S_RCSR_BCE | I2S_RCSR_FRDE | I2S_RCSR_FR;
-	update_responsibility = update_setup();
-	dma.enable();
-	dma.attachInterrupt(isr);
 }
 
 void AudioInputI2SHex::isr(void)
