@@ -392,6 +392,9 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioInputTDM2",        "resource":"Sample Rate",   "shareable":true,  "setting":"Teensy Control"},
 		{"type":"AudioInputTDM2",        "resource":"IN2 Pin",       "shareable":false},
 		{"type":"AudioInputUSB",         "resource":"USB Rx Endpoint","shareable":false},
+		{"type":"AudioInputUSBQuad",         "resource":"USB Rx Endpoint","shareable":false},
+		{"type":"AudioInputUSBHex",         "resource":"USB Rx Endpoint","shareable":false},
+		{"type":"AudioInputUSBOct",         "resource":"USB Rx Endpoint","shareable":false},
 		{"type":"AudioOutputI2S",        "resource":"I2S Device",    "shareable":true,  "setting":"I2S Master"},
 		{"type":"AudioOutputI2S",        "resource":"Sample Rate",   "shareable":true,  "setting":"Teensy Control"},
 		{"type":"AudioOutputI2S",        "resource":"OUT1A Pin",     "shareable":false},
@@ -449,7 +452,10 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioOutputADAT",       "resource":"I2S Device",    "shareable":true,  "setting":"ADAT Protocol"},
 		{"type":"AudioOutputADAT",       "resource":"Sample Rate",   "shareable":true,  "setting":"Teensy Control"},
 		{"type":"AudioOutputADAT",       "resource":"OUT1A Pin",     "shareable":false},
-		{"type":"AudioOutputUSB",        "resource":"USB Tx Endpoint","shareable":false}
+		{"type":"AudioOutputUSB",        "resource":"USB Tx Endpoint","shareable":false},
+		{"type":"AudioOutputUSBQuad",    "resource":"USB Tx Endpoint","shareable":false},
+		{"type":"AudioOutputUSBHex",     "resource":"USB Tx Endpoint","shareable":false},
+		{"type":"AudioOutputUSBOct",     "resource":"USB Tx Endpoint","shareable":false}
 	]}
 </script>
 
@@ -471,6 +477,9 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioInputTDM","data":{"defaults":{"name":{"value":"new"}},"shortName":"tdm","inputs":0,"outputs":16,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputTDM2","data":{"defaults":{"name":{"value":"new"}},"shortName":"tdm2","inputs":0,"outputs":16,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioInputUSB","data":{"defaults":{"name":{"value":"new"}},"shortName":"usb","inputs":0,"outputs":2,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputUSBQuad","data":{"defaults":{"name":{"value":"new"}},"shortName":"usb_quad","inputs":0,"outputs":4,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputUSBHex","data":{"defaults":{"name":{"value":"new"}},"shortName":"usb_hex","inputs":0,"outputs":6,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioInputUSBOct","data":{"defaults":{"name":{"value":"new"}},"shortName":"usb_oct","inputs":0,"outputs":8,"category":"input-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 
 		{"type":"AudioOutputI2S","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputI2SQuad","data":{"defaults":{"name":{"value":"new"}},"shortName":"i2s_quad","inputs":4,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -491,6 +500,9 @@ span.mainfunction {color: #993300; font-weight: bolder}
 		{"type":"AudioOutputTDM2","data":{"defaults":{"name":{"value":"new"}},"shortName":"tdm2","inputs":16,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputADAT","data":{"defaults":{"name":{"value":"new"}},"shortName":"adat","inputs":8,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioOutputUSB","data":{"defaults":{"name":{"value":"new"}},"shortName":"usb","inputs":2,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputUSBQuad","data":{"defaults":{"name":{"value":"new"}},"shortName":"usb_quad","inputs":4,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputUSBHex","data":{"defaults":{"name":{"value":"new"}},"shortName":"usb_hex","inputs":6,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
+		{"type":"AudioOutputUSBOct","data":{"defaults":{"name":{"value":"new"}},"shortName":"usb_oct","inputs":8,"outputs":0,"category":"output-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 
 		{"type":"AudioAmplifier","data":{"defaults":{"name":{"value":"new"}},"shortName":"amp","inputs":1,"outputs":1,"category":"mixer-function","color":"#E6E0F8","icon":"arrow-in.png"}},
 		{"type":"AudioMixer4","data":{"defaults":{"name":{"value":"new"}},"shortName":"mixer","inputs":4,"outputs":1,"category":"mixer-function","color":"#E6E0F8","icon":"arrow-in.png"}},
@@ -1492,6 +1504,165 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 		<input type="text" id="node-input-name" placeholder="Name">
 	</div>
 </script>
+
+<!-- ------------------------------------------------------------------------------------------------------------>
+<script type="text/x-red" data-help-name="AudioInputUSBQuad">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Receive 4-channel audio from a PC or Mac.  Teensy appears as a USB
+		sound device.</p>
+	<p align=center><img src="img/usbtype_audio_in.png"></p>
+	</div>
+	<h3>Boards Supported</h3>
+	<ul>
+	<li>Teensy 4.0
+	<li>Teensy 4.1
+	</ul>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Channel 0</td></tr>
+		<tr class=odd><td align=center>Out 1</td><td>Channel 1</td></tr>
+		<tr class=odd><td align=center>Out 2</td><td>Channel 2</td></tr>
+		<tr class=odd><td align=center>Out 3</td><td>Channel 3</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>volume</span>();</p>
+	<p class=desc>Returns the volume setting requested by the USB host.
+		Range is 0 to 1.0.  To make the PC's volume control work, this
+		setting should be read periodically and used to control the
+		system processing the signal.
+	</p>
+	<!--
+	<h3>Hardware</h3>
+	-->
+	<h3>Examples</h3>
+	<p class=exam>TBD</p>
+	</p>
+	<h3>Notes</h3>
+	<p>Arduino's <b>Tools &gt; USB Type</b> menu must be set to <b>Audio</b>.
+		</p>
+	<p align=center><img src="img/usbtype_audio.png"></p>
+	<p>USB input &amp; output does not cause the Teensy Audio Library to
+		update.  At least one non-USB input or output object must be
+		present for the entire library to update properly.</p>
+</script>
+
+<script type="text/x-red" data-template-name="AudioInputUSBQuad">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+<!-- ------------------------------------------------------------------------------------------------------------>
+
+<!-- ------------------------------------------------------------------------------------------------------------>
+<script type="text/x-red" data-help-name="AudioInputUSBHex">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Receive 6-channel audio from a PC or Mac.  Teensy appears as a USB
+		sound device.</p>
+	<p align=center><img src="img/usbtype_audio_in.png"></p>
+	</div>
+	<h3>Boards Supported</h3>
+	<ul>
+	<li>Teensy 4.0
+	<li>Teensy 4.1
+	</ul>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Channel 0</td></tr>
+		<tr class=odd><td align=center>Out 1</td><td>Channel 1</td></tr>
+		<tr class=odd><td align=center>Out 2</td><td>Channel 2</td></tr>
+		<tr class=odd><td align=center>Out 3</td><td>Channel 3</td></tr>
+		<tr class=odd><td align=center>Out 4</td><td>Channel 4</td></tr>
+		<tr class=odd><td align=center>Out 5</td><td>Channel 5</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>volume</span>();</p>
+	<p class=desc>Returns the volume setting requested by the USB host.
+		Range is 0 to 1.0.  To make the PC's volume control work, this
+		setting should be read periodically and used to control the
+		system processing the signal.
+	</p>
+	<!--
+	<h3>Hardware</h3>
+	-->
+	<h3>Examples</h3>
+	<p class=exam>TBD</p>
+	</p>
+	<h3>Notes</h3>
+	<p>Arduino's <b>Tools &gt; USB Type</b> menu must be set to <b>Audio</b>.
+		</p>
+	<p align=center><img src="img/usbtype_audio.png"></p>
+	<p>USB input &amp; output does not cause the Teensy Audio Library to
+		update.  At least one non-USB input or output object must be
+		present for the entire library to update properly.</p>
+</script>
+
+<script type="text/x-red" data-template-name="AudioInputUSBHex">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<!-- ------------------------------------------------------------------------------------------------------------>
+<script type="text/x-red" data-help-name="AudioInputUSBOct">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Receive 8-channel audio from a PC or Mac.  Teensy appears as a USB
+		sound device.</p>
+	<p align=center><img src="img/usbtype_audio_in.png"></p>
+	</div>
+	<h3>Boards Supported</h3>
+	<ul>
+	<li>Teensy 4.0
+	<li>Teensy 4.1
+	</ul>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>Out 0</td><td>Channel 0</td></tr>
+		<tr class=odd><td align=center>Out 1</td><td>Channel 1</td></tr>
+		<tr class=odd><td align=center>Out 2</td><td>Channel 2</td></tr>
+		<tr class=odd><td align=center>Out 3</td><td>Channel 3</td></tr>
+		<tr class=odd><td align=center>Out 4</td><td>Channel 4</td></tr>
+		<tr class=odd><td align=center>Out 5</td><td>Channel 5</td></tr>
+		<tr class=odd><td align=center>Out 6</td><td>Channel 6</td></tr>
+		<tr class=odd><td align=center>Out 7</td><td>Channel 7</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p class=func><span class=keyword>volume</span>();</p>
+	<p class=desc>Returns the volume setting requested by the USB host.
+		Range is 0 to 1.0.  To make the PC's volume control work, this
+		setting should be read periodically and used to control the
+		system processing the signal.
+	</p>
+	<!--
+	<h3>Hardware</h3>
+	-->
+	<h3>Examples</h3>
+	<p class=exam>TBD</p>
+	</p>
+	<h3>Notes</h3>
+	<p>Arduino's <b>Tools &gt; USB Type</b> menu must be set to <b>Audio</b>.
+		</p>
+	<p align=center><img src="img/usbtype_audio.png"></p>
+	<p>USB input &amp; output does not cause the Teensy Audio Library to
+		update.  At least one non-USB input or output object must be
+		present for the entire library to update properly.</p>
+</script>
+
+<script type="text/x-red" data-template-name="AudioInputUSBOct">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+<!-- ------------------------------------------------------------------------------------------------------------>
+
 
 <script type="text/x-red" data-help-name="AudioOutputI2S">
 	<h3>Summary</h3>
@@ -2534,6 +2705,163 @@ Returns the actual achieved attenuation of the anti-aliasing filter. If the inpu
 		<input type="text" id="node-input-name" placeholder="Name">
 	</div>
 </script>
+<!-- ------------------------------------------------------------------------------------------------------------>
+
+<script type="text/x-red" data-help-name="AudioOutputUSBQuad">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Send 4-channel audio to a PC or Mac.  Teensy appears as a USB
+		sound device.</p>
+	<p align=center><img src="img/usbtype_audio_out.png"></p>
+	</div>
+	<h3>Boards Supported</h3>
+	<ul>
+	<li>Teensy 4.0
+	<li>Teensy 4.1
+	</ul>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Channel 0</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Channel 1</td></tr>
+		<tr class=odd><td align=center>In 2</td><td>Channel 2</td></tr>
+		<tr class=odd><td align=center>In 3</td><td>Channel 3</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams from its 4 input ports to the USB.</p>
+	<!--
+	<h3>Hardware</h3>
+	-->
+	<h3>Examples</h3>
+	<p class=exam>TBD</p>
+	</p>
+	<h3>Notes</h3>
+	<p>Arduino's <b>Tools &gt; USB Type</b> menu must be set to <b>Audio</b>.
+		</p>
+	<p align=center><img src="img/usbtype_audio.png"></p>
+	<p>USB input &amp; output does not cause the Teensy Audio Library to
+		update.  At least one non-USB input or output object must be
+		present for the entire library to update properly.</p>
+	<p>A known problem exists with USB audio from Macintosh computers.
+		An imperfect <a href="https://forum.pjrc.com/threads/34855-Distorted-audio-when-using-USB-input-on-Teensy-3-1?p=110392&viewfull=1#post110392">workaround
+		can be enabled by editing usb_audio.cpp</a>.
+		Find and uncomment "#define MACOSX_ADAPTIVE_LIMIT".</p>
+</script>
+
+<script type="text/x-red" data-template-name="AudioOutputUSBQuad">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<!-- ------------------------------------------------------------------------------------------------------------>
+<script type="text/x-red" data-help-name="AudioOutputUSBHex">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Send 6-channel audio to a PC or Mac.  Teensy appears as a USB
+		sound device.</p>
+	<p align=center><img src="img/usbtype_audio_out.png"></p>
+	</div>
+	<h3>Boards Supported</h3>
+	<ul>
+	<li>Teensy 4.0
+	<li>Teensy 4.1
+	</ul>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Channel 0</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Channel 1</td></tr>
+		<tr class=odd><td align=center>In 2</td><td>Channel 2</td></tr>
+		<tr class=odd><td align=center>In 3</td><td>Channel 3</td></tr>
+		<tr class=odd><td align=center>In 4</td><td>Channel 4</td></tr>
+		<tr class=odd><td align=center>In 5</td><td>Channel 5</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams from its 6 input ports to the USB.</p>
+	<!--
+	<h3>Hardware</h3>
+	-->
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; WavFilePlayerUSB</p>
+	</p>
+	<h3>Notes</h3>
+	<p>Arduino's <b>Tools &gt; USB Type</b> menu must be set to <b>Audio</b>.
+		</p>
+	<p align=center><img src="img/usbtype_audio.png"></p>
+	<p>USB input &amp; output does not cause the Teensy Audio Library to
+		update.  At least one non-USB input or output object must be
+		present for the entire library to update properly.</p>
+	<p>A known problem exists with USB audio from Macintosh computers.
+		An imperfect <a href="https://forum.pjrc.com/threads/34855-Distorted-audio-when-using-USB-input-on-Teensy-3-1?p=110392&viewfull=1#post110392">workaround
+		can be enabled by editing usb_audio.cpp</a>.
+		Find and uncomment "#define MACOSX_ADAPTIVE_LIMIT".</p>
+</script>
+
+<script type="text/x-red" data-template-name="AudioOutputUSBHex">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+
+<!-- ------------------------------------------------------------------------------------------------------------>
+<script type="text/x-red" data-help-name="AudioOutputUSBOct">
+	<h3>Summary</h3>
+	<div class=tooltipinfo>
+	<p>Send 8-channel audio to a PC or Mac.  Teensy appears as a USB
+		sound device.</p>
+	<p align=center><img src="img/usbtype_audio_out.png"></p>
+	</div>
+	<h3>Boards Supported</h3>
+	<ul>
+	<li>Teensy 4.0
+	<li>Teensy 4.1
+	</ul>
+	<h3>Audio Connections</h3>
+	<table class=doc align=center cellpadding=3>
+		<tr class=top><th>Port</th><th>Purpose</th></tr>
+		<tr class=odd><td align=center>In 0</td><td>Channel 0</td></tr>
+		<tr class=odd><td align=center>In 1</td><td>Channel 1</td></tr>
+		<tr class=odd><td align=center>In 2</td><td>Channel 2</td></tr>
+		<tr class=odd><td align=center>In 3</td><td>Channel 3</td></tr>
+		<tr class=odd><td align=center>In 4</td><td>Channel 4</td></tr>
+		<tr class=odd><td align=center>In 5</td><td>Channel 5</td></tr>
+		<tr class=odd><td align=center>In 6</td><td>Channel 6</td></tr>
+		<tr class=odd><td align=center>In 7</td><td>Channel 7</td></tr>
+	</table>
+	<h3>Functions</h3>
+	<p>This object has no functions to call from the Arduino sketch.  It
+		simply streams from its 8 input ports to the USB.</p>
+	<!--
+	<h3>Hardware</h3>
+	-->
+	<h3>Examples</h3>
+	<p class=exam>File &gt; Examples &gt; Audio &gt; HardwareTesting &gt; WavFilePlayerUSB</p>
+	</p>
+	<h3>Notes</h3>
+	<p>Arduino's <b>Tools &gt; USB Type</b> menu must be set to <b>Audio</b>.
+		</p>
+	<p align=center><img src="img/usbtype_audio.png"></p>
+	<p>USB input &amp; output does not cause the Teensy Audio Library to
+		update.  At least one non-USB input or output object must be
+		present for the entire library to update properly.</p>
+	<p>A known problem exists with USB audio from Macintosh computers.
+		An imperfect <a href="https://forum.pjrc.com/threads/34855-Distorted-audio-when-using-USB-input-on-Teensy-3-1?p=110392&viewfull=1#post110392">workaround
+		can be enabled by editing usb_audio.cpp</a>.
+		Find and uncomment "#define MACOSX_ADAPTIVE_LIMIT".</p>
+</script>
+
+<script type="text/x-red" data-template-name="AudioOutputUSBOct">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+</script>
+<!-- ------------------------------------------------------------------------------------------------------------>
 
 <script type="text/x-red" data-help-name="AudioAmplifier">
 	<h3>Summary</h3>
