@@ -96,12 +96,30 @@ void AudioOutputI2S::begin(void)
 	dma.enable();
 
 	I2S1_RCSR |= I2S_RCSR_RE | I2S_RCSR_BCE;
-	I2S1_TCSR = I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE;
+	I2S1_TCSR = I2S_TCSR_TE | I2S_TCSR_BCE | I2S_TCSR_FRDE | I2S_TCSR_FEIE;
+	//attachInterruptVector(IRQ_SAI1, isr_fifo_underrun);
+	//NVIC_SET_PRIORITY(IRQ_SAI1, 240); // lowest priority
+	//NVIC_ENABLE_IRQ(IRQ_SAI1);
 #endif
 	update_responsibility = update_setup();
 	dma.attachInterrupt(isr);
 }
 
+#if defined(__IMXRT1062__)
+
+// not need with I2S_TCR4_FCONT
+// https://forum.pjrc.com/index.php?threads/76608/page-3#post-367711
+//void AudioOutputI2S::isr_fifo_underrun(void)
+//{
+//	// TODO: If another DMA channel is hogging all the DMA bandwidth,
+//	// maybe we could end up hogging all the CPU until it stops, if
+//	// this underrun error repeatedly triggers while the DMA remains
+//	// unavailable.  How to better handle this situation??
+//	I2S1_TCSR |= I2S_TCSR_FEF; // clear error flag
+//	//digitalToggleFast(3);
+//}
+
+#endif
 
 void AudioOutputI2S::isr(void)
 {
@@ -439,17 +457,17 @@ void AudioOutputI2S::config_i2s(bool only_bclk)
 
 	I2S1_TMR = 0;
 	//I2S1_TCSR = (1<<25); //Reset
-	I2S1_TCR1 = I2S_TCR1_RFW(1);
+	I2S1_TCR1 = I2S_TCR1_TFW(28);
 	I2S1_TCR2 = I2S_TCR2_SYNC(tsync) | I2S_TCR2_BCP // sync=0; tx is async;
 		    | (I2S_TCR2_BCD | I2S_TCR2_DIV((1)) | I2S_TCR2_MSEL(1));
 	I2S1_TCR3 = I2S_TCR3_TCE;
 	I2S1_TCR4 = I2S_TCR4_FRSZ((2-1)) | I2S_TCR4_SYWD((32-1)) | I2S_TCR4_MF
-		    | I2S_TCR4_FSD | I2S_TCR4_FSE | I2S_TCR4_FSP;
+		    | I2S_TCR4_FSD | I2S_TCR4_FSE | I2S_TCR4_FSP | I2S_TCR4_FCONT;
 	I2S1_TCR5 = I2S_TCR5_WNW((32-1)) | I2S_TCR5_W0W((32-1)) | I2S_TCR5_FBT((32-1));
 
 	I2S1_RMR = 0;
 	//I2S1_RCSR = (1<<25); //Reset
-	I2S1_RCR1 = I2S_RCR1_RFW(1);
+	I2S1_RCR1 = I2S_RCR1_RFW(16);
 	I2S1_RCR2 = I2S_RCR2_SYNC(rsync) | I2S_RCR2_BCP  // sync=0; rx is async;
 		    | (I2S_RCR2_BCD | I2S_RCR2_DIV((1)) | I2S_RCR2_MSEL(1));
 	I2S1_RCR3 = I2S_RCR3_RCE;

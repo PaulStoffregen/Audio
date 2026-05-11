@@ -58,6 +58,7 @@ protected:
 	static bool update_responsibility;
 	static DMAChannel dma;
 	static void isr(void);
+	static void isr_fifo_underrun(void);
 private:
 	static audio_block_t *block_left_2nd;
 	static audio_block_t *block_right_2nd;
